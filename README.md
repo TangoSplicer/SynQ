@@ -193,6 +193,5 @@ Use of SynQ for commercial or derivative works requires explicit licensing.
 ✅ Conclusion
 
 Welcome to SynQ — the future of computation.
-
-Next, I will update each of the previously flagged `.md` files. Proceeding with `docs/conclusion.md` and continuing one-by-one with static outputs.
+.
 
