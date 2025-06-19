@@ -1,0 +1,26 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: dispatch_to_agents.synq
+// Purpose: Split a complex task and route subtasks to relevant plugin skills
+
+macro dispatch_to_agents(goal) {
+  let skill_registry = @system.skill_store()
+  let copilot = @system.ai_router()
+
+  let subtasks = copilot.decompose(goal)  // e.g. ["extract data", "clean", "summarize"]
+  let results = []
+
+  for task in subtasks {
+    let skill = skill_registry.find_best_match(task)
+    if skill != null {
+      let result = skill.handler(task)
+      results.push({task: task, plugin: skill.plugin, output: result})
+    } else {
+      results.push({task: task, plugin: "❌ none", output: "unfulfilled"})
+    }
+  }
+
+  return results
+}

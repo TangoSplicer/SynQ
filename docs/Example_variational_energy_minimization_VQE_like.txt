@@ -1,0 +1,33 @@
+import quantum.circuits as qc
+import quantum.measurements as qm
+import math
+
+# Define a function to evaluate the expectation of Z for a given angle θ
+def evaluate(theta: float, shots: int = 100) -> float:
+    # Prepare a single-qubit circuit with a parameterized rotation
+    circuit = qc.Circuit(1)             # 1 qubit circuit
+    q = circuit.register[0]
+    circuit.ry(theta, q)               # apply R_y(θ) to rotate the qubit
+    circuit.measure(q)                 # measure the qubit (this adds a measure op to circuit)
+    # Run the circuit multiple times to estimate expectation ⟨Z⟩
+    results = circuit.run(shots=shots)  # this will return a dict of outcome frequencies
+    # Compute expectation value: Z=+1 for outcome 0, -1 for outcome 1
+    exp_Z = 0
+    for outcome, count in results.items():
+        bit = outcome[0]  # tuple of one bit
+        value = +1 if bit == 0 else -1
+        exp_Z += value * (count/shots)
+    return exp_Z
+
+# Main variational loop: try to find angle that minimizes ⟨Z⟩ (which should be θ = π for state |1>)
+best_theta = None
+best_value = 1e9
+# Simple parameter sweep (could use gradient descent or other optimizer in general)
+for theta in [i * math.pi/8 for i in range(0, 17)]:  # 0 to 2π in steps of π/8
+    exp_val = evaluate(theta)
+    print(f"Theta={theta:.3f}, Expectation Z={exp_val:.3f}")
+    if exp_val < best_value:
+        best_value = exp_val
+        best_theta = theta
+
+print("Optimal angle found:", best_theta, "with ⟨Z⟩ =", best_value)

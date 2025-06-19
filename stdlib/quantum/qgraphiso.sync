@@ -1,0 +1,67 @@
+// In stdlib/quantum/QGraphISO.synq
+// QGraphISO: Quantum Graph Isomorphism Oracle using Spectral QPE and Amplitude Oracle Collapse
+function QGraphISO(isomorphicFlag: Qubit, graph1: Graph, graph2: Graph) : Bool {
+    // 1. Convert adjacency matrices to unitary oracles U1 and U2 (e.g., via Hamiltonian simulation).
+    //    For simplicity, assume a procedure encodeAdjacencyToUnitary that yields unitary operators.
+    let U1 = encodeAdjacencyToUnitary(graph1);  // unitary encoding of graph1's adjacency
+    let U2 = encodeAdjacencyToUnitary(graph2);  // unitary encoding of graph2's adjacency
+
+    // 2. Allocate quantum registers for phase estimation on each graph.
+    //    ancillaPhaseCount is chosen sufficiently large to resolve distinct eigenvalues.
+    let n = graph1.vertexCount; 
+    let m = graph2.vertexCount;
+    let ancillaPhaseCount = max(⌈log2(n)⌉, ⌈log2(m)⌉) + extraBitsForPrecision(); 
+    // ^ extraBitsForPrecision() can be determined by expected spectral gap.
+    using (phaseReg1 = Qubit[ancillaPhaseCount], phaseReg2 = Qubit[ancillaPhaseCount], 
+           eigenReg1 = Qubit[n], eigenReg2 = Qubit[m]) {
+        // 3. Prepare initial states: put eigen registers in uniform superposition (or a specific eigenstate if known).
+        // For generality, use H-gates to create superposition over all basis states as a trial state.
+        H* on eigenReg1;  // apply Hadamards on all qubits of eigenReg1
+        H* on eigenReg2;
+        // Also initialize phase registers to |0...0>.
+        // (They are already |0⟩ by allocation.)
+
+        // 4. Perform Quantum Phase Estimation (QPE) on each graph unitary.
+        // This will entangle phaseReg with eigenReg states s.t. phaseReg encodes eigenphase φ (eigenvalue info).
+        // Apply Hadamards on phaseReg qubits to create equal superposition of phase basis states.
+        H* on phaseReg1;
+        H* on phaseReg2;
+        // Controlled-U^2^j operations: for each ancilla qubit j, apply U1^(2^j) controlled on phaseReg1[j].
+        for j in 0..(ancillaPhaseCount-1) {
+            let power = 2^j;
+            controlled(phaseReg1[j], eigenReg1, U1^power);
+            controlled(phaseReg2[j], eigenReg2, U2^power);
+        }
+        // Apply inverse Quantum Fourier Transform on each phase register to obtain binary phase result.
+        invQFT(phaseReg1);
+        invQFT(phaseReg2);
+
+        // At this point, phaseReg1 and phaseReg2 hold the eigen-phases (eigenvalue fingerprints) for graph1 and graph2.
+        // The total state is entangled across eigenReg and phaseReg.
+
+        // 5. Compare the sorted eigenvalue spectra.
+        // We use a quantum comparator oracle that flips isomorphicFlag if all eigenvalues match.
+        // For demonstration, assume we can sort and compare within the quantum state (else, measure and compare classically).
+        sortPhaseRegister(phaseReg1);
+        sortPhaseRegister(phaseReg2);
+        compareRegistersOracle(phaseReg1, phaseReg2, isomorphicFlag);
+        // ^ compareRegistersOracle: a custom oracle that checks if phaseReg1 equals phaseReg2 bitwise.
+        // It will perform |x⟩|y⟩|f⟩ -> |x⟩|y⟩|f ⊕ [x==y]⟩, flipping isomorphicFlag if registers match exactly.
+
+        // 6. Amplitude Oracle Collapse (AOC) via amplitude amplification.
+        // If the isomorphicFlag was flipped to |1⟩ (meaning spectra match), amplify this state.
+        // We apply Grover iterations: reflect about |isomorphicFlag = 1⟩ and initial state to boost success amplitude.
+        if (useAmplitudeAmplification) {
+            let iterations = chooseGroverIterations(probEstimate=0.5);  // number of iterations heuristically or analytically chosen
+            for k in 1..iterations {
+                OracleReflect(isomorphicFlag);        // Oracle: phase flip states where isomorphicFlag |1⟩
+                DiffusionReflect(phaseReg1, phaseReg2, eigenReg1, eigenReg2); // Diffusion: reflect about initial equal superposition
+            }
+        }
+
+        // 7. Measurement: measure the flag qubit to decide isomorphism.
+        let result = M(isomorphicFlag);
+        ResetAll(phaseReg1, phaseReg2, eigenReg1, eigenReg2);
+        return (result == One); // True if graphs deemed isomorphic.
+    }
+}

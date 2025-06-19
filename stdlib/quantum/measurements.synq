@@ -1,0 +1,31 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+# quantum/measurements.synq
+
+def measure(qubit: Qubit) -> int:
+    """Measure the given qubit in the computational basis (|0>,|1>) and return the outcome 0 or 1.
+       This operation collapses the qubit's state (and entangled state) accordingly."""
+    reg = qubit.register
+    q_index = qubit.id
+    # Calculate probability of qubit being 1 by summing |amplitude|^2 of all basis states with q_index = 1
+    total_states = len(reg._state)
+    prob1 = 0.0
+    # Each basis state index can be checked by bit mask to see if the qubit's bit is 1
+    mask = 1 << q_index
+    for idx, amplitude in enumerate(reg._state):
+        if idx & mask:  # if the bit at q_index is 1 in the binary representation of idx
+            prob1 += abs(amplitude)**2
+    # Randomly choose outcome based on prob1
+    outcome = 1 if random() < prob1 else 0
+    # Collapse the state vector: keep only amplitudes consistent with outcome
+    for idx in range(total_states):
+        bit = 1 if idx & mask else 0
+        if bit != outcome:
+            reg._state[idx] = 0  # eliminate amplitudes where qubit bit != outcome
+    # Normalize state vector after collapse
+    norm = math.sqrt(sum(abs(a)**2 for a in reg._state))
+    if norm > 0:
+        reg._state = [a/norm for a in reg._state]
+    return outcome

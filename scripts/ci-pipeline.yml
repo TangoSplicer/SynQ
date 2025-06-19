@@ -1,0 +1,12 @@
+# © 2025 SynQ Project. All rights reserved.
+name: SynQ CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: bash synq/scripts/build.sh
+      - name: Test
+        run: bash synq/scripts/test.sh

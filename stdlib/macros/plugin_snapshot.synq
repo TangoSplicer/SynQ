@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: plugin_snapshot.synq
+// Purpose: Save and load named logic states for a plugin
+
+macro plugin_snapshot_save(label, code) {
+  let path = "snapshots/" + @plugin.name() + "_" + label + ".synq"
+  @system.fs_write(path, code)
+  return true
+}
+
+macro plugin_snapshot_load(label) {
+  let path = "snapshots/" + @plugin.name() + "_" + label + ".synq"
+  return @system.fs_read(path)
+}

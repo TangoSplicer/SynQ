@@ -1,0 +1,25 @@
+---
+
+### ✅ File: `synq/tests/unit/test_release.synq`  
+🧪 **Tests Export + Sign + Package**
+
+```synq
+test release_automation:
+
+    uses compiler.export.exporter as exporter
+    uses signing.signer as signer
+    uses io.fs as fs
+
+    case "export and sign plugin":
+        let base = "examples/plugins/teleport/"
+        let main = base + "main.synq"
+        exporter.export_plugin(main, "bin")
+        signer.sign_plugin(replace_ext(main, ".bin"))
+        assert fs.exists(base + "main.bin.sig")
+
+    case "validate bundle output":
+        let meta = fs.read_json("examples/plugins/teleport/release_meta.json")
+        assert meta["signed"]
+        assert meta["score"] > 50
+
+end

@@ -1,0 +1,34 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// test_model_provider.cpp
+#include "compiler/model_provider.h"
+#include <cassert>
+#include <iostream>
+
+using namespace synq;
+
+void test_basic_infer() {
+    auto provider = ModelProviderRegistry::instance().create("llama-mock");
+    InferenceResult result = provider->infer("What is 2 + 2?");
+    assert(result.output.find("Answer") != std::string::npos);
+    assert(result.token_count > 0);
+    std::cout << "test_basic_infer passed.\n";
+}
+
+void test_streaming_infer() {
+    auto provider = ModelProviderRegistry::instance().create("llama-mock");
+    std::string streamed;
+    provider->stream_infer("Stream test", [&](const std::string& tok) {
+        streamed += tok;
+    });
+    assert(streamed.find("Stream test") != std::string::npos);
+    std::cout << "test_streaming_infer passed.\n";
+}
+
+int main() {
+    test_basic_infer();
+    test_streaming_infer();
+    return 0;
+}

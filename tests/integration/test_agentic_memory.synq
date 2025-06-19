@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import agent_memory
+
+@test "agent memory logging":
+    mem = new_memory("alpha")
+    mem = remember(mem, "observation", "State collapsed to |1>")
+    mem = remember(mem, "plan", "Apply Grover in phase 2", "phase_plan")
+    @assert memory_summary(mem) contains "Grover"
+
+@test "agent memory recall":
+    mem = new_memory("beta")
+    mem = remember(mem, "tool_call", "Invoked QEBET search", "search_ref")
+    found = recall_by_label(mem, "search_ref")
+    @assert found.content contains "QEBET"

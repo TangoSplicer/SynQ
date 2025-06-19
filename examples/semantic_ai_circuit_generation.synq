@@ -1,0 +1,13 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import ai_fusion
+@import meta_circuits
+
+@main
+    prompt = "Create a superposition then entangle Q0 and Q1"
+    c = create_meta()
+    c = call_model("llama-mock", prompt)
+    @log "AI-generated circuit: " + c.to_string()
+@end

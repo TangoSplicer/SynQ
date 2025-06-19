@@ -1,0 +1,8 @@
+{
+  "plugin": "classical_cache",
+  "version": "1.0.0",
+  "description": "Hybrid LRU cache implementation across classical/quantum boundaries",
+  "entry": "classical_cache.synq",
+  "type": "hybrid",
+  "tags": ["cache", "hybrid", "lru", "quantum", "performance"]
+}

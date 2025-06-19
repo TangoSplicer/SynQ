@@ -1,0 +1,17 @@
+// SynQ plugin: synq_webhook
+// Trigger webhook notifications on key events
+
+config url = "https://example.com/webhook"
+config event = "job_success"
+
+fn payload():
+    return {
+        "event": event,
+        "plugin": current_plugin(),
+        "timestamp": now(),
+        "status": "OK"
+    }
+
+send_webhook url, payload()
+
+print "Webhook sent to", url

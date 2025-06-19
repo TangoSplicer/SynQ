@@ -1,0 +1,8 @@
+{
+  "plugin": "state_tracer",
+  "version": "1.0.0",
+  "description": "Traces full quantum state vectors at each stage for debugging and visualization",
+  "entry": "state_tracer.synq",
+  "type": "quantum",
+  "tags": ["quantum", "debug", "state", "tracer", "visualization"]
+}

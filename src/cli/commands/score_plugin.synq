@@ -1,0 +1,27 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: score_plugin.synq — CLI entry point for plugin scoring
+
+plugin score_plugin_cli:
+
+    uses plugin.score.score_engine as engine
+
+    command "score":
+        args:
+            required --plugin [dir]
+        run:
+            let result = engine.score_plugin(--plugin)
+            print "🔍 Breakdown:"
+            print "   Safety:", result["safety"]
+            print "   Performance:", result["performance"]
+            print "   Popularity:", result["popularity"]
+            print "   Compatibility:", result["compatibility"]
+            print "→ Final Score:", result["score"]
+
+    description:
+        "Score any plugin with trust, safety, and performance metrics."
+
+    tags:
+        ["cli", "score", "plugin", "metrics", "trust"]
+
+end

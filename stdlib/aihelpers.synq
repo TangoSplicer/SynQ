@@ -1,0 +1,14 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - AI Helper Tools
+# File: stdlib/aihelpers.synq
+##################################################
+
+@fn choose_best_agent(agents, prompt):
+    return reranker.score(agents, prompt).top()
+
+@fn boost_response(r):
+    return r + " (refined)"

@@ -1,0 +1,30 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_quantum_circuit.synq
+
+// --- Integration Test: Simple Quantum Circuit ---
+
+// Allocate two qubits
+allocate(q0)
+allocate(q1)
+
+// Create a Bell state
+H(q0)
+CNOT(q0, q1)
+
+// Measure both
+m0 = measure(q0)
+m1 = measure(q1)
+
+print("Measurement results:")
+print(m0)
+print(m1)
+
+// Expect strong correlation (00 or 11)
+if (m0 == m1) {
+    print("[PASS] Entangled correlation confirmed.")
+} else {
+    print("[FAIL] Unexpected result.")
+}

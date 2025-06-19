@@ -1,0 +1,27 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+# synq/examples/teleportation.synq
+
+import quantum.circuits as qc
+import quantum.measurements as qm
+
+let reg = qc.Register(3)
+let q0 = reg[0]
+let q1 = reg[1]
+let q2 = reg[2]
+
+let circuit = qc.Circuit(reg)
+circuit.h(q1)
+circuit.cnot(q1, q2)
+circuit.cnot(q0, q1)
+circuit.h(q0)
+
+let m0 = qm.measure(q0)
+let m1 = qm.measure(q1)
+
+if m1 == 1: circuit.x(q2)
+if m0 == 1: circuit.h(q2)
+
+print("Teleported state result:", qm.measure(q2))

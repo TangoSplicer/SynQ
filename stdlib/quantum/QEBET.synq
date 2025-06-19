@@ -1,0 +1,82 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// In stdlib/qml/QEBET.synq
+// QEBET: Quantum Entangled Backpropagation with Entropy Trace for training quantum neural networks
+function QEBET_trainStep(params: Array<Double>, input: Qubit[], targetDist: Array<Double>, learningRate: Double) : Double {
+    // params: array of parameters (angles) for the variational circuit gates
+    // input: qubit register encoding the input features (initial state)
+    // targetDist: target output probability distribution (classical vector) for this input
+    // learningRate: step size for parameter update
+    let numParams = length(params);
+    let numQubits = length(input);
+    let circuitDepth = numParams; // assume one parameter per gate in a single layer for simplicity
+
+    // 1. Forward pass: prepare input state and apply parameterized gates
+    // (We assume input is already encoded into `input` qubits as initial state |ψ_in⟩.)
+    let idx = 0;
+    for q in 0..(numQubits-1) {
+        // Example encoding gates: apply a Y-rotation on each qubit with corresponding parameter (could encode biases or features).
+        RY(input[q], params[idx]);
+        idx += 1;
+    }
+    // (If more complex layering is needed, e.g., entangling gates, apply them here with their params and increment idx accordingly.)
+    // For simplicity, assume params list includes all needed gate angles in sequence.
+    // After this loop, the quantum state of `input` qubits is the output state of the QNN, |ψ_out⟩.
+
+    // 2. Measure output distribution and compute entropy-based loss.
+    // Measure all qubits in computational basis to get outcome probabilities.
+    let probs = measureProbabilities(input); 
+    // `probs` is an array of length 2^numQubits containing the probability of each basis state outcome.
+    // Compute cross-entropy loss between `probs` and `targetDist` (assuming targetDist is a distribution over the same basis).
+    let loss = crossEntropy(probs, targetDist);
+    // Alternatively, we could compute Shannon entropy of probs as loss if targetDist is not given (unsupervised scenario).
+    // Or measure a specific observable's expectation if using a different cost function.
+
+    // 3. Backward pass: compute gradients via parameter-shift rule.
+    let gradients = Array<Double>(numParams);
+    for i in 0..(numParams-1) {
+        // For each parameter, shift it by +delta and -delta and recompute loss.
+        let delta = (π/2);  // parameter shift value
+        let originalTheta = params[i];
+
+        params[i] = originalTheta + delta;
+        let plusLoss = runForwardAndComputeLoss(params, input, targetDist);
+        // ^ This calls a subroutine that applies the forward circuit with params (like steps 1-2 above) and returns the loss.
+
+        params[i] = originalTheta - delta;
+        let minusLoss = runForwardAndComputeLoss(params, input, targetDist);
+
+        // Restore original parameter value
+        params[i] = originalTheta;
+
+        // Parameter-shift formula: for many quantum gates, ∂L/∂θ = (plusLoss - minusLoss) / 2.
+        gradients[i] = (plusLoss - minusLoss) / 2.0;
+    }
+
+    // 4. Update parameters with a gradient descent step.
+    for j in 0..(numParams-1) {
+        params[j] -= learningRate * gradients[j];
+    }
+
+    // 5. (Optional) Reset quantum state if needed. In a real quantum training loop, the above would be one iteration.
+    // Return the loss for monitoring.
+    return loss;
+}
+
+// Helper function to run forward pass and compute loss (for use in gradient calculation):
+function runForwardAndComputeLoss(params: Array<Double>, input: Qubit[], targetDist: Array<Double>) : Double {
+    // Reinitialize input qubits to |ψ_in⟩ (assume we can reprepare the same input state deterministically for analysis).
+    prepareInputState(input);  // resets `input` qubits to the initial state corresponding to the given example
+    // Apply the same forward circuit as in QEBET_trainStep (using current params).
+    let idx = 0;
+    for q in 0..(length(input)-1) {
+        RY(input[q], params[idx]);
+        idx += 1;
+    }
+    // (Apply other parameterized gates for deeper layers similarly, incrementing idx.)
+    let probs = measureProbabilities(input);
+    let loss = crossEntropy(probs, targetDist);
+    return loss;
+}

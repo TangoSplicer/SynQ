@@ -1,0 +1,19 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import agent_memory
+
+@main
+    @log "=== Agentic Memory Layer Demo ==="
+    mem = new_memory("agent007")
+    mem = remember(mem, "observation", "Measured superposition in Q0")
+    mem = remember(mem, "plan", "Apply phase flip", "phase_action")
+    mem = remember(mem, "tool_call", "Used qvisual.render()", "toollog")
+
+    summary = memory_summary(mem)
+    @log summary
+
+    found = recall_by_label(mem, "phase_action")
+    @assert found.content contains "phase"
+@end

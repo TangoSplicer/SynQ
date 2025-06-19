@@ -1,0 +1,20 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+# synq/examples/quantum_demo.synq
+
+import quantum.core
+import quantum.circuits
+import quantum.measurements
+
+let reg = Register(2)
+let q0 = reg[0]
+let q1 = reg[1]
+
+let circ = Circuit(reg)
+circ.h(q0)
+circ.cnot(q0, q1)
+
+let result = circ.run()
+print("Entangled output:", result)

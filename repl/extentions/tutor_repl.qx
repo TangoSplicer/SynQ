@@ -1,0 +1,8 @@
+# synq/repl/extensions/tutor_repl.qx
+# SynQ REPL Integration for AI Tutor
+# License: SynQ Commercial Attribution License v1.0
+
+when input startswith "tutor " {
+    command = input.remove_prefix("tutor ").strip()
+    print(run_shell("synq-tutor " + command))
+}

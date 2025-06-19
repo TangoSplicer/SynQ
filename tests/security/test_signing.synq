@@ -1,0 +1,31 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: test_signing.synq — Tests for SynQ plugin signing system
+
+test plugin_signing:
+
+    uses security.signer as signer
+
+    case "sign and verify plugin":
+        let plugin = "examples/plugins/qpu_visualizer/"
+        let key = "keys/dev.key"
+
+        signer.sign_plugin(plugin, key)
+        let verified = signer.verify_plugin(plugin)
+
+        assert verified == true
+
+    case "detect tampered plugin":
+        let plugin = "examples/plugins/tampered_gate/"
+        let key = "keys/dev.key"
+
+        signer.sign_plugin(plugin, key)
+
+        // Simulate tampering
+        let target_file = plugin + "/main.synq"
+        append_line(target_file, "// malicious mutation")
+
+        let verified = signer.verify_plugin(plugin)
+        assert verified == false
+
+end

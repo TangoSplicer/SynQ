@@ -1,0 +1,15 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Scheduler
+# File: stdlib/scheduler.synq
+##################################################
+
+@task every_10s interval=10:
+    print("Ping at", now())
+
+@job one_off:
+    print("Executed once.")
+    complete()

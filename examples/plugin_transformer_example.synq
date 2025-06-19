@@ -1,0 +1,16 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import plugin_registry
+
+@main
+    @log "=== Plugin Store Transformer Demo ==="
+
+    register_plugin("upper", "1.0", "Converts strings to uppercase",
+        (input) => input.text.toUpper())
+
+    result = invoke_plugin("upper", { "text": "hello synq" })
+    @log "Result = " + result
+    @assert result == "HELLO SYNQ"
+@end

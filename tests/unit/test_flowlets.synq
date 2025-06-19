@@ -1,0 +1,18 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Unit Test: Flowlets
+# File: tests/unit/test_flowlets
+##################################################
+
+@import flowlets
+
+@test "flowlet triggering"
+    memory.size = 3001
+    system.temp = 91
+    update_monitor()
+    assert system.temp > 90
+    assert memory.size > 2048
+@end

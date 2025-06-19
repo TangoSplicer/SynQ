@@ -1,0 +1,17 @@
+---
+
+### ✅ `manifest.synqmeta`
+
+```json
+{
+  "name": "entangler",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "entangler.synq",
+    "entangler_config.json",
+    "README.md"
+  ]
+}

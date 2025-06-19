@@ -1,0 +1,1 @@
+synq run qcompress.synq --config size=8

@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SynQ Plugin Mutation Schema",
+  "type": "object",
+  "properties": {
+    "plugin_name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "mutations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pass": {
+            "type": "string",
+            "enum": ["rename", "insert", "delete"]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "parameters": {
+            "type": "object"
+          }
+        },
+        "required": ["pass", "enabled"]
+      }
+    }
+  },
+  "required": ["plugin_name", "version", "mutations"]
+}

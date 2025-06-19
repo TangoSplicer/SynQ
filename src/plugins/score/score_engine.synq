@@ -1,0 +1,71 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: score_engine.synq — Plugin scoring based on trust metrics
+
+plugin score_engine:
+
+    uses io.fs as fs
+    uses compiler.parser as parser
+    uses system.env as env
+    uses ai.linter.linter_engine as linter
+
+    fn score_plugin(dir):
+        let meta = load_metadata(dir)
+        let safety = score_safety(dir)
+        let perf = score_performance(dir)
+        let usage = score_popularity(meta)
+        let compat = score_compatibility(meta)
+
+        let total = round((safety * 0.35) + (perf * 0.25) + (usage * 0.20) + (compat * 0.20))
+        print "📊 Plugin Score for", dir, "→", total
+        return {
+            "safety": safety,
+            "performance": perf,
+            "popularity": usage,
+            "compatibility": compat,
+            "score": total
+        }
+
+    fn load_metadata(dir):
+        let path = dir + "/plugin.json"
+        if fs.exists(path):
+            return fs.read_json(path)
+        return {}
+
+    fn score_safety(dir):
+        let results = linter.analyze_directory(dir)
+        let issues = count(results where it.severity == "critical")
+        if issues == 0:
+            return 100
+        if issues < 3:
+            return 80
+        return max(50 - (issues * 5), 10)
+
+    fn score_performance(dir):
+        let code = fs.read_all(dir, "*.synq")
+        let gates = count(code where it has any ["CNOT", "H", "X", "RX", "RY", "RZ"])
+        let depth = max(1, len(code))
+        return max(100 - (gates / 2 + depth / 10), 10)
+
+    fn score_popularity(meta):
+        if not meta:
+            return 40
+        let downloads = meta.get("downloads") or 0
+        let stars = meta.get("stars") or 0
+        return min((downloads / 10) + (stars * 5), 100)
+
+    fn score_compatibility(meta):
+        let ver = meta.get("synq_version") or "0.0.0"
+        if ver startswith env.synq_version():
+            return 100
+        if ver has env.synq_version().split(".")[0]:
+            return 70
+        return 30
+
+    description:
+        "Evaluates trust, safety, and performance metrics for any SynQ plugin."
+
+    tags:
+        ["score", "plugin", "trust", "metrics", "rating"]
+
+end

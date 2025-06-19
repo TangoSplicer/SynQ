@@ -1,0 +1,26 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/qsymbolic.synq
+
+# SynQ Symbolic Quantum Algebra DSL
+
+extern SymbolicExpr
+extern SymbolicAlgebra
+
+def parse_expr(expr_str):
+    return SymbolicAlgebra.parse(expr_str)
+
+def simplify_expr(expr_str):
+    expr = SymbolicAlgebra.parse(expr_str)
+    return expr.simplify().to_string()
+
+def are_equal(expr_a, expr_b):
+    a = SymbolicAlgebra.parse(expr_a)
+    b = SymbolicAlgebra.parse(expr_b)
+    return a.equals(b)
+
+def dagger_expr(expr_str):
+    expr = SymbolicAlgebra.parse(expr_str)
+    return SymbolicAlgebra.dagger(expr).to_string()

@@ -1,0 +1,15 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import agent_memory
+
+@main
+    mem = new_memory("teleport_monitor")
+    mem = remember(mem, "observation", "Teleportation initialized")
+    H(0)
+    CNOT(0,1)
+    MEASURE(0)
+    mem = remember(mem, "observation", "Classical bit measured: 0")
+    @log memory_summary(mem)
+@end

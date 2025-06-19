@@ -1,0 +1,31 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: tutor.synq — Native CLI plugin for SynQ AI Tutor
+
+plugin tutor_cli:
+
+    uses ai.tutor.core as tutor
+
+    command "tutor" as entry:
+        args:
+            optional --file [path]
+            optional --mode [interactive|explain|analyze]
+        run:
+            if --file:
+                let code = load_text(--file)
+                let result = tutor.analyze(code, --mode or "explain")
+                print result
+            else:
+                print "Enter AI Tutor Mode:"
+                loop:
+                    input("▶ ") as line
+                    let out = tutor.respond(line)
+                    print out
+
+    description:
+        "Launches the AI Tutor from CLI. Supports code file explanation, error analysis, and interactive mode."
+
+    tags:
+        ["ai", "cli", "tutor", "assist"]
+
+end

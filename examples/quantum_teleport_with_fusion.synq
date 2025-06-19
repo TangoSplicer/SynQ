@@ -1,0 +1,23 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import ai_fusion
+
+@macro teleport_if_true(prompt):
+    response = call_model("llama-mock", prompt)
+    if response contains "yes":
+        H(0)
+        CNOT(0, 1)
+        MEASURE(0)
+        MEASURE(1)
+        X(2)
+        Z(2)
+        @log "Teleportation completed."
+    else:
+        @log "Teleportation aborted."
+
+@main
+    @log "=== Quantum-AI Teleportation Hybrid ==="
+    teleport_if_true("Should I teleport the qubit?")
+@end

@@ -1,0 +1,80 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Structs, Enums, Traits
+# File: stdlib/structs.synq
+# Description: Rich type modeling for classical code
+##################################################
+
+### 🧱 STRUCT DEFINITIONS ###
+struct Point:
+    x: float
+    y: float
+
+struct User:
+    id: int
+    name: string
+    active: bool
+
+struct Rectangle:
+    width: float
+    height: float
+    @fn area(self): -> float
+        return self.width * self.height
+
+### 🧬 TRAITS ###
+trait Named:
+    @fn get_name(self): -> string
+
+trait Identifiable:
+    @fn get_id(self): -> int
+
+struct Person with Named, Identifiable:
+    id: int
+    name: string
+    @fn get_name(self): -> string
+        return self.name
+    @fn get_id(self): -> int
+        return self.id
+
+### 📦 ENUMS ###
+enum Status:
+    Pending
+    Active
+    Inactive
+    Deleted
+
+enum Direction:
+    North
+    South
+    East
+    West
+
+@fn handle_status(s: Status): -> string
+    match s:
+        Status::Pending => return "Waiting"
+        Status::Active => return "Live"
+        Status::Inactive => return "Disabled"
+        _ => return "Unknown"
+
+### 🔍 REFLECTION ###
+@fn describe_struct(obj): -> void
+    let t = typeof(obj)
+    print("Instance of", t)
+
+### 🧪 SAMPLE INSTANCE USE ###
+let r = Rectangle(10.5, 4.0)
+print("Area:", r.area())
+
+let user = User(101, "Alice", true)
+print("User:", user.name, "-", user.active)
+
+let p = Person(42, "Neo")
+print(p.get_name(), p.get_id())
+
+let current = Status::Active
+print(handle_status(current))
+
+### ✅ END STRUCTS ###

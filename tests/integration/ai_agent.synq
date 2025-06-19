@@ -1,0 +1,22 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/ai_agent.synq
+
+class Agent:
+    def __init__(name):
+        set self.name = name
+        set self.memory = new Memory()
+
+    def observe(msg):
+        self.memory.add("External: " + msg)
+
+    def think(goal):
+        return self.memory.ask("As " + self.name + ", consider: " + goal)
+
+    def reset():
+        self.memory.clear()
+
+def new Agent(name):
+    return Agent(name)

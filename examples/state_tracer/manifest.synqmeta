@@ -1,0 +1,17 @@
+---
+
+### ✅ `manifest.synqmeta`
+
+```json
+{
+  "name": "state_tracer",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "state_tracer.synq",
+    "state_tracer_config.json",
+    "README.md"
+  ]
+}

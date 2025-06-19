@@ -1,0 +1,18 @@
+// Quantum Teleportation Protocol Plugin
+plugin teleportation:
+
+    entry main:
+        qbit a, b, c;
+        H a;
+        CNOT a, b;
+        CNOT b, c;
+        measure a;
+        measure b;
+
+    description:
+        "Standard teleportation protocol plugin."
+
+    tags:
+        ["quantum", "example", "teleportation"]
+
+end

@@ -1,0 +1,22 @@
+SynQ Programming Ecosystem – Authorship Declaration
+
+---
+
+Lead Architect:
+- JMAM-O ("Tango") (2025)
+
+Core Contributors:
+- SynQ AI Compiler Team - JMAM-O ("Tango") (2025)
+- Quantum Runtime Research Group - JMAM-O ("Tango") (2025)
+- Plugin Framework Engineers - JMAM-O ("Tango") (2025)
+- SynQHUB Platform Developers - JMAM-O ("Tango") (2025)
+
+---
+
+All code was generated with custom AI tools under direction of the license holder.  
+No third-party copyrighted material is included.
+
+All components are:
+✅ Original  
+✅ Maximally enhanced  
+✅ Secure for commercial distribution

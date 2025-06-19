@@ -1,0 +1,36 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_ai_fusion.synq
+
+// Test: AI Fusion Layer via ai.synq DSL
+
+use plugin "MockLLM"
+use stdlib "ai.synq"
+
+# Test basic ask
+print("[TEST] Running: ask")
+response = ask("What is quantum decoherence?")
+print(response)
+
+# Test summarization
+print("[TEST] Running: summarize")
+summary = summarize("Quantum systems can lose coherence by interacting with the environment.")
+print(summary)
+
+# Test explanation
+print("[TEST] Running: explain")
+explained = explain("Quantum tunneling")
+print(explained)
+
+# Test classifier
+print("[TEST] Running: classify")
+label = classify("The cat sat on the mat.", ["animal", "object", "place"])
+print("Predicted label:", label)
+
+# Test dynamic switching
+print("[TEST] Switching AI plugin")
+use_ai("DemoLLM")
+alt = ask("This should use the alternate plugin.")
+print(alt)

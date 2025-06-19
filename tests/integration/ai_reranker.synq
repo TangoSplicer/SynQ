@@ -1,0 +1,25 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/ai_reranker.synq
+
+# --- AI Reranker using prompt-injected scoring ---
+
+def rerank(prompt, options):
+    set scores = []
+    for opt in options:
+        set ask_prompt = "Rate the following option (1-10) for answering this:\n" +
+                         "Question: " + prompt + "\n" +
+                         "Option: " + opt
+        set score = run ActiveAI(ask_prompt)
+        push scores int(score)
+    
+    set best = -1
+    set idx = -1
+    for i in range(len(scores)):
+        if scores[i] > best:
+            set best = scores[i]
+            set idx = i
+
+    return options[idx]

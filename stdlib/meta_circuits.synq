@@ -1,0 +1,35 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// meta_circuits.synq
+// SynQ DSL module for symbolic meta-circuit operations
+
+@module meta_circuits
+
+// Create and return a new symbolic meta-circuit object
+@macro create_meta():
+    @let __meta__ = @system.MetaCircuit()
+    return __meta__
+
+// Add an operation to the meta-circuit
+@macro add_op(meta, gate, qubits, param=None):
+    meta.add_op(gate=gate, qubits=qubits, param=param)
+    return meta
+
+// Merge two circuits together
+@macro merge(meta1, meta2):
+    meta1.merge(meta2)
+    return meta1
+
+// Randomly mutate the symbolic circuit
+@macro mutate(meta):
+    meta.mutate()
+    return meta
+
+// Invert operation order
+@macro invert(meta):
+    meta.invert()
+    return meta
+
+@endmodule

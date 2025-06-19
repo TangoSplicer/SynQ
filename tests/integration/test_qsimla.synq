@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import qsimla
+
+@test "qsimla simulation and snapshot":
+    sim = new_sim(2)
+    sim = apply(sim, "Z", 0)
+    snap = snapshot(sim)
+    @assert snap.circuit_hash != ""
+
+@test "inject and compare latent vectors":
+    sim1 = new_sim(1)
+    sim2 = new_sim(1)
+    sim1 = inject_latent(sim1, [1.0, 0.0])
+    sim2 = inject_latent(sim2, [1.0, 0.0])
+    snap1 = snapshot(sim1)
+    snap2 = snapshot(sim2)
+    score = compare_latents(snap1, snap2)
+    @assert score > 0.99

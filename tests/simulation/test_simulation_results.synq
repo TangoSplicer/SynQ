@@ -1,0 +1,30 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/simulation/test_simulation_results.synq
+
+// --- Simulation Result Validation ---
+
+allocate(q0)
+allocate(q1)
+
+// Create Bell state
+H(q0)
+CNOT(q0, q1)
+
+// Get serialized simulation result
+circuit_data = serialize_circuit()
+print("Serialized Circuit:")
+print(circuit_data)
+
+// Simulate the circuit
+sim_result = simulate_circuit()
+
+print("Simulation Result:")
+print(sim_result)
+
+// Optional: Describe via AI
+desc = run GPT4("Explain the following result:\n" + str(sim_result))
+print("AI Explanation:")
+print(desc)

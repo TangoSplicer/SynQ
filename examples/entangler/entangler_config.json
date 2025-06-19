@@ -1,0 +1,8 @@
+{
+  "plugin": "entangler",
+  "version": "1.0.0",
+  "description": "Simulates entanglement topologies (GHZ, W, cluster) for N qubits",
+  "entry": "entangler.synq",
+  "type": "quantum",
+  "tags": ["quantum", "entanglement", "visualizer", "simulation"]
+}

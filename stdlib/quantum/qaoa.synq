@@ -1,0 +1,41 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/qaoa.synq
+
+// --- QAOA: Quantum Approximate Optimization Algorithm ---
+// This example solves a simple MaxCut problem on a 2-node graph
+
+// Step 1: Define qubits
+allocate(q0)
+allocate(q1)
+
+// Step 2: Prepare uniform superposition
+H(q0)
+H(q1)
+
+// Step 3: Problem unitary U_C(γ)
+// MaxCut cost function: Z₀Z₁
+fn apply_cost_unitary(gamma) {
+    CNOT(q0, q1)
+    RZ(q1, 2 * gamma)
+    CNOT(q0, q1)
+}
+
+// Step 4: Mixer unitary U_B(β)
+fn apply_mixer_unitary(beta) {
+    RX(q0, 2 * beta)
+    RX(q1, 2 * beta)
+}
+
+// Step 5: Apply p=1 QAOA layer
+gamma = 0.8
+beta = 0.7
+apply_cost_unitary(gamma)
+apply_mixer_unitary(beta)
+
+// Step 6: Measure output
+result = measure_all()
+print("QAOA MaxCut result (bitstring):")
+print(result)

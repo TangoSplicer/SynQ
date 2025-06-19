@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: declare_skill.synq
+// Purpose: Declare a skill under this plugin's name with tags for discovery
+
+macro declare_skill(name, tags, handler) {
+  let skill_registry = @system.skill_store()
+  skill_registry.register({
+    skill_name: name,
+    plugin: @plugin.name(),
+    tags: tags,
+    handler: handler
+  })
+  return true
+}

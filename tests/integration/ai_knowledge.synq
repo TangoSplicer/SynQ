@@ -1,0 +1,12 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/ai_knowledge.synq
+
+def inject_knowledge(facts, question):
+    set preload = "Use the following facts:\n"
+    for f in facts:
+        preload = preload + "- " + f + "\n"
+    preload = preload + "\nQuestion: " + question
+    return run ActiveAI(preload)

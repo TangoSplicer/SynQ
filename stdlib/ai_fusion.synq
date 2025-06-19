@@ -1,0 +1,44 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// ai_fusion.synq
+// SynQ DSL bindings for AI ↔ Quantum logic
+
+@module ai_fusion
+
+// Define a model call macro (route to provider by name)
+@macro call_model(model_name, input_prompt):
+    __model_out__ = @system.infer(model=model_name, prompt=input_prompt)
+    return __model_out__
+
+// Use model response to control a quantum gate
+@macro control_gate_from_ai(model_name, prompt, qubit_index):
+    model_response = call_model(model_name, prompt)
+    if model_response contains "yes":
+        X(qubit_index)
+    elif model_response contains "no":
+        Z(qubit_index)
+    else:
+        H(qubit_index)
+
+// Inject model-generated phase into rotation gate
+@macro inject_phase_from_model(model_name, prompt, target):
+    val = call_model(model_name, prompt)
+    @cast theta = float(val.extract_number())  // primitive extraction
+    RY(theta, target)
+
+// Complete QPU pipeline driven by natural language
+@pipeline ai_to_qpu_pipeline(prompt):
+    text = call_model("llama-mock", prompt)
+    if text contains "superposition":
+        H(0)
+    if text contains "entangle":
+        H(1)
+        CNOT(1, 2)
+    if text contains "measure":
+        MEASURE(0)
+        MEASURE(1)
+        MEASURE(2)
+
+@endmodule

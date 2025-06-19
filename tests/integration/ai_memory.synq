@@ -1,0 +1,28 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/ai_memory.synq
+
+// --- SynQ Conversational Memory Module ---
+
+class Memory:
+    def __init__():
+        set self.history = []
+
+    def add(line):
+        push self.history line
+
+    def clear():
+        set self.history = []
+
+    def ask(query):
+        set all = join(self.history, "\n") + "\nUser: " + query
+        set reply = run ActiveAI(all)
+        push self.history "User: " + query
+        push self.history "Bot: " + reply
+        return reply
+
+# Factory function
+def new Memory():
+    return Memory()

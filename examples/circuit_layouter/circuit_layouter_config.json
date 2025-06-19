@@ -1,0 +1,8 @@
+{
+  "plugin": "circuit_layouter",
+  "version": "1.0.0",
+  "description": "Hybrid optimizer for quantum circuits based on cost heuristics",
+  "entry": "circuit_layouter.synq",
+  "type": "hybrid",
+  "tags": ["quantum", "optimization", "layout", "circuit"]
+}

@@ -1,0 +1,18 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Collections
+# File: stdlib/collections.synq
+##################################################
+
+let List = array
+let Map = dict
+let Set = set
+
+@fn unique(lst: List): -> Set
+    return Set(lst)
+
+@fn merge_maps(m1: Map, m2: Map): -> Map
+    return m1 + m2

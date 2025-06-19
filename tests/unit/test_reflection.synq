@@ -1,0 +1,11 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import reflection
+
+@test "introspect"
+    struct A: x: int, y: string
+    let obj = A(1, "test")
+    introspect(obj)
+@end

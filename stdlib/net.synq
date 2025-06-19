@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Networking
+# File: stdlib/net.synq
+##################################################
+
+@fn get(url: string): -> string
+    return http.get(url)
+
+@fn post(url: string, data: dict): -> string
+    return http.post(url, json=data)
+
+@fn ping(host: string): -> bool
+    return net.ping(host)

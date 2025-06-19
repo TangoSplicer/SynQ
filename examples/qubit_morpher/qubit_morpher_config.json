@@ -1,0 +1,8 @@
+{
+  "plugin": "qubit_morpher",
+  "version": "1.0.0",
+  "description": "Morphs quantum gates based on adaptive topology mapping",
+  "entry": "qubit_morpher.synq",
+  "type": "quantum",
+  "tags": ["quantum", "topology", "morphing", "gates", "adaptive"]
+}

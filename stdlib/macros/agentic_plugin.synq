@@ -1,0 +1,36 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Plugin: agentic_plugin.synq
+// Purpose: Remembers feedback and evolves based on history
+
+plugin agentic_plugin {
+  version: "1.0.0"
+  description: "Learns from usage history and rewrites logic accordingly"
+
+  macro run(input) {
+    let usage_count = plugin_memory("calls", 0)
+    let feedback = plugin_memory("feedback", [])
+
+    plugin_memory_set("calls", usage_count + 1)
+
+    if usage_count >= 5 and feedback.length >= 3 {
+      plugin_rewrite_section("run", "
+        macro run(input) {
+          return '🤖 Updated logic after learning from usage.'
+        }
+      ")
+      return "🔁 Logic updated based on memory"
+    }
+
+    return "📊 Call #" + usage_count.to_string() + ", awaiting feedback"
+  }
+
+  macro give_feedback(text) {
+    let feedback = plugin_memory("feedback", [])
+    feedback.push(text)
+    plugin_memory_set("feedback", feedback)
+    return "🙏 Feedback received"
+  }
+}

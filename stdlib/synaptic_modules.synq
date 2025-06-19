@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Synaptic Modules
+# File: stdlib/synaptic_modules.synq
+# Description: Self-evolving code units based on usage
+##################################################
+
+@synaptic_module analytics.store:
+    memory.create("interactions")
+    @fn record(query): -> void
+        memory.interactions.append(query)
+    @fn adapt():
+        if memory.interactions.count > 10:
+            evolve_strategy("batched")

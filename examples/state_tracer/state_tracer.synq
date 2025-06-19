@@ -1,0 +1,22 @@
+// SynQ plugin: state_tracer
+// Trace the quantum state evolution across a circuit
+
+qubit q0, q1
+
+H q0
+trace_state "After H on q0"
+
+CNOT q0, q1
+trace_state "After CNOT q0->q1"
+
+T q1
+trace_state "After T on q1"
+
+H q1
+trace_state "After H on q1"
+
+measure q0 -> m0
+measure q1 -> m1
+
+trace_state "Final measured state"
+dump m0, m1

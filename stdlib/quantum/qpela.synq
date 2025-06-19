@@ -1,0 +1,78 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// In stdlib/quantum/QPE_LA.synq
+// QPE-LA: Quantum Phase Estimation with Linear Algebraic Enhancement
+function QPE_LA(H: HermitianMatrix, initState: Qubit[], tolerance: Double) : (Double, Qubit[]) {
+    // H: Hermitian matrix (Hamiltonian or similar) whose eigenvalue we want to estimate.
+    // initState: quantum register prepared in an eigenstate of H (or a superposition that has overlap on one eigenstate).
+    // tolerance: desired precision (e.g., maximum error in eigenvalue estimate).
+
+    // 1. Classical pre-analysis (SVD/eigen decomposition) to determine preconditioner and spectral properties.
+    let n = length(initState); 
+    let (U_classical, eigenvals, V_classical) = classicalSVD(H);
+    // Suppose H = U * Diag(eigenvals) * V^† (for Hermitian, U=V and eigenvals are actual eigenvalues).
+    // Determine a conditioning matrix M based on SVD (e.g., use V_classical or parts of it).
+    let M = derivePreconditioner(U_classical, eigenvals, V_classical);
+    // M could, for example, whiten the spectrum or scale eigenvalues to a manageable range.
+    // We'll apply M^-1 * H * M on the quantum side by incorporating M into state preparation or measurement adjustments.
+
+    // 2. Adjust initial state by applying M^-1 (if M is unitary or easily implemented).
+    if (M is implementable) {
+        applyUnitary(M^-1, initState);
+    }
+    // Now the state is prepared for the transformed Hamiltonian M^-1 H M (which has same eigenvalues as H, but eigenvectors rotated).
+
+    // 3. Determine required ancilla qubits based on desired tolerance and spectral gap.
+    let spectralGap = estimateSpectralGap(eigenvals); // minimum difference between distinct eigenvalues
+    let phasePrecBits = ceil(-log2(tolerance)); 
+    if (spectralGap > 0) {
+        // Ensure ability to distinguish eigenvalues separated by spectralGap.
+        phasePrecBits = max(phasePrecBits, ceil(-log2(spectralGap)) + 1);
+    }
+    let ancillaCount = phasePrecBits;
+    // The number of ancillas (phase register qubits) determines the binary precision of φ22.
+    // We add +1 or a safety margin if using iterative QPE or if we want high success probability.
+
+    using (phaseReg = Qubit[ancillaCount]) {
+        // 4. Prepare phase register in superposition |+...+⟩ (Hadamards) and eigenstate on initState (already prepared).
+        H* on phaseReg;
+
+        // 5. Apply controlled-U^(2^j) for j=0..ancillaCount-1, where U = exp(i * H_scaled).
+        // We need a unitary operator whose eigenphases encode eigenvalues of H.
+        // Use U = exp(i * H * t) for some t that normalizes phases into [0,1). Choose t such that max(eigenval * t / 2π) < 1.
+        let H_max = max(|e| for e in eigenvals);
+        let t = 2π / (2 * H_max);  // time such that largest eigenphase ~ 0.5 (to avoid wrap-around)
+        let U = simulateHamiltonian(H, time=t);  // quantum operation implementing e^{i H t}
+        for j in 0..(ancillaCount-1) {
+            let power = 2^j;
+            controlled(phaseReg[j], initState, U^power);
+        }
+
+        // 6. Apply inverse Quantum Fourier Transform on phaseReg to obtain the phase bits.
+        invQFT(phaseReg);
+
+        // 7. Measure phase register to get raw phase estimate.
+        // (In a complete algorithm, we might use iterative phase estimation to avoid measuring all qubits at once,
+        // but for simplicity we do a direct measurement here.)
+        let phaseBits = MeasureZ(phaseReg);  // read out the phase bits as an integer
+        let φ_est = phaseBits / (2^ancillaCount);  // estimated phase in [0,1)
+
+        ResetAll(phaseReg);
+
+        // 8. Convert φ_est to actual eigenvalue estimate.
+        // Because U = e^{i H t}, eigenphase φ relates to eigenvalue λ by φ ≈ λ * t / (2π)23.
+        let λ_est = (φ_est * 2π) / t;
+        // If we applied a preconditioner M^-1, and if that altered scaling, adjust accordingly (here it didn't change eigenvalues).
+        // Also, optionally refine λ_est by one round of classical post-processing (e.g., Newton iteration if needed for more precision).
+        
+        // 9. (Optional) Uncompute preconditioner effect on state to return the eigenstate of original H.
+        if (M is implementable) {
+            applyUnitary(M, initState);
+        }
+        // Now initState is (with high probability) collapsed to an eigenstate of H corresponding to eigenvalue λ_est.
+
+        return (λ_est, initState);
+    }
+}

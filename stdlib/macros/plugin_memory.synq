@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: plugin_memory.synq
+// Purpose: Key-value memory scoped to this plugin's identity
+
+macro plugin_memory(key, fallback = null) {
+  let store = @system.plugin_store()
+  if store.has_key(key) {
+    return store.get(key)
+  } else {
+    return fallback
+  }
+}
+
+macro plugin_memory_set(key, value) {
+  let store = @system.plugin_store()
+  store.set(key, value)
+  return true
+}

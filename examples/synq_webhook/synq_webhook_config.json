@@ -1,0 +1,8 @@
+{
+  "plugin": "synq_webhook",
+  "version": "1.0.0",
+  "description": "Sends webhook HTTP events based on SynQ job or plugin triggers",
+  "entry": "synq_webhook.synq",
+  "type": "classical",
+  "tags": ["webhook", "ci", "cd", "event", "alert"]
+}

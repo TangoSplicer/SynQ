@@ -1,0 +1,9 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import event
+
+@test "emit event"
+    emit_example()
+@end

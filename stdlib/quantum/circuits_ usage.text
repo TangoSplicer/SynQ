@@ -1,0 +1,14 @@
+import quantum.circuits as qc
+
+# Create a circuit with 2 qubits
+circuit = qc.Circuit(2)
+q0, q1 = circuit.register[0], circuit.register[1]
+
+# Build a Bell state circuit: Apply H on q0, then CNOT from q0 to q1
+circuit.h(q0)
+circuit.cnot(q0, q1)
+
+# Run the circuit and measure both qubits (result should be 00 or 11 with equal probability)
+result = circuit.run(shots=100)
+print("Measurement outcomes over 100 shots:", result)
+# Example expected output: {(0,0): 50, (1,1): 50}

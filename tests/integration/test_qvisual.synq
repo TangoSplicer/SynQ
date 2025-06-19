@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_qvisual.synq
+
+extern Visualizer
+
+ir = "H 0 CNOT 0 1 H 1 CNOT 1 2"
+
+print("[VISUALIZER TEST] Input IR:")
+print(ir)
+
+v = new Visualizer()
+v.load_circuit(ir)
+
+print("\n[ASCII VIEW]")
+print(v.as_ascii())
+
+print("\n[DOT FORMAT]")
+print(v.as_dot())

@@ -1,0 +1,8 @@
+{
+  "plugin": "optimizer_ai",
+  "version": "1.0.0",
+  "description": "RL-style iterative optimizer for SynQ plugin configurations",
+  "entry": "optimizer_ai.synq",
+  "type": "ai",
+  "tags": ["ai", "optimization", "config", "reinforcement", "learning"]
+}

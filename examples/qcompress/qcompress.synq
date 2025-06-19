@@ -1,0 +1,14 @@
+// SynQ plugin: qcompress
+// Lossless compression using QFT for binary patterns
+
+config size = 8
+qubit q[size]
+
+load_binary q, input_data
+
+QFT q
+
+// Compression = representation in frequency space
+measure q -> compressed_data
+
+dump compressed_data

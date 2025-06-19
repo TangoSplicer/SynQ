@@ -1,0 +1,18 @@
+// File: export_plugin.synq — CLI interface for SynQ export formats
+
+plugin export_cli:
+
+    uses compiler.export.exporter as exporter
+
+    command "export":
+        args:
+            required --input [file]
+            required --target [synqvm|wasm|bin]
+        run:
+            print "🔧 Exporting", --input, "→", --target
+            exporter.export_plugin(--input, --target)
+
+    description:
+        "Compiles .synq files into .synqvm, .wasm, or .bin formats"
+
+end

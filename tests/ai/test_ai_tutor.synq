@@ -1,0 +1,27 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: test_ai_tutor.synq — Tests for AI Tutor functionality
+
+test ai_tutor_core:
+
+    uses ai.tutor.core as tutor
+
+    case "explain basic teleportation":
+        let program = """
+            qbit a, b;
+            H a;
+            CNOT a, b;
+            measure a;
+            measure b;
+        """
+        let explanation = tutor.analyze(program, "explain")
+        assert "Hadamard" in explanation
+        assert "CNOT" in explanation
+
+    case "interactive mode generates output":
+        let input = "What is a quantum gate?"
+        let response = tutor.respond(input)
+        assert "quantum" in response
+        assert len(response) > 10
+
+end

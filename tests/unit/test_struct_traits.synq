@@ -1,0 +1,40 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Unit Test: Structs, Traits, Enums
+# File: tests/unit/test_structs_traits
+##################################################
+
+@import structs
+
+@test "struct instance"
+    let pt = Point(3.0, 4.0)
+    assert pt.x == 3.0
+    assert pt.y == 4.0
+@end
+
+@test "rectangle area"
+    let r = Rectangle(5.0, 2.0)
+    assert r.area() == 10.0
+@end
+
+@test "trait implementation"
+    let p = Person(12, "Lara")
+    assert p.get_name() == "Lara"
+    assert p.get_id() == 12
+@end
+
+@test "enums and matching"
+    let s = Status::Inactive
+    assert handle_status(s) == "Disabled"
+
+    let d = Direction::West
+    assert typeof(d) == "Direction"
+@end
+
+@test "reflection"
+    let u = User(1, "Bob", false)
+    describe_struct(u)
+@end

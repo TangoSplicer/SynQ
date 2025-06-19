@@ -1,0 +1,8 @@
+{
+  "plugin": "teleport",
+  "description": "Quantum teleportation protocol demo",
+  "version": "1.0.0",
+  "entry": "teleport.synq",
+  "type": "quantum",
+  "tags": ["demo", "teleportation", "quantum", "synq"]
+}

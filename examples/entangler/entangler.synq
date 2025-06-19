@@ -1,0 +1,28 @@
+// SynQ plugin: entangler
+// Simulate entanglement patterns: GHZ, W-state, Cluster
+
+config pattern = "ghz"
+config qubits = 4
+
+qubit q[qubits]
+
+if pattern == "ghz":
+    H q[0]
+    for i in 1..(qubits-1):
+        CNOT q[0], q[i]
+
+if pattern == "w":
+    for i in 0..(qubits-1):
+        X q[i]
+    for i in 0..(qubits-2):
+        CNOT q[i], q[i+1]
+    for i in 0..(qubits-1):
+        H q[i]
+
+if pattern == "cluster":
+    for i in 0..(qubits-1):
+        H q[i]
+    for i in 0..(qubits-2):
+        CZ q[i], q[i+1]
+
+dump q

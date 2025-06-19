@@ -1,0 +1,12 @@
+# synq/examples/ising_simulation.synq
+
+import quantum.simulation as qs
+
+let H = qs.Hamiltonian(2)
+H.add_term(qs.Pauli.X, [0], 0.5)
+H.add_term(qs.Pauli.Z, [0, 1], 1.0)
+
+let circuit = H.trotter_circuit(time=1.0, steps=50)
+let final_state = circuit.run(get_state=True)
+
+print("Ising model final state:", final_state)

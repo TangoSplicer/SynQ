@@ -1,0 +1,15 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/ai_cot.synq
+
+def chain(prompt):
+    set prefix = "Let’s solve this step-by-step:\n"
+    return run ActiveAI(prefix + prompt)
+
+def think(prompt, steps):
+    set context = "Let's walk through this:\n"
+    for s in steps:
+        context = context + "- " + s + "\n"
+    return run ActiveAI(context + prompt)

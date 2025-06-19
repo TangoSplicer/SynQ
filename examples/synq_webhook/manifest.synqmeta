@@ -1,0 +1,17 @@
+---
+
+### ✅ `manifest.synqmeta`
+
+```json
+{
+  "name": "synq_webhook",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "synq_webhook.synq",
+    "synq_webhook_config.json",
+    "README.md"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "plugin": "synqgpt",
+  "version": "1.0.0",
+  "description": "Uses SynQ's integrated AI system to execute a prompt chain using LLMs",
+  "entry": "synqgpt.synq",
+  "type": "ai",
+  "tags": ["ai", "llm", "prompt", "gpt", "chain"]
+}

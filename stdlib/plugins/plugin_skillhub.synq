@@ -1,0 +1,31 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Plugin: plugin_skillhub.synq
+// Purpose: Demonstrates how to register multiple skills under one plugin
+
+plugin plugin_skillhub {
+  version: "1.0.0"
+  description: "Multi-skill plugin demo (summarize, lint, upper_case)"
+
+  macro init() {
+    declare_skill("summarize", ["text", "nlp"], this.summarize)
+    declare_skill("lint_code", ["lint", "format"], this.lint)
+    declare_skill("shout", ["upper", "text", "yell"], this.upper_case)
+    return "✅ Skillhub ready"
+  }
+
+  macro summarize(text) {
+    let parts = text.split(".")
+    return parts[0] + "..."
+  }
+
+  macro lint(code) {
+    return code.trim().replace(";", ";\n")
+  }
+
+  macro upper_case(input) {
+    return input.to_upper()
+  }
+}

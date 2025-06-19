@@ -1,0 +1,25 @@
+# synq/scripts/completions/synq.aliases
+# Useful aliases for SynQ developers
+# © 2025 SynQ Project
+
+# Core CLI
+alias sbuild='synq build'
+alias srun='synq run'
+alias stest='synq test'
+alias splugin='synq plugin'
+alias sdebug='synq debug'
+
+# Advanced
+alias sfuzz='synq fuzz'
+alias smutate='synq mutate'
+alias sinspect='synq inspect'
+alias sqtrace='synq qtrace'
+
+# Scripts
+alias sbuildsh='bash synq/scripts/build.sh'
+alias sdeploy='bash synq/scripts/deploy.sh'
+alias spush='bash synq/scripts/push_synqhub.sh'
+alias smutateai='bash synq/scripts/mutate.sh'
+alias slint='bash synq/scripts/lint.sh'
+alias sreview='bash synq/scripts/ai_review.sh'
+alias scommit='bash synq/scripts/auto_commit.sh'

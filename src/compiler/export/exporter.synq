@@ -1,0 +1,46 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: exporter.synq — Compiles .synq plugins into .synqvm, .bin, .wasm
+
+plugin exporter:
+
+    uses compiler.parser as parser
+    uses compiler.backend as backend
+    uses crypto.hash as hash
+    uses io.fs as fs
+
+    fn export_plugin(path, target):
+        let code = fs.read_text(path)
+        let ast = parser.parse(code)
+
+        match target:
+            case "synqvm":
+                let bytecode = backend.compile_vm(ast)
+                let out = replace_ext(path, ".synqvm")
+                fs.write_bytes(out, bytecode)
+                print "✅ Exported to", out
+
+            case "bin":
+                let bin = backend.compile_bin(ast)
+                let out = replace_ext(path, ".bin")
+                fs.write_bytes(out, bin)
+                let hashval = hash.sha256(bin)
+                fs.write_text(out + ".hash", hashval)
+                print "✅ Binary + hash exported"
+
+            case "wasm":
+                let wasm = backend.compile_wasm(ast)
+                let out = replace_ext(path, ".wasm")
+                fs.write_bytes(out, wasm)
+                print "✅ WebAssembly module exported"
+
+            default:
+                raise "Unknown export target: " + target
+
+    description:
+        "Exports SynQ plugins to .synqvm, .bin (signed), and .wasm formats."
+
+    tags:
+        ["compile", "export", "synqvm", "wasm", "binary"]
+
+end

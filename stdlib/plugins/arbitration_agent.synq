@@ -1,0 +1,30 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Plugin: arbitration_agent.synq
+// Purpose: Resolve conflicting agent results or vote between outputs
+
+plugin arbitration_agent {
+  version: "1.0.0"
+  description: "Plugin that resolves multi-agent conflicts with rules, votes, and AI"
+
+  macro resolve(outputs) {
+    let vote_map = {}
+    for out in outputs {
+      vote_map[out] = vote_map.get(out, 0) + 1
+    }
+
+    let sorted = vote_map.to_list().sort_by(kv => -kv[1])
+    if sorted[0][1] > 1 {
+      return sorted[0][0]
+    } else {
+      return @system.ai_router().run_with_model("referee", outputs.join(" vs "))
+    }
+  }
+
+  macro init() {
+    declare_skill("arbitrate_results", ["vote", "resolve", "agent"], this.resolve)
+    return "🗳️ arbitration_agent loaded"
+  }
+}

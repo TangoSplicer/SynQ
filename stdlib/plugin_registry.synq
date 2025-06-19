@@ -1,0 +1,24 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// plugin_registry.synq
+// DSL bindings for Compiler Plugin Store
+
+@module plugin_registry
+
+// Register a new plugin
+@macro register_plugin(name, version, desc, handler):
+    meta = { "name": name, "version": version, "description": desc }
+    @system.PluginStore.register(name=name, plugin=(meta, handler))
+    return name
+
+// Invoke a registered plugin by name
+@macro invoke_plugin(name, json_payload):
+    return @system.PluginStore.get_plugin(name).invoke(json_payload)
+
+// List all registered plugins
+@macro list_plugins():
+    return @system.PluginStore.list_plugins()
+
+@endmodule

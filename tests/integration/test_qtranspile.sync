@@ -1,0 +1,14 @@
+// File: tests/integration/test_qtranspile.synq
+
+use stdlib "quantum/qtranspile.synq"
+
+ir = "H 1 CNOT 1 2"
+
+print("[QASM DSL OUTPUT]")
+print(to_qasm(ir))
+
+print("[CIRQ DSL OUTPUT]")
+print(to_cirq(ir))
+
+print("[BRAKET DSL OUTPUT]")
+print(to_braket(ir))

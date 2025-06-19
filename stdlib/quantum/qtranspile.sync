@@ -1,0 +1,21 @@
+// File: stdlib/quantum/qtranspile.synq
+
+# SynQ Transpiler DSL
+
+extern Transpiler
+extern TargetFormat
+
+def to_qasm(ir):
+    t = new Transpiler()
+    t.load_ir(ir)
+    return t.export_to(TargetFormat.QASM)
+
+def to_cirq(ir):
+    t = new Transpiler()
+    t.load_ir(ir)
+    return t.export_to(TargetFormat.CIRQ)
+
+def to_braket(ir):
+    t = new Transpiler()
+    t.load_ir(ir)
+    return t.export_to(TargetFormat.BRAKET)

@@ -1,0 +1,46 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: plugin_template.synq
+// Purpose: Dynamically suggest a plugin skeleton based on task prompt
+
+macro plugin_suggest_template(prompt) {
+  if prompt ~ "analyze" {
+    return {
+      name: "plugin_analyzer",
+      version: "1.0.0",
+      description: "Analyzes input and reports findings",
+      macro: {
+        run: "function(input) { return analyze(input); }"
+      }
+    }
+  } elif prompt ~ "visual" or prompt ~ "graph" {
+    return {
+      name: "plugin_visualizer",
+      version: "1.0.0",
+      description: "Visualizes structures or logic flows",
+      macro: {
+        run: "function(input) { return plot(input); }"
+      }
+    }
+  } elif prompt ~ "quantum" or prompt ~ "gate" {
+    return {
+      name: "plugin_qbuilder",
+      version: "1.0.0",
+      description: "Builds quantum gate sequences",
+      macro: {
+        run: "function(qc) { return qc.compose(); }"
+      }
+    }
+  } else {
+    return {
+      name: "plugin_default",
+      version: "1.0.0",
+      description: "General-purpose plugin",
+      macro: {
+        run: "function(input) { return input; }"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_transpile_export.synq
+
+extern Transpiler
+extern TargetFormat
+
+print("[TRANSPILER TEST] Loading IR...")
+t = new Transpiler()
+t.load_ir("H 0 CNOT 0 1")
+
+print("[QASM OUTPUT]")
+print(t.export_to(TargetFormat.QASM))
+
+print("[CIRQ OUTPUT]")
+print(t.export_to(TargetFormat.CIRQ))
+
+print("[BRAKET OUTPUT]")
+print(t.export_to(TargetFormat.BRAKET))

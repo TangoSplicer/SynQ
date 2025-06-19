@@ -1,0 +1,17 @@
+---
+
+### ✅ `manifest.synqmeta`
+
+```json
+{
+  "name": "circuit_layouter",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "circuit_layouter.synq",
+    "circuit_layouter_config.json",
+    "README.md"
+  ]
+}

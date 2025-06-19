@@ -1,0 +1,8 @@
+{
+  "plugin": "time_dilation_sync",
+  "version": "1.0.0",
+  "description": "Simulates time dilation to synchronize quantum operations between async nodes",
+  "entry": "time_dilation_sync.synq",
+  "type": "quantum",
+  "tags": ["quantum", "sync", "dilation", "distributed", "relativistic"]
+}

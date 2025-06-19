@@ -1,0 +1,14 @@
+// SynQ plugin: synqgpt
+// AI prompt chaining and response processor for integrated inference
+
+config model = "gpt-4"
+config prompt = "Summarize the quantum teleportation process."
+
+llm_response = ai_call model, prompt
+
+print "Response:"
+print llm_response
+
+// Optional post-processing
+if contains(llm_response, "Bell"):
+    tag "quantum_protocol"

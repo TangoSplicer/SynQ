@@ -1,0 +1,14 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import plugin_registry
+
+@test "register and invoke plugin":
+    register_plugin("adder", "1.0", "adds one", (input) => input.value + 1)
+    out = invoke_plugin("adder", { "value": 4 })
+    @assert out == 5
+
+@test "list plugins":
+    all = list_plugins()
+    @assert all contains "adder"

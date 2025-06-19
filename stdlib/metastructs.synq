@@ -1,0 +1,18 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - MetaStructs
+# File: stdlib/metastructs.synq
+# Description: Reflective data structures that adapt
+##################################################
+
+metastruct UserProfile:
+    name: string
+    meta age
+    meta last_login?: datetime
+
+@fn describe_profile(user):
+    for field in reflect(user).fields():
+        print("Field:", field.name, "-", field.optional)

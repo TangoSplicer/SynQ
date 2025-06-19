@@ -1,0 +1,62 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Unit Test: Classical Core Features
+# File: tests/unit/test_classical_core
+##################################################
+
+@import core
+
+@test "variable declarations"
+    let a = 42
+    var b = "test"
+    const c = 3.14
+    auto d = true
+    assert typeof(a) == "int"
+    assert typeof(b) == "string"
+    assert typeof(c) == "float"
+    assert typeof(d) == "bool"
+@end
+
+@test "control flow"
+    let value = 5
+    if value > 0:
+        assert true
+    else:
+        assert false
+@end
+
+@test "loop and iteration"
+    let total = 0
+    for i in [1, 2, 3]:
+        total += i
+    assert total == 6
+@end
+
+@test "functions and lambdas"
+    @fn inc(x: int): -> int
+        return x + 1
+    assert inc(3) == 4
+
+    @lambda double(x): x * 2
+    assert double(4) == 8
+@end
+
+@test "match expressions"
+    let cmd = "run"
+    match cmd:
+        "run" => assert true
+        _ => assert false
+@end
+
+@test "error handling"
+    @fn divide(a: int, b: int): -> float
+        try:
+            return a / b
+        catch e:
+            return -1.0
+    assert divide(10, 2) == 5.0
+    assert divide(1, 0) == -1.0
+@end

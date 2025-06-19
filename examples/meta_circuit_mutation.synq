@@ -1,0 +1,19 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import meta_circuits
+
+@main
+    @log "=== Meta-Circuit Compiler Demo ==="
+    c = create_meta()
+    c = add_op(c, "H", [0])
+    c = add_op(c, "CNOT", [0,1])
+    c = add_op(c, "X", [2])
+    c = mutate(c)
+
+    rep = c.to_string()
+    @log "Mutated Circuit:\n" + rep
+
+    @assert rep contains "("
+@end

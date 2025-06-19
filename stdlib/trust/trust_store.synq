@@ -1,0 +1,16 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// trust_store.synq
+@cert module_name="qgraphiso"
+       issuer="SynQ Authority"
+       issued_at="2025-06-15T12:00:00Z"
+       fingerprint="d2a3cf7b8b3ed4a11f77f3..."
+       signature="DMCU1-K39FU-AB77X-SAJGG..."
+
+@cert module_name="qtms"
+       issuer="SynQ Authority"
+       issued_at="2025-06-15T12:01:00Z"
+       fingerprint="c731cf2e1cde85baaa7bc4..."
+       signature="G8U1Q-TDL98-WOXE9-MJ92Z..."

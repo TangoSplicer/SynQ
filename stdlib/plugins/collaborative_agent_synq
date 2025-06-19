@@ -1,0 +1,16 @@
+// Plugin: collaborative_agent.synq
+// Purpose: Agent that delegates goal to other agents/skills based on task match
+
+plugin collaborative_agent {
+  version: "1.1.0"
+  description: "AI plugin that dispatches sub-goals to external skill handlers"
+
+  macro solve(goal) {
+    return dispatch_to_agents(goal)
+  }
+
+  macro init() {
+    declare_skill("delegate_goal", ["ai", "agent", "meta"], this.solve)
+    return "🤝 collaborative_agent online"
+  }
+}

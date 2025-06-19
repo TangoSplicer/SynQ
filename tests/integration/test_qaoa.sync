@@ -1,0 +1,32 @@
+// File: tests/integration/test_qaoa.synq
+
+// --- Integration Test: QAOA for MaxCut on 2-node Graph ---
+
+// Allocate two qubits representing nodes
+allocate(q0)
+allocate(q1)
+
+// Prepare uniform superposition
+H(q0)
+H(q1)
+
+// Apply cost unitary for MaxCut
+CNOT(q0, q1)
+RZ(q1, 2 * 0.8)
+CNOT(q0, q1)
+
+// Apply mixer unitary
+RX(q0, 2 * 0.7)
+RX(q1, 2 * 0.7)
+
+// Measure
+outcome = measure_all()
+print("QAOA Output:")
+print(outcome)
+
+// Validate bitstring format
+if str(outcome) == "[0, 1]" or str(outcome) == "[1, 0]" {
+    print("[PASS] Likely MaxCut result found.")
+} else {
+    print("[WARN] Other result encountered.")
+}

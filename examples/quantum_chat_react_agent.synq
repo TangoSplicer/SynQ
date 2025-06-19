@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import agent_memory
+@import ai_fusion
+
+@main
+    mem = new_memory("react_agent")
+    plan = call_model("llama-mock", "What should I do with 3 qubits?")
+    mem = remember(mem, "plan", plan, "initial")
+    if plan contains "superposition":
+        H(0)
+    if plan contains "entangle":
+        CNOT(0,1)
+    @log memory_summary(mem)
+@end

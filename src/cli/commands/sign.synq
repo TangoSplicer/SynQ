@@ -1,0 +1,34 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: sign.synq — CLI interface for signing and verifying plugins
+
+plugin sign_cli:
+
+    uses security.signer as signer
+
+    command "sign" as entry:
+        args:
+            required --plugin [path]
+            optional --key [path]
+        run:
+            let keyfile = --key or "keys/default.key"
+            signer.sign_plugin(--plugin, keyfile)
+            print "✅ Plugin signed:", --plugin
+
+    command "verify":
+        args:
+            required --plugin [path]
+        run:
+            let status = signer.verify_plugin(--plugin)
+            if status:
+                print "✅ Verified:", --plugin
+            else:
+                print "❌ Signature verification failed for", --plugin
+
+    description:
+        "Sign or verify SynQ plugins using your local keyring."
+
+    tags:
+        ["sign", "verify", "security", "plugin", "cli"]
+
+end

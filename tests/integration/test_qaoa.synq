@@ -1,0 +1,40 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_qaoa.synq
+
+// Test QAOA optimizer for 2-node MaxCut
+
+fn energy(params) {
+    γ = params["gamma"]
+    β = params["beta"]
+
+    allocate(q0)
+    allocate(q1)
+
+    H(q0)
+    H(q1)
+
+    CNOT(q0, q1)
+    RZ(q1, 2 * γ)
+    CNOT(q0, q1)
+
+    RX(q0, 2 * β)
+    RX(q1, 2 * β)
+
+    return expect(Z0Z1)
+}
+
+init = { "gamma": 0.6, "beta": 0.5 }
+
+result = optimize(
+    energy,
+    init,
+    strategy="bracketed",
+    max_iters=50
+)
+
+print("γ:", result["gamma"])
+print("β:", result["beta"])
+print("[PASS] QAOA optimizer completed.")

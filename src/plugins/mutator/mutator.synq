@@ -1,0 +1,47 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: mutator.synq — SynQ-native plugin mutation sandbox
+
+plugin plugin_mutator:
+
+    uses io.fs as fs
+    uses crypto.hash as hash
+
+    command "mutate":
+        args:
+            required --plugin [dir]
+            optional --passes [int] = 1
+        run:
+            print "🔁 Starting mutation on", --plugin
+            loop i from 1 to --passes:
+                print "🔬 Mutation pass", i
+                call mutate_plugin(--plugin)
+
+    fn mutate_plugin(dir):
+        let files = fs.list(dir, "*.synq")
+        for f in files:
+            let lines = fs.read_lines(f)
+            let mutated = []
+            for line in lines:
+                let out = mutate_line(line)
+                mutated += out
+            fs.write_lines(f, mutated)
+        let current = hash.dir_sha256(dir)
+        fs.append_json("mutation_log.json", {"plugin": dir, "hash": current, "time": now()})
+
+    fn mutate_line(line):
+        if line has "H " and chance(20):
+            return ["// MUTATE: Replaced H with X", replace(line, "H ", "X ")]
+        if line has "CNOT" and chance(15):
+            return ["// MUTATE: Dropped CNOT gate"]
+        if chance(5):
+            return [line, "barrier;"]
+        return [line]
+
+    description:
+        "Applies random mutations to .synq plugin code to evolve behavior."
+
+    tags:
+        ["ai", "mutation", "sandbox", "evolution", "plugin"]
+
+end

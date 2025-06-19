@@ -1,0 +1,60 @@
+✅ File: synq/docs/PluginScoring.md
+
+📘 Scoring Documentation
+
+# SynQ Plugin Scoring Guide
+
+## Overview
+
+SynQ uses a trust-centric scoring engine to rate plugins based on:
+
+- **Safety** – AI-assisted linting, circuit warnings, mutation history
+- **Performance** – Gate count, qubit depth, runtime
+- **Popularity** – Download count, community rating
+- **Compatibility** – Compiler version, deprecation tags
+
+---
+
+## Breakdown
+
+| Metric        | Weight |
+|---------------|--------|
+| Safety        | 35%    |
+| Performance   | 25%    |
+| Popularity    | 20%    |
+| Compatibility | 20%    |
+
+---
+
+## CLI Usage
+
+```bash
+synq score --plugin teleport/
+
+
+---
+
+Sample Output
+
+Safety:        95
+Performance:   78
+Popularity:    32
+Compatibility: 100
+→ Final Score: 83
+
+
+---
+
+Tag Thresholds
+
+Trusted: 85+
+
+Compatible: 70+
+
+Risky: < 60
+
+
+
+---
+
+© 2025 SynQ Project — Plugin Scoring System

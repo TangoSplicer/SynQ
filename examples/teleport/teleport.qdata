@@ -1,0 +1,5 @@
+{
+  "entanglement_pairs": [["q1", "q2"]],
+  "measurement_basis": ["X", "Z"],
+  "output": ["q2"]
+}

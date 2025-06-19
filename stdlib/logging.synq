@@ -1,0 +1,20 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Logging & Metrics
+# File: stdlib/logging.synq
+##################################################
+
+@fn log(msg: string): -> void
+    stdout.write("[LOG]", msg)
+
+@fn warn(msg: string): -> void
+    stdout.write("[WARN]", msg)
+
+@fn error(msg: string): -> void
+    stderr.write("[ERROR]", msg)
+
+@fn metric(name: string, value): -> void
+    telemetry.record(name, value)

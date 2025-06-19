@@ -1,0 +1,10 @@
+============================
+⚛️ SynQ Quantum Codegen Coverage
+============================
+
+Test File                  | Category | Backend Emitted | Syntax Pass | Codegen Pass | Error Logs
+-----------------------------------------------------------------------------------------------
+test_codegen_qiskit.synq   | quantum  | ✔               | ✔           | ✔            | None
+test_codegen_synqvm.synq   | quantum  | ✔               | ✔           | ✔            | None
+
+Summary: All quantum/hybrid codegen tests passed successfully.

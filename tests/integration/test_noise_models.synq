@@ -1,0 +1,29 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_noise_models.synq
+
+use stdlib "quantum/core.synq"
+use stdlib "quantum/noise.synq"
+
+print("[NOISE] Depolarizing noise test:")
+q = allocate("dq")
+depolarize(q, 0.2)
+print(measure(q))
+
+print("[NOISE] Phase damping:")
+q2 = allocate("pq")
+dephase(q2, 0.3)
+print(measure(q2))
+
+print("[NOISE] Amplitude damping:")
+q3 = allocate("aq")
+amplitude_damping(q3, 0.4)
+print(measure(q3))
+
+print("[NOISE] Noisy CNOT:")
+q4 = allocate("n0")
+q5 = allocate("n1")
+noisy_cnot(q4, q5, 0.1)
+print(measure(q4), measure(q5))

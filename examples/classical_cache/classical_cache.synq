@@ -1,0 +1,21 @@
+// SynQ plugin: classical_cache
+// Hybrid classical/quantum LRU cache
+
+cache_capacity = 5
+cache = {}
+
+fn fetch(key):
+    if key in cache:
+        print "Cache hit:", key
+        return cache[key]
+    else:
+        print "Cache miss:", key
+        value = compute(key)
+        if len(cache) >= cache_capacity:
+            evict = lru_key(cache)
+            delete cache[evict]
+        cache[key] = value
+        return value
+
+fn compute(key):
+    return key * 42 // Dummy computation

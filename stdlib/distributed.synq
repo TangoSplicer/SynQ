@@ -1,0 +1,38 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/distributed.synq
+
+# --- SynQ Distributed Execution DSL ---
+
+extern DistributedScheduler scheduler
+extern ComputeNode
+
+enum NodeType {
+    CPU,
+    GPU,
+    QUANTUM_SIM,
+    QPU
+}
+
+# Register a compute node
+def register_node(id, type):
+    node = new ComputeNode(id, NodeType[type])
+    scheduler.register_node(node)
+
+# Launch async task
+def dispatch_async(id, code, preferred):
+    task = {
+        id: id,
+        code: code,
+        preferred: NodeType[preferred]
+    }
+    return scheduler.dispatch_async(task)
+
+# Launch many tasks
+def dispatch_batch(task_list):
+    # task_list = [ { id: "...", code: "...", preferred: "CPU" }, ... ]
+    for i in range(len(task_list)):
+        task_list[i].preferred = NodeType[task_list[i].preferred]
+    return scheduler.dispatch_batch(task_list)

@@ -1,0 +1,19 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/qvisual.synq
+
+# SynQ Circuit Visualizer DSL
+
+extern Visualizer
+
+def show_ascii(ir):
+    v = new Visualizer()
+    v.load_circuit(ir)
+    return v.as_ascii()
+
+def show_dot(ir):
+    v = new Visualizer()
+    v.load_circuit(ir)
+    return v.as_dot()

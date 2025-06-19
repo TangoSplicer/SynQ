@@ -1,0 +1,31 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// agent_memory.synq
+// DSL bindings for the Agentic Memory Layer (AML)
+
+@module agent_memory
+
+// Create memory space for a specific agent
+@macro new_memory(agent_id):
+    return @system.AgenticMemory(agent_id)
+
+// Record a memory entry
+@macro remember(mem, type, content, label=None):
+    mem.record(type=type, content=content, label=label)
+    return mem
+
+// Fetch all entries by type
+@macro recall_by_type(mem, type):
+    return mem.retrieve_by_type(type)
+
+// Fetch entry by label
+@macro recall_by_label(mem, label):
+    return mem.retrieve_by_label(label)
+
+// Dump the entire memory as a string
+@macro memory_summary(mem):
+    return mem.export_summary()
+
+@endmodule

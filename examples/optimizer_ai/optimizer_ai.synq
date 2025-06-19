@@ -1,0 +1,23 @@
+// SynQ plugin: optimizer_ai
+// RL-based configuration optimizer for SynQ plugins
+
+config plugin_name = "qcompress"
+config trials = 10
+
+best_score = -inf
+best_config = {}
+
+for i in 0..(trials - 1):
+    candidate = {
+        "size": random_int(4, 12),
+        "pattern": random_choice(["ghz", "w", "cluster"])
+    }
+
+    score = simulate plugin_name with candidate
+    log "Trial", i, candidate, "→", score
+
+    if score > best_score:
+        best_score = score
+        best_config = candidate
+
+print "Optimal configuration:", best_config, "Score:", best_score

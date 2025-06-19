@@ -1,0 +1,32 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// qsimla.synq
+// SynQ DSL interface for Quantum Simulator with Latent Alignment (QSim-LA)
+
+@module qsimla
+
+// Create a new simulation engine
+@macro new_sim(qubits):
+    return @system.QSimLA(qubits)
+
+// Apply a symbolic gate to the simulation engine
+@macro apply(sim, gate, qubit, param=None):
+    sim.apply_gate(gate, [qubit], param)
+    return sim
+
+// Inject latent vector
+@macro inject_latent(sim, vec):
+    sim.inject_latent_vector(vec)
+    return sim
+
+// Take snapshot of current state
+@macro snapshot(sim):
+    return sim.snapshot()
+
+// Compare two latent states
+@macro compare_latents(a, b):
+    return @system.compare_alignment(a, b)
+
+@endmodule

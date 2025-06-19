@@ -1,0 +1,14 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Event System
+# File: stdlib/event.synq
+##################################################
+
+@event SignalData(data)
+@event AppClosed(reason)
+
+@fn emit_example():
+    emit SignalData("test_payload")

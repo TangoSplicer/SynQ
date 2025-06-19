@@ -1,0 +1,12 @@
+##################################################
+# SynQ Standard Library - Compiler Meta
+# File: stdlib/compiler.synq
+##################################################
+
+@macro repeat(n, block):
+    for i in 0..n:
+        eval(block)
+
+@plugin_transform hook_log_calls:
+    before_call(fn):
+        inject("log('Calling', fn.name)")

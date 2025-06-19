@@ -1,0 +1,18 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Custom Errors
+# File: stdlib/errors.synq
+# Description: Domain-specific and symbolic exception handling
+##################################################
+
+error FileNotFound
+error UnauthorizedAccess
+
+@fn risky_call(should_fail: bool):
+    if should_fail:
+        throw FileNotFound("Missing file detected.")
+    else:
+        return "OK"

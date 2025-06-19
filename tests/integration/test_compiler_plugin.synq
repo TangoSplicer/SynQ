@@ -1,0 +1,25 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_compiler_plugin.synq
+
+use stdlib "plugin_compiler.synq"
+
+print("[PLUGIN TEST] Defining mock compiler pass...")
+
+define_plugin_pass("uppercase_ir", fn(ctx):
+    ir = ctx.get_ir()
+    ctx.set_ir(to_uppercase(ir))
+    ctx.annotate("modified", "yes")
+)
+
+print("[PLUGIN TEST] Input IR:")
+ir_code = "h q0; cx q0, q1;"
+print(ir_code)
+
+print("[PLUGIN TEST] Running plugins...")
+output = run_compiler_plugins(ir_code)
+
+print("[PLUGIN TEST] Output IR:")
+print(output)

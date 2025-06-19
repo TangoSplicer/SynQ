@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Flowlets (Symbolic Reactivity)
+# File: stdlib/flowlets.synq
+# Description: Mini reactive logic atoms triggered by state
+##################################################
+
+### ⚡ FLOWLET DECLARATION ###
+@flowlet notify_if_critical if system.temp > 90:
+    log("CRITICAL TEMP:", system.temp)
+
+@flowlet flag_memory_growth if memory.size > 2048:
+    alert("Memory usage high.")
+
+@fn update_monitor():
+    system.temp = 95
+    memory.size = 3000
+    trigger_flowlets()

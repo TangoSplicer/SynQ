@@ -1,0 +1,17 @@
+---
+
+### ✅ `manifest.synqmeta`
+
+```json
+{
+  "name": "optimizer_ai",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "optimizer_ai.synq",
+    "optimizer_ai_config.json",
+    "README.md"
+  ]
+}

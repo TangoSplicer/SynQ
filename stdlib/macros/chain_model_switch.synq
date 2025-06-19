@@ -1,0 +1,24 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: chain_model_switch.synq
+// Purpose: Dynamically switch models between subtasks
+
+macro chain_model_switch(goal) {
+  let steps = @system.ai_router().decompose(goal)
+  let models = ["copilot", "llama3", "synqcore"]
+  let responses = []
+
+  for i in 0..steps.len() {
+    let model = models[i % models.len()]
+    let result = @system.ai_router().run_with_model(model, steps[i])
+    responses.push({
+      step: steps[i],
+      model: model,
+      response: result
+    })
+  }
+
+  return responses
+}

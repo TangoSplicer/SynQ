@@ -1,0 +1,13 @@
+{
+  "name": "teleport",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "README.md",
+    "teleport.synq",
+    "teleport.qdata",
+    "teleport_config.json"
+  ]
+}

@@ -1,0 +1,25 @@
+---
+
+### ✅ File: `teleport.synq`
+
+```synq
+// Quantum teleportation protocol in SynQ hybrid language
+
+qubit q0, q1, q2
+
+H q1
+CNOT q1, q2
+
+CNOT q0, q1
+H q0
+
+measure q0 -> c0
+measure q1 -> c1
+
+if c1 == 1:
+    X q2
+
+if c0 == 1:
+    Z q2
+
+dump q2

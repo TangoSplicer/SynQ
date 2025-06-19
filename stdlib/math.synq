@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - Math Utilities
+# File: stdlib/math.synq
+##################################################
+
+@fn square(x): -> float
+    return x * x
+
+@fn mean(arr): -> float
+    return sum(arr) / len(arr)
+
+@fn distance(x1, y1, x2, y2): -> float
+    return sqrt(square(x2 - x1) + square(y2 - y1))
+
+@fn factorial(n): -> int
+    if n <= 1: return 1
+    return n * factorial(n - 1)

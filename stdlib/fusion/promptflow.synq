@@ -1,0 +1,29 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// promptflow.synq
+// Define prompt chaining pipelines for AI agents
+
+plugin promptflow {
+  version: "1.0.0"
+  description: "Composable prompt chain executor"
+
+  macro flow(chain) {
+    let router = @system.ai_router()
+    let state = ""
+
+    for step in chain {
+      let model = step.model
+      let prompt = step.prompt.replace("{input}", state)
+      state = router.run_with_model(model, prompt)
+    }
+
+    return state
+  }
+
+  macro init() {
+    declare_skill("promptflow_chain", ["ai", "nlp", "compose"], this.flow)
+    return "🧠 promptflow active"
+  }
+}

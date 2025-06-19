@@ -1,0 +1,17 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// suggest_rewrites.synq
+// Macro that uses AI to propose optimized, idiomatic rewrites
+
+macro suggest_rewrites(code_block) {
+  let ai = @system.ai_router()
+  let prompt = """
+  Given the following code block, suggest a more efficient or idiomatic version.
+  Include inline comments explaining your changes.
+
+  Original Code:
+  ```synq
+  {code_block}
+""return ai.run_with_model("copilot", prompt) }

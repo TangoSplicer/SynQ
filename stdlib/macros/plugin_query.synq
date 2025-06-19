@@ -1,0 +1,16 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: plugin_query.synq
+// Purpose: Search for plugins matching a tag or keyword
+
+macro search_plugins(query) {
+  let results = @system.plugin_registry().search(query)
+  return results.map(p => ({
+    name: p.name,
+    description: p.description,
+    usage: p.usage_count,
+    tags: p.tags
+  }))
+}

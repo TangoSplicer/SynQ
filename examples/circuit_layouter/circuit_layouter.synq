@@ -1,0 +1,22 @@
+// SynQ plugin: circuit_layouter
+// Optimize circuit layout using hybrid classical-quantum heuristics
+
+config gates = [
+  {"op": "CNOT", "target": [0, 1]},
+  {"op": "H", "target": [0]},
+  {"op": "T", "target": [1]},
+  {"op": "CNOT", "target": [1, 2]}
+]
+
+fn cost(op):
+    if op == "CNOT": return 3
+    if op == "H": return 1
+    if op == "T": return 2
+    return 5
+
+sorted_gates = sort gates by cost(op["op"])
+
+for g in sorted_gates:
+    apply g["op"], g["target"]
+
+report "Optimized layout applied"

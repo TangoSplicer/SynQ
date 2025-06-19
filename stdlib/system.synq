@@ -1,0 +1,23 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - System Info Access
+# File: stdlib/system.synq
+# Description: Host and platform runtime data
+##################################################
+
+@fn get_arch(): -> string
+    return env.architecture
+
+@fn get_platform(): -> string
+    return env.platform
+
+@fn system_summary(): -> dict
+    return {
+        "arch": get_arch(),
+        "platform": get_platform,
+        "cpu_cores": env.cpu_count,
+        "ram": env.total_memory
+    }

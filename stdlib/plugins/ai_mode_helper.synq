@@ -1,0 +1,25 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Plugin: ai_mode_helper.synq
+// Purpose: Provides Copilot-based suggestions
+
+plugin ai_mode_helper {
+  version: "1.1.0"
+  description: "Suggests actions based on Copilot AI mode"
+
+  macro suggest(task) {
+    let mode = @system.copilot_mode()
+
+    if mode == "Ghostwriter" {
+      return "🔮 Auto-complete hint: Wrap this in a class for reuse."
+    } elif mode == "ELI5" {
+      return "💡 Let’s break it down: Try printing each value to see how it works."
+    } elif mode == "Debugger" {
+      return "🧩 Enable stacktrace flag and rerun test_plugin_debug"
+    } elif mode == "Hardcore" {
+      return "🚨 No help given. You're the debugger now."
+    }
+  }
+}

@@ -1,0 +1,33 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_distributed.synq
+
+use stdlib "distributed.synq"
+
+print("[DISTRIBUTED] Registering compute nodes")
+register_node("cpu0", "CPU")
+register_node("qsim1", "QUANTUM_SIM")
+
+print("[DISTRIBUTED] Dispatching async task")
+res1 = dispatch_async("task1", "simulate_circuit()", "QUANTUM_SIM")
+print("Task 1 launched")
+
+res2 = dispatch_async("task2", "print('Hello')", "CPU")
+print("Task 2 launched")
+
+print("[DISTRIBUTED] Waiting for results...")
+print(res1.output)
+print(res2.output)
+
+print("[DISTRIBUTED] Batch test")
+tasks = [
+    { id: "t3", code: "entangle(q1, q2)", preferred: "QUANTUM_SIM" },
+    { id: "t4", code: "measure_all()", preferred: "CPU" }
+]
+
+batch_results = dispatch_batch(tasks)
+for r in batch_results {
+    print(r.task_id + ": " + r.output)
+}

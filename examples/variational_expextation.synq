@@ -1,0 +1,26 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+# synq/examples/variational_expectation.synq
+
+import quantum.circuits as qc
+import quantum.measurements as qm
+import math
+
+fn evaluate(theta: float) -> int:
+    let c = qc.Circuit(1)
+    let q = c.register[0]
+
+    let Ry = qc.Gate([[cos(theta/2), -sin(theta/2)],
+                      [sin(theta/2), cos(theta/2)]], "Ry")
+
+    c.apply(Ry, q.id)
+    c.apply(qc.Gate.Z, q.id)
+
+    return qm.measure(q)
+
+for i in range(0, 17):
+    let theta = i * math.pi / 8
+    let est = evaluate(theta)
+    print("Theta =", round(theta, 2), "=> Expectation ~", est)

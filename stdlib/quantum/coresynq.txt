@@ -1,0 +1,48 @@
+// File: stdlib/quantum/core.synq
+
+// --- Core Quantum Operations ---
+
+fn allocate(name) {
+    qubit name
+}
+
+fn hadamard(target) {
+    H(target)
+}
+
+fn cnot(control, target) {
+    CNOT(control, target)
+}
+
+fn measure_all() {
+    return measure *
+}
+
+// --- Advanced Quantum Instructions ---
+
+fn prepare_superposition(qs) {
+    for q in qs {
+        H(q)
+    }
+}
+
+fn entangle(q1, q2) {
+    H(q1)
+    CNOT(q1, q2)
+}
+
+// --- Bridge to Simulation ---
+
+fn simulate_circuit() {
+    return simulate *
+}
+
+fn expectation(op, state) {
+    return expect(op, state)
+}
+
+// --- Quantum + AI Prompting ---
+fn describe_circuit() {
+    desc = serialize_circuit()
+    return run GPT4("Explain this quantum circuit:\n" + desc)
+}

@@ -1,0 +1,27 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Plugin: ai_mode_echo.synq
+// Purpose: Echoes a response based on the current Copilot Mode
+
+plugin ai_mode_echo {
+  version: "1.0.0"
+  description: "Responds with different tone depending on Copilot AI mode"
+
+  macro run(input) {
+    let mode = @system.copilot_mode()
+
+    if mode == "Ghostwriter" {
+      return "👨‍💻 Echo from Ghostwriter mode: Clean and structured"
+    } elif mode == "ELI5" {
+      return "🍼 Echo from ELI5: This means the plugin talked back, like a helper friend."
+    } elif mode == "Debugger" {
+      return "🛠️ Echo from Debugger mode: Full diagnostic path here (none yet)."
+    } elif mode == "Hardcore" {
+      return "🔧 Raw Echo: " + input
+    } else {
+      return "🤖 Unknown mode"
+    }
+  }
+}

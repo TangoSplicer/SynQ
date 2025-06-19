@@ -1,0 +1,18 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Standard Library - App/Game Canvas Layer
+# File: stdlib/app.synq
+# Description: Create apps, games, and GUIs from SynQ
+##################################################
+
+@canvas main:
+    @layout vertical:
+        label("Welcome to SynQ App")
+        input_box("Enter your name", bind=name)
+        button("Submit", on_click=save_user)
+
+@fn save_user():
+    print("Saved:", name)

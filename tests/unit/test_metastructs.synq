@@ -1,0 +1,16 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Unit Test: MetaStructs
+# File: tests/unit/test_metastructs
+##################################################
+
+@import metastructs
+
+@test "metastruct field introspection"
+    let user = UserProfile("Alice", 29, "2025-06-13")
+    describe_profile(user)
+    assert reflect(user).field_count() == 3
+@end

@@ -1,0 +1,13 @@
+# synq/repl/extensions/signing_repl.qx
+# Adds 'sign' and 'verify' to REPL
+# License: SynQ Commercial Attribution License v1.0
+
+when input startswith "sign " {
+    args = input.remove_prefix("sign ").strip()
+    print(run_shell("synq sign --sign " + args))
+}
+
+when input startswith "verify " {
+    args = input.remove_prefix("verify ").strip()
+    print(run_shell("synq sign --verify " + args))
+}

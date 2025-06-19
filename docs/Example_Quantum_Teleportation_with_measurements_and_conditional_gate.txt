@@ -1,0 +1,36 @@
+import quantum.circuits as qc
+import quantum.measurements as qm
+
+# Allocate 3 qubits (Register of 3) for teleportation: [q0 (Alice's), q1 (ancilla), q2 (Bob's)]
+reg = qc.Register(3)
+q0, q1, q2 = reg[0], reg[1], reg[2]
+
+# Step 1: Prepare qubit q0 in some arbitrary state |ψ> to teleport.
+qc.Gate.X.apply_to(q0)           # example: put q0 in state |1> (this would be our |ψ>)
+# (In general, |ψ> could be any state; here we applied X for demonstration.)
+
+# Step 2: Create an entangled pair (Bell state) between q1 and q2.
+circuit = qc.Circuit(reg)        # start building a circuit on our register
+circuit.h(q1)                    # Hadamard on q1
+circuit.cnot(q1, q2)             # CNOT with q1 as control and q2 as target (q1–q2 entangled)
+
+# Step 3: Perform Bell measurement on q0 and q1.
+circuit.cnot(q0, q1)             # CNOT with q0 as control, q1 target
+circuit.h(q0)                    # Hadamard on q0
+m0 = qm.measure(q0)              # Measure q0 (Alice's qubit)
+m1 = qm.measure(q1)              # Measure q1 (ancilla qubit)
+
+# At this point, q0 and q1 are measured (classical outcomes m0, m1).
+# q2 is still holding an uncollapsed state which is a rotated version of the original |ψ>.
+
+# Step 4: Use classical results m0, m1 to correct q2's state.
+if m1 == 1:
+    circuit.x(q2)   # Apply X on q2 if m1 (second measurement) is 1
+if m0 == 1:
+    circuit.z(q2)   # Apply Z on q2 if m0 (first measurement) is 1
+
+# (The state of q2 is now collapsed to |ψ>, the original state from q0.)
+# We can verify by measuring q2 to see if it's in the state |1> as we initially set |ψ> = |1>.
+final_bit = qm.measure(q2)
+print("Bob's qubit measurement:", final_bit)
+# Expected output: 1 (with certainty, since we teleported |1> state).

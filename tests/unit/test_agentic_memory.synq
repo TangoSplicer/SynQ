@@ -1,0 +1,34 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+#include "compiler/agentic_memory.h"
+#include <cassert>
+#include <iostream>
+
+using namespace synq;
+
+void test_memory_record_and_retrieve() {
+    AgenticMemory mem("agent_001");
+    mem.record("observation", "Saw a particle at Q3.");
+    mem.record("plan", "Flip Q2 tomorrow.", "plan1");
+    auto plans = mem.retrieve_by_type("plan");
+    assert(plans.size() == 1);
+    assert(plans[0].content.find("Flip Q2") != std::string::npos);
+    std::cout << "test_memory_record_and_retrieve passed.\n";
+}
+
+void test_memory_label_lookup() {
+    AgenticMemory mem("agent_X");
+    mem.record("tool_call", "Used optimizer", "tool1");
+    auto result = mem.retrieve_by_label("tool1");
+    assert(result.has_value());
+    assert(result->type == "tool_call");
+    std::cout << "test_memory_label_lookup passed.\n";
+}
+
+int main() {
+    test_memory_record_and_retrieve();
+    test_memory_label_lookup();
+    return 0;
+}

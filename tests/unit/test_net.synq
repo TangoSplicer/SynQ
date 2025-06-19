@@ -1,0 +1,9 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+@import net
+
+@test "ping test"
+    assert ping("127.0.0.1") == true
+@end

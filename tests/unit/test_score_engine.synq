@@ -1,0 +1,28 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: test_score_engine.synq — Tests for score engine logic
+
+test plugin_score:
+
+    uses plugin.score.score_engine as score
+    uses io.fs as fs
+
+    case "score clean plugin":
+        let dir = "examples/plugins/teleport/"
+        let result = score.score_plugin(dir)
+        assert result["safety"] >= 90
+        assert result["score"] >= 80
+
+    case "score legacy incompatible plugin":
+        let dir = "examples/plugins/old_circuit/"
+        let meta = {
+            "synq_version": "0.1.0",
+            "downloads": 0,
+            "stars": 0
+        }
+        fs.write_json(dir + "/plugin.json", meta)
+        let result = score.score_plugin(dir)
+        assert result["compatibility"] < 50
+        assert result["score"] < 70
+
+end

@@ -1,0 +1,32 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/qsolvers.synq
+
+# SynQ Solver Bridge DSL
+
+extern SolverBridge
+extern SolverType
+
+def new_solver(mode):
+    s = new SolverBridge()
+    if mode == "SAT":
+        s.set_type(SolverType.SAT)
+    elif mode == "CVX":
+        s.set_type(SolverType.CVX)
+    elif mode == "ANNEAL":
+        s.set_type(SolverType.ANNEAL)
+    return s
+
+def add_var(s, name, value = 0.0):
+    s.add_variable(name, value)
+
+def add_constraint(s, lhs, op, rhs):
+    s.add_constraint(lhs, op, rhs)
+
+def set_objective(s, expr):
+    s.set_objective(expr)
+
+def solve(s):
+    return s.solve()

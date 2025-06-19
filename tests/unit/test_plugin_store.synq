@@ -1,0 +1,32 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+#include "compiler/plugin_store.h"
+#include <cassert>
+#include <iostream>
+
+using namespace synq;
+using json = nlohmann::json;
+
+void test_plugin_registration_and_call() {
+    PluginMetadata meta = {"echo_plugin", "1.0", "Returns input unchanged"};
+    CompilerPlugin plugin(meta, [](const json& input) {
+        return input;
+    });
+
+    PluginStore::instance().register_plugin("echo", plugin);
+    auto loaded = PluginStore::instance().get_plugin("echo");
+    assert(loaded.has_value());
+
+    json payload = {{"data", 42}};
+    json output = loaded->invoke(payload);
+    assert(output["data"] == 42);
+
+    std::cout << "test_plugin_registration_and_call passed.\n";
+}
+
+int main() {
+    test_plugin_registration_and_call();
+    return 0;
+}

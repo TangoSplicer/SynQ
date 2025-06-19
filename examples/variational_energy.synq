@@ -1,0 +1,32 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: examples/variational_energy.synq
+
+// --- Variational Quantum Energy Minimization (VQE) ---
+
+// Define energy expectation function
+fn energy(params) {
+    theta = params["theta"]
+
+    allocate(q0)
+    RX(q0, theta)
+    return expect(Z, q0)
+}
+
+// Initial parameter guess
+init_params = {
+    "theta": 0.5
+}
+
+// Run variational optimizer using echoWave
+result = optimize(
+    energy,
+    init_params,
+    strategy = "echo",
+    max_iters = 40
+)
+
+print("Optimized theta:")
+print(result)

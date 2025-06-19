@@ -1,0 +1,21 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: test_mutator.synq — Verifies plugin mutation system
+
+test plugin_mutator:
+
+    uses plugin.mutator.mutator as mutator
+    uses io.fs as fs
+
+    case "mutate simple plugin":
+        let base = "examples/plugins/teleport/"
+        fs.copy_tree(base, "sandbox/teleport_m1/")
+        mutator.mutate_plugin("sandbox/teleport_m1/")
+        let exists = fs.exists("sandbox/teleport_m1/main.synq")
+        assert exists
+
+    case "log mutation result":
+        let log = fs.read_text("mutation_log.json")
+        assert "teleport_m1" in log
+
+end

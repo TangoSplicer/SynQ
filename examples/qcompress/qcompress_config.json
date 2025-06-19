@@ -1,0 +1,8 @@
+{
+  "plugin": "qcompress",
+  "version": "1.0.0",
+  "description": "Quantum lossless compressor using QFT for binary quantum data",
+  "entry": "qcompress.synq",
+  "type": "quantum",
+  "tags": ["quantum", "compression", "qft", "encoding"]
+}

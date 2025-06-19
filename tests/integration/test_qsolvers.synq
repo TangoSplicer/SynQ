@@ -1,0 +1,28 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_qsolvers.synq
+
+use stdlib "quantum/qsolvers.synq"
+
+print("[SOLVER TEST] Initializing SAT solver...")
+s1 = new_solver("SAT")
+add_constraint(s1, "A", "OR", "B")
+add_constraint(s1, "~B", "OR", "C")
+print(solve(s1))
+
+print("\n[SOLVER TEST] Initializing CVX solver...")
+s2 = new_solver("CVX")
+add_var(s2, "x", 1.0)
+add_var(s2, "y", 2.0)
+add_constraint(s2, "x", "+", "y <= 3")
+set_objective(s2, "x^2 + y^2")
+print(solve(s2))
+
+print("\n[SOLVER TEST] Initializing Anneal solver...")
+s3 = new_solver("ANNEAL")
+add_var(s3, "q0", 0)
+add_var(s3, "q1", 1)
+set_objective(s3, "-q0 * q1 + q0 + q1")
+print(solve(s3))

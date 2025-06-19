@@ -1,0 +1,100 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+###############################################
+# SynQ Standard Library - Core Classical Logic
+# File: stdlib/core.synq
+# Description: Native classical types, flow, logic
+###############################################
+
+### 🔢 PRIMITIVE TYPES ###
+type int
+type float
+type bool
+type string
+type char
+type null
+
+### 🔀 TYPE HELPERS ###
+@fn typeof(x): -> string
+    builtin
+
+@fn len(x): -> int
+    builtin
+
+@fn print(msg): -> void
+    builtin
+
+@fn input(prompt): -> string
+    builtin
+
+### 💡 VARIABLE DECLARATIONS ###
+@keyword let        # immutable
+@keyword var        # mutable
+@keyword const      # constant
+@keyword auto       # inferred type
+
+let a = 10
+var name = "SynQ"
+const PI = 3.14159
+auto score = 97.5
+
+### 🔁 CONTROL FLOW ###
+@syntax if (condition): block
+@syntax else: block
+@syntax elif (condition): block
+@syntax for var in list: block
+@syntax while (condition): block
+@syntax loop: block
+@syntax break
+@syntax continue
+
+### 🔍 MATCHING ###
+match user_input:
+    "start" => launch()
+    "quit" => exit()
+    _ => print("Unknown command")
+
+### 🧠 LOGICAL OPERATORS ###
+# all symbolic traceable
+and, or, not, ==, !=, >, <, >=, <=, is
+
+### 🔄 FUNCTION DEFINITIONS ###
+@fn greet(name: string): -> string
+    return "Hello, " + name
+
+@fn add(a: int, b: int): -> int
+    return a + b
+
+@lambda square(x): x * x
+
+@fn describe(x): -> void
+    match typeof(x):
+        "int" => print("Integer")
+        "string" => print("Text")
+        _ => print("Unknown type")
+
+### ⚠️ ERROR HANDLING ###
+try:
+    risky_call()
+catch e:
+    print("Error occurred:", e)
+
+### 📌 SAMPLE FUNCTIONAL USE ###
+@fn factorial(n: int): -> int
+    if n <= 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+@fn is_even(x): -> bool
+    return x % 2 == 0
+
+@fn sum_list(numbers: list): -> int
+    let total = 0
+    for n in numbers:
+        total += n
+    return total
+
+### ✅ END CORE ###

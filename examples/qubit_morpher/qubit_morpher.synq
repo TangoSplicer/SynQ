@@ -1,0 +1,15 @@
+// SynQ plugin: qubit_morpher
+// Dynamically morph gate angles and patterns to match topological layout
+
+qubit q0, q1
+
+angle = adaptive_angle("qpu_graph")
+morph_pattern = optimize_topology(q0, q1)
+
+U3 q0, angle.theta, angle.phi, angle.lambda
+if morph_pattern == "swap":
+    SWAP q0, q1
+else:
+    CNOT q0, q1
+
+print "Morphing applied:", morph_pattern

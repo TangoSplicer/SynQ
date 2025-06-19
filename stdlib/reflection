@@ -1,0 +1,9 @@
+##################################################
+# SynQ Standard Library - Deep Reflection
+# File: stdlib/reflection.synq
+##################################################
+
+@fn introspect(obj):
+    let fields = reflect(obj).fields()
+    for f in fields:
+        print(f.name, f.type)

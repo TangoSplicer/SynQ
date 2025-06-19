@@ -1,0 +1,32 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_quantum_templates.synq
+
+use stdlib "quantum/core.synq"
+use stdlib "quantum/circuits.synq"
+
+print("[CIRCUITS] Bell State:")
+q0 = allocate("q0")
+q1 = allocate("q1")
+bell(q0, q1)
+print(measure(q0), measure(q1))
+
+print("[CIRCUITS] GHZ State:")
+qs = [allocate("g0"), allocate("g1"), allocate("g2")]
+ghz(qs)
+print(measure(qs[0]), measure(qs[1]), measure(qs[2]))
+
+print("[CIRCUITS] QFT:")
+qs2 = [allocate("qft0"), allocate("qft1"), allocate("qft2")]
+qft(qs2)
+measure_all()
+
+print("[CIRCUITS] Teleportation:")
+t0 = allocate("t0")
+t1 = allocate("t1")
+t2 = allocate("t2")
+H(t0)
+teleport(t0, t1, t2)
+print(measure(t2))

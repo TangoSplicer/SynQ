@@ -1,0 +1,73 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Example: Classical Language Basics
+# File: examples/classical_basics.synq
+# Demonstrates variables, loops, conditionals, and functions
+##################################################
+
+@import core
+
+### 🎯 Variable Declarations ###
+let language = "SynQ"
+var year = 2025
+const max_points = 100
+auto bonus = 17.5
+
+print("Language:", language)
+print("Year:", year)
+print("Max:", max_points)
+print("Bonus:", bonus)
+
+### 🔄 Loops ###
+@fn show_numbers(limit: int): -> void
+    for i in 0..limit:
+        print("Value:", i)
+
+show_numbers(5)
+
+### ✅ Functions ###
+@fn multiply(a: int, b: int): -> int
+    return a * b
+
+print("5 × 7 =", multiply(5, 7))
+
+### 🧮 Lists and Iteration ###
+let primes = [2, 3, 5, 7, 11]
+for p in primes:
+    print("Prime:", p)
+
+### 🔍 Match + Pattern Example ###
+let command = "status"
+
+match command:
+    "start" => print("Starting system...")
+    "stop" => print("Stopping system...")
+    "status" => print("System online.")
+    _ => print("Unknown command.")
+
+### 🔁 While Loop ###
+var countdown = 3
+while countdown > 0:
+    print("T-minus", countdown)
+    countdown -= 1
+
+### 🧠 Type Checking ###
+@fn explain_type(x): -> void
+    let t = typeof(x)
+    match t:
+        "int" => print("This is an integer.")
+        "string" => print("This is a string.")
+        "bool" => print("This is a boolean.")
+        _ => print("Unknown type.")
+
+explain_type(language)
+explain_type(year)
+explain_type(true)
+
+### ⚠️ Error Handling ###
+@fn risky_divide(a: int, b: int): -> float
+    try:
+        return a /

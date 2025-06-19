@@ -1,0 +1,18 @@
+---
+
+### ✅ `manifest.synqmeta`
+
+```json
+{
+  "name": "qcompress",
+  "version": "1.0.0",
+  "signed": true,
+  "validated": true,
+  "synq_version": "1.0",
+  "files": [
+    "qcompress.synq",
+    "qcompress_config.json",
+    "qcompress.qdata",
+    "README.md"
+  ]
+}

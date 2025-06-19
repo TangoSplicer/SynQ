@@ -1,0 +1,48 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: examples/qaoa_maxcut.synq
+
+// --- QAOA Optimization for MaxCut on 2-node Graph ---
+
+// QAOA energy function
+fn qaoa_cost(params) {
+    gamma = params["gamma"]
+    beta = params["beta"]
+
+    allocate(q0)
+    allocate(q1)
+
+    // Prepare |+> state
+    H(q0)
+    H(q1)
+
+    // Apply cost unitary
+    CNOT(q0, q1)
+    RZ(q1, 2 * gamma)
+    CNOT(q0, q1)
+
+    // Apply mixer unitary
+    RX(q0, 2 * beta)
+    RX(q1, 2 * beta)
+
+    return expect(Z0Z1)
+}
+
+// Initial γ, β
+init = {
+    "gamma": 0.8,
+    "beta": 0.7
+}
+
+// Run QAOA optimizer
+result = optimize(
+    qaoa_cost,
+    init,
+    strategy = "bracketed",
+    max_iters = 50
+)
+
+print("Optimized QAOA parameters:")
+print(result)

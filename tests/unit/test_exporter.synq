@@ -1,0 +1,24 @@
+// File: test_exporter.synq — Tests for export backend
+
+test exporter:
+
+    uses compiler.export.exporter as exporter
+    uses io.fs as fs
+
+    case "export synqvm":
+        let src = "examples/plugins/teleport/main.synq"
+        exporter.export_plugin(src, "synqvm")
+        assert fs.exists("examples/plugins/teleport/main.synqvm")
+
+    case "export bin":
+        let src = "examples/plugins/teleport/main.synq"
+        exporter.export_plugin(src, "bin")
+        assert fs.exists("examples/plugins/teleport/main.bin")
+        assert fs.exists("examples/plugins/teleport/main.bin.hash")
+
+    case "export wasm":
+        let src = "examples/plugins/teleport/main.synq"
+        exporter.export_plugin(src, "wasm")
+        assert fs.exists("examples/plugins/teleport/main.wasm")
+
+end

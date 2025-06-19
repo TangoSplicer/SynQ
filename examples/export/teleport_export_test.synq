@@ -1,0 +1,23 @@
+---
+
+### ✅ File: `synq/examples/exports/teleport_export_test.synq`  
+🧪 **Exportable Source Example**
+
+```synq
+plugin teleportation:
+
+    entry main:
+        qbit a, b, c;
+        H a;
+        CNOT a, b;
+        CNOT b, c;
+        measure a;
+        measure b;
+
+    description:
+        "Teleportation test file for export engine."
+
+    tags:
+        ["example", "export", "quantum", "wasm", "synqvm"]
+
+end

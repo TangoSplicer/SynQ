@@ -1,0 +1,29 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/plugin_compiler.synq
+
+# --- SynQ Compiler Plugin DSL ---
+
+extern CompilerPluginRegistry
+extern PassContext
+extern CompilerPass
+
+# Define a custom plugin pass
+def define_plugin_pass(name, func):
+    class CustomPass(CompilerPass):
+        def name():
+            return name
+
+        def run(ctx):
+            func(ctx)
+
+    CompilerPluginRegistry.register_pass(name, () -> new CustomPass())
+
+# Run all registered plugin passes
+def run_compiler_plugins(ir_code):
+    ctx = new PassContext()
+    ctx.set_ir(ir_code)
+    CompilerPluginRegistry.run_all(ctx)
+    return ctx.get_ir()

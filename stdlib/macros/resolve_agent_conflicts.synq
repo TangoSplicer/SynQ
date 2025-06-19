@@ -1,0 +1,22 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// Macro: resolve_agent_conflicts.synq
+// Purpose: Compare agent outputs, vote for best result, or escalate
+
+macro resolve_agent_conflicts(results) {
+  let outputs = results.map(r => r.output)
+  let count_map = {}
+  for out in outputs {
+    count_map[out] = count_map.get(out, 0) + 1
+  }
+
+  let sorted = count_map.to_list().sort_by(kv => -kv[1])
+  if sorted[0][1] > 1 {
+    return { resolution: "consensus", output: sorted[0][0] }
+  } else {
+    let escalated = @system.ai_router().run_with_model("arbitrator", outputs.join(" || "))
+    return { resolution: "arbitrated", output: escalated }
+  }
+}

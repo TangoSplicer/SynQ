@@ -1,0 +1,23 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+##################################################
+# SynQ Unit Test: Phantom Context Blocks
+# File: tests/unit/test_phantom
+##################################################
+
+@import phantoms
+
+@test "phantom context fallback"
+    memory.reset()
+    memory.set("bias", "latency")
+    choose_strategy
+    assert memory.last_used() == "QEBET"
+@end
+
+@test "phantom function dispatch"
+    let input = {"size": 1200, "type": "text"}
+    process_data(input)
+    assert memory.last_used() == "batch_compress"
+@end

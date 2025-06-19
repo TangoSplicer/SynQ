@@ -1,0 +1,11 @@
+// In your plugin .cpp file:
+extern "C" synq::Plugin* create_plugin() {
+    return new MyPlugin();
+}
+
+
+then.
+
+bash
+
+g++ -fPIC -shared -o libMyPlugin.so my_plugin.cpp

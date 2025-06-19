@@ -1,0 +1,11 @@
+// SynQ plugin: time_dilation_sync
+// Time-sync across async quantum subsystems using relativistic simulation
+
+config nodes = ["node1", "node2", "node3"]
+config reference = "node1"
+
+for n in nodes:
+    delay = simulate_dilation(n, reference)
+    sync_clock n, delay
+
+print "Time dilation synchronization complete."

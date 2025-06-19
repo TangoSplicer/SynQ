@@ -1,0 +1,45 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// File: prepare_release.synq — Builds, validates, signs, and packages SynQ plugins
+
+plugin release_preparer:
+
+    uses compiler.export.exporter as exporter
+    uses signing.signer as signer
+    uses io.fs as fs
+    uses compiler.validator as validator
+    uses plugin.score.score_engine as score
+
+    command "prepare_release":
+        args:
+            required --project [dir]
+            optional --version [str] = "v1.0.0"
+        run:
+            print "🔎 Validating project:", --project
+            validator.validate_project(--project)
+
+            print "📊 Scoring plugin:"
+            let s = score.score_plugin(--project)
+            assert s["score"] >= 70
+
+            print "📦 Exporting binary:"
+            let main = fs.find(--project, "main.synq")
+            exporter.export_plugin(main, "bin")
+
+            print "🔐 Signing binary:"
+            let bin = replace_ext(main, ".bin")
+            signer.sign_plugin(bin)
+
+            let bundle = "--project/release_" + --version + ".synqbundle.zip"
+            fs.zip_dir(--project, bundle)
+
+            fs.write_json("--project/release_meta.json", {
+                "version": --version,
+                "score": s["score"],
+                "signed": true,
+                "timestamp": now()
+            })
+
+            print "✅ Release bundle ready at", bundle
+
+end

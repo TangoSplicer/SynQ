@@ -1,0 +1,34 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: examples/ai_demo.synq
+
+// --- SynQ AI Module Demonstration ---
+
+// Define a prompt and a model
+prompt = "Explain the concept of quantum teleportation in simple terms."
+
+// Execute model inference
+answer = run GPT4(prompt)
+
+// Print result
+print("AI Response:")
+print(answer)
+
+
+// --- Hybrid Example with Quantum Serialization ---
+
+// Build a simple quantum circuit
+allocate(q0)
+allocate(q1)
+entangle(q0, q1)
+
+// Get serialized description
+circuit_desc = serialize_circuit()
+
+// Use AI to explain the circuit
+explanation = run GPT4("What does this circuit do?\n" + circuit_desc)
+
+print("Circuit Explanation:")
+print(explanation)
