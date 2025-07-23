@@ -6,6 +6,7 @@
 
 #include "ai_provider.h"
 #include <iostream>
+#include <memory>
 
 namespace synq {
 

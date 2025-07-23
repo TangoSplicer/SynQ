@@ -5,29 +5,18 @@
 
 echo "=== SynQ Test Coverage Suite ==="
 
-BUILD_DIR="./build"
-COVERAGE_LOG="./coverage_report.log"
-DUMP_BIN="./tests/tools/coverage_dump"
+# Clean up previous coverage data
+rm -rf coverage
+mkdir -p coverage/cpp
 
-# Build the test coverage aggregator if not already built
-if [ ! -f "$DUMP_BIN" ]; then
-    echo "[*] Building coverage_dump.cpp..."
-    g++ -std=c++17 -O2 -o "$DUMP_BIN" ./tests/tools/coverage_dump.cpp
-    if [ $? -ne 0 ]; then
-        echo "[✗] Build failed: coverage_dump.cpp"
-        exit 1
-    fi
-fi
+# C++ Coverage
+echo "--- Generating C++ coverage report ---"
+PYBIND11_CMAKE_DIR=$(python3 -m pybind11 --cmakedir)
+cmake -D SYNQ_ENABLE_COVERAGE=ON -D CMAKE_PREFIX_PATH=${PYBIND11_CMAKE_DIR} -B build -S .
+cmake --build build
+(cd build && ctest)
+lcov --capture --directory . --output-file coverage/cpp/coverage.info
+genhtml coverage/cpp/coverage.info --output-directory coverage/cpp/html
 
-# Execute the aggregator
-echo "[*] Running coverage dump..."
-"$DUMP_BIN"
-
-# Display summary
-if [ -f "$COVERAGE_LOG" ]; then
-    echo
-    echo "=== Coverage Summary ==="
-    cat "$COVERAGE_LOG"
-else
-    echo "[✗] Coverage log not generated."
-fi
+echo "=== Coverage reports generated ==="
+echo "C++ report: coverage/cpp/html/index.html"

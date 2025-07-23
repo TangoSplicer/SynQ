@@ -4,7 +4,6 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/json.h>
 #include "../src/compiler/repl.h"
 
 namespace py = pybind11;
