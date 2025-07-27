@@ -15,8 +15,8 @@ void run_test(const fs::path& path) {
     std::cout << "🧪 Running test: " << path.filename() << "\n";
     std::ifstream test_file(path);
     if (!test_file) {
-        std::cerr << "❌ Could not open test file.\n";
-        return;
+        std::cerr << "❌ Could not open test file: " << path << "\n";
+        exit(1);
     }
 
     std::string line;

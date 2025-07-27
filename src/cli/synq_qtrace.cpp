@@ -13,8 +13,8 @@ void visualize_quantum_trace(const std::string& file) {
 
     std::ifstream f(file);
     if (!f) {
-        std::cerr << "❌ Cannot open circuit file.\n";
-        return;
+        std::cerr << "❌ Cannot open circuit file: " << file << "\n";
+        exit(1);
     }
 
     std::string gate;

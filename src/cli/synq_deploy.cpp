@@ -6,15 +6,26 @@
 
 #include <iostream>
 #include <string>
-#include <cstdlib>
+#include <unistd.h>
+#include <sys/wait.h>
 
 void deploy_to_target(const std::string& file, const std::string& target) {
     std::cout << "🚀 Deploying " << file << " to target: " << target << "\n";
 
     if (target == "local") {
         std::cout << "📦 Running locally...\n";
-        std::string cmd = "./build/synq_run " + file;
-        std::system(cmd.c_str());
+        pid_t pid = fork();
+        if (pid == -1) {
+            std::cerr << "❌ Fork failed.\n";
+            exit(1);
+        } else if (pid == 0) {
+            execl("./build/synq_run", "synq_run", file.c_str(), (char*)NULL);
+            std::cerr << "❌ Exec failed.\n";
+            exit(1);
+        } else {
+            int status;
+            waitpid(pid, &status, 0);
+        }
     } else if (target == "aws" || target == "gcp" || target == "azure") {
         std::cout << "🌐 Uploading to " << target << " via SynQHub API...\n";
         // Stub for future HTTP integration

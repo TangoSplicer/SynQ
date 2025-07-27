@@ -9,14 +9,14 @@
 
 using json = nlohmann::json;
 
-const std::string QUORUM_PATH = "build/quorum_config.json";
-const std::string SIGNATURES_PATH = "build/plugin_signatures.json";
-const std::string KEYRING_PATH = "build/keyring_registry.json";
+std::string quorum_path = "build/quorum_config.json";
+std::string signatures_path = "build/plugin_signatures.json";
+std::string keyring_path = "build/keyring_registry.json";
 
 void show_keys() {
-    std::ifstream file(KEYRING_PATH);
+    std::ifstream file(keyring_path);
     if (!file) {
-        std::cout << "No keyring found.\n";
+        std::cout << "No keyring found at " << keyring_path << "\n";
         return;
     }
     json keys;
@@ -27,7 +27,7 @@ void show_keys() {
 }
 
 void check_quorum(const std::string& plugin_id) {
-    std::ifstream qf(QUORUM_PATH), sf(SIGNATURES_PATH);
+    std::ifstream qf(quorum_path), sf(signatures_path);
     if (!qf || !sf) {
         std::cout << "Missing quorum or signature data.\n";
         return;
@@ -48,11 +48,11 @@ void check_quorum(const std::string& plugin_id) {
 }
 
 void set_quorum(const std::string& plugin_id, int required, int total) {
-    std::ifstream infile(QUORUM_PATH);
+    std::ifstream infile(quorum_path);
     json conf;
     if (infile) infile >> conf;
     conf[plugin_id] = {{"required", required}, {"total", total}};
-    std::ofstream outfile(QUORUM_PATH);
+    std::ofstream outfile(quorum_path);
     outfile << conf.dump(2);
     std::cout << "Set quorum for " << plugin_id << ": " << required << " of " << total << "\n";
 }
@@ -60,7 +60,21 @@ void set_quorum(const std::string& plugin_id, int required, int total) {
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cout << "Usage: synq quorum <show-keys|check|set> [args]\n";
+        std::cout << "  --quorum-path <path>\n";
+        std::cout << "  --signatures-path <path>\n";
+        std::cout << "  --keyring-path <path>\n";
         return 1;
+    }
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--quorum-path" && i + 1 < argc) {
+            quorum_path = argv[++i];
+        } else if (arg == "--signatures-path" && i + 1 < argc) {
+            signatures_path = argv[++i];
+        } else if (arg == "--keyring-path" && i + 1 < argc) {
+            keyring_path = argv[++i];
+        }
     }
 
     std::string cmd = argv[1];

@@ -1,0 +1,33 @@
+add_executable(synq
+  synq_mutate.cpp
+  synq_ai.cpp
+  synq_test.cpp
+  signing_quorum.cpp
+  synq_config.cpp
+  synq_debug.cpp
+  synq_version.cpp
+  synq_run.cpp
+  synq_chain.cpp
+  synq_create.cpp
+  synq_doctor.cpp
+  synq_deploy.cpp
+  synq_inspect.cpp
+  synq_lint.cpp
+  synq_publish.cpp
+  synq_build.cpp
+  synq_profile.cpp
+  synq_compile.cpp
+  synq_fuzz.cpp
+  synq_sign.cpp
+  synq_help.cpp
+  synq_skillmap.cpp
+  synq_plugin.cpp
+  synq_man.cpp
+  synq_export.cpp
+  synq_qtrace.cpp
+  synq_init.cpp
+  skillmap_query.cpp
+  synq_trace.cpp
+)
+
+target_link_libraries(synq PRIVATE synq_lib)

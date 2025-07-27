@@ -4,30 +4,40 @@
 
 #include <iostream>
 #include <string>
-#include <cstdlib>
+#include <pybind11/embed.h>
+
+namespace py = pybind11;
 
 void publish_remote(const std::string& plugin, const std::string& team) {
-    std::string cmd = "python3 -c \"import sys; sys.path.append('src/plugin/registry'); "
-                      "import remote_hub; remote_hub.publish_plugin_to_synqhub('" + plugin + "', '" + team + "')\"";
-    std::system(cmd.c_str());
+    py::scoped_interpreter guard{};
+    py::module_ sys = py::module_::import("sys");
+    sys.attr("path").attr("append")("src/plugins/registry");
+    py::module_ remote_hub = py::module_::import("remote_hub");
+    remote_hub.attr("publish_plugin_to_synqhub")(plugin, team);
 }
 
 void pull_remote(const std::string& plugin) {
-    std::string cmd = "python3 -c \"import sys; sys.path.append('src/plugin/registry'); "
-                      "import remote_hub; remote_hub.pull_plugin_from_synqhub('" + plugin + "')\"";
-    std::system(cmd.c_str());
+    py::scoped_interpreter guard{};
+    py::module_ sys = py::module_::import("sys");
+    sys.attr("path").attr("append")("src/plugins/registry");
+    py::module_ remote_hub = py::module_::import("remote_hub");
+    remote_hub.attr("pull_plugin_from_synqhub")(plugin);
 }
 
 void sync_metadata() {
-    std::string cmd = "python3 -c \"import sys; sys.path.append('src/plugin/registry'); "
-                      "import remote_hub; remote_hub.sync_synqhub_metadata()\"";
-    std::system(cmd.c_str());
+    py::scoped_interpreter guard{};
+    py::module_ sys = py::module_::import("sys");
+    sys.attr("path").attr("append")("src/plugins/registry");
+    py::module_ remote_hub = py::module_::import("remote_hub");
+    remote_hub.attr("sync_synqhub_metadata")();
 }
 
 void verify_plugin(const std::string& plugin) {
-    std::string cmd = "python3 -c \"import sys; sys.path.append('src/plugin/registry'); "
-                      "import remote_hub; remote_hub.validate_remote_signature('" + plugin + "')\"";
-    std::system(cmd.c_str());
+    py::scoped_interpreter guard{};
+    py::module_ sys = py::module_::import("sys");
+    sys.attr("path").attr("append")("src/plugins/registry");
+    py::module_ remote_hub = py::module_::import("remote_hub");
+    remote_hub.attr("validate_remote_signature")(plugin);
 }
 
 int main(int argc, char* argv[]) {

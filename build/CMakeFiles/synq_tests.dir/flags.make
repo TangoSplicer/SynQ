@@ -4,6 +4,6 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES =
 
-CXX_INCLUDES = -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -isystem /home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -isystem /home/jules/.pyenv/versions/3.12.11/include/python3.12
+CXX_INCLUDES = -I/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -I/home/jules/.pyenv/versions/3.12.11/include/python3.12 -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings
 
 CXX_FLAGS = -std=gnu++17 -fPIE --coverage
