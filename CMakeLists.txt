@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-set(pybind11_DIR /home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/share/cmake/pybind11)
+
 
 include(dependencies)
 include(packaging)
@@ -33,6 +33,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/backend)
 include_directories(${CMAKE_SOURCE_DIR}/src/optimizer)
 include_directories(${CMAKE_SOURCE_DIR}/src/bindings)
 
+target_link_libraries(synq_lib PRIVATE Threads::Threads pybind11::embed)
+
 # Helper macro to collect sources
 file(GLOB_RECURSE COMPILER_SOURCES CONFIGURE_DEPENDS compiler/*.cpp)
 file(GLOB_RECURSE TOOLS_SOURCES CONFIGURE_DEPENDS tools/*.cpp)
@@ -40,3 +42,5 @@ file(GLOB_RECURSE REPL_SOURCES CONFIGURE_DEPENDS repl/*.cpp)
 file(GLOB_RECURSE PLUGIN_SOURCES CONFIGURE_DEPENDS plugins/*.cpp)
 file(GLOB_RECURSE LSP_SOURCES CONFIGURE_DEPENDS lsp/*.cpp)
 file(GLOB_RECURSE STD_SOURCES CONFIGURE_DEPENDS stdlib/*.cpp)
+
+find_package(pybind11 CONFIG REQUIRED)
