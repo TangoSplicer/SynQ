@@ -1,0 +1,7 @@
+option(SYNQ_ENABLE_COVERAGE "Enable coverage instrumentation" ON)
+if(SYNQ_ENABLE_COVERAGE)
+  target_compile_options(synq_lib PRIVATE --coverage)
+  target_link_libraries(synq_lib PRIVATE --coverage)
+  target_compile_options(synq_tests PRIVATE --coverage)
+  target_link_libraries(synq_tests PRIVATE --coverage)
+endif()

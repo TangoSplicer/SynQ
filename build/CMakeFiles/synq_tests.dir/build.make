@@ -156,7 +156,6 @@ synq_tests: CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.o
 synq_tests: CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.o
 synq_tests: CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.o
 synq_tests: CMakeFiles/synq_tests.dir/build.make
-synq_tests: /home/jules/.pyenv/versions/3.12.11/lib/libpython3.12.so
 synq_tests: CMakeFiles/synq_tests.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/app/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable synq_tests"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/synq_tests.dir/link.txt --verbose=$(VERBOSE)

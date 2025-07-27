@@ -283,7 +283,7 @@ SynQ_IS_TOP_LEVEL:STATIC=ON
 SynQ_SOURCE_DIR:STATIC=/app
 
 //The directory containing a CMake configuration file for pybind11.
-pybind11_DIR:PATH=/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/share/cmake/pybind11
+pybind11_DIR:PATH=pybind11_DIR-NOTFOUND
 
 
 ########################
@@ -392,7 +392,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -15,6 +15,9 @@ def sign_plugin(path: str, user: str) -> str:
 
 def verify_plugin(path: str, user: str) -> bool:
     public_key = get_public_key(user)
-    with open(path + ".sig", "r") as f:
-        signature = f.read().strip()
+    try:
+        with open(path + ".sig", "r") as f:
+            signature = f.read().strip()
+    except FileNotFoundError:
+        return False
     return verify_signature(path, public_key, signature)

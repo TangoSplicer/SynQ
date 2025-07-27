@@ -12,8 +12,8 @@
 void simulate_runtime(const std::string& path) {
     std::ifstream file(path);
     if (!file) {
-        std::cerr << "❌ Cannot open file.\n";
-        return;
+        std::cerr << "❌ Cannot open file: " << path << "\n";
+        exit(1);
     }
 
     std::string line;

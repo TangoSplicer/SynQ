@@ -12,8 +12,8 @@ void debug_script(const std::string& file) {
 
     std::ifstream src(file);
     if (!src) {
-        std::cerr << "❌ File not found.\n";
-        return;
+        std::cerr << "❌ File not found: " << file << "\n";
+        exit(1);
     }
 
     std::string line;

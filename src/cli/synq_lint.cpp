@@ -12,7 +12,7 @@ void lint_file(const std::string& path) {
     std::ifstream file(path);
     if (!file) {
         std::cerr << "❌ Cannot open file: " << path << "\n";
-        return;
+        exit(1);
     }
 
     std::string line;

@@ -5,8 +5,8 @@
 # without explicit written permission. See LICENSE.txt for full terms.
 
 echo "[BUILD] Building SynQ via CMake..."
-mkdir -p ../build
-cd ../build || exit
+mkdir -p build
+cd build
 cmake ..
 make -j$(nproc)
 echo "[BUILD] Done."
