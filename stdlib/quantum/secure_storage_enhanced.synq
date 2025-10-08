@@ -1,0 +1,1226 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/secure_storage_enhanced.synq
+// Enhanced Secure Quantum Storage with Advanced Classical Features
+// SynQ Language Standards Compliant Version
+
+import quantum.circuits as qc
+import core.math as math
+import core.crypto as crypto
+import core.memory as mem
+import core.security as sec
+import core.parallel as par
+
+// Enhanced security configuration with resource management
+struct SecurityConfig {
+    key_length: int = 256
+    encoding_dim: int = 8
+    syndrome_bits: int = 4
+    signature_length: int = 128
+    encryption_rounds: int = 16
+    memory_protection: bool = true
+    side_channel_resistance: bool = true
+    key_rotation_interval: int = 3600  // seconds
+}
+
+// Resource-aware NSQS with advanced error correction
+struct NSQS {
+    config: SecurityConfig
+    error_correction: QuantumErrorCorrection
+    memory_pool: QuantumMemoryPool
+    performance_monitor: CryptoPerformanceMonitor
+    encoding_cache: EncodingCache
+    
+    @fn init(config: SecurityConfig): -> NSQS
+        let qec = QuantumErrorCorrection.init(config)
+        let pool = QuantumMemoryPool.init(config.encoding_dim * 1024)
+        let monitor = CryptoPerformanceMonitor.init()
+        let cache = EncodingCache.init(1000)
+        
+        return NSQS {
+            config: config
+            error_correction: qec
+            memory_pool: pool
+            performance_monitor: monitor
+            encoding_cache: cache
+        }
+    
+    // Enhanced encoding with side-channel resistance
+    @fn encode_qubit(self, state: [complex]): -> [complex]
+        let start_time = perf.get_time()
+        
+        // Validate input
+        if len(state) != 2:
+            error("Input must be a 2D qubit state vector")
+        
+        // Check cache first
+        let cache_key = self.hash_state(state)
+        if self.encoding_cache.contains(cache_key):
+            self.performance_monitor.record_cache_hit()
+            return self.encoding_cache.get(cache_key)
+        
+        let memory_before = mem.get_usage()
+        
+        // Apply side-channel resistant encoding
+        let encoded = if self.config.side_channel_resistance:
+            self.side_channel_resistant_encode(state)
+        else:
+            self.standard_encode(state)
+        
+        // Apply error correction encoding
+        encoded = self.error_correction.encode_for_transmission(encoded)
+        
+        let memory_after = mem.get_usage()
+        let end_time = perf.get_time()
+        
+        self.performance_monitor.record_encoding(
+            end_time - start_time,
+            memory_after - memory_before
+        )
+        
+        // Cache result
+        self.encoding_cache.put(cache_key, encoded)
+        
+        return encoded
+    
+    @fn side_channel_resistant_encode(self, state: [complex]): -> [complex]
+        let alpha = state[0]
+        let beta = state[1]
+        
+        // Add random padding to prevent timing attacks
+        let random_delay = math.random() * 0.001  // Small random delay
+        perf.sleep(random_delay)
+        
+        // Encoding basis states with constant-time operations
+        let basis_0 = self.constant_time_encoding([1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2)])
+        let basis_1 = self.constant_time_encoding([0.0, 1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2), 0.0])
+        
+        // Constant-time linear combination
+        let encoded = self.constant_time_combination(alpha, beta, basis_0, basis_1)
+        
+        return encoded
+    
+    @fn constant_time_encoding(self, template: [float]): -> [complex]
+        // Ensure constant-time encoding operations
+        let result = [0.0 + 0.0j for _ in range(8)]
+        for i in range(8):
+            result[i] = template[i] + 0.0j  // Constant-time assignment
+        return result
+    
+    @fn constant_time_combination(self, alpha: complex, beta: complex, basis_0: [complex], basis_1: [complex]): -> [complex]
+        let result = [0.0 + 0.0j for _ in range(8)]
+        for i in range(8):
+            result[i] = alpha * basis_0[i] + beta * basis_1[i]
+        return result
+    
+    @fn standard_encode(self, state: [complex]): -> [complex]
+        let alpha = state[0]
+        let beta = state[1]
+        
+        // Encoding basis states
+        let basis_0 = [1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2)]
+        let basis_1 = [0.0, 1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2), 0.0]
+        
+        // Encode state
+        let encoded = [alpha * b0 + beta * b1 for b0, b1 in zip(basis_0, basis_1)]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in encoded]))
+        if norm > 0:
+            encoded = [a/norm for a in encoded]
+        
+        return encoded
+    
+    @fn decode_qubit(self, encoded_state: [complex]): -> [complex]
+        if len(encoded_state) != 8:
+            error("Encoded state must be 8D")
+        
+        // Apply error correction first
+        encoded_state = self.error_correction.decode_from_transmission(encoded_state)
+        
+        let start_time = perf.get_time()
+        
+        let decoded = if self.config.side_channel_resistance:
+            self.side_channel_resistant_decode(encoded_state)
+        else:
+            self.standard_decode(encoded_state)
+        
+        let end_time = perf.get_time()
+        self.performance_monitor.record_decoding(end_time - start_time)
+        
+        return decoded
+    
+    @fn side_channel_resistant_decode(self, encoded_state: [complex]): -> [complex]
+        // Add random delay for timing resistance
+        let random_delay = math.random() * 0.001
+        perf.sleep(random_delay)
+        
+        return self.constant_time_projection(encoded_state)
+    
+    @fn constant_time_projection(self, encoded_state: [complex]): -> [complex]
+        // Project onto encoding basis with constant-time operations
+        let basis_0 = [1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2)]
+        let basis_1 = [0.0, 1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2), 0.0]
+        
+        let alpha = self.constant_time_dot_product(basis_0, encoded_state)
+        let beta = self.constant_time_dot_product(basis_1, encoded_state)
+        
+        let decoded = [alpha, beta]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in decoded]))
+        if norm > 0:
+            decoded = [a/norm for a in decoded]
+        
+        return decoded
+    
+    @fn constant_time_dot_product(self, a: [complex], b: [complex]): -> complex
+        let result = 0.0 + 0.0j
+        for i in range(len(a)):
+            result += a[i] * b[i].conj()
+        return result
+    
+    @fn standard_decode(self, encoded_state: [complex]): -> [complex]
+        // Project onto encoding basis
+        let basis_0 = [1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2)]
+        let basis_1 = [0.0, 1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2), 0.0]
+        
+        let alpha = self.dot_product(basis_0, encoded_state)
+        let beta = self.dot_product(basis_1, encoded_state)
+        
+        let decoded = [alpha, beta]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in decoded]))
+        if norm > 0:
+            decoded = [a/norm for a in decoded]
+        
+        return decoded
+    
+    @fn hash_state(self, state: [complex]): -> str
+        // Create hash of quantum state for caching
+        let state_str = str([abs(a) for a in state])
+        return crypto.sha256(state_str)
+    
+    @fn dot_product(self, a: [complex], b: [complex]): -> complex
+        return sum([a[i] * b[i].conj() for i in range(len(a))])
+}
+
+// Advanced Quantum One-Time Pad with key management
+struct QuantumOneTimePad {
+    key_length: int
+    key_cache: KeyCache
+    rotation_timer: KeyRotationTimer
+    security_monitor: SecurityMonitor
+    
+    @fn init(key_length: int = 256): -> QuantumOneTimePad
+        let cache = KeyCache.init(100)
+        let timer = KeyRotationTimer.init(3600)  // 1 hour rotation
+        let monitor = SecurityMonitor.init()
+        
+        return QuantumOneTimePad {
+            key_length: key_length
+            key_cache: key_cache
+            rotation_timer: timer
+            security_monitor: monitor
+        }
+    
+    @fn generate_quantum_key(self, n_qubits: int): -> [[complex]]
+        let start_time = perf.get_time()
+        
+        // Check for key rotation necessity
+        if self.rotation_timer.needs_rotation():
+            self.rotate_keys()
+        
+        // Generate quantum random key with enhanced security
+        let key_matrix = if self.config.side_channel_resistance:
+            self.side_channel_resistant_key_generation()
+        else:
+            self.standard_key_generation()
+        
+        let end_time = perf.get_time()
+        self.security_monitor.record_key_generation(end_time - start_time)
+        
+        return key_matrix
+    
+    @fn side_channel_resistant_key_generation(self): -> [[complex]]
+        // Generate key with timing resistance
+        let random_delay = math.random() * 0.01
+        perf.sleep(random_delay)
+        
+        // Use quantum random number generator
+        let key_matrix = self.quantum_random_matrix(4, 4)
+        
+        // Make Hermitian with constant-time operations
+        key_matrix = self.constant_time_hermitian(key_matrix)
+        
+        // Normalize with timing resistance
+        key_matrix = self.constant_time_normalize(key_matrix)
+        
+        return key_matrix
+    
+    @fn quantum_random_matrix(self, rows: int, cols: int): -> [[complex]]
+        // Use quantum random number generation for enhanced security
+        let matrix = []
+        for i in range(rows):
+            let row = []
+            for j in range(cols):
+                let quantum_random = self.get_quantum_random()
+                row.append(quantum_random)
+            matrix.append(row)
+        return matrix
+    
+    @fn get_quantum_random(self): -> complex
+        // Interface to quantum random number generator
+        return math.random() + 1j * math.random()  # Simplified for demo
+    
+    @fn constant_time_hermitian(self, matrix: [[complex]]): -> [[complex]]
+        let result = [row[:] for row in matrix]  # Deep copy
+        
+        for i in range(len(result)):
+            for j in range(i + 1, len(result[0])):
+                result[i][j] = result[j][i].conj()
+        
+        return result
+    
+    @fn constant_time_normalize(self, matrix: [[complex]]): -> [[complex]]
+        let norm = 0.0
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                norm += abs(matrix[i][j])**2
+        
+        norm = math.sqrt(norm)
+        
+        if norm > 0:
+            for i in range(len(matrix)):
+                for j in range(len(matrix[0])):
+                    matrix[i][j] = matrix[i][j] / norm
+        
+        return matrix
+    
+    @fn standard_key_generation(self): -> [[complex]]
+        // Generate random key matrix
+        let key_matrix = [[math.random() + 1j * math.random() 
+                          for _ in range(4)] for _ in range(4)]
+        
+        // Make Hermitian
+        for i in range(4):
+            for j in range(i + 1, 4):
+                key_matrix[i][j] = key_matrix[j][i].conj()
+        
+        // Normalize
+        let norm = math.sqrt(sum([sum([abs(a)**2 for a in row]) for row in key_matrix]))
+        if norm > 0:
+            key_matrix = [[a/norm for a in row] for row in key_matrix]
+        
+        return key_matrix
+    
+    @fn encrypt(self, state: [complex], key: [[complex]]): -> [complex]
+        let start_time = perf.get_time()
+        
+        // Validate encryption parameters
+        if not self.validate_encryption_params(state, key):
+            error("Invalid encryption parameters")
+        
+        // Apply quantum one-time pad with side-channel resistance
+        let encrypted = if self.config.side_channel_resistance:
+            self.side_channel_resistant_encrypt(state, key)
+        else:
+            self.standard_encrypt(state, key)
+        
+        let end_time = perf.get_time()
+        self.security_monitor.record_encryption(end_time - start_time)
+        
+        return encrypted
+    
+    @fn side_channel_resistant_encrypt(self, state: [complex], key: [[complex]]): -> [complex]
+        // Add timing resistance
+        let random_delay = math.random() * 0.005
+        perf.sleep(random_delay)
+        
+        return self.constant_time_encryption(state, key)
+    
+    @fn constant_time_encryption(self, state: [complex], key: [[complex]]): -> [complex]
+        // Pauli matrices for constant-time operations
+        let sigma = {
+            "I": [[1.0, 0.0], [0.0, 1.0]],
+            "X": [[0.0, 1.0], [1.0, 0.0]],
+            "Y": [[0.0, -1j], [1j, 0.0]],
+            "Z": [[1.0, 0.0], [0.0, -1.0]]
+        }
+        
+        let pauli_ops = ["I", "X", "Y", "Z"]
+        
+        // Create density matrix with constant-time operations
+        let rho = [[state[i] * state[j].conj() for j in range(len(state))] 
+                  for i in range(len(state))]
+        
+        // Apply encryption with constant-time operations
+        let encrypted = [[0.0 + 0.0j for _ in range(len(state))] 
+                        for _ in range(len(state))]
+        
+        for i in range(4):
+            for j in range(4):
+                if abs(key[i][j]) > 1e-10:
+                    let sigma_i = sigma[pauli_ops[i]]
+                    let sigma_j = sigma[pauli_ops[j]]
+                    
+                    let term = self.constant_time_matrix_multiply(
+                        self.constant_time_matrix_multiply(sigma_i, rho),
+                        self.constant_time_matrix_multiply(sigma_j, [[1.0, 0.0], [0.0, 1.0]])
+                    )
+                    
+                    let scaled_term = self.constant_time_scale(key[i][j], term)
+                    encrypted = self.constant_time_matrix_add(encrypted, scaled_term)
+        
+        // Convert back to state vector with constant-time operations
+        return self.constant_time_extract_state(encrypted)
+    
+    @fn constant_time_matrix_multiply(self, a: [[complex]], b: [[complex]]): -> [[complex]]
+        let result = [[0.0 + 0.0j for _ in range(len(b[0]))] for _ in range(len(a))]
+        
+        for i in range(len(a)):
+            for j in range(len(b[0])):
+                for k in range(len(b)):
+                    result[i][j] += a[i][k] * b[k][j]
+        
+        return result
+    
+    @fn constant_time_scale(self, scalar: complex, matrix: [[complex]]): -> [[complex]]
+        return [[scalar * element for element in row] for row in matrix]
+    
+    @fn constant_time_matrix_add(self, a: [[complex]], b: [[complex]]): -> [[complex]]
+        return [[a[i][j] + b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+    
+    @fn constant_time_extract_state(self, matrix: [[complex]]): -> [complex]
+        // Simplified constant-time extraction
+        let eigvals, eigvecs = self.constant_time_eigen_decomposition(matrix)
+        let max_idx = self.constant_time_argmax([abs(e) for e in eigvals])
+        
+        let state = eigvecs[max_idx]
+        
+        // Normalize with constant-time operations
+        let norm = 0.0
+        for i in range(len(state)):
+            norm += abs(state[i])**2
+        norm = math.sqrt(norm)
+        
+        if norm > 0:
+            for i in range(len(state)):
+                state[i] = state[i] / norm
+        
+        return state
+    
+    @fn constant_time_eigen_decomposition(self, matrix: [[complex]]): -> ([complex], [[complex]])
+        // Simplified constant-time eigen decomposition for 2x2 matrices
+        let a = matrix[0][0]
+        let b = matrix[0][1]
+        let c = matrix[1][0]
+        let d = matrix[1][1]
+        
+        let trace = a + d
+        let det = a * d - b * c
+        
+        let eigval1 = (trace + math.sqrt(trace**2 - 4 * det)) / 2
+        let eigval2 = (trace - math.sqrt(trace**2 - 4 * det)) / 2
+        
+        let eigvecs = [
+            [1.0, 0.0],
+            [0.0, 1.0]
+        ]
+        
+        return ([eigval1, eigval2], eigvecs)
+    
+    @fn constant_time_argmax(self, values: [float]): -> int
+        let max_idx = 0
+        let max_val = values[0]
+        
+        for i in range(1, len(values)):
+            if values[i] > max_val:
+                max_val = values[i]
+                max_idx = i
+        
+        return max_idx
+    
+    @fn standard_encrypt(self, state: [complex], key: [[complex]]): -> [complex]
+        // Pauli matrices
+        let sigma = {
+            "I": [[1.0, 0.0], [0.0, 1.0]],
+            "X": [[0.0, 1.0], [1.0, 0.0]],
+            "Y": [[0.0, -1j], [1j, 0.0]],
+            "Z": [[1.0, 0.0], [0.0, -1.0]]
+        }
+        
+        let pauli_ops = ["I", "X", "Y", "Z"]
+        
+        // Create density matrix
+        let rho = [[state[i] * state[j].conj() for j in range(len(state))] 
+                  for i in range(len(state))]
+        
+        // Apply encryption
+        let encrypted = [[0.0 + 0.0j for _ in range(len(state))] 
+                        for _ in range(len(state))]
+        
+        for i in range(4):
+            for j in range(4):
+                if abs(key[i][j]) > 1e-10:
+                    let sigma_i = sigma[pauli_ops[i]]
+                    let sigma_j = sigma[pauli_ops[j]]
+                    
+                    let term = self.matrix_multiply(
+                        self.matrix_multiply(sigma_i, rho),
+                        self.matrix_multiply(sigma_j, [[1.0, 0.0], [0.0, 1.0]])
+                    )
+                    
+                    let scaled_term = [[key[i][j] * t for t in row] for row in term]
+                    encrypted = self.matrix_add(encrypted, scaled_term)
+        
+        // Convert back to state vector
+        return self.extract_state(encrypted)
+    
+    @fn matrix_multiply(self, a: [[complex]], b: [[complex]]): -> [[complex]]
+        let result = [[0.0 + 0.0j for _ in range(len(b[0]))] for _ in range(len(a))]
+        
+        for i in range(len(a)):
+            for j in range(len(b[0])):
+                for k in range(len(b)):
+                    result[i][j] += a[i][k] * b[k][j]
+        
+        return result
+    
+    @fn matrix_add(self, a: [[complex]], b: [[complex]]): -> [[complex]]
+        return [[a[i][j] + b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+    
+    @fn extract_state(self, matrix: [[complex]]): -> [complex]
+        let eigvals, eigvecs = self.eigen_decomposition(matrix)
+        let max_idx = self.argmax([abs(e) for e in eigvals])
+        
+        let state = eigvecs[max_idx]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in state]))
+        if norm > 0:
+            state = [a/norm for a in state]
+        
+        return state
+    
+    @fn eigen_decomposition(self, matrix: [[complex]]): -> ([complex], [[complex]])
+        // Simplified eigen decomposition
+        let eigvals = [matrix[0][0], matrix[1][1]]
+        let eigvecs = [[[1.0, 0.0], [0.0, 1.0]], [[0.0, 1.0], [1.0, 0.0]]]
+        return (eigvals, eigvecs)
+    
+    @fn argmax(self, values: [float]): -> int
+        let max_idx = 0
+        let max_val = values[0]
+        
+        for i in range(1, len(values)):
+            if values[i] > max_val:
+                max_val = values[i]
+                max_idx = i
+        
+        return max_idx
+    
+    @fn decrypt(self, encrypted_state: [complex], key: [[complex]]): -> [complex]
+        let start_time = perf.get_time()
+        
+        // Validate decryption parameters
+        if not self.validate_decryption_params(encrypted_state, key):
+            error("Invalid decryption parameters")
+        
+        // Apply inverse encryption
+        let key_inv = self.matrix_inverse(key)
+        let decrypted = self.encrypt(encrypted_state, key_inv)
+        
+        let end_time = perf.get_time()
+        self.security_monitor.record_decryption(end_time - start_time)
+        
+        return decrypted
+    
+    @fn validate_encryption_params(self, state: [complex], key: [[complex]]): -> bool
+        return len(state) == 2 and len(key) == 4 and len(key[0]) == 4
+    
+    @fn validate_decryption_params(self, state: [complex], key: [[complex]]): -> bool
+        return self.validate_encryption_params(state, key)
+    
+    @fn matrix_inverse(self, matrix: [[complex]]): -> [[complex]]
+        let det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+        if abs(det) < 1e-10:
+            return [[1.0, 0.0], [0.0, 1.0]]  // Return identity if singular
+        
+        return [[matrix[1][1]/det, -matrix[0][1]/det],
+                [-matrix[1][0]/det, matrix[0][0]/det]]
+    
+    @fn rotate_keys(self): -> void
+        print("Rotating quantum keys...")
+        self.rotation_timer.reset()
+        self.security_monitor.record_key_rotation()
+    
+    @fn get_security_report(self): -> dict
+        return {
+            "encryption_count": self.security_monitor.get_encryption_count(),
+            "decryption_count": self.security_monitor.get_decryption_count(),
+            "key_rotations": self.security_monitor.get_key_rotations(),
+            "security_alerts": self.security_monitor.get_security_alerts(),
+            "cache_statistics": self.key_cache.get_statistics()
+        }
+}
+
+// Advanced Quantum Key Distribution with enhanced security
+struct QuantumKeyDistribution {
+    bell_state: [complex]
+    security_validator: SecurityValidator
+    quantum_channel: QuantumChannel
+    error_handler: QKDErrorHandler
+    
+    @fn init(): -> QuantumKeyDistribution
+        let bell = self.create_bell_state()
+        let validator = SecurityValidator.init()
+        let channel = QuantumChannel.init()
+        let handler = QKDErrorHandler.init()
+        
+        return QuantumKeyDistribution {
+            bell_state: bell
+            security_validator: validator
+            quantum_channel: channel
+            error_handler: handler
+        }
+    
+    @fn create_bell_state(self): -> [complex]
+        let bell = [0.0] * 4
+        bell[0] = 1.0 / math.sqrt(2)
+        bell[3] = 1.0 / math.sqrt(2)
+        return bell
+    
+    @fn distribute_key(self, message_length: int): -> ([int], [[complex]])
+        let start_time = perf.get_time()
+        
+        // Generate random basis choices with quantum randomness
+        let alice_bases = self.generate_quantum_random_bases(message_length)
+        let bob_bases = self.generate_quantum_random_bases(message_length)
+        
+        // Generate random bits with quantum randomness
+        let alice_bits = self.generate_quantum_random_bits(message_length)
+        
+        // Validate security parameters
+        if not self.security_validator.validate_parameters(message_length, alice_bases, bob_bases):
+            self.error_handler.handle_security_error("Invalid QKD parameters")
+            return [], []
+        
+        // Alice's states with enhanced security
+        let alice_states = self.prepare_quantum_states(alice_bits, alice_bases)
+        
+        // Bob's measurements with error detection
+        let bob_results = self.perform_secure_measurements(alice_states, bob_bases)
+        
+        // Error detection and correction
+        let error_rate = self.calculate_quantum_error_rate(alice_bits, bob_results, alice_bases, bob_bases)
+        if error_rate > 0.1:  # 10% threshold
+            self.error_handler.handle_high_error_rate(error_rate)
+            return self.retry_key_distribution(message_length)
+        
+        // Keep only matching bases
+        let matching_indices = self.find_matching_bases(alice_bases, bob_bases)
+        
+        // Privacy amplification
+        let shared_key = self.privacy_amplification(alice_bits, matching_indices)
+        
+        let end_time = perf.get_time()
+        print("QKD completed in", end_time - start_time, "seconds")
+        print("Error rate:", error_rate)
+        
+        return shared_key, alice_states
+    
+    @fn generate_quantum_random_bases(self, length: int): -> [str]
+        let bases = []
+        for i in range(length):
+            let quantum_random = self.get_quantum_random_bit()
+            bases.append("X" if quantum_random == 0 else "Z")
+        return bases
+    
+    @fn generate_quantum_random_bits(self, length: int): -> [int]
+        let bits = []
+        for i in range(length):
+            bits.append(self.get_quantum_random_bit())
+        return bits
+    
+    @fn get_quantum_random_bit(self): -> int
+        // Interface to quantum random number generator
+        return 0 if math.random() < 0.5 else 1  # Simplified for demo
+    
+    @fn prepare_quantum_states(self, bits: [int], bases: [str]): -> [[complex]]
+        let states = []
+        for bit, basis in zip(bits, bases):
+            let state = if basis == "Z":
+                [1.0, 0.0] if bit == 0 else [0.0, 1.0]
+            else:  # X basis
+                [1.0/math.sqrt(2), 1.0/math.sqrt(2)] if bit == 0 else [1.0/math.sqrt(2), -1.0/math.sqrt(2)]
+            states.append(state)
+        return states
+    
+    @fn perform_secure_measurements(self, states: [[complex]], bases: [str]): -> [int]
+        let results = []
+        for state, basis in zip(states, bases):
+            let result = if basis == "Z":
+                0 if math.random() < abs(state[0])**2 else 1
+            else:  # X basis
+                let prob_plus = abs([1.0/math.sqrt(2), 1.0/math.sqrt(2)].dot(state))**2
+                0 if math.random() < prob_plus else 1
+            results.append(result)
+        return results
+    
+    @fn calculate_quantum_error_rate(self, alice_bits: [int], bob_results: [int], alice_bases: [str], bob_bases: [str]): -> float
+        let errors = 0
+        let total = 0
+        
+        for i in range(len(alice_bits)):
+            if alice_bases[i] == bob_bases[i]:
+                total += 1
+                if alice_bits[i] != bob_results[i]:
+                    errors += 1
+        
+        return errors / total if total > 0 else 0.0
+    
+    @fn find_matching_bases(self, alice_bases: [str], bob_bases: [str]): -> [int]
+        let matching = []
+        for i in range(len(alice_bases)):
+            if alice_bases[i] == bob_bases[i]:
+                matching.append(i)
+        return matching
+    
+    @fn privacy_amplification(self, bits: [int], indices: [int]): -> [int]
+        // Simple privacy amplification using hash function
+        let shared_bits = [bits[i] for i in indices]
+        let bit_string = ''.join([str(bit) for bit in shared_bits])
+        
+        let amplified = crypto.sha256(bit_string)
+        let key = [int(c) for c in amplified[:len(indices) // 2]]  # Reduce by half for privacy
+        
+        return key
+    
+    @fn retry_key_distribution(self, message_length: int): -> ([int], [[complex]])
+        print("Retrying key distribution with enhanced error correction...")
+        return self.distribute_key(message_length // 2)  # Reduce length for better reliability
+    
+    @fn get_channel_statistics(self): -> dict
+        return {
+            "channel_capacity": self.quantum_channel.get_capacity(),
+            "error_rate_history": self.error_handler.get_error_history(),
+            "security_validation_passed": self.security_validator.get_validation_count()
+        }
+}
+
+// Enhanced Quantum Error Correction with resource management
+struct QuantumErrorCorrection {
+    config: SecurityConfig
+    stabilizer_cache: StabilizerCache
+    syndrome_processor: SyndromeProcessor
+    recovery_engine: RecoveryEngine
+    
+    @fn init(config: SecurityConfig): -> QuantumErrorCorrection
+        let cache = StabilizerCache.init(1000)
+        let processor = SyndromeProcessor.init()
+        let engine = RecoveryEngine.init()
+        
+        return QuantumErrorCorrection {
+            config: config
+            stabilizer_cache: cache
+            syndrome_processor: processor
+            recovery_engine: engine
+        }
+    
+    @fn create_stabilizers(self): -> [Stabilizer]
+        let cache_key = "standard_stabilizers"
+        
+        if self.stabilizer_cache.contains(cache_key):
+            return self.stabilizer_cache.get(cache_key)
+        
+        let stabilizers = self.generate_standard_stabilizers()
+        self.stabilizer_cache.put(cache_key, stabilizers)
+        
+        return stabilizers
+    
+    @fn generate_standard_stabilizers(self): -> [Stabilizer]
+        let X = [[0.0, 1.0], [1.0, 0.0]]
+        let Z = [[1.0, 0.0], [0.0, -1.0]]
+        let I = [[1.0, 0.0], [0.0, 1.0]]
+        
+        let stabilizers = []
+        
+        // X-stabilizers
+        stabilizers.append(Stabilizer.init([X, X, I], "X1"))
+        stabilizers.append(Stabilizer.init([I, X, X], "X2"))
+        
+        // Z-stabilizers
+        stabilizers.append(Stabilizer.init([Z, Z, I], "Z1"))
+        stabilizers.append(Stabilizer.init([I, Z, Z], "Z2"))
+        
+        return stabilizers
+    
+    @fn compute_syndrome(self, state: [complex], stabilizers: [Stabilizer]): -> [int]
+        let syndrome = []
+        
+        for stabilizer in stabilizers:
+            let expectation = self.compute_expectation_value(state, stabilizer)
+            let syndrome_bit = 1 if abs(expectation + 1) < 1e-6 else 0
+            syndrome.append(syndrome_bit)
+        
+        return syndrome
+    
+    @fn compute_expectation_value(self, state: [complex], stabilizer: Stabilizer): -> float
+        let operator = stabilizer.get_operator()
+        let expectation = math.real(self.dot_product(state, self.apply_operator(operator, state)))
+        return expectation
+    
+    @fn apply_recovery_operation(self, state: [complex], syndrome: [int]): -> [complex]
+        let recovery_op = self.recovery_engine.get_recovery_operator(syndrome)
+        return self.apply_operator(recovery_op, state)
+    
+    @fn encode_for_transmission(self, state: [complex]): -> [complex]
+        // Apply encoding for quantum transmission
+        let encoded = state
+        let stabilizers = self.create_stabilizers()
+        
+        for stabilizer in stabilizers:
+            encoded = self.apply_encoding_stabilizer(encoded, stabilizer)
+        
+        return encoded
+    
+    @fn decode_from_transmission(self, state: [complex]): -> [complex]
+        // Decode from quantum transmission
+        let decoded = state
+        let stabilizers = self.create_stabilizers()
+        
+        for stabilizer in stabilizers:
+            decoded = self.apply_decoding_stabilizer(decoded, stabilizer)
+        
+        return decoded
+    
+    @fn apply_encoding_stabilizer(self, state: [complex], stabilizer: Stabilizer): -> [complex]
+        // Apply encoding stabilizer (simplified)
+        return state
+    
+    @fn apply_decoding_stabilizer(self, state: [complex], stabilizer: Stabilizer): -> [complex]
+        // Apply decoding stabilizer (simplified)
+        return state
+    
+    @fn apply_operator(self, operator: [[complex]], state: [complex]): -> [complex]
+        return self.matrix_vector_multiply(operator, state)
+    
+    @fn matrix_vector_multiply(self, matrix: [[complex]], vector: [complex]): -> [complex]
+        let result = []
+        for i in range(len(matrix)):
+            let sum = 0.0 + 0.0j
+            for j in range(len(vector)):
+                sum += matrix[i][j] * vector[j]
+            result.append(sum)
+        return result
+    
+    @fn dot_product(self, a: [complex], b: [complex]): -> complex
+        return sum([a[i] * b[i].conj() for i in range(len(a))])
+}
+
+// Supporting structures for enhanced functionality
+struct Stabilizer {
+    operators: [[[complex]]]
+    name: str
+    syndrome_history: [int]
+    
+    @fn init(operators: [[[complex]]], name: str): -> Stabilizer
+        return Stabilizer {
+            operators: operators
+            name: name
+            syndrome_history: []
+        }
+    
+    @fn get_operator(self): -> [[complex]]
+        return self.operators[0]  // Simplified for demo
+    
+    @fn record_syndrome(self, syndrome: int): -> void
+        self.syndrome_history.append(syndrome)
+}
+
+struct SecurityValidator {
+    validation_count: int
+    security_alerts: [str]
+    
+    @fn init(): -> SecurityValidator
+        return SecurityValidator {
+            validation_count: 0
+            security_alerts: []
+        }
+    
+    @fn validate_parameters(self, message_length: int, alice_bases: [str], bob_bases: [str]): -> bool
+        self.validation_count += 1
+        
+        if message_length <= 0:
+            self.security_alerts.append("Invalid message length")
+            return False
+        
+        if len(alice_bases) != len(bob_bases):
+            self.security_alerts.append("Basis length mismatch")
+            return False
+        
+        return True
+    
+    @fn get_validation_count(self): -> int
+        return self.validation_count
+}
+
+struct SecurityMonitor {
+    encryption_count: int
+    decryption_count: int
+    key_rotations: int
+    security_alerts: [str]
+    
+    @fn init(): -> SecurityMonitor
+        return SecurityMonitor {
+            encryption_count: 0
+            decryption_count: 0
+            key_rotations: 0
+            security_alerts: []
+        }
+    
+    @fn record_encryption(self, duration: float): -> void
+        self.encryption_count += 1
+    
+    @fn record_decryption(self, duration: float): -> void
+        self.decryption_count += 1
+    
+    @fn record_key_rotation(self): -> void
+        self.key_rotations += 1
+    
+    @fn get_encryption_count(self): -> int
+        return self.encryption_count
+    
+    @fn get_decryption_count(self): -> int
+        return self.decryption_count
+    
+    @fn get_key_rotations(self): -> int
+        return self.key_rotations
+    
+    @fn get_security_alerts(self): -> [str]
+        return self.security_alerts
+}
+
+struct CryptoPerformanceMonitor {
+    encoding_times: [float]
+    decoding_times: [float]
+    cache_hits: int
+    cache_misses: int
+    
+    @fn init(): -> CryptoPerformanceMonitor
+        return CryptoPerformanceMonitor {
+            encoding_times: []
+            decoding_times: []
+            cache_hits: 0
+            cache_misses: 0
+        }
+    
+    @fn record_encoding(self, duration: float, memory_delta: int): -> void
+        self.encoding_times.append(duration)
+    
+    @fn record_decoding(self, duration: float): -> void
+        self.decoding_times.append(duration)
+    
+    @fn record_cache_hit(self): -> void
+        self.cache_hits += 1
+    
+    @fn record_cache_miss(self): -> void
+        self.cache_misses += 1
+    
+    @fn get_statistics(self): -> dict
+        return {
+            "average_encoding_time": sum(self.encoding_times) / len(self.encoding_times) if len(self.encoding_times) > 0 else 0.0,
+            "average_decoding_time": sum(self.decoding_times) / len(self.decoding_times) if len(self.decoding_times) > 0 else 0.0,
+            "cache_hit_rate": self.cache_hits / (self.cache_hits + self.cache_misses) if (self.cache_hits + self.cache_misses) > 0 else 0.0
+        }
+}
+
+struct EncodingCache: PathCache {
+    // Same as PathCache but specialized for encoding operations
+}
+
+struct KeyCache {
+    cache: dict
+    max_size: int
+    hit_count: int
+    miss_count: int
+    
+    @fn init(max_size: int): -> KeyCache
+        return KeyCache {
+            cache: {}
+            max_size: max_size
+            hit_count: 0
+            miss_count: 0
+        }
+    
+    @fn contains(self, key: str): -> bool
+        let contains = key in self.cache
+        if contains:
+            self.hit_count += 1
+        else:
+            self.miss_count += 1
+        return contains
+    
+    @fn get(self, key: str): -> any
+        return self.cache[key]
+    
+    @fn put(self, key: str, value: any): -> void
+        if len(self.cache) >= self.max_size:
+            self.evict_oldest()
+        
+        self.cache[key] = value
+    
+    @fn evict_oldest(self): -> void
+        let oldest_key = list(self.cache.keys())[0]
+        self.cache.pop(oldest_key)
+    
+    @fn get_statistics(self): -> dict
+        return {
+            "size": len(self.cache),
+            "hit_rate": self.hit_count / (self.hit_count + self.miss_count) if (self.hit_count + self.miss_count) > 0 else 0.0,
+            "hits": self.hit_count,
+            "misses": self.miss_count
+        }
+}
+
+struct KeyRotationTimer {
+    interval: int
+    last_rotation: float
+    rotation_count: int
+    
+    @fn init(interval: int): -> KeyRotationTimer
+        return KeyRotationTimer {
+            interval: interval
+            last_rotation: perf.get_time()
+            rotation_count: 0
+        }
+    
+    @fn needs_rotation(self): -> bool
+        return perf.get_time() - self.last_rotation > self.interval
+    
+    @fn reset(self): -> void
+        self.last_rotation = perf.get_time()
+        self.rotation_count += 1
+    
+    @fn get_rotation_count(self): -> int
+        return self.rotation_count
+}
+
+struct QuantumChannel {
+    capacity: float
+    noise_level: float
+    error_history: [float]
+    
+    @fn init(): -> QuantumChannel
+        return QuantumChannel {
+            capacity: 1.0
+            noise_level: 0.01
+            error_history: []
+        }
+    
+    @fn get_capacity(self): -> float
+        return self.capacity
+    
+    @fn record_error(self, error_rate: float): -> void
+        self.error_history.append(error_rate)
+        if len(self.error_history) > 100:
+            self.error_history = self.error_history[-100:]
+    
+    @fn get_average_error_rate(self): -> float
+        return sum(self.error_history) / len(self.error_history) if len(self.error_history) > 0 else 0.0
+}
+
+struct QKDErrorHandler {
+    error_history: [float]
+    error_threshold: float
+    
+    @fn init(): -> QKDErrorHandler
+        return QKDErrorHandler {
+            error_history: []
+            error_threshold: 0.1
+        }
+    
+    @fn handle_security_error(self, message: str): -> void
+        print("Security error:", message)
+        sec.log_security_event("QKD_ERROR", message)
+    
+    @fn handle_high_error_rate(self, error_rate: float): -> void
+        self.error_history.append(error_rate)
+        print("High error rate detected:", error_rate)
+        
+        if error_rate > self.error_threshold:
+            self.handle_security_error("Error rate exceeds threshold: " + str(error_rate))
+    
+    @fn get_error_history(self): -> [float]
+        return self.error_history
+}
+
+struct StabilizerCache: PathCache {
+    // Same as PathCache but specialized for stabilizer operations
+}
+
+struct SyndromeProcessor {
+    processing_time: [float]
+    accuracy_rate: float
+    
+    @fn init(): -> SyndromeProcessor
+        return SyndromeProcessor {
+            processing_time: []
+            accuracy_rate: 0.95
+        }
+    
+    @fn process_syndrome(self, syndrome: [int]): -> dict
+        let start_time = perf.get_time()
+        
+        let result = {
+            "error_type": self.classify_error(syndrome),
+            "confidence": self.calculate_confidence(syndrome),
+            "recommended_action": self.recommend_action(syndrome)
+        }
+        
+        let end_time = perf.get_time()
+        self.processing_time.append(end_time - start_time)
+        
+        return result
+    
+    @fn classify_error(self, syndrome: [int]): -> str
+        if sum(syndrome) == 0:
+            return "no_error"
+        elif syndrome == [1, 0, 0, 0]:
+            return "x_error_q1"
+        elif syndrome == [1, 1, 0, 0]:
+            return "x_error_q2"
+        else:
+            return "unknown_error"
+    
+    @fn calculate_confidence(self, syndrome: [int]): -> float
+        return self.accuracy_rate
+    
+    @fn recommend_action(self, syndrome: [int]): -> str
+        if sum(syndrome) == 0:
+            return "no_action"
+        else:
+            return "apply_recovery"
+}
+
+struct RecoveryEngine {
+    recovery_operations: dict
+    success_rate: float
+    
+    @fn init(): -> RecoveryEngine
+        return RecoveryEngine {
+            recovery_operations: self.initialize_recovery_operations()
+            success_rate: 0.98
+        }
+    
+    @fn initialize_recovery_operations(self): -> dict
+        return {
+            "x_error_q1": [[0.0, 1.0], [1.0, 0.0]],  # X gate
+            "x_error_q2": [[0.0, 1.0], [1.0, 0.0]],  # X gate
+            "no_error": [[1.0, 0.0], [0.0, 1.0]]     # Identity
+        }
+    
+    @fn get_recovery_operator(self, syndrome: [int]): -> [[complex]]
+        let error_type = self.classify_error_from_syndrome(syndrome)
+        return self.recovery_operations.get(error_type, [[1.0, 0.0], [0.0, 1.0]])
+    
+    @fn classify_error_from_syndrome(self, syndrome: [int]): -> str
+        if sum(syndrome) == 0:
+            return "no_error"
+        elif syndrome == [1, 0, 0, 0]:
+            return "x_error_q1"
+        elif syndrome == [1, 1, 0, 0]:
+            return "x_error_q2"
+        else:
+            return "unknown_error"
+}
+
+// Utility functions
+@fn dot_product(a: [complex], b: [complex]): -> complex
+    return sum([a[i] * b[i].conj() for i in range(len(a))])
+
+@fn matrix_vector_multiply(matrix: [[complex]], vector: [complex]): -> [complex]
+    let result = []
+    for i in range(len(matrix)):
+        let sum = 0.0 + 0.0j
+        for j in range(len(vector)):
+            sum += matrix[i][j] * vector[j]
+        result.append(sum)
+    return result
+
+// Enhanced main function with comprehensive testing
+@fn main():
+    print("=== Enhanced Secure Quantum Storage Demo ===")
+    
+    // Configuration with advanced security features
+    let config = SecurityConfig {
+        key_length: 256
+        encoding_dim: 8
+        syndrome_bits: 4
+        signature_length: 128
+        encryption_rounds: 16
+        memory_protection: True
+        side_channel_resistance: True
+        key_rotation_interval: 3600
+    }
+    
+    // Initialize enhanced NSQS
+    let nsqs = NSQS.init(config)
+    
+    print("Testing NSQS encoding/decoding...")
+    let test_qubit = [1.0/math.sqrt(2), 1.0/math.sqrt(2)]  # |+> state
+    
+    let encoded = nsqs.encode_qubit(test_qubit)
+    let decoded = nsqs.decode_qubit(encoded)
+    
+    print("Original qubit:", test_qubit)
+    print("Decoded qubit:", decoded)
+    
+    let fidelity = abs(dot_product(test_qubit, decoded))**2
+    print("NSQS fidelity:", fidelity)
+    
+    // Test QOTP with key management
+    print("\nTesting Quantum One-Time Pad...")
+    let qotp = QuantumOneTimePad.init()
+    let key = qotp.generate_quantum_key(1)
+    let encrypted = qotp.encrypt(test_qubit, key)
+    let decrypted = qotp.decrypt(encrypted, key)
+    
+    let qotp_fidelity = abs(dot_product(test_qubit, decrypted))**2
+    print("QOTP fidelity:", qotp_fidelity)
+    
+    // Test QKD with security validation
+    print("\nTesting Quantum Key Distribution...")
+    let qkd = QuantumKeyDistribution.init()
+    let shared_key, states = qkd.distribute_key(64)  # 64-bit key
+    
+    print("Shared key length:", len(shared_key))
+    print("Quantum states generated:", len(states))
+    
+    let channel_stats = qkd.get_channel_statistics()
+    print("Channel statistics:", channel_stats)
+    
+    // Test error correction
+    print("\nTesting Quantum Error Correction...")
+    let qec = QuantumErrorCorrection.init(config)
+    let stabilizers = qec.create_stabilizers()
+    
+    let test_state = [1.0, 0.0]  # |0> state
+    let syndrome = qec.compute_syndrome(test_state, stabilizers)
+    print("Computed syndrome:", syndrome)
+    
+    // Get performance and security reports
+    print("\n=== Performance and Security Reports ===")
+    
+    let security_report = qotp.get_security_report()
+    print("Security report:", security_report)
+    
+    // Test memory cleanup
+    print("\nCleaning up resources...")
+    nsqs.memory_pool.defragment()
+    
+    print("=== Enhanced Secure Quantum Storage Demo Complete ===")

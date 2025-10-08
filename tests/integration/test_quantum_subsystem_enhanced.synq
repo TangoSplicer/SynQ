@@ -1,0 +1,175 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_quantum_subsystem_enhanced.synq
+// Comprehensive tests for enhanced quantum subsystem with SynQ compliance
+
+import quantum.quantum_subsystem_enhanced as qsub
+import quantum.quantum_walker_enhanced as qw
+import quantum.secure_storage_enhanced as qs
+import quantum.transmission_protocol as qt
+import core.math as math
+import core.testing as testing
+import core.performance as perf
+
+// Test master quantum subsystem
+@fn test_master_quantum_subsystem():
+    print("Testing Master Quantum Subsystem...")
+    
+    let subsystem = qsub.MasterQuantumSubsystem.init()
+    
+    // Test basic functionality
+    let start = [0, 0, 0]
+    let goal = [2, 2, 1]
+    let data = [1.0, 0.0]
+    
+    let result = subsystem.quantum_mapping_workflow(start, goal, data)
+    
+    testing.assert(result["transmission_fidelity"] > 0.8, "Transmission fidelity should be high")
+    testing.assert(len(result["optimal_path"]) > 0, "Should find optimal path")
+    testing.assert(result["metrics"]["security_score"] > 0, "Security score should be positive")
+    
+    print("✓ Master Quantum Subsystem basic functionality test passed")
+
+// Test enhanced quantum walker
+@fn test_enhanced_quantum_walker():
+    print("Testing Enhanced Quantum Walker...")
+    
+    let config = qw.QuantumConfig {
+        grid_size: 4
+        depth: 2
+        qubits: 2
+        coin_states: 6
+        memory_limit: 5 * 1024 * 1024  # 5MB
+        enable_parallel: True
+        optimization_level: 2
+    }
+    
+    let walker = qw.QuantumWalker.init(config)
+    
+    // Test resource management
+    let initial_state = walker.prepare_initial_state()
+    
+    testing.assert(len(initial_state) > 0, "Should create valid initial state")
+    
+    // Test performance monitoring
+    let report = walker.get_performance_report()
+    testing.assert("performance_metrics" in report, "Should have performance metrics")
+    
+    print("✓ Enhanced Quantum Walker test passed")
+
+// Test enhanced secure storage
+@fn test_enhanced_secure_storage():
+    print("Testing Enhanced Secure Storage...")
+    
+    let config = qs.SecurityConfig {
+        key_length: 256
+        encoding_dim: 8
+        syndrome_bits: 4
+        signature_length: 128
+        encryption_rounds: 16
+        memory_protection: True
+        side_channel_resistance: True
+        key_rotation_interval: 3600
+    }
+    
+    let nsqs = qs.NSQS.init(config)
+    
+    // Test encoding/decoding with security features
+    let test_qubit = [1.0/math.sqrt(2), 1.0/math.sqrt(2)]
+    let encoded = nsqs.encode_qubit(test_qubit)
+    let decoded = nsqs.decode_qubit(encoded)
+    
+    let fidelity = abs(nsqs.dot_product(test_qubit, decoded))**2
+    testing.assert(fidelity > 0.95, "Encoding/Decoding should preserve fidelity")
+    
+    // Test QOTP with enhanced security
+    let qotp = qs.QuantumOneTimePad.init()
+    let key = qotp.generate_quantum_key(1)
+    let encrypted = qotp.encrypt(test_qubit, key)
+    let decrypted = qotp.decrypt(encrypted, key)
+    
+    let qotp_fidelity = abs(nsqs.dot_product(test_qubit, decrypted))**2
+    testing.assert(qotp_fidelity > 0.95, "QOTP should preserve fidelity")
+    
+    print("✓ Enhanced Secure Storage test passed")
+
+// Test comprehensive benchmarking
+@fn test_comprehensive_benchmarking():
+    print("Testing Comprehensive Benchmarking...")
+    
+    let subsystem = qsub.MasterQuantumSubsystem.init()
+    
+    let test_cases = [
+        {
+            "start": [0, 0, 0],
+            "goal": [2, 1, 1],
+            "data": [1.0, 0.0]
+        },
+        {
+            "start": [1, 0, 0],
+            "goal": [3, 2, 1],
+            "data": [0.0, 1.0]
+        }
+    ]
+    
+    let benchmark = subsystem.comprehensive_benchmark(test_cases)
+    
+    testing.assert("summary" in benchmark, "Should have benchmark summary")
+    testing.assert("test_results" in benchmark, "Should have test results")
+    testing.assert(benchmark["summary"]["total_tests"] == 2, "Should run 2 tests")
+    
+    print("✓ Comprehensive benchmarking test passed")
+
+// Test resource management
+@fn test_resource_management():
+    print("Testing Resource Management...")
+    
+    let subsystem = qsub.MasterQuantumSubsystem.init()
+    
+    let resource_status = subsystem.resource_manager.get_system_status()
+    testing.assert("memory_pools" in resource_status, "Should have memory pool status")
+    
+    print("✓ Resource management test passed")
+
+// Test real-time monitoring
+@fn test_real_time_monitoring():
+    print("Testing Real-time Monitoring...")
+    
+    let subsystem = qsub.MasterQuantumSubsystem.init()
+    
+    let monitoring = subsystem.start_real_time_monitoring()
+    
+    let simple_test = subsystem.quantum_mapping_workflow([0, 0, 0], [1, 1, 1], [1.0, 0.0])
+    
+    let report = subsystem.stop_real_time_monitoring(monitoring)
+    
+    testing.assert("monitoring_duration" in report, "Should have monitoring duration")
+    testing.assert("system_health" in report, "Should have system health report")
+    
+    print("✓ Real-time monitoring test passed")
+
+// Test parallel processing
+@fn test_parallel_processing():
+    print("Testing Parallel Processing...")
+    
+    let config = qw.QuantumConfig {
+        grid_size: 6
+        depth: 3
+        qubits: 2
+        coin_states: 6
+        memory_limit: 20 * 1024 * 1024
+        enable_parallel: True
+        optimization_level: 3
+    }
+    
+    let walker = qw.QuantumWalker.init(config)
+    
+    // Test parallel state preparation
+    let start_time = perf.get_time()
+    let state = walker.prepare_initial_state()
+    let end_time = perf.get_time()
+    
+    testing.assert(len(state) > 0, "Should prepare state successfully")
+    testing.assert(end_time - start_time

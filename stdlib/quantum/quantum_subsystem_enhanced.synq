@@ -1,0 +1,901 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/quantum_subsystem_enhanced.synq
+// Complete Enhanced Quantum Subsystem Integration
+// SynQ Language Standards Compliant with Advanced Classical Features
+
+import quantum.quantum_walker_enhanced as qw
+import quantum.secure_storage_enhanced as qs
+import quantum.transmission_protocol as qt
+import quantum.circuits as qc
+import core.math as math
+import core.memory as mem
+import core.performance as perf
+import core.security as sec
+import core.parallel as par
+
+// Master configuration with resource management
+struct MasterQuantumConfig {
+    walker_config: qw.QuantumConfig
+    security_config: qs.SecurityConfig
+    transmission_config: qt.TransmissionConfig
+    resource_config: ResourceConfig
+    optimization_config: OptimizationConfig
+    
+    @fn init(): -> MasterQuantumConfig
+        let walker_config = qw.QuantumConfig {
+            grid_size: 8
+            depth: 4
+            qubits: 3
+            coin_states: 6
+            memory_limit: 50 * 1024 * 1024  // 50MB
+            enable_parallel: True
+            optimization_level: 3
+        }
+        
+        let security_config = qs.SecurityConfig {
+            key_length: 256
+            encoding_dim: 8
+            syndrome_bits: 4
+            signature_length: 128
+            encryption_rounds: 16
+            memory_protection: True
+            side_channel_resistance: True
+            key_rotation_interval: 3600
+        }
+        
+        let transmission_config = qt.TransmissionConfig {
+            max_path_length: 10
+            error_threshold: 0.01
+            fidelity_threshold: 0.95
+            teleportation_fidelity: 0.99
+        }
+        
+        let resource_config = ResourceConfig.init()
+        let optimization_config = OptimizationConfig.init()
+        
+        return MasterQuantumConfig {
+            walker_config: walker_config
+            security_config: security_config
+            transmission_config: transmission_config
+            resource_config: resource_config
+            optimization_config: optimization_config
+        }
+}
+
+// Resource management configuration
+struct ResourceConfig {
+    max_memory_usage: int
+    enable_caching: bool
+    enable_parallel: bool
+    enable_monitoring: bool
+    cleanup_interval: int
+    
+    @fn init(): -> ResourceConfig
+        return ResourceConfig {
+            max_memory_usage: 100 * 1024 * 1024  // 100MB
+            enable_caching: True
+            enable_parallel: True
+            enable_monitoring: True
+            cleanup_interval: 300  // 5 minutes
+        }
+}
+
+// Optimization configuration
+struct OptimizationConfig {
+    enable_gate_fusion: bool
+    enable_qubit_reuse: bool
+    enable_parallelization: bool
+    enable_memory_pooling: bool
+    enable_performance_profiling: bool
+    
+    @fn init(): -> OptimizationConfig
+        return OptimizationConfig {
+            enable_gate_fusion: True
+            enable_qubit_reuse: True
+            enable_parallelization: True
+            enable_memory_pooling: True
+            enable_performance_profiling: True
+        }
+}
+
+// Master quantum subsystem with comprehensive integration
+struct MasterQuantumSubsystem {
+    config: MasterQuantumConfig
+    walker: qw.QuantumWalker
+    astar: qw.QuantumAStar
+    nsqs: qs.NSQS
+    qotp: qs.QuantumOneTimePad
+    qkd: qs.QuantumKeyDistribution
+    qec_storage: qs.QuantumErrorCorrection
+    pgt: qt.PathGuidedTransmission
+    qec_transmission: qt.QuantumErrorCorrectionTransmission
+    
+    resource_manager: QuantumResourceManager
+    performance_monitor: MasterPerformanceMonitor
+    security_monitor: MasterSecurityMonitor
+    optimization_engine: QuantumOptimizationEngine
+    
+    @fn init(config: MasterQuantumConfig = None): -> MasterQuantumSubsystem
+        let final_config = config if config is not None else MasterQuantumConfig.init()
+        
+        let walker = qw.QuantumWalker.init(final_config.walker_config)
+        let astar = qw.QuantumAStar.init(final_config.walker_config)
+        let nsqs = qs.NSQS.init(final_config.security_config)
+        let qotp = qs.QuantumOneTimePad.init()
+        let qkd = qs.QuantumKeyDistribution.init()
+        let qec_storage = qs.QuantumErrorCorrection.init(final_config.security_config)
+        let pgt = qt.PathGuidedTransmission.init(final_config.transmission_config)
+        let qec_transmission = qt.QuantumErrorCorrectionTransmission.init(final_config.transmission_config)
+        
+        let resource_manager = QuantumResourceManager.init(final_config.resource_config)
+        let performance_monitor = MasterPerformanceMonitor.init()
+        let security_monitor = MasterSecurityMonitor.init()
+        let optimization_engine = QuantumOptimizationEngine.init(final_config.optimization_config)
+        
+        return MasterQuantumSubsystem {
+            config: final_config
+            walker: walker
+            astar: astar
+            nsqs: nsqs
+            qotp: qotp
+            qkd: qkd
+            qec_storage: qec_storage
+            pgt: pgt
+            qec_transmission: qec_transmission
+            resource_manager: resource_manager
+            performance_monitor: performance_monitor
+            security_monitor: security_monitor
+            optimization_engine: optimization_engine
+        }
+    
+    // Comprehensive quantum mapping workflow with full optimization
+    @fn quantum_mapping_workflow(self, start: [int, int, int], goal: [int, int, int], data: [complex]): -> dict
+        print("=== Master Quantum Mapping Workflow ===")
+        
+        // Initialize resource monitoring
+        let resource_start = self.resource_manager.start_session("quantum_mapping")
+        
+        // Step 1: Optimize configuration based on problem size
+        let optimized_config = self.optimization_engine.optimize_for_problem(
+            start, goal, data, self.config
+        )
+        
+        // Step 2: Quantum walker exploration with performance tracking
+        print("Step 1: Quantum walker exploration")
+        let walker_start = perf.get_time()
+        let walker_state = self.walker.prepare_initial_state()
+        let evolved_state = self.walker.apply_step()
+        let walker_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("walker_exploration", walker_end - walker_start)
+        
+        // Step 3: Quantum A* pathfinding with caching
+        print("Step 2: Quantum A* pathfinding")
+        let astar_start = perf.get_time()
+        let state_space = self.astar.state_space_representation(start, goal)
+        let heuristic_op = self.astar.quantum_heuristic_operator(goal)
+        let optimal_path = self.find_optimal_path_optimized(state_space, start, goal)
+        let astar_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("quantum_astar", astar_end - astar_start)
+        
+        // Step 4: Secure data storage with full security pipeline
+        print("Step 3: Secure quantum data storage")
+        let storage_start = perf.get_time()
+        let encoded_data = self.nsqs.encode_qubit(data)
+        let encrypted_data = self.qotp.encrypt(encoded_data, self.qotp.generate_quantum_key(1))
+        let storage_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("secure_storage", storage_end - storage_start)
+        
+        // Step 5: Generate shared key with security validation
+        let key_start = perf.get_time()
+        let shared_key, quantum_states = self.qkd.distribute_key(256)
+        let key_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("key_distribution", key_end - key_start)
+        
+        // Step 6: Quantum transmission along optimal path
+        print("Step 4: Quantum transmission along optimal path")
+        let transmission_start = perf.get_time()
+        let transmitted_data = self.pgt.complete_transmission_unitary(encrypted_data, optimal_path)
+        let transmission_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("quantum_transmission", transmission_end - transmission_start)
+        
+        // Step 7: Error correction with advanced processing
+        let correction_start = perf.get_time()
+        let stabilizers = self.qec_transmission.create_surface_code_stabilizers(3)
+        let syndrome = self.qec_transmission.syndrome_extraction(transmitted_data, stabilizers["X_stabilizers"])
+        let correction = self.qec_transmission.error_correction_operator(syndrome)
+        let corrected_data = qt.apply_matrix(correction, transmitted_data)
+        let correction_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("error_correction", correction_end - correction_start)
+        
+        // Step 8: Decryption and final decoding
+        let decryption_start = perf.get_time()
+        let decrypted_data = self.qotp.decrypt(corrected_data, self.qotp.generate_quantum_key(1))
+        let final_data = self.nsqs.decode_qubit(decrypted_data)
+        let decryption_end = perf.get_time()
+        
+        self.performance_monitor.record_operation("decryption", decryption_end - decryption_start)
+        
+        // Step 9: Comprehensive metrics calculation
+        let metrics = self.calculate_comprehensive_metrics(data, final_data, optimal_path)
+        
+        // Step 10: Resource cleanup and final report
+        let resource_end = self.resource_manager.end_session(resource_start)
+        
+        let final_report = {
+            "original_data": data,
+            "final_data": final_data,
+            "optimal_path": optimal_path,
+            "metrics": metrics,
+            "syndrome": syndrome,
+            "transmission_fidelity": metrics["fidelity"],
+            "security_summary": self.security_monitor.get_security_report(),
+            "performance_summary": self.performance_monitor.get_performance_report(),
+            "resource_usage": resource_end,
+            "optimization_report": self.optimization_engine.get_optimization_report()
+        }
+        
+        return final_report
+    
+    @fn find_optimal_path_optimized(self, state_space: dict, start: [int, int, int], goal: [int, int, int]): -> [[int, int, int]]
+        let cache_key = str(start) + "_" + str(goal)
+        
+        if self.config.resource_config.enable_caching:
+            let cached_path = self.optimization_engine.get_cached_path(cache_key)
+            if cached_path is not None:
+                return cached_path
+        
+        let path = self.astar.find_optimal_path(state_space, start, goal)
+        
+        if self.config.resource_config.enable_caching:
+            self.optimization_engine.cache_path(cache_key, path)
+        
+        return path
+    
+    @fn calculate_comprehensive_metrics(self, original: [complex], final: [complex], path: [[int, int, int]]): -> dict
+        let metrics = qt.QuantumTransmissionMetrics {}
+        
+        let fidelity = metrics.transmission_fidelity(original, final)
+        let error_rate = metrics.error_rate(original, final)
+        let capacity = metrics.channel_capacity(fidelity, error_rate)
+        let security = metrics.security_parameter(0.001)
+        
+        let path_efficiency = 1.0 / len(path)
+        let computational_efficiency = self.calculate_computational_efficiency()
+        let memory_efficiency = self.calculate_memory_efficiency()
+        let security_score = self.calculate_security_score()
+        
+        return {
+            "fidelity": fidelity,
+            "error_rate": error_rate,
+            "channel_capacity": capacity,
+            "security_parameter": security,
+            "path_length": len(path),
+            "path_efficiency": path_efficiency,
+            "computational_efficiency": computational_efficiency,
+            "memory_efficiency": memory_efficiency,
+            "security_score": security_score,
+            "total_operations": self.performance_monitor.get_total_operations()
+        }
+    
+    @fn calculate_computational_efficiency(self): -> float
+        let total_time = self.performance_monitor.get_total_time()
+        let total_operations = self.performance_monitor.get_total_operations()
+        
+        return total_operations / total_time if total_time > 0 else 0.0
+    
+    @fn calculate_memory_efficiency(self): -> float
+        let peak_memory = self.resource_manager.get_peak_memory_usage()
+        let allocated_memory = self.resource_manager.get_allocated_memory()
+        
+        return 1.0 - (peak_memory / allocated_memory) if allocated_memory > 0 else 0.0
+    
+    @fn calculate_security_score(self): -> float
+        let security_report = self.security_monitor.get_security_report()
+        let key_strength = security_report["key_strength"]
+        let encryption_rounds = security_report["encryption_rounds"]
+        let side_channel_resistance = security_report["side_channel_resistance"]
+        
+        return (key_strength + encryption_rounds + side_channel_resistance) / 3.0
+    
+    // Advanced benchmarking with real-time monitoring
+    @fn comprehensive_benchmark(self, test_cases: [dict]): -> dict
+        print("=== Comprehensive Quantum Subsystem Benchmark ===")
+        
+        let results = []
+        let total_time = 0.0
+        let peak_memory = 0
+        
+        for i, test_case in test_cases:
+            print("Running test case", i + 1, "of", len(test_cases))
+            
+            let test_start = perf.get_time()
+            let memory_start = mem.get_usage()
+            
+            let result = self.quantum_mapping_workflow(
+                test_case["start"], 
+                test_case["goal"], 
+                test_case["data"]
+            )
+            
+            let test_end = perf.get_time()
+            let memory_end = mem.get_usage()
+            
+            let execution_time = test_end - test_start
+            let memory_usage = memory_end - memory_start
+            
+            total_time += execution_time
+            peak_memory = max(peak_memory, memory_usage)
+            
+            results.append({
+                "test_case": test_case,
+                "result": result,
+                "execution_time": execution_time,
+                "memory_usage": memory_usage,
+                "performance_score": self.calculate_performance_score(result, execution_time, memory_usage)
+            })
+        
+        let avg_fidelity = sum([r["result"]["metrics"]["fidelity"] for r in results]) / len(results)
+        let avg_time = total_time / len(results)
+        let avg_memory = sum([r["memory_usage"] for r in results]) / len(results)
+        
+        let benchmark_report = {
+            "test_results": results,
+            "summary": {
+                "average_fidelity": avg_fidelity,
+                "average_execution_time": avg_time,
+                "average_memory_usage": avg_memory,
+                "peak_memory_usage": peak_memory,
+                "total_tests": len(results),
+                "resource_efficiency": self.calculate_resource_efficiency(results)
+            },
+            "optimization_recommendations": self.optimization_engine.generate_recommendations(results)
+        }
+        
+        return benchmark_report
+    
+    @fn calculate_performance_score(self, result: dict, execution_time: float, memory_usage: int): -> float
+        let fidelity = result["metrics"]["fidelity"]
+        let security = result["metrics"]["security_score"]
+        let efficiency = 1.0 / (execution_time * (memory_usage / 1024.0 / 1024.0))
+        
+        return (fidelity * 0.4 + security * 0.3 + efficiency * 0.3)
+    
+    @fn calculate_resource_efficiency(self, results: [dict]): -> float
+        let total_fidelity = sum([r["result"]["metrics"]["fidelity"] for r in results])
+        let total_time = sum([r["execution_time"] for r in results])
+        let total_memory = sum([r["memory_usage"] for r in results])
+        
+        return total_fidelity / (total_time * (total_memory / 1024.0 / 1024.0))
+    
+    // Real-time monitoring and alerting
+    @fn start_real_time_monitoring(self): -> MonitoringSession
+        return MonitoringSession.init(self)
+    
+    @fn stop_real_time_monitoring(self, session: MonitoringSession): -> dict
+        return session.get_final_report()
+    
+    // Memory management and cleanup
+    @fn cleanup_resources(self): -> void
+        self.resource_manager.cleanup_all_resources()
+        self.walker.cleanup_resources()
+        self.astar.cleanup_resources()
+        self.nsqs.memory_pool.defragment()
+        self.performance_monitor.reset()
+        self.security_monitor.reset()
+    
+    @fn get_system_health(self): -> dict
+        return {
+            "resource_status": self.resource_manager.get_system_status(),
+            "performance_metrics": self.performance_monitor.get_performance_report(),
+            "security_status": self.security_monitor.get_security_report(),
+            "optimization_status": self.optimization_engine.get_optimization_report()
+        }
+}
+
+// Supporting structures for enhanced functionality
+struct QuantumResourceManager {
+    sessions: [ResourceSession]
+    memory_pools: [MemoryPool]
+    performance_metrics: ResourceMetrics
+    
+    @fn init(config: ResourceConfig): -> QuantumResourceManager
+        let pools = [MemoryPool.init(1024 * 1024) for _ in range(4)]  # 4 pools of 1MB each
+        let metrics = ResourceMetrics.init()
+        
+        return QuantumResourceManager {
+            sessions: []
+            memory_pools: pools
+            performance_metrics: metrics
+        }
+    
+    @fn start_session(self, name: str): -> ResourceSession
+        let session = ResourceSession.init(name)
+        self.sessions.append(session)
+        return session
+    
+    @fn end_session(self, session: ResourceSession): -> dict
+        session.end()
+        self.sessions.remove(session)
+        return session.get_summary()
+    
+    @fn allocate_memory(self, size: int): -> MemoryBlock
+        return self.memory_pools[0].allocate(size)  # Simplified for demo
+    
+    @fn cleanup_all_resources(self): -> void
+        for pool in self.memory_pools:
+            pool.cleanup()
+        
+        for session in self.sessions:
+            session.cleanup()
+    
+    @fn get_system_status(self): -> dict
+        return {
+            "active_sessions": len(self.sessions),
+            "memory_pools": [pool.get_status() for pool in self.memory_pools],
+            "total_allocated": self.performance_metrics.get_total_allocated(),
+            "peak_usage": self.performance_metrics.get_peak_usage()
+        }
+    
+    @fn get_peak_memory_usage(self): -> int
+        return self.performance_metrics.get_peak_usage()
+    
+    @fn get_allocated_memory(self): -> int
+        return self.performance_metrics.get_total_allocated()
+}
+
+struct MasterPerformanceMonitor {
+    operation_times: dict
+    memory_usage: [int]
+    fidelity_history: [float]
+    resource_efficiency: [float]
+    
+    @fn init(): -> MasterPerformanceMonitor
+        return MasterPerformanceMonitor {
+            operation_times: {}
+            memory_usage: []
+            fidelity_history: []
+            resource_efficiency: []
+        }
+    
+    @fn record_operation(self, operation: str, duration: float): -> void
+        if operation not in self.operation_times:
+            self.operation_times[operation] = []
+        self.operation_times[operation].append(duration)
+    
+    @fn record_memory_usage(self, usage: int): -> void
+        self.memory_usage.append(usage)
+    
+    @fn record_fidelity(self, fidelity: float): -> void
+        self.fidelity_history.append(fidelity)
+    
+    @fn record_resource_efficiency(self, efficiency: float): -> void
+        self.resource_efficiency.append(efficiency)
+    
+    @fn get_performance_report(self): -> dict
+        let avg_times = {}
+        for op, times in self.operation_times:
+            avg_times[op] = sum(times) / len(times)
+        
+        return {
+            "average_operation_times": avg_times,
+            "total_memory_usage": sum(self.memory_usage),
+            "average_fidelity": sum(self.fidelity_history) / len(self.fidelity_history) if len(self.fidelity_history) > 0 else 0.0,
+            "average_resource_efficiency": sum(self.resource_efficiency) / len(self.resource_efficiency) if len(self.resource_efficiency) > 0 else 0.0,
+            "total_operations": sum([len(times) for times in self.operation_times.values()])
+        }
+    
+    @fn get_total_operations(self): -> int
+        return sum([len(times) for times in self.operation_times.values()])
+    
+    @fn get_total_time(self): -> float
+        let total = 0.0
+        for times in self.operation_times.values():
+            total += sum(times)
+        return total
+    
+    @fn reset(self): -> void
+        self.operation_times.clear()
+        self.memory_usage.clear()
+        self.fidelity_history.clear()
+        self.resource_efficiency.clear()
+}
+
+struct MasterSecurityMonitor {
+    encryption_events: int
+    decryption_events: int
+    key_rotations: int
+    security_alerts: [SecurityAlert]
+    key_strength: float
+    encryption_rounds: int
+    side_channel_resistance: bool
+    
+    @fn init(): -> MasterSecurityMonitor
+        return MasterSecurityMonitor {
+            encryption_events: 0
+            decryption_events: 0
+            key_rotations: 0
+            security_alerts: []
+            key_strength: 256.0
+            encryption_rounds: 16
+            side_channel_resistance: True
+        }
+    
+    @fn record_encryption(self): -> void
+        self.encryption_events += 1
+    
+    @fn record_decryption(self): -> void
+        self.decryption_events += 1
+    
+    @fn record_key_rotation(self): -> void
+        self.key_rotations += 1
+    
+    @fn add_security_alert(self, alert: SecurityAlert): -> void
+        self.security_alerts.append(alert)
+    
+    @fn get_security_report(self): -> dict
+        return {
+            "encryption_events": self.encryption_events,
+            "decryption_events": self.decryption_events,
+            "key_rotations": self.key_rotations,
+            "security_alerts": len(self.security_alerts),
+            "key_strength": self.key_strength,
+            "encryption_rounds": self.encryption_rounds,
+            "side_channel_resistance": self.side_channel_resistance
+        }
+    
+    @fn reset(self): -> void
+        self.encryption_events = 0
+        self.decryption_events = 0
+        self.key_rotations = 0
+        self.security_alerts.clear()
+}
+
+struct QuantumOptimizationEngine {
+    config: OptimizationConfig
+    optimization_cache: OptimizationCache
+    performance_predictor: PerformancePredictor
+    resource_optimizer: ResourceOptimizer
+    
+    @fn init(config: OptimizationConfig): -> QuantumOptimizationEngine
+        let cache = OptimizationCache.init(1000)
+        let predictor = PerformancePredictor.init()
+        let optimizer = ResourceOptimizer.init()
+        
+        return QuantumOptimizationEngine {
+            config: config
+            optimization_cache: cache
+            performance_predictor: predictor
+            resource_optimizer: optimizer
+        }
+    
+    @fn optimize_for_problem(self, start: [int, int, int], goal: [int, int, int], data: [complex], base_config: MasterQuantumConfig): -> MasterQuantumConfig
+        let problem_size = self.calculate_problem_size(start, goal, data)
+        let optimal_config = base_config
+        
+        // Optimize grid size based on problem complexity
+        let optimal_grid = self.calculate_optimal_grid_size(problem_size, base_config.resource_config.max_memory_usage)
+        optimal_config.walker_config.grid_size = optimal_grid
+        
+        // Optimize memory limits based on available resources
+        let optimal_memory = self.calculate_optimal_memory_limit(problem_size, base_config.resource_config.max_memory_usage)
+        optimal_config.walker_config.memory_limit = optimal_memory
+        
+        // Enable/disable parallel processing based on problem size
+        optimal_config.walker_config.enable_parallel = self.should_enable_parallel(problem_size)
+        
+        return optimal_config
+    
+    @fn calculate_problem_size(self, start: [int, int, int], goal: [int, int, int], data: [complex]): -> int
+        let grid_volume = abs(goal[0] - start[0]) * abs(goal[1] - start[1]) * abs(goal[2] - start[2])
+        let data_complexity = len(data) * 16  # 16 bytes per complex number
+        
+        return grid_volume + data_complexity
+    
+    @fn calculate_optimal_grid_size(self, problem_size: int, memory_limit: int): -> int
+        let max_grid = math.floor(math.sqrt(memory_limit / (problem_size * 16)))
+        return min(max_grid, 16)  # Cap at 16 for practical reasons
+    
+    @fn calculate_optimal_memory_limit(self, problem_size: int, max_memory: int): -> int
+        let required_memory = problem_size * 16 * 4  # 4x for safety margin
+        return min(required_memory, max_memory)
+    
+    @fn should_enable_parallel(self, problem_size: int): -> bool
+        return problem_size > 1000
+    
+    @fn cache_path(self, key: str, path: [[int, int, int]]): -> void
+        if self.config.enable_caching:
+            self.optimization_cache.put(key, path)
+    
+    @fn get_cached_path(self, key: str): -> [[int, int, int]]
+        return self.optimization_cache.get(key) if self.optimization_cache.contains(key) else None
+    
+    @fn generate_recommendations(self, results: [dict]): -> [str]
+        let recommendations = []
+        
+        let avg_fidelity = sum([r["result"]["metrics"]["fidelity"] for r in results]) / len(results)
+        let avg_time = sum([r["execution_time"] for r in results]) / len(results)
+        let avg_memory = sum([r["memory_usage"] for r in results]) / len(results)
+        
+        if avg_fidelity < 0.9:
+            recommendations.append("Consider increasing error correction strength")
+        
+        if avg_time > 1.0:
+            recommendations.append("Enable parallel processing for better performance")
+        
+        if avg_memory > 50 * 1024 * 1024:  # 50MB
+            recommendations.append("Reduce grid size or optimize memory usage")
+        
+        return recommendations
+    
+    @fn get_optimization_report(self): -> dict
+        return {
+            "cache_size": self.optimization_cache.size(),
+            "predictions_made": self.performance_predictor.get_prediction_count(),
+            "optimizations_applied": self.resource_optimizer.get_optimization_count()
+        }
+}
+
+// Supporting structures
+struct ResourceConfig {
+    max_memory_usage: int
+    enable_caching: bool
+    enable_parallel: bool
+    enable_monitoring: bool
+    cleanup_interval: int
+    
+    @fn init(): -> ResourceConfig
+        return ResourceConfig {
+            max_memory_usage: 100 * 1024 * 1024  # 100MB
+            enable_caching: True
+            enable_parallel: True
+            enable_monitoring: True
+            cleanup_interval: 300  # 5 minutes
+        }
+}
+
+struct OptimizationConfig {
+    enable_gate_fusion: bool
+    enable_qubit_reuse: bool
+    enable_parallelization: bool
+    enable_memory_pooling: bool
+    enable_performance_profiling: bool
+    
+    @fn init(): -> OptimizationConfig
+        return OptimizationConfig {
+            enable_gate_fusion: True
+            enable_qubit_reuse: True
+            enable_parallelization: True
+            enable_memory_pooling: True
+            enable_performance_profiling: True
+        }
+}
+
+struct ResourceSession {
+    name: str
+    start_time: float
+    memory_start: int
+    operations: [str]
+    
+    @fn init(name: str): -> ResourceSession
+        return ResourceSession {
+            name: name
+            start_time: perf.get_time()
+            memory_start: mem.get_usage()
+            operations: []
+        }
+    
+    @fn record_operation(self, operation: str): -> void
+        self.operations.append(operation)
+    
+    @fn end(self): -> void
+        self.end_time = perf.get_time()
+        self.memory_end = mem.get_usage()
+    
+    @fn get_summary(self): -> dict
+        return {
+            "name": self.name
+            "duration": self.end_time - self.start_time
+            "memory_usage": self.memory_end - self.memory_start
+            "operations": len(self.operations)
+        }
+    
+    @fn cleanup(self): -> void
+        self.operations.clear()
+}
+
+struct SecurityAlert {
+    type: str
+    message: str
+    timestamp: float
+    severity: int
+    
+    @fn init(type: str, message: str, severity: int): -> SecurityAlert
+        return SecurityAlert {
+            type: type
+            message: message
+            timestamp: perf.get_time()
+            severity: severity
+        }
+}
+
+struct MonitoringSession {
+    subsystem: MasterQuantumSubsystem
+    start_time: float
+    metrics: [dict]
+    
+    @fn init(subsystem: MasterQuantumSubsystem): -> MonitoringSession
+        return MonitoringSession {
+            subsystem: subsystem
+            start_time: perf.get_time()
+            metrics: []
+        }
+    
+    @fn record_metric(self, metric: dict): -> void
+        self.metrics.append(metric)
+    
+    @fn get_final_report(self): -> dict
+        let end_time = perf.get_time()
+        
+        return {
+            "monitoring_duration": end_time - self.start_time
+            "metrics_collected": len(self.metrics)
+            "system_health": self.subsystem.get_system_health()
+            "performance_summary": self.subsystem.performance_monitor.get_performance_report()
+            "security_summary": self.subsystem.security_monitor.get_security_report()
+        }
+}
+
+// Advanced utility structures
+struct MemoryPool {
+    blocks: [MemoryBlock]
+    allocation_count: int
+    
+    @fn init(size: int): -> MemoryPool
+        return MemoryPool {
+            blocks: [MemoryBlock.init(size)]
+            allocation_count: 0
+        }
+    
+    @fn allocate(self, size: int): -> MemoryBlock
+        # Simplified allocation
+        self.allocation_count += 1
+        return MemoryBlock.init(size)
+    
+    @fn cleanup(self): -> void
+        self.blocks.clear()
+    
+    @fn get_status(self): -> dict
+        return {
+            "blocks": len(self.blocks)
+            "allocations": self.allocation_count
+        }
+}
+
+struct MemoryBlock {
+    size: int
+    in_use: bool
+    
+    @fn init(size: int): -> MemoryBlock
+        return MemoryBlock {
+            size: size
+            in_use: False
+        }
+}
+
+struct ResourceMetrics {
+    total_allocated: int
+    peak_usage: int
+    
+    @fn init(): -> ResourceMetrics
+        return ResourceMetrics {
+            total_allocated: 0
+            peak_usage: 0
+        }
+    
+    @fn record_allocation(self, size: int): -> void
+        self.total_allocated += size
+        self.peak_usage = max(self.peak_usage, self.total_allocated)
+    
+    @fn get_total_allocated(self): -> int
+        return self.total_allocated
+    
+    @fn get_peak_usage(self): -> int
+        return self.peak_usage
+}
+
+struct PerformancePredictor {
+    prediction_count: int
+    
+    @fn init(): -> PerformancePredictor
+        return PerformancePredictor {
+            prediction_count: 0
+        }
+    
+    @fn get_prediction_count(self): -> int
+        return self.prediction_count
+}
+
+struct ResourceOptimizer {
+    optimization_count: int
+    
+    @fn init(): -> ResourceOptimizer
+        return ResourceOptimizer {
+            optimization_count: 0
+        }
+    
+    @fn get_optimization_count(self): -> int
+        return self.optimization_count
+}
+
+struct OptimizationCache: PathCache {
+    // Same as PathCache but specialized for optimization caching
+}
+
+// Enhanced main function with comprehensive testing
+@fn main():
+    print("=== Master Quantum Subsystem Enhanced Demo ===")
+    
+    // Initialize master quantum subsystem
+    let subsystem = MasterQuantumSubsystem.init()
+    
+    // Run comprehensive benchmark
+    let test_cases = [
+        {
+            "start": [0, 0, 0],
+            "goal": [3, 3, 1],
+            "data": [1.0, 0.0]
+        },
+        {
+            "start": [1, 1, 0],
+            "goal": [5, 2, 2],
+            "data": [0.0, 1.0]
+        },
+        {
+            "start": [0, 0, 0],
+            "goal": [7, 3, 3],
+            "data": [1.0/math.sqrt(2), 1.0/math.sqrt(2)]
+        }
+    ]
+    
+    print("Running comprehensive benchmark...")
+    let benchmark = subsystem.comprehensive_benchmark(test_cases)
+    
+    print("\n=== Benchmark Results ===")
+    print("Average fidelity:", benchmark["summary"]["average_fidelity"])
+    print("Average execution time:", benchmark["summary"]["average_execution_time"], "seconds")
+    print("Average memory usage:", benchmark["summary"]["average_memory_usage"] / 1024.0 / 1024.0, "MB")
+    print("Peak memory usage:", benchmark["summary"]["peak_memory_usage"] / 1024.0 / 1024.0, "MB")
+    
+    print("\n=== Optimization Recommendations ===")
+    for recommendation in benchmark["optimization_recommendations"]:
+        print("-", recommendation)
+    
+    print("\n=== System Health Report ===")
+    let health = subsystem.get_system_health()
+    print("Resource status:", health["resource_status"])
+    print("Security status:", health["security_summary"])
+    
+    // Test real-time monitoring
+    print("\n=== Real-time Monitoring Demo ===")
+    let monitoring = subsystem.start_real_time_monitoring()
+    
+    # Simulate some operations
+    let simple_test = subsystem.quantum_mapping_workflow([0, 0, 0], [2, 1, 1], [1.0, 0.0])
+    
+    let monitoring_report = subsystem.stop_real_time_monitoring(monitoring)
+    print("Monitoring report:", monitoring_report)
+    
+    // Cleanup resources
+    print("\nCleaning up resources...")
+    subsystem.cleanup_resources()
+    
+    print("=== Master Quantum Subsystem Enhanced Demo Complete ===")

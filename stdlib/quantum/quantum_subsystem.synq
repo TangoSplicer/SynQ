@@ -1,0 +1,286 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/quantum_subsystem.synq
+// Complete Quantum Subsystem Integration
+// Agent-Based Quantum Mapping System (AQMS) - Main Interface
+
+@import quantum.quantum_walker as qw
+@import quantum.secure_storage as qs
+@import quantum.transmission_protocol as qt
+@import quantum.circuits as qc
+@import core.math as math
+
+// Main quantum subsystem interface
+struct QuantumSubsystem {
+    walker_config: qw.QuantumConfig
+    security_config: qs.SecurityConfig
+    transmission_config: qt.TransmissionConfig
+    
+    walker: qw.QuantumWalker
+    astar: qw.QuantumAStar
+    nsqs: qs.NSQS
+    qotp: qs.QuantumOneTimePad
+    qkd: qs.QuantumKeyDistribution
+    qec_storage: qs.QuantumErrorCorrection
+    pgt: qt.PathGuidedTransmission
+    qec_transmission: qt.QuantumErrorCorrectionTransmission
+    
+    fn init() -> QuantumSubsystem {
+        let walker_config = qw.QuantumConfig {
+            grid_size: 8
+            depth: 4
+            qubits: 3
+            coin_states: 6
+        }
+        
+        let security_config = qs.SecurityConfig {
+            key_length: 256
+            encoding_dim: 8
+            syndrome_bits: 4
+            signature_length: 128
+        }
+        
+        let transmission_config = qt.TransmissionConfig {
+            max_path_length: 10
+            error_threshold: 0.01
+            fidelity_threshold: 0.95
+            teleportation_fidelity: 0.99
+        }
+        
+        return QuantumSubsystem {
+            walker_config: walker_config
+            security_config: security_config
+            transmission_config: transmission_config
+            
+            walker: qw.QuantumWalker.init(walker_config)
+            astar: qw.QuantumAStar.init(walker_config)
+            nsqs: qs.NSQS.init(security_config)
+            qotp: qs.QuantumOneTimePad.init()
+            qkd: qs.QuantumKeyDistribution.init()
+            qec_storage: qs.QuantumErrorCorrection.init(security_config)
+            pgt: qt.PathGuidedTransmission.init(transmission_config)
+            qec_transmission: qt.QuantumErrorCorrectionTransmission.init(transmission_config)
+        }
+    }
+    
+    // Complete quantum mapping workflow
+    fn quantum_mapping_workflow(self, start: [int, int, int], 
+                               goal: [int, int, int], 
+                               data: [complex]) -> dict {
+        
+        print("=== Starting Quantum Mapping Workflow ===")
+        
+        // Step 1: Quantum walker exploration
+        print("Step 1: Quantum walker exploration")
+        let walker_state = self.walker.prepare_initial_state()
+        let evolved_state = self.walker.apply_step()
+        
+        // Step 2: Quantum A* pathfinding
+        print("Step 2: Quantum A* pathfinding")
+        let state_space = self.astar.state_space_representation(start, goal)
+        let heuristic_op = self.astar.quantum_heuristic_operator(goal)
+        let optimal_path = self.find_optimal_path(state_space, start, goal)
+        
+        // Step 3: Secure data storage
+        print("Step 3: Secure quantum data storage")
+        let encoded_data = self.nsqs.encode_qubit(data)
+        let encrypted_data = self.qotp.encrypt(encoded_data, 
+                                              self.qotp.generate_quantum_key(1))
+        
+        // Generate shared key
+        let shared_key, _ = self.qkd.distribute_key(128)
+        
+        // Step 4: Quantum transmission along optimal path
+        print("Step 4: Quantum transmission along optimal path")
+        let transmitted_data = self.pgt.complete_transmission_unitary(
+            encrypted_data, optimal_path)
+        
+        // Step 5: Error correction
+        print("Step 5: Quantum error correction")
+        let stabilizers = self.qec_transmission.create_surface_code_stabilizers(3)
+        let syndrome = self.qec_transmission.syndrome_extraction(
+            transmitted_data, stabilizers["X_stabilizers"])
+        let correction = self.qec_transmission.error_correction_operator(syndrome)
+        let corrected_data = qt.apply_matrix(correction, transmitted_data)
+        
+        // Step 6: Decryption and decoding
+        print("Step 6: Decryption and decoding")
+        let decrypted_data = self.qotp.decrypt(corrected_data, 
+                                              self.qotp.generate_quantum_key(1))
+        let final_data = self.nsqs.decode_qubit(decrypted_data)
+        
+        // Calculate metrics
+        let metrics = self.calculate_metrics(data, final_data, optimal_path)
+        
+        return {
+            "original_data": data,
+            "final_data": final_data,
+            "optimal_path": optimal_path,
+            "metrics": metrics,
+            "syndrome": syndrome,
+            "transmission_fidelity": metrics["fidelity"]
+        }
+    }
+    
+    fn find_optimal_path(self, state_space: dict, start: [int, int, int], 
+                        goal: [int, int, int]) -> [[int, int, int]] {
+        // Simplified pathfinding based on f-values
+        let f_values = state_space["f_values"]
+        let current = start
+        let path = [start]
+        
+        while current != goal && len(path) < 20 {
+            let neighbors = get_neighbors(current, self.walker_config)
+            let best_neighbor = current
+            let best_f = math.inf
+            
+            for neighbor in neighbors {
+                let neighbor_str = str(neighbor)
+                if neighbor_str in f_values && f_values[neighbor_str] < best_f {
+                    best_f = f_values[neighbor_str]
+                    best_neighbor = neighbor
+                }
+            }
+            
+            if best_neighbor == current {
+                break
+            }
+            
+            current = best_neighbor
+            path.append(current)
+        }
+        
+        return path
+    }
+    
+    fn calculate_metrics(self, original: [complex], final: [complex], 
+                        path: [[int, int, int]]) -> dict {
+        let metrics = qt.QuantumTransmissionMetrics {}
+        
+        let fidelity = metrics.transmission_fidelity(original, final)
+        let error_rate = metrics.error_rate(original, final)
+        let capacity = metrics.channel_capacity(fidelity, error_rate)
+        let security = metrics.security_parameter(0.001)  // Low eavesdropping probability
+        
+        return {
+            "fidelity": fidelity,
+            "error_rate": error_rate,
+            "channel_capacity": capacity,
+            "security_parameter": security,
+            "path_length": len(path),
+            "path_efficiency": 1.0 / len(path)
+        }
+    }
+}
+
+// Performance optimization
+fn optimize_quantum_subsystem(subsystem: QuantumSubsystem, 
+                            optimization_params: dict) -> QuantumSubsystem {
+    
+    print("=== Optimizing Quantum Subsystem ===")
+    
+    // Optimize grid size based on problem size
+    let optimal_grid_size = optimization_params.get("grid_size", 8)
+    let optimal_depth = optimization_params.get("depth", 4)
+    
+    let new_config = qw.QuantumConfig {
+        grid_size: optimal_grid_size
+        depth: optimal_depth
+        qubits: subsystem.walker_config.qubits
+        coin_states: subsystem.walker_config.coin_states
+    }
+    
+    return QuantumSubsystem {
+        walker_config: new_config
+        security_config: subsystem.security_config
+        transmission_config: subsystem.transmission_config
+        
+        walker: qw.QuantumWalker.init(new_config)
+        astar: qw.QuantumAStar.init(new_config)
+        nsqs: subsystem.nsqs
+        qotp: subsystem.qotp
+        qkd: subsystem.qkd
+        qec_storage: subsystem.qec_storage
+        pgt: subsystem.pgt
+        qec_transmission: subsystem.qec_transmission
+    }
+}
+
+// Benchmarking and testing
+fn benchmark_quantum_subsystem(subsystem: QuantumSubsystem) -> dict {
+    print("=== Benchmarking Quantum Subsystem ===")
+    
+    let test_cases = [
+        {
+            "start": [0, 0, 0],
+            "goal": [2, 2, 1],
+            "data": [1.0, 0.0]  // |0>
+        },
+        {
+            "start": [1, 1, 0],
+            "goal": [5, 5, 2],
+            "data": [0.0, 1.0]  // |1>
+        },
+        {
+            "start": [0, 0, 0],
+            "goal": [7, 7, 3],
+            "data": [1.0/math.sqrt(2), 1.0/math.sqrt(2)]  // |+>
+        }
+    ]
+    
+    let results = []
+    let total_time = 0.0
+    
+    for test_case in test_cases {
+        let start_time = time.now()
+        let result = subsystem.quantum_mapping_workflow(
+            test_case["start"], test_case["goal"], test_case["data"])
+        let end_time = time.now()
+        
+        let execution_time = end_time - start_time
+        total_time += execution_time
+        
+        results.append({
+            "test_case": test_case,
+            "result": result,
+            "execution_time": execution_time
+        })
+    }
+    
+    let avg_fidelity = sum([r["result"]["metrics"]["fidelity"] for r in results]) / len(results)
+    let avg_time = total_time / len(results)
+    
+    return {
+        "test_results": results,
+        "average_fidelity": avg_fidelity,
+        "average_execution_time": avg_time,
+        "total_tests": len(results)
+    }
+}
+
+// Example usage
+fn main() {
+    print("=== Quantum Subsystem Demo ===")
+    
+    // Initialize quantum subsystem
+    let subsystem = QuantumSubsystem.init()
+    
+    // Run quantum mapping workflow
+    let start = [0, 0, 0]
+    let goal = [5, 5, 2]
+    let data = [1.0/math.sqrt(2), 1.0/math.sqrt(2)]  // |+> state
+    
+    let result = subsystem.quantum_mapping_workflow(start, goal, data)
+    
+    print("Quantum mapping completed!")
+    print("Transmission fidelity:", result["metrics"]["fidelity"])
+    print("Path length:", result["metrics"]["path_length"])
+    print("Security parameter:", result["metrics"]["security_parameter"])
+    
+    // Benchmark the system
+    let benchmark = benchmark_quantum_subsystem(subsystem)
+    print("Average fidelity:", benchmark["average_fidelity"])
+    print("Average execution time:", benchmark["average_execution_time"], "seconds")
+}

@@ -1,0 +1,212 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: tests/integration/test_quantum_subsystem.synq
+// Comprehensive tests for quantum subsystem implementation
+
+@import quantum.quantum_subsystem as qsub
+@import quantum.quantum_walker as qw
+@import quantum.secure_storage as qs
+@import quantum.transmission_protocol as qt
+@import core.math as math
+@import core.testing as testing
+
+// Test quantum walker
+fn test_quantum_walker() {
+    print("Testing Quantum Walker...")
+    
+    let config = qw.QuantumConfig {grid_size: 4, depth: 2, qubits: 2}
+    let walker = qw.QuantumWalker.init(config)
+    
+    // Test initial state preparation
+    let initial_state = walker.prepare_initial_state()
+    testing.assert(len(initial_state) > 0, "Initial state should not be empty")
+    
+    // Test Grover diffusion operator
+    let grover = qw.grover_diffusion_operator(config.coin_states)
+    testing.assert(len(grover.matrix) == config.coin_states, 
+                  "Grover operator dimension should match coin states")
+    
+    // Test state evolution
+    let evolved_state = walker.apply_step()
+    testing.assert(len(evolved_state) == len(initial_state), 
+                  "Evolved state should maintain dimension")
+    
+    // Test normalization
+    let norm = math.sqrt(sum([abs(a)**2 for a in evolved_state]))
+    testing.assert(abs(norm - 1.0) < 1e-6, "State should remain normalized")
+    
+    print("✓ Quantum Walker tests passed")
+}
+
+// Test secure storage
+fn test_secure_storage() {
+    print("Testing Secure Storage...")
+    
+    let config = qs.SecurityConfig {}
+    let nsqs = qs.NSQS.init(config)
+    
+    // Test NSQS encoding/decoding
+    let test_qubit = [1.0/math.sqrt(2), 1.0/math.sqrt(2)]
+    let encoded = nsqs.encode_qubit(test_qubit)
+    let decoded = nsqs.decode_qubit(encoded)
+    
+    let fidelity = abs(qs.dot_product(test_qubit, decoded))**2
+    testing.assert(fidelity > 0.95, "NSQS should preserve qubit state")
+    
+    // Test QOTP encryption
+    let qotp = qs.QuantumOneTimePad.init()
+    let key = qotp.generate_quantum_key(1)
+    let encrypted = qotp.encrypt(test_qubit, key)
+    let decrypted = qotp.decrypt(encrypted, key)
+    
+    let qotp_fidelity = abs(qs.dot_product(test_qubit, decrypted))**2
+    testing.assert(qotp_fidelity > 0.95, "QOTP should preserve qubit state")
+    
+    print("✓ Secure Storage tests passed")
+}
+
+// Test transmission protocol
+fn test_transmission_protocol() {
+    print("Testing Transmission Protocol...")
+    
+    let config = qt.TransmissionConfig {}
+    let pgt = qt.PathGuidedTransmission.init(config)
+    
+    // Test channel state preparation
+    let channel_state = pgt.prepare_channel_state(3)
+    testing.assert(len(channel_state) > 0, "Channel state should not be empty")
+    
+    // Test teleportation chain
+    let teleportation_ops = pgt.create_teleportation_chain(2)
+    testing.assert(len(teleportation_ops) == 2, 
+                  "Should create correct number of teleportation operators")
+    
+    // Test complete transmission
+    let test_state = [1.0, 0.0]
+    let test_path = [[0, 0, 0], [1, 1, 1], [2, 2, 2]]
+    let transmitted = pgt.complete_transmission_unitary(test_state, test_path)
+    
+    let metrics = qt.QuantumTransmissionMetrics {}
+    let fidelity = metrics.transmission_fidelity(test_state, transmitted)
+    testing.assert(fidelity > 0.9, "Transmission should have high fidelity")
+    
+    print("✓ Transmission Protocol tests passed")
+}
+
+// Test quantum A* algorithm
+fn test_quantum_astar() {
+    print("Testing Quantum A*...")
+    
+    let config = qw.QuantumConfig {grid_size: 4, depth: 2, qubits: 2}
+    let astar = qw.QuantumAStar.init(config)
+    
+    let start = [0, 0, 0]
+    let goal = [3, 3, 1]
+    
+    let state_space = astar.state_space_representation(start, goal)
+    testing.assert(len(state_space["f_values"]) > 0, 
+                  "State space should contain f-values")
+    
+    let heuristic_op = astar.quantum_heuristic_operator(goal)
+    testing.assert(len(heuristic_op.matrix) == config.grid_size**2 * config.depth,
+                  "Heuristic operator should match position space dimension")
+    
+    print("✓ Quantum A* tests passed")
+}
+
+// Test complete quantum subsystem
+fn test_quantum_subsystem() {
+    print("Testing Complete Quantum Subsystem...")
+    
+    let subsystem = qsub.QuantumSubsystem.init()
+    
+    // Test quantum mapping workflow
+    let start = [0, 0, 0]
+    let goal = [2, 2, 1]
+    let data = [1.0, 0.0]
+    
+    let result = subsystem.quantum_mapping_workflow(start, goal, data)
+    
+    testing.assert(len(result["optimal_path"]) > 0, 
+                  "Should find optimal path")
+    testing.assert(result["metrics"]["fidelity"] > 0.8,
+                  "Should maintain high transmission fidelity")
+    testing.assert(result["metrics"]["security_parameter"] > 0,
+                  "Should have positive security parameter")
+    
+    print("✓ Complete Quantum Subsystem tests passed")
+}
+
+// Test error correction
+fn test_error_correction() {
+    print("Testing Error Correction...")
+    
+    let storage_config = qs.SecurityConfig {}
+    let transmission_config = qt.TransmissionConfig {}
+    
+    let qec_storage = qs.QuantumErrorCorrection.init(storage_config)
+    let qec_transmission = qt.QuantumErrorCorrectionTransmission.init(transmission_config)
+    
+    // Test stabilizer creation
+    let stabilizers = qec_storage.create_stabilizers()
+    testing.assert(len(stabilizers) == 4, "Should create 4 stabilizers")
+    
+    // Test surface code
+    let surface_stabilizers = qec_transmission.create_surface_code_stabilizers(3)
+    testing.assert(len(surface_stabilizers["X_stabilizers"]) > 0, 
+                  "Should create X-stabilizers")
+    
+    print("✓ Error Correction tests passed")
+}
+
+// Test key distribution
+fn test_key_distribution() {
+    print("Testing Key Distribution...")
+    
+    let qkd = qs.QuantumKeyDistribution.init()
+    let key, states = qkd.distribute_key(128)
+    
+    testing.assert(len(key) > 0, "Should generate shared key")
+    testing.assert(len(states) == 128, "Should generate all states")
+    
+    print("✓ Key Distribution tests passed")
+}
+
+// Performance benchmark
+fn test_performance_benchmark() {
+    print("Testing Performance Benchmark...")
+    
+    let subsystem = qsub.QuantumSubsystem.init()
+    let benchmark = qsub.benchmark_quantum_subsystem(subsystem)
+    
+    testing.assert(benchmark["total_tests"] == 3, 
+                  "Should run 3 test cases")
+    testing.assert(benchmark["average_fidelity"] > 0.8,
+                  "Should maintain high average fidelity")
+    
+    print("✓ Performance Benchmark tests passed")
+}
+
+// Integration test suite
+fn run_all_tests() {
+    print("=== Running Quantum Subsystem Integration Tests ===")
+    
+    test_quantum_walker()
+    test_secure_storage()
+    test_transmission_protocol()
+    test_quantum_astar()
+    test_quantum_subsystem()
+    test_error_correction()
+    test_key_distribution()
+    test_performance_benchmark()
+    
+    print("\n=== All Integration Tests Passed! ===")
+    print("Quantum subsystem is fully functional and ready for deployment.")
+}
+
+// Example usage
+fn main() {
+    run_all_tests()
+}

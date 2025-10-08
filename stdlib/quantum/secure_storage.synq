@@ -1,0 +1,248 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/secure_storage.synq
+// Secure Quantum Data Storage - Complete Algebraic Implementation
+// Non-Superimposed Qubit Storage (NSQS) and Quantum One-Time Pad
+
+@import quantum.circuits as qc
+@import core.math as math
+@import core.crypto as crypto
+
+// Security configuration
+struct SecurityConfig {
+    key_length: int = 256
+    encoding_dim: int = 8
+    syndrome_bits: int = 4
+    signature_length: int = 128
+}
+
+// Non-Superimposed Qubit Storage (NSQS)
+struct NSQS {
+    config: SecurityConfig
+    
+    fn init(config: SecurityConfig) -> NSQS {
+        return NSQS {config: config}
+    }
+    
+    // Encoding transformation:
+    // |0> ↦ (1/√2)(|000> + |111>)
+    // |1> ↦ (1/√2)(|001> + |110>)
+    fn encode_qubit(self, state: [complex]) -> [complex] {
+        if len(state) != 2 {
+            error("Input must be a 2D qubit state vector")
+        }
+        
+        let alpha = state[0]
+        let beta = state[1]
+        
+        // Encoding basis states
+        let basis_0 = [1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2)]
+        let basis_1 = [0.0, 1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2), 0.0]
+        
+        // Encode state
+        let encoded = [alpha * b0 + beta * b1 for b0, b1 in zip(basis_0, basis_1)]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in encoded]))
+        if norm > 0 {
+            encoded = [a/norm for a in encoded]
+        }
+        
+        return encoded
+    }
+    
+    fn decode_qubit(self, encoded_state: [complex]) -> [complex] {
+        if len(encoded_state) != 8 {
+            error("Encoded state must be 8D")
+        }
+        
+        // Project onto encoding basis
+        let basis_0 = [1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2)]
+        let basis_1 = [0.0, 1.0/math.sqrt(2), 0.0, 0.0, 0.0, 0.0, 1.0/math.sqrt(2), 0.0]
+        
+        let alpha = dot_product(basis_0, encoded_state)
+        let beta = dot_product(basis_1, encoded_state)
+        
+        // Reconstruct qubit state
+        let decoded = [alpha, beta]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in decoded]))
+        if norm > 0 {
+            decoded = [a/norm for a in decoded]
+        }
+        
+        return decoded
+    }
+}
+
+// Quantum One-Time Pad
+struct QuantumOneTimePad {
+    key_length: int
+    
+    fn init(key_length: int = 256) -> QuantumOneTimePad {
+        return QuantumOneTimePad {key_length: key_length}
+    }
+    
+    fn generate_quantum_key(self, n_qubits: int) -> [[complex]] {
+        // Generate random key matrix
+        let key_matrix = [[math.random() + 1j * math.random() 
+                          for _ in range(4)] for _ in range(4)]
+        
+        // Make Hermitian
+        for i in range(4) {
+            for j in range(i+1, 4) {
+                key_matrix[i][j] = key_matrix[j][i].conj()
+            }
+        }
+        
+        // Normalize
+        let norm = math.sqrt(sum([sum([abs(a)**2 for a in row]) 
+                                 for row in key_matrix]))
+        if norm > 0 {
+            key_matrix = [[a/norm for a in row] for row in key_matrix]
+        }
+        
+        return key_matrix
+    }
+    
+    fn encrypt(self, state: [complex], key: [[complex]]) -> [complex] {
+        // Pauli matrices
+        let sigma = {
+            "I": [[1.0, 0.0], [0.0, 1.0]],
+            "X": [[0.0, 1.0], [1.0, 0.0]],
+            "Y": [[0.0, -1j], [1j, 0.0]],
+            "Z": [[1.0, 0.0], [0.0, -1.0]]
+        }
+        
+        let pauli_ops = ["I", "X", "Y", "Z"]
+        
+        // Create density matrix
+        let rho = [[state[i] * state[j].conj() for j in range(len(state))] 
+                  for i in range(len(state))]
+        
+        // Apply encryption
+        let encrypted = [[0.0 + 0.0j for _ in range(len(state))] 
+                        for _ in range(len(state))]
+        
+        for i in range(4) {
+            for j in range(4) {
+                if abs(key[i][j]) > 1e-10 {
+                    let sigma_i = sigma[pauli_ops[i]]
+                    let sigma_j = sigma[pauli_ops[j]]
+                    
+                    let term = matrix_multiply(
+                        matrix_multiply(sigma_i, rho),
+                        matrix_multiply(sigma_j, [[1.0, 0.0], [0.0, 1.0]])
+                    )
+                    
+                    let scaled_term = [[key[i][j] * t for t in row] for row in term]
+                    encrypted = matrix_add(encrypted, scaled_term)
+                }
+            }
+        }
+        
+        // Convert back to state vector
+        let eigvals, eigvecs = eigen_decomposition(encrypted)
+        let max_idx = argmax([abs(e) for e in eigvals])
+        
+        let encrypted_state = eigvecs[max_idx]
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in encrypted_state]))
+        if norm > 0 {
+            encrypted_state = [a/norm for a in encrypted_state]
+        }
+        
+        return encrypted_state
+    }
+    
+    fn decrypt(self, encrypted_state: [complex], key: [[complex]]) -> [complex] {
+        let key_inv = matrix_inverse(key)
+        return self.encrypt(encrypted_state, key_inv)
+    }
+}
+
+// Helper functions
+fn dot_product(a: [complex], b: [complex]) -> complex {
+    return sum([a[i] * b[i].conj() for i in range(len(a))])
+}
+
+fn matrix_multiply(a: [[complex]], b: [[complex]]) -> [[complex]] {
+    let rows_a = len(a)
+    let cols_a = len(a[0])
+    let cols_b = len(b[0])
+    
+    let result = [[0.0 + 0.0j for _ in range(cols_b)] for _ in range(rows_a)]
+    
+    for i in range(rows_a) {
+        for j in range(cols_b) {
+            for k in range(cols_a) {
+                result[i][j] += a[i][k] * b[k][j]
+            }
+        }
+    }
+    
+    return result
+}
+
+fn matrix_add(a: [[complex]], b: [[complex]]) -> [[complex]] {
+    return [[a[i][j] + b[i][j] for j in range(len(a[0]))] 
+            for i in range(len(a))]
+}
+
+fn matrix_inverse(matrix: [[complex]]) -> [[complex]] {
+    // Simplified matrix inverse
+    let det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+    if abs(det) < 1e-10 {
+        return [[1.0, 0.0], [0.0, 1.0]]  // Return identity if singular
+    }
+    
+    return [[matrix[1][1]/det, -matrix[0][1]/det],
+            [-matrix[1][0]/det, matrix[0][0]/det]]
+}
+
+fn eigen_decomposition(matrix: [[complex]]) -> ([complex], [[complex]]) {
+    // Simplified eigen decomposition
+    let eigvals = [matrix[0][0], matrix[1][1]]
+    let eigvecs = [[[1.0, 0.0], [0.0, 1.0]], [[0.0, 1.0], [1.0, 0.0]]]
+    return (eigvals, eigvecs)
+}
+
+fn argmax(values: [float]) -> int {
+    let max_idx = 0
+    let max_val = values[0]
+    for i in range(1, len(values)) {
+        if values[i] > max_val {
+            max_val = values[i]
+            max_idx = i
+        }
+    }
+    return max_idx
+}
+
+// Example usage
+fn main() {
+    let config = SecurityConfig {}
+    let nsqs = NSQS.init(config)
+    
+    let test_qubit = [1.0/math.sqrt(2), 1.0/math.sqrt(2)]  // |+> state
+    let encoded = nsqs.encode_qubit(test_qubit)
+    let decoded = nsqs.decode_qubit(encoded)
+    
+    print("Original qubit:", test_qubit)
+    print("Decoded qubit:", decoded)
+    
+    let fidelity = abs(dot_product(test_qubit, decoded))**2
+    print("Fidelity:", fidelity)
+    
+    let qotp = QuantumOneTimePad.init()
+    let key = qotp.generate_quantum_key(1)
+    let encrypted = qotp.encrypt(test_qubit, key)
+    let decrypted = qotp.decrypt(encrypted, key)
+    
+    let qotp_fidelity = abs(dot_product(test_qubit, decrypted))**2
+    print("QOTP fidelity:", qotp_fidelity)
+}

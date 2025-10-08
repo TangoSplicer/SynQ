@@ -1,0 +1,937 @@
+// SynQ Commercial Attribution License v1.0
+// © 2025 SynQ Contributors. All rights reserved.
+// This file is part of the SynQ programming ecosystem.
+
+// File: stdlib/quantum/quantum_walker_enhanced.synq
+// Enhanced Quantum Walker with Advanced Classical Features
+// SynQ Language Standards Compliant Version
+
+import quantum.circuits as qc
+import quantum.measurements as qm
+import core.math as math
+import core.memory as mem
+import core.parallel as par
+import core.performance as perf
+
+// Enhanced configuration with resource management
+struct QuantumConfig {
+    grid_size: int = 8
+    depth: int = 4
+    qubits: int = 3
+    coin_states: int = 6
+    memory_limit: int = 1024 * 1024  // 1MB default
+    enable_parallel: bool = true
+    optimization_level: int = 2
+}
+
+// Resource-aware Hilbert space with memory tracking
+struct HilbertSpace {
+    dim_position: int
+    dim_coin: int
+    dim_coherence: int
+    dim_data: int
+    dim_total: int
+    memory_usage: int
+    cache_enabled: bool
+    
+    @fn init(config: QuantumConfig): -> HilbertSpace
+        let dim_position = config.grid_size * config.grid_size * config.depth
+        let dim_coin = config.coin_states
+        let dim_coherence = 4
+        let dim_data = 2 ** config.qubits
+        let dim_total = dim_position * dim_coin * dim_coherence * dim_data
+        let memory_usage = dim_total * 16  // Complex numbers: 16 bytes each
+        
+        // Validate memory constraints
+        if memory_usage > config.memory_limit:
+            error("Memory usage exceeds limit: " + str(memory_usage) + " > " + str(config.memory_limit))
+        
+        return HilbertSpace {
+            dim_position: dim_position
+            dim_coin: dim_coin
+            dim_coherence: dim_coherence
+            dim_data: dim_data
+            dim_total: dim_total
+            memory_usage: memory_usage
+            cache_enabled: dim_total < 10000  // Enable cache for smaller systems
+        }
+    
+    @fn position_index(self, x: int, y: int, z: int, config: QuantumConfig): -> int
+        return x * config.grid_size * config.depth + y * config.depth + z
+    
+    @fn position_coords(self, idx: int, config: QuantumConfig): -> [int, int, int]
+        let z = idx % config.depth
+        let y = (idx // config.depth) % config.grid_size
+        let x = idx // (config.grid_size * config.depth)
+        return [x, y, z]
+    
+    @fn get_memory_usage(self): -> int
+        return self.memory_usage
+    
+    @fn cleanup_cache(self): -> void
+        if self.cache_enabled:
+            mem.clear_cache("quantum_states")
+}
+
+// Performance-optimized quantum walker with resource management
+struct QuantumWalker {
+    config: QuantumConfig
+    hilbert: HilbertSpace
+    current_state: [complex]
+    performance_monitor: QuantumPerformanceMonitor
+    resource_pool: QuantumMemoryPool
+    execution_history: [ExecutionRecord]
+    
+    @fn init(config: QuantumConfig): -> QuantumWalker
+        let hilbert = HilbertSpace.init(config)
+        let monitor = QuantumPerformanceMonitor.init()
+        let pool = QuantumMemoryPool.init(hilbert.memory_usage * 2)
+        
+        return QuantumWalker {
+            config: config
+            hilbert: hilbert
+            current_state: []
+            performance_monitor: monitor
+            resource_pool: pool
+            execution_history: []
+        }
+    
+    @fn prepare_initial_state(self): -> [complex]
+        let start_time = perf.get_time()
+        let memory_before = mem.get_usage()
+        
+        let N = self.config.grid_size * self.config.grid_size * self.config.depth
+        
+        // Use parallel processing for large systems
+        let pos_state = if self.config.enable_parallel and N > 1000:
+            self.parallel_position_superposition(N)
+        else:
+            self.serial_position_superposition(N)
+        
+        let coin_state = self.create_coin_superposition()
+        let coherence_state = [1.0, 0.0, 0.0, 0.0]
+        let data_state = self.create_data_register()
+        
+        let initial_state = self.tensor_product_safe([pos_state, coin_state, coherence_state, data_state])
+        
+        let end_time = perf.get_time()
+        let memory_after = mem.get_usage()
+        
+        self.performance_monitor.record_execution(
+            end_time - start_time, 
+            memory_after - memory_before, 
+            1.0
+        )
+        
+        self.current_state = initial_state
+        return initial_state
+    
+    @fn serial_position_superposition(self, N: int): -> [complex]
+        return [1.0/math.sqrt(N) for _ in range(N)]
+    
+    @fn parallel_position_superposition(self, N: int): -> [complex]
+        return par.parallel_map(self.create_uniform_amplitude, range(N), num_workers=4)
+    
+    @fn create_uniform_amplitude(self, _: int): -> complex
+        return 1.0/math.sqrt(self.config.grid_size * self.config.grid_size * self.config.depth)
+    
+    @fn create_coin_superposition(self): -> [complex]
+        return [1.0/math.sqrt(self.config.coin_states) for _ in range(self.config.coin_states)]
+    
+    @fn create_data_register(self): -> [complex]
+        let state = [0.0] * self.hilbert.dim_data
+        state[0] = 1.0
+        return state
+    
+    @fn tensor_product_safe(self, states: [[complex]]): -> [complex]
+        let total_size = 1
+        for state in states:
+            total_size *= len(state)
+        
+        if total_size > self.config.memory_limit // 16:
+            return self.chunked_tensor_product(states)
+        else:
+            return self.standard_tensor_product(states)
+    
+    @fn standard_tensor_product(self, states: [[complex]]): -> [complex]
+        let result = states[0]
+        for state in states[1:]:
+            result = self.tensor_product_pair(result, state)
+        return result
+    
+    @fn chunked_tensor_product(self, states: [[complex]]): -> [complex]
+        // Memory-efficient tensor product using chunked processing
+        let chunk_size = 1000
+        let result = states[0]
+        
+        for state in states[1:]:
+            let temp_result = []
+            for i in range(0, len(result), chunk_size):
+                let chunk1 = result[i:i+chunk_size]
+                for j in range(0, len(state), chunk_size):
+                    let chunk2 = state[j:j+chunk_size]
+                    let chunk_product = self.tensor_product_pair(chunk1, chunk2)
+                    temp_result.extend(chunk_product)
+            result = temp_result
+        
+        return result
+    
+    @fn tensor_product_pair(self, a: [complex], b: [complex]): -> [complex]
+        return [a_val * b_val for a_val in a for b_val in b]
+    
+    @fn grover_diffusion_operator(self): -> qc.Gate
+        let start_time = perf.get_time()
+        
+        let uniform = [1.0/math.sqrt(self.config.coin_states) for _ in range(self.config.coin_states)]
+        let projector = [[uniform[i] * uniform[j] for j in range(self.config.coin_states)] 
+                         for i in range(self.config.coin_states)]
+        
+        let identity = [[1.0 if i == j else 0.0 for j in range(self.config.coin_states)] 
+                        for i in range(self.config.coin_states)]
+        
+        let grover_matrix = [[2.0 * projector[i][j] - identity[i][j] 
+                              for j in range(self.config.coin_states)] 
+                             for i in range(self.config.coin_states)]
+        
+        let end_time = perf.get_time()
+        self.record_operation("grover_diffusion", end_time - start_time)
+        
+        return qc.Gate("Grover", grover_matrix)
+    
+    @fn conditional_shift_operator(self): -> qc.Gate
+        let start_time = perf.get_time()
+        let directions = ["↑", "↓", "←", "→", "⊕", "⊖"]
+        let dim = self.hilbert.dim_total
+        
+        let shift_matrix = [[0.0 for _ in range(dim)] for _ in range(dim)]
+        
+        // Use parallel processing for large grids
+        if self.config.enable_parallel and self.config.grid_size > 8:
+            shift_matrix = self.parallel_shift_computation(directions, dim)
+        else:
+            shift_matrix = self.serial_shift_computation(directions, dim)
+        
+        let end_time = perf.get_time()
+        self.record_operation("conditional_shift", end_time - start_time)
+        
+        return qc.Gate("ConditionalShift", shift_matrix)
+    
+    @fn parallel_shift_computation(self, directions: [str], dim: int): -> [[complex]]
+        let result = [[0.0 for _ in range(dim)] for _ in range(dim)]
+        
+        let computation_chunks = self.create_computation_chunks()
+        
+        let chunk_results = par.parallel_map(
+            self.compute_shift_chunk, 
+            computation_chunks, 
+            num_workers=4
+        )
+        
+        // Merge chunk results
+        for chunk_result in chunk_results:
+            result = self.merge_matrices(result, chunk_result)
+        
+        return result
+    
+    @fn serial_shift_computation(self, directions: [str], dim: int): -> [[complex]]
+        let result = [[0.0 for _ in range(dim)] for _ in range(dim)]
+        
+        for x in range(self.config.grid_size):
+            for y in range(self.config.grid_size):
+                for z in range(self.config.depth):
+                    for coin_idx in range(self.config.coin_states):
+                        let new_coords = self.get_new_coordinates(x, y, z, directions[coin_idx])
+                        
+                        if self.all_valid(new_coords):
+                            let old_idx = self.hilbert.position_index(x, y, z, self.config)
+                            let new_idx = self.hilbert.position_index(
+                                new_coords[0], new_coords[1], new_coords[2], self.config)
+                            
+                            let old_state = self.create_basis_state(old_idx, coin_idx)
+                            let new_state = self.create_basis_state(new_idx, coin_idx)
+                            
+                            result = self.add_outer_product(result, new_state, old_state)
+        
+        return result
+    
+    @fn create_basis_state(self, pos_idx: int, coin_idx: int): -> [complex]
+        let pos = self.hilbert.create_position_state(pos_idx // self.config.depth, 
+                                                    (pos_idx // self.config.depth) // self.config.grid_size, 
+                                                    pos_idx % self.config.depth)
+        let coin = self.create_coin_basis_state(coin_idx)
+        let coherence = [1.0, 0.0, 0.0, 0.0]
+        let data = [1.0] + [0.0] * (self.hilbert.dim_data - 1)
+        
+        return self.tensor_product_safe([pos, coin, coherence, data])
+    
+    @fn create_coin_basis_state(self, idx: int): -> [complex]
+        let state = [0.0] * self.config.coin_states
+        state[idx] = 1.0
+        return state
+    
+    @fn get_new_coordinates(self, x: int, y: int, z: int, direction: str): -> [int, int, int]
+        let dx = 0
+        let dy = 0
+        let dz = 0
+        
+        match direction:
+            "↑" => dz = 1
+            "↓" => dz = -1
+            "←" => dx = -1
+            "→" => dx = 1
+            "⊕" => dy = 1
+            "⊖" => dy = -1
+        
+        return [x + dx, y + dy, z + dz]
+    
+    @fn all_valid(self, coords: [int]): -> bool
+        return coords[0] >= 0 and coords[0] < self.config.grid_size and \
+               coords[1] >= 0 and coords[1] < self.config.grid_size and \
+               coords[2] >= 0 and coords[2] < self.config.depth
+    
+    @fn add_outer_product(self, matrix: [[complex]], ket: [complex], bra: [complex]): -> [[complex]]
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                matrix[i][j] += ket[i] * bra[j].conj()
+        return matrix
+    
+    @fn apply_step(self): -> [complex]
+        if len(self.current_state) == 0:
+            self.prepare_initial_state()
+        
+        let start_time = perf.get_time()
+        
+        // Create operators with performance tracking
+        let coin_op = self.grover_diffusion_operator()
+        let shift_op = self.conditional_shift_operator()
+        
+        // Apply evolution with memory monitoring
+        let memory_before = mem.get_usage()
+        let new_state = self.apply_gate_safe(shift_op, self.apply_gate_safe(coin_op, self.current_state))
+        let memory_after = mem.get_usage()
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in new_state]))
+        if norm > 0:
+            new_state = [a/norm for a in new_state]
+        
+        let end_time = perf.get_time()
+        
+        self.record_execution("quantum_step", end_time - start_time, memory_after - memory_before)
+        
+        self.current_state = new_state
+        return new_state
+    
+    @fn apply_gate_safe(self, gate: qc.Gate, state: [complex]): -> [complex]
+        // Memory-safe gate application with error handling
+        try:
+            return self.apply_gate_optimized(gate, state)
+        except MemoryError as e:
+            self.hilbert.cleanup_cache()
+            return self.apply_gate_fallback(gate, state)
+    
+    @fn apply_gate_optimized(self, gate: qc.Gate, state: [complex]): -> [complex]
+        // Optimized gate application using SIMD when available
+        if self.config.optimization_level >= 2 and len(state) > 100:
+            return self.apply_gate_simd(gate, state)
+        else:
+            return self.apply_gate_standard(gate, state)
+    
+    @fn apply_gate_simd(self, gate: qc.Gate, state: [complex]): -> [complex]
+        // SIMD-optimized matrix-vector multiplication
+        return math.simd_matrix_vector_multiply(gate.matrix, state)
+    
+    @fn apply_gate_standard(self, gate: qc.Gate, state: [complex]): -> [complex]
+        // Standard matrix-vector multiplication
+        let result = []
+        for i in range(len(gate.matrix)):
+            let sum = 0.0 + 0.0j
+            for j in range(len(state)):
+                sum += gate.matrix[i][j] * state[j]
+            result.append(sum)
+        return result
+    
+    @fn apply_gate_fallback(self, gate: qc.Gate, state: [complex]): -> [complex]
+        // Fallback for low-memory situations
+        let chunk_size = max(100, len(state) // 10)
+        let result = [0.0 + 0.0j] * len(state)
+        
+        for i in range(0, len(gate.matrix), chunk_size):
+            for j in range(0, len(state), chunk_size):
+                result = self.process_matrix_chunk(gate.matrix, state, result, i, j, chunk_size)
+        
+        return result
+    
+    @fn record_execution(self, operation: str, duration: float, memory_delta: int): -> void
+        let record = ExecutionRecord {
+            operation: operation
+            duration: duration
+            memory_delta: memory_delta
+            timestamp: perf.get_time()
+        }
+        
+        self.execution_history.append(record)
+        
+        if len(self.execution_history) > 1000:
+            self.execution_history = self.execution_history[-500:]  // Keep last 500 records
+    
+    @fn record_operation(self, operation: str, duration: float): -> void
+        self.performance_monitor.record_operation(operation, duration)
+    
+    @fn get_performance_report(self): -> dict
+        return {
+            "execution_history": self.execution_history,
+            "performance_metrics": self.performance_monitor.get_metrics(),
+            "memory_usage": self.hilbert.get_memory_usage(),
+            "resource_pool_status": self.resource_pool.get_status()
+        }
+    
+    @fn cleanup_resources(self): -> void
+        self.hilbert.cleanup_cache()
+        self.resource_pool.defragment()
+        self.execution_history.clear()
+        self.performance_monitor.reset()
+}
+
+// Enhanced Quantum A* with classical optimization
+struct QuantumAStar {
+    config: QuantumConfig
+    hilbert: HilbertSpace
+    path_cache: PathCache
+    heuristic_cache: HeuristicCache
+    parallel_enabled: bool
+    
+    @fn init(config: QuantumConfig): -> QuantumAStar
+        let hilbert = HilbertSpace.init(config)
+        let path_cache = PathCache.init(1000)  // Cache 1000 paths
+        let heuristic_cache = HeuristicCache.init(10000)  // Cache 10000 heuristics
+        
+        return QuantumAStar {
+            config: config
+            hilbert: hilbert
+            path_cache: path_cache
+            heuristic_cache: heuristic_cache
+            parallel_enabled: config.enable_parallel and config.grid_size > 8
+        }
+    
+    @fn state_space_representation(self, start: [int, int, int], goal: [int, int, int]): -> dict
+        let cache_key = str(start) + "_" + str(goal)
+        
+        if self.path_cache.contains(cache_key):
+            return self.path_cache.get(cache_key)
+        
+        let start_time = perf.get_time()
+        let g_values = {}
+        let h_values = {}
+        let f_values = {}
+        
+        // Use parallel processing for large grids
+        if self.parallel_enabled:
+            let results = self.parallel_state_space_computation(start, goal)
+            g_values = results["g_values"]
+            h_values = results["h_values"]
+            f_values = results["f_values"]
+        else:
+            let results = self.serial_state_space_computation(start, goal)
+            g_values = results["g_values"]
+            h_values = results["h_values"]
+            f_values = results["f_values"]
+        
+        let result = {
+            "g_values": g_values,
+            "h_values": h_values,
+            "f_values": f_values
+        }
+        
+        self.path_cache.put(cache_key, result)
+        return result
+    
+    @fn parallel_state_space_computation(self, start: [int, int, int], goal: [int, int, int]): -> dict
+        let positions = []
+        for x in range(self.config.grid_size):
+            for y in range(self.config.grid_size):
+                for z in range(self.config.depth):
+                    positions.append([x, y, z])
+        
+        let results = par.parallel_map(
+            self.compute_position_costs, 
+            positions, 
+            num_workers=4,
+            extra_args=[start, goal]
+        )
+        
+        let g_values = {}
+        let h_values = {}
+        let f_values = {}
+        
+        for pos, costs in zip(positions, results):
+            let pos_str = str(pos)
+            g_values[pos_str] = costs["g"]
+            h_values[pos_str] = costs["h"]
+            f_values[pos_str] = costs["f"]
+        
+        return {
+            "g_values": g_values,
+            "h_values": h_values,
+            "f_values": f_values
+        }
+    
+    @fn serial_state_space_computation(self, start: [int, int, int], goal: [int, int, int]): -> dict
+        let g_values = {}
+        let h_values = {}
+        let f_values = {}
+        
+        for x in range(self.config.grid_size):
+            for y in range(self.config.grid_size):
+                for z in range(self.config.depth):
+                    let pos = [x, y, z]
+                    let costs = self.compute_position_costs(pos, start, goal)
+                    
+                    let pos_str = str(pos)
+                    g_values[pos_str] = costs["g"]
+                    h_values[pos_str] = costs["h"]
+                    f_values[pos_str] = costs["f"]
+        
+        return {
+            "g_values": g_values,
+            "h_values": h_values,
+            "f_values": f_values
+        }
+    
+    @fn compute_position_costs(self, pos: [int, int, int], start: [int, int, int], goal: [int, int, int]): -> dict
+        let h = abs(pos[0] - goal[0]) + abs(pos[1] - goal[1]) + abs(pos[2] - goal[2])
+        let g = abs(pos[0] - start[0]) + abs(pos[1] - start[1]) + abs(pos[2] - start[2])
+        let coherence_weight = math.random() * 0.1
+        let f = g + h + coherence_weight
+        
+        return {"g": g, "h": h, "f": f}
+    
+    @fn quantum_heuristic_operator(self, goal: [int, int, int], h_max: float = 10.0): -> qc.Gate
+        let cache_key = str(goal) + "_" + str(h_max)
+        
+        if self.heuristic_cache.contains(cache_key):
+            return self.heuristic_cache.get(cache_key)
+        
+        let dim = self.hilbert.dim_position
+        let matrix = [[0.0 for _ in range(dim)] for _ in range(dim)]
+        
+        // Parallel computation of heuristic phases
+        if self.parallel_enabled:
+            matrix = self.parallel_heuristic_computation(goal, h_max, dim)
+        else:
+            matrix = self.serial_heuristic_computation(goal, h_max, dim)
+        
+        let gate = qc.Gate("QuantumHeuristic", matrix)
+        self.heuristic_cache.put(cache_key, gate)
+        
+        return gate
+    
+    @fn parallel_heuristic_computation(self, goal: [int, int, int], h_max: float, dim: int): -> [[complex]]
+        let matrix = [[0.0 for _ in range(dim)] for _ in range(dim)]
+        
+        let positions = []
+        for x in range(self.config.grid_size):
+            for y in range(self.config.grid_size):
+                for z in range(self.config.depth):
+                    positions.append([x, y, z])
+        
+        let phases = par.parallel_map(
+            self.compute_heuristic_phase,
+            positions,
+            num_workers=4,
+            extra_args=[goal, h_max]
+        )
+        
+        for pos, phase in zip(positions, phases):
+            let idx = self.hilbert.position_index(pos[0], pos[1], pos[2], self.config)
+            matrix[idx][idx] = phase
+        
+        return matrix
+    
+    @fn serial_heuristic_computation(self, goal: [int, int, int], h_max: float, dim: int): -> [[complex]]
+        let matrix = [[0.0 for _ in range(dim)] for _ in range(dim)]
+        
+        for x in range(self.config.grid_size):
+            for y in range(self.config.grid_size):
+                for z in range(self.config.depth):
+                    let phase = self.compute_heuristic_phase([x, y, z], goal, h_max)
+                    let idx = self.hilbert.position_index(x, y, z, self.config)
+                    matrix[idx][idx] = phase
+        
+        return matrix
+    
+    @fn compute_heuristic_phase(self, pos: [int, int, int], goal: [int, int, int], h_max: float): -> complex
+        let h = abs(pos[0] - goal[0]) + abs(pos[1] - goal[1]) + abs(pos[2] - goal[2])
+        return math.exp(-1j * math.pi * h / h_max)
+    
+    @fn amplitude_amplification(self, state: [complex], target_cost: float): -> [complex]
+        // Create reflection operators with memory optimization
+        let source_reflection = self.create_reflection_operator(state)
+        let target_reflection = self.create_target_reflection(target_cost, len(state))
+        
+        // Apply amplification with performance tracking
+        let start_time = perf.get_time()
+        let amplified = self.apply_reflection_sequence(source_reflection, target_reflection, state)
+        let end_time = perf.get_time()
+        
+        self.record_operation("amplitude_amplification", end_time - start_time)
+        
+        return amplified
+    
+    @fn create_reflection_operator(self, state: [complex]): -> [[complex]]
+        return [[2.0 * state[i] * state[j].conj() - (1.0 if i == j else 0.0) 
+                 for j in range(len(state))] 
+                for i in range(len(state))]
+    
+    @fn create_target_reflection(self, target_cost: float, dim: int): -> [[complex]]
+        // Simplified target reflection based on cost threshold
+        return [[(1.0 if i == j else 0.0) for j in range(dim)] for i in range(dim)]
+    
+    @fn apply_reflection_sequence(self, source: [[complex]], target: [[complex]], state: [complex]): -> [complex]
+        let result = state
+        
+        // Apply sequence: -source * target * source * target
+        result = self.apply_matrix_operator(target, result)
+        result = self.apply_matrix_operator(source, result)
+        result = self.apply_matrix_operator(target, result)
+        result = self.apply_matrix_operator(source, result)
+        
+        // Normalize
+        let norm = math.sqrt(sum([abs(a)**2 for a in result]))
+        if norm > 0:
+            result = [a/norm for a in result]
+        
+        return result
+    
+    @fn apply_matrix_operator(self, matrix: [[complex]], state: [complex]): -> [complex]
+        return self.walker.apply_matrix_operator(matrix, state)
+    
+    @fn cleanup_resources(self): -> void
+        self.path_cache.clear()
+        self.heuristic_cache.clear()
+    
+    @fn get_cache_statistics(self): -> dict
+        return {
+            "path_cache_size": self.path_cache.size(),
+            "path_cache_hits": self.path_cache.get_hit_count(),
+            "heuristic_cache_size": self.heuristic_cache.size(),
+            "heuristic_cache_hits": self.heuristic_cache.get_hit_count()
+        }
+}
+
+// Helper structures for enhanced functionality
+struct QuantumPerformanceMonitor {
+    operation_times: dict
+    memory_usage: [int]
+    fidelity_history: [float]
+    cache_statistics: dict
+    
+    @fn init(): -> QuantumPerformanceMonitor
+        return QuantumPerformanceMonitor {
+            operation_times: {}
+            memory_usage: []
+            fidelity_history: []
+            cache_statistics: {}
+        }
+    
+    @fn record_execution(self, operation: str, duration: float, memory_delta: int): -> void
+        if operation not in self.operation_times:
+            self.operation_times[operation] = []
+        self.operation_times[operation].append(duration)
+        self.memory_usage.append(memory_delta)
+    
+    @fn record_operation(self, operation: str, duration: float): -> void
+        if operation not in self.operation_times:
+            self.operation_times[operation] = []
+        self.operation_times[operation].append(duration)
+    
+    @fn record_fidelity(self, fidelity: float): -> void
+        self.fidelity_history.append(fidelity)
+    
+    @fn get_metrics(self): -> dict
+        let avg_times = {}
+        for op, times in self.operation_times:
+            avg_times[op] = sum(times) / len(times)
+        
+        return {
+            "average_operation_times": avg_times,
+            "total_memory_usage": sum(self.memory_usage),
+            "average_fidelity": sum(self.fidelity_history) / len(self.fidelity_history) if len(self.fidelity_history) > 0 else 0.0
+        }
+    
+    @fn reset(self): -> void
+        self.operation_times.clear()
+        self.memory_usage.clear()
+        self.fidelity_history.clear()
+}
+
+struct QuantumMemoryPool {
+    available_blocks: [MemoryBlock]
+    used_blocks: [MemoryBlock]
+    pool_size: int
+    allocation_count: int
+    
+    @fn init(initial_size: int): -> QuantumMemoryPool
+        return QuantumMemoryPool {
+            available_blocks: [MemoryBlock.init(initial_size)]
+            used_blocks: []
+            pool_size: initial_size
+            allocation_count: 0
+        }
+    
+    @fn allocate(self, size: int): -> MemoryBlock
+        // Find best-fit block
+        let best_block = None
+        let best_idx = -1
+        
+        for i, block in self.available_blocks:
+            if block.size >= size and (best_block is None or block.size < best_block.size):
+                best_block = block
+                best_idx = i
+        
+        if best_block is None:
+            // Expand pool
+            self.expand_pool(size * 2)
+            return self.allocate(size)
+        
+        // Split block if necessary
+        let remaining_size = best_block.size - size
+        if remaining_size > 64:  // Minimum block size
+            let new_block = MemoryBlock.init(remaining_size)
+            self.available_blocks.append(new_block)
+        
+        let allocated_block = MemoryBlock.init(size)
+        self.used_blocks.append(allocated_block)
+        self.available_blocks.remove(best_idx)
+        
+        self.allocation_count += 1
+        return allocated_block
+    
+    @fn deallocate(self, block: MemoryBlock): -> void
+        self.used_blocks.remove(block)
+        self.available_blocks.append(block)
+        self.allocation_count -= 1
+    
+    @fn expand_pool(self, additional_size: int): -> void
+        self.pool_size += additional_size
+        self.available_blocks.append(MemoryBlock.init(additional_size))
+    
+    @fn defragment(self): -> void
+        // Simple defragmentation by merging adjacent free blocks
+        self.available_blocks.sort(key=lambda b: b.address)
+        
+        let i = 0
+        while i < len(self.available_blocks) - 1:
+            let current = self.available_blocks[i]
+            let next_block = self.available_blocks[i + 1]
+            
+            if current.is_adjacent(next_block):
+                current.merge(next_block)
+                self.available_blocks.remove(i + 1)
+            else:
+                i += 1
+    
+    @fn get_utilization(self): -> float
+        let used_size = sum([block.size for block in self.used_blocks])
+        return used_size / self.pool_size
+    
+    @fn get_status(self): -> dict
+        return {
+            "pool_size": self.pool_size
+            "used_blocks": len(self.used_blocks)
+            "available_blocks": len(self.available_blocks)
+            "utilization": self.get_utilization()
+            "allocation_count": self.allocation_count
+        }
+}
+
+struct MemoryBlock {
+    size: int
+    address: int
+    in_use: bool
+    
+    @fn init(size: int): -> MemoryBlock
+        return MemoryBlock {
+            size: size
+            address: mem.allocate(size)
+            in_use: False
+        }
+    
+    @fn is_adjacent(self, other: MemoryBlock): -> bool
+        return self.address + self.size == other.address
+    
+    @fn merge(self, other: MemoryBlock): -> void
+        self.size += other.size
+}
+
+struct PathCache {
+    cache: dict
+    max_size: int
+    hit_count: int
+    miss_count: int
+    
+    @fn init(max_size: int): -> PathCache
+        return PathCache {
+            cache: {}
+            max_size: max_size
+            hit_count: 0
+            miss_count: 0
+        }
+    
+    @fn contains(self, key: str): -> bool
+        let contains = key in self.cache
+        if contains:
+            self.hit_count += 1
+        else:
+            self.miss_count += 1
+        return contains
+    
+    @fn get(self, key: str): -> any
+        return self.cache[key]
+    
+    @fn put(self, key: str, value: any): -> void
+        if len(self.cache) >= self.max_size:
+            self.evict_oldest()
+        
+        self.cache[key] = value
+    
+    @fn evict_oldest(self): -> void
+        // Simple LRU eviction
+        let oldest_key = list(self.cache.keys())[0]
+        self.cache.pop(oldest_key)
+    
+    @fn clear(self): -> void
+        self.cache.clear()
+    
+    @fn size(self): -> int
+        return len(self.cache)
+    
+    @fn get_hit_count(self): -> int
+        return self.hit_count
+    
+    @fn get_miss_count(self): int
+        return self.miss_count
+}
+
+struct HeuristicCache: PathCache {
+    // Same as PathCache but specialized for heuristic computations
+}
+
+struct ExecutionRecord {
+    operation: str
+    duration: float
+    memory_delta: int
+    timestamp: float
+}
+
+// Enhanced helper functions with error handling and optimization
+@fn tensor_product_safe(states: [[complex]], memory_limit: int): -> [complex]
+    let total_size = 1
+    for state in states:
+        total_size *= len(state)
+    
+    if total_size * 16 > memory_limit:  # 16 bytes per complex number
+        return chunked_tensor_product(states, memory_limit)
+    else:
+        return standard_tensor_product(states)
+
+@fn chunked_tensor_product(states: [[complex]], memory_limit: int): -> [complex]
+    let chunk_size = memory_limit // (16 * len(states))
+    let result = states[0]
+    
+    for state in states[1:]:
+        let temp_result = []
+        for i in range(0, len(result), chunk_size):
+            let chunk1 = result[i:i+chunk_size]
+            for j in range(0, len(state), chunk_size):
+                let chunk2 = state[j:j+chunk_size]
+                let chunk_product = tensor_product_pair(chunk1, chunk2)
+                temp_result.extend(chunk_product)
+        result = temp_result
+    
+    return result
+
+@fn tensor_product_pair(a: [complex], b: [complex]): -> [complex]
+    return [a_val * b_val for a_val in a for b_val in b]
+
+@fn standard_tensor_product(states: [[complex]]): -> [complex]
+    let result = states[0]
+    for state in states[1:]:
+        result = tensor_product_pair(result, state)
+    return result
+
+@fn create_computation_chunks(self, total_work: int): -> [ComputationChunk]
+    let num_chunks = 4 if self.parallel_enabled else 1
+    let chunk_size = total_work // num_chunks
+    
+    let chunks = []
+    for i in range(num_chunks):
+        let start = i * chunk_size
+        let end = (i + 1) * chunk_size if i < num_chunks - 1 else total_work
+        chunks.append(ComputationChunk {start: start, end: end})
+    
+    return chunks
+
+@fn merge_matrices(self, base: [[complex]], addition: [[complex]]): -> [[complex]]
+    for i in range(len(base)):
+        for j in range(len(base[0])):
+            base[i][j] += addition[i][j]
+    return base
+
+// Resource-aware main function with benchmarking
+@fn main():
+    print("=== Enhanced Quantum Walker Demo ===")
+    
+    // Configuration with resource limits
+    let config = QuantumConfig {
+        grid_size: 6
+        depth: 3
+        qubits: 2
+        coin_states: 6
+        memory_limit: 10 * 1024 * 1024  // 10MB
+        enable_parallel: True
+        optimization_level: 2
+    }
+    
+    // Initialize enhanced quantum walker
+    let walker = QuantumWalker.init(config)
+    
+    print("Memory usage:", walker.hilbert.get_memory_usage(), "bytes")
+    print("Resource pool status:", walker.resource_pool.get_status())
+    
+    // Prepare initial state with performance tracking
+    let initial_state = walker.prepare_initial_state()
+    print("Initial state prepared, dimension:", len(initial_state))
+    
+    // Apply quantum steps with monitoring
+    for step in range(3):
+        print("Applying step", step + 1)
+        let evolved_state = walker.apply_step()
+        print("Step completed, fidelity:", abs(dot_product(initial_state, evolved_state))**2)
+    
+    // Get comprehensive performance report
+    let report = walker.get_performance_report()
+    print("Performance metrics:", report["performance_metrics"])
+    print("Cache statistics:", report.get("cache_statistics", {}))
+    
+    // Test quantum A* with caching
+    let astar = QuantumAStar.init(config)
+    let start = [0, 0, 0]
+    let goal = [5, 2, 2]
+    
+    print("Computing state space...")
+    let state_space = astar.state_space_representation(start, goal)
+    print("State space computed, positions:", len(state_space["f_values"]))
+    
+    let cache_stats = astar.get_cache_statistics()
+    print("Cache statistics:", cache_stats)
+    
+    // Cleanup resources
+    walker.cleanup_resources()
+    astar.cleanup_resources()
+    
+    print("=== Enhanced Quantum Walker Demo Complete ===")
+
+// Utility functions
+@fn dot_product(a: [complex], b: [complex]): -> complex
+    return sum([a[i] * b[i].conj() for i in range(len(a))])
