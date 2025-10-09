@@ -67,22 +67,23 @@ int main(int argc, char** argv) {
     bool do_repl = false;
 
     ExportOptions export_opts;
-    export_opts.outputDir = "";
-    export_opts.dryRun = false;
-    export_opts.target = ExportTarget::UNKNOWN;
+    export_opts.outputPath = "output.ast";
+    export_opts.overwrite = false;
+    export_opts.format = ExportFormat::AST;
+       export_opts.includeMetadata = true;
 
     for (int i = 2; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "--run") do_run = true;
         else if (arg == "--export") do_export = true;
-        else if (arg.starts_with("--target=")) {
+        else if (arg.rfind("--target=", 0) == 0) {
             std::string tgt = arg.substr(9);
-            export_opts.target = Exporter().parseTarget(tgt);
+            // TODO: Add target parsing logic
         }
-        else if (arg == "--dry-run") export_opts.dryRun = true;
+        else if (arg == "--dry-run") export_opts.overwrite = false;
         else if (arg == "--repl") do_repl = true;
-        else if (arg.starts_with("--out=")) {
-            export_opts.outputDir = arg.substr(6);
+        else if (arg.rfind("--out=", 0) == 0) {
+            export_opts.outputPath = arg.substr(6);
         }
     }
 
@@ -91,12 +92,12 @@ int main(int argc, char** argv) {
         std::cout << "📄 Loaded: " << filepath << std::endl;
 
         if (do_export) {
-            if (export_opts.target == ExportTarget::UNKNOWN) {
-                std::cerr << "❌ Export failed: --target must be specified.\n";
+            // TODO: Add target validation
+            std::cerr << "❌ Export failed: --target must be specified.\n";
                 return 2;
             }
             Exporter exporter;
-            std::string compiled = compileToTarget(code, export_opts.target);
+            std::string compiled = compileToTarget(code, ExportFormat::AST);
             exporter.exportCode(filepath, compiled, export_opts);
         }
 

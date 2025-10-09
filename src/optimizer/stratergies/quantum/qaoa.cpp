@@ -23,7 +23,7 @@
 
 #include "qaoa.h"
 #include "../classical.h"
-#include "optimizer/optimizer.h"
+#include "../../optimizer.h"
 #include <iostream>
 
 namespace synq {

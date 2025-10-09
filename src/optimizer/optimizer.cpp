@@ -22,7 +22,7 @@
 // File: optimizer/optimizer.cpp
 
 #include "optimizer.h"
-#include "strategies/classical.h"
+#include "stratergies/classical.h"
 #include <iostream>
 
 namespace synq {
