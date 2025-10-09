@@ -28,6 +28,7 @@
 #include <vector>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <optional>
 
 namespace synq {
 

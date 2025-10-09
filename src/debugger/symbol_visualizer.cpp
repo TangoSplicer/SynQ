@@ -32,14 +32,15 @@ void SymbolVisualizer::showAll() {
     std::cout << std::setw(16) << "Name" << std::setw(20) << "Value" << "\n";
     std::cout << std::string(36, '-') << "\n";
 
-    for (const auto& [k, v] : EvalContext::variables) {
+    for (const auto& [k, v] : EvalContext::getVariables()) {
         std::cout << std::setw(16) << k << std::setw(20) << v << "\n";
     }
 }
 
 void SymbolVisualizer::show(const std::string& name) {
-    auto it = EvalContext::variables.find(name);
-    if (it != EvalContext::variables.end()) {
+    auto vars = EvalContext::getVariables();
+     auto it = vars.find(name);
+    if (it != vars.end()) {
         std::cout << "[Visualizer] " << name << " = " << it->second << "\n";
     } else {
         std::cout << "[Visualizer] No such symbol: " << name << "\n";

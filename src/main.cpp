@@ -29,7 +29,7 @@
 #include "compiler/runtime.h"
 #include "compiler/exporter.h"
 #include "compiler/plugin_loader.h"
-#include "compiler/debug_hooks.h"
+#include "debugger/debugger_core.h"
 
 namespace fs = std::filesystem;
 
