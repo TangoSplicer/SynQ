@@ -33,7 +33,7 @@ struct GhostFrame {
     std::map<std::string, std::string> state;
 };
 
-class GhostFrame {
+class GhostFrameManager {
 public:
     static void record(int tick, const std::map<std::string, std::string>& state);
     static void rewind(int tick);

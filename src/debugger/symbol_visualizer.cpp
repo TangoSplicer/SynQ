@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 #include "symbol_visualizer.h"
-#include "eval_context.h"
+#include "../runtime/eval_context.h"
 
 #include <iostream>
 #include <iomanip>

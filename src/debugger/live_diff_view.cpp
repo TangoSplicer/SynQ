@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 #include "live_diff_view.h"
-#include "eval_context.h"
+#include "../runtime/eval_context.h"
 #include <iostream>
 
 namespace synq {
@@ -28,7 +28,7 @@ namespace synq {
 std::map<std::string, LiveDiffView::Snapshot> LiveDiffView::snapshots;
 
 void LiveDiffView::takeSnapshot(const std::string& id) {
-    snapshots[id] = EvalContext::variables;
+    snapshots[id] = EvalContext::getVariables();
     std::cout << "[LiveDiff] Snapshot '" << id << "' taken with "
               << snapshots[id].size() << " entries.\n";
 }

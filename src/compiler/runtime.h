@@ -23,6 +23,8 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
+#include "../ui/debugger_overlay.h"
 
 namespace synq::compiler {
 
@@ -38,10 +40,12 @@ namespace synq::compiler {
   class Runtime {
   public:
     Runtime();
+    void initialize();
 
     void execute(const Program& program);
     void inject(const Program& module);  // 🔁 Hot reload support
 
+    std::shared_ptr<synq::ui::DebuggerOverlay> overlay;
     std::vector<Instruction> instructions;
   };
 

@@ -24,13 +24,13 @@
 
 namespace synq {
 
-std::vector<GhostFrame> GhostFrame::frameLog;
+std::vector<GhostFrame> GhostFrameManager::frameLog;
 
-void GhostFrame::record(int tick, const std::map<std::string, std::string>& state) {
+void GhostFrameManager::record(int tick, const std::map<std::string, std::string>& state) {
     frameLog.push_back({tick, state});
 }
 
-void GhostFrame::rewind(int tick) {
+void GhostFrameManager::rewind(int tick) {
     for (auto it = frameLog.rbegin(); it != frameLog.rend(); ++it) {
         if (it->tickId <= tick) {
             std::cout << "[GhostFrame Rewind to Tick " << it->tickId << "]\n";
@@ -42,7 +42,7 @@ void GhostFrame::rewind(int tick) {
     }
 }
 
-void GhostFrame::play() {
+void GhostFrameManager::play() {
     for (const auto& gf : frameLog) {
         std::cout << "[Tick " << gf.tickId << "]\n";
         for (const auto& [k, v] : gf.state) {
@@ -51,7 +51,7 @@ void GhostFrame::play() {
     }
 }
 
-void GhostFrame::reset() {
+void GhostFrameManager::reset() {
     frameLog.clear();
 }
 

@@ -45,4 +45,8 @@ void EvalContext::clear() {
     variables.clear();
 }
 
+   std::map<std::string, std::string> EvalContext::getVariables() {
+       return variables;
+   }
+
 }

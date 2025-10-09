@@ -33,6 +33,7 @@ public:
     static std::string resolve(const std::string& var);
     static void dump();
     static void clear();
+       static std::map<std::string, std::string> getVariables();
 
 private:
     static std::map<std::string, std::string> variables;
