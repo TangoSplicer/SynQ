@@ -42,7 +42,19 @@
 
 ## 📁 Project Structure
 
-synq/ ├─ src/              # Core compiler, runtime, REPL, plugin, and encryption logic │   ├─ repl/         # REPL core + inspect + interactive commands │   ├─ cli/          # CLI toolchain (ai, mutate, fuzz, sign, debug, etc.) │   ├─ core/         # Language internals, tokenization, type system │   ├─ plugins/      # Plugin loader, mutation, registry management │   └─ quantum/      # Quantum simulation and logic (QPELA, QEBET, QGraphISO) ├─ stdlib/           # Built-in modules for quantum, AI, classical operations ├─ tests/            # Full unit/integration test suite ├─ notebooks/        # AI demos, circuit visualization, plugin mutation ├─ docs/             # Reference guides and manuals ├─ build/            # Compiled output, binaries, signed bundles ├─ CMakeLists.txt    # Cross-platform build config └─ README.md         # Project entry point (this file)
+synq/ ├─ src/              # Core compiler, runtime, REPL, plugin, and encryption logic │
+      ├─ repl/         # REPL core + inspect + interactive commands │   
+      ├─ cli/          # CLI toolchain (ai, mutate, fuzz, sign, debug, etc.) │   
+      ├─ core/         # Language internals, tokenization, type system │   
+      ├─ plugins/      # Plugin loader, mutation, registry management │   
+      └─ quantum/      # Quantum simulation and logic (QPELA, QEBET, QGraphISO) 
+      ├─ stdlib/           # Built-in modules for quantum, AI, classical operations 
+      ├─ tests/            # Full unit/integration test suite 
+      ├─ notebooks/        # AI demos, circuit visualization, plugin mutation 
+      ├─ docs/             # Reference guides and manuals 
+      ├─ build/            # Compiled output, binaries, signed bundles 
+      ├─ CMakeLists.txt    # Cross-platform build config 
+      └─ README.md         # Project entry point (this file)
 
 ---
 
