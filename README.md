@@ -143,7 +143,7 @@ AI-assisted creation
 Signing via synq sign
 
 
-Registered plugins can be published to SynQHub.
+Registered plugins can be published to SynQHub. //# TO BE IMPLEMENTED 
 
 
 ---
