@@ -1,6 +1,5 @@
-src/CMakeFiles/synq_lib.dir/compiler/backend_qiskit.cpp.o: \
- /workspace/SynQ/src/compiler/backend_qiskit.cpp \
- /usr/include/stdc-predef.h \
+src/CMakeFiles/synq_lib.dir/compiler/backend_x86.cpp.o: \
+ /workspace/SynQ/src/compiler/backend_x86.cpp /usr/include/stdc-predef.h \
  /workspace/SynQ/src/compiler/codegen_backend.h \
  /usr/include/c++/12/string \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++config.h \
