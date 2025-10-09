@@ -23,8 +23,8 @@
 
 #include "runtime.h"
 #include <iostream>
-#include "../../plugins/registry.h"
-#include "../../plugins/ai_plugin.h"
+#include "plugins/registry.h"
+#include "plugins/ai_plugin.h"
 
 namespace synq {
 

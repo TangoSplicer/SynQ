@@ -22,6 +22,7 @@
 // backend_factories.h
 #pragma once
 #include "codegen_backend.h"
+#include <memory>
 
 namespace synq::compiler {
   std::shared_ptr<CodegenBackend> make_backend_x86();

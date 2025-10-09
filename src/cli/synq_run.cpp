@@ -17,22 +17,37 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OF OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 #include <iostream>
-#include "synq_run.h"
-#include "compiler/pipeline_executor.h"
+#include <fstream>
+#include <vector>
+#include <string>
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: synq_run <file.synq>" << std::endl;
+        std::cerr << "Usage: synq_run <filename.synq>\n";
         return 1;
     }
 
-    std::cout << "Running SynQ executable pipeline..." << std::endl;
-    synq::compiler::PipelineExecutor executor;
-    executor.execute(argv[1]);
+    std::string filename = argv[1];
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << "\n";
+        return 1;
+    }
+
+    std::cout << "SynQ Runner - Basic Implementation\n";
+    std::cout << "Running: " << filename << "\n";
+    
+    // Basic file content display for now
+    std::string line;
+    std::cout << "\nFile contents:\n";
+    while (std::getline(file, line)) {
+        std::cout << line << "\n";
+    }
+    
     return 0;
 }

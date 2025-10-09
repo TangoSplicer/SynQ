@@ -22,7 +22,7 @@
 // codegen_backend.h
 #pragma once
 #include <string>
-#include "../ast/ast.h"
+#include "ast.h"
 #include "target_profile.h"
 
 namespace synq::compiler {

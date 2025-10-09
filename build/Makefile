@@ -85,16 +85,6 @@ package_source:
 package_source/fast: package_source
 .PHONY : package_source/fast
 
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-.PHONY : test/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -193,19 +183,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named synq_tests
-
-# Build rule for target.
-synq_tests: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 synq_tests
-.PHONY : synq_tests
-
-# fast build rule for target.
-synq_tests/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/build
-.PHONY : synq_tests/fast
-
-#=============================================================================
 # Target rules for targets named synq_lib
 
 # Build rule for target.
@@ -217,139 +194,6 @@ synq_lib: cmake_check_build_system
 synq_lib/fast:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/synq_lib.dir/build.make src/CMakeFiles/synq_lib.dir/build
 .PHONY : synq_lib/fast
-
-#=============================================================================
-# Target rules for targets named synq
-
-# Build rule for target.
-synq: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 synq
-.PHONY : synq
-
-# fast build rule for target.
-synq/fast:
-	$(MAKE) $(MAKESILENT) -f src/cli/CMakeFiles/synq.dir/build.make src/cli/CMakeFiles/synq.dir/build
-.PHONY : synq/fast
-
-tests/unit/test_ai.o: tests/unit/test_ai.cpp.o
-.PHONY : tests/unit/test_ai.o
-
-# target to build an object file
-tests/unit/test_ai.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.o
-.PHONY : tests/unit/test_ai.cpp.o
-
-tests/unit/test_ai.i: tests/unit/test_ai.cpp.i
-.PHONY : tests/unit/test_ai.i
-
-# target to preprocess a source file
-tests/unit/test_ai.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.i
-.PHONY : tests/unit/test_ai.cpp.i
-
-tests/unit/test_ai.s: tests/unit/test_ai.cpp.s
-.PHONY : tests/unit/test_ai.s
-
-# target to generate assembly for a file
-tests/unit/test_ai.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.s
-.PHONY : tests/unit/test_ai.cpp.s
-
-tests/unit/test_meta_circuit.o: tests/unit/test_meta_circuit.cpp.o
-.PHONY : tests/unit/test_meta_circuit.o
-
-# target to build an object file
-tests/unit/test_meta_circuit.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.o
-.PHONY : tests/unit/test_meta_circuit.cpp.o
-
-tests/unit/test_meta_circuit.i: tests/unit/test_meta_circuit.cpp.i
-.PHONY : tests/unit/test_meta_circuit.i
-
-# target to preprocess a source file
-tests/unit/test_meta_circuit.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.i
-.PHONY : tests/unit/test_meta_circuit.cpp.i
-
-tests/unit/test_meta_circuit.s: tests/unit/test_meta_circuit.cpp.s
-.PHONY : tests/unit/test_meta_circuit.s
-
-# target to generate assembly for a file
-tests/unit/test_meta_circuit.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.s
-.PHONY : tests/unit/test_meta_circuit.cpp.s
-
-tests/unit/test_mock_plugin.o: tests/unit/test_mock_plugin.cpp.o
-.PHONY : tests/unit/test_mock_plugin.o
-
-# target to build an object file
-tests/unit/test_mock_plugin.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.o
-.PHONY : tests/unit/test_mock_plugin.cpp.o
-
-tests/unit/test_mock_plugin.i: tests/unit/test_mock_plugin.cpp.i
-.PHONY : tests/unit/test_mock_plugin.i
-
-# target to preprocess a source file
-tests/unit/test_mock_plugin.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.i
-.PHONY : tests/unit/test_mock_plugin.cpp.i
-
-tests/unit/test_mock_plugin.s: tests/unit/test_mock_plugin.cpp.s
-.PHONY : tests/unit/test_mock_plugin.s
-
-# target to generate assembly for a file
-tests/unit/test_mock_plugin.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.s
-.PHONY : tests/unit/test_mock_plugin.cpp.s
-
-tests/unit/test_optimizer.o: tests/unit/test_optimizer.cpp.o
-.PHONY : tests/unit/test_optimizer.o
-
-# target to build an object file
-tests/unit/test_optimizer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.o
-.PHONY : tests/unit/test_optimizer.cpp.o
-
-tests/unit/test_optimizer.i: tests/unit/test_optimizer.cpp.i
-.PHONY : tests/unit/test_optimizer.i
-
-# target to preprocess a source file
-tests/unit/test_optimizer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.i
-.PHONY : tests/unit/test_optimizer.cpp.i
-
-tests/unit/test_optimizer.s: tests/unit/test_optimizer.cpp.s
-.PHONY : tests/unit/test_optimizer.s
-
-# target to generate assembly for a file
-tests/unit/test_optimizer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.s
-.PHONY : tests/unit/test_optimizer.cpp.s
-
-tests/unit/test_runtime.o: tests/unit/test_runtime.cpp.o
-.PHONY : tests/unit/test_runtime.o
-
-# target to build an object file
-tests/unit/test_runtime.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.o
-.PHONY : tests/unit/test_runtime.cpp.o
-
-tests/unit/test_runtime.i: tests/unit/test_runtime.cpp.i
-.PHONY : tests/unit/test_runtime.i
-
-# target to preprocess a source file
-tests/unit/test_runtime.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.i
-.PHONY : tests/unit/test_runtime.cpp.i
-
-tests/unit/test_runtime.s: tests/unit/test_runtime.cpp.s
-.PHONY : tests/unit/test_runtime.s
-
-# target to generate assembly for a file
-tests/unit/test_runtime.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/synq_tests.dir/build.make CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.s
-.PHONY : tests/unit/test_runtime.cpp.s
 
 # Help Target
 help:
@@ -365,25 +209,7 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... test"
-	@echo "... synq"
 	@echo "... synq_lib"
-	@echo "... synq_tests"
-	@echo "... tests/unit/test_ai.o"
-	@echo "... tests/unit/test_ai.i"
-	@echo "... tests/unit/test_ai.s"
-	@echo "... tests/unit/test_meta_circuit.o"
-	@echo "... tests/unit/test_meta_circuit.i"
-	@echo "... tests/unit/test_meta_circuit.s"
-	@echo "... tests/unit/test_mock_plugin.o"
-	@echo "... tests/unit/test_mock_plugin.i"
-	@echo "... tests/unit/test_mock_plugin.s"
-	@echo "... tests/unit/test_optimizer.o"
-	@echo "... tests/unit/test_optimizer.i"
-	@echo "... tests/unit/test_optimizer.s"
-	@echo "... tests/unit/test_runtime.o"
-	@echo "... tests/unit/test_runtime.i"
-	@echo "... tests/unit/test_runtime.s"
 .PHONY : help
 
 

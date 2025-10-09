@@ -18,4 +18,5 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(synq_lib PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
-add_subdirectory(cli)
+# Skip CLI for now to ensure core builds
+# add_subdirectory(cli)

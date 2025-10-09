@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -isystem /usr/local/include/python3.11
 
-CXX_FLAGS = -O3 -DNDEBUG --coverage
+CXX_FLAGS = 
 

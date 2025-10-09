@@ -23,7 +23,7 @@
 
 #include "variational.h"
 #include "../classical.h"
-#include "../../optimizer.h"
+#include "optimizer/optimizer.h"
 #include <iostream>
 
 namespace synq {

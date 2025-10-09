@@ -20,18 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 #include <iostream>
-#include "synq_trace.h"
-#include "debugger/qtrace.h"
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "Usage: synq_trace <file.synq>" << std::endl;
-        return 1;
-    }
-
-    std::cout << "Tracing quantum circuit and causal structure..." << std::endl;
-    synq::debugger::QTrace::visualize(argv[1]);
+    std::cout << "SynQ Trace - Placeholder Implementation\n";
+    std::cout << "This is a placeholder for the tracing functionality.\n";
     return 0;
 }

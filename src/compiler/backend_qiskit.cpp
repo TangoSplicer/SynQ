@@ -22,6 +22,7 @@
 // backend_qiskit.cpp
 #include "codegen_backend.h"
 #include <sstream>
+#include <memory>
 
 namespace synq::compiler {
 

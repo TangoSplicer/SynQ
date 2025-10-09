@@ -17,8 +17,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(dependencies)
 include(packaging)
-include(gtest)
-include(coverage)
+
+# Only include tests if building with tests enabled
+option(BUILD_TESTS "Build test suite" ON)
+if(BUILD_TESTS)
+    include(gtest)
+    include(coverage)
+endif()
 
 # Global includes
 include_directories(${CMAKE_SOURCE_DIR}/src)
