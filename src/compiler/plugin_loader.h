@@ -25,7 +25,7 @@
 #include <vector>
 #include <memory>
 
-struct PluginInfo {
+struct PluginMetadata {
     std::string name;
     std::string description;
     bool loaded;
@@ -38,7 +38,7 @@ class ASTNode;  // forward declaration
 void loadAllPlugins();
 bool loadPlugin(const std::string& name);
 bool unloadPlugin(const std::string& name);
-std::vector<PluginInfo> listAvailablePlugins();
+std::vector<PluginMetadata> listAvailablePlugins();
 std::string getPluginMetadata(const std::string& pluginName);
 
 // Plugin-driven exports

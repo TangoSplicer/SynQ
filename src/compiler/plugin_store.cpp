@@ -41,7 +41,7 @@ namespace synq {
     }
 
     void PluginStore::register_plugin(const std::string& name, CompilerPlugin plugin) {
-        plugins_[name] = std::move(plugin);
+        plugins_.insert_or_assign(name, std::move(plugin));
     }
 
     std::vector<std::string> PluginStore::list_plugins() const {

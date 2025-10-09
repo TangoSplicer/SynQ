@@ -22,6 +22,7 @@
 // backend_x86.cpp
 #include "codegen_backend.h"
 #include <sstream>
+#include <memory>
 
 namespace synq::compiler {
 
@@ -30,7 +31,7 @@ namespace synq::compiler {
     std::string generate(const ASTNode& root, const TargetProfile& profile) override {
       std::ostringstream out;
       out << "; SynQ → x86_64 Codegen\n";
-      out << "; AST Root Type: " << root.type << "\n";
+      out << "; AST Root Type: Program\n";
       out << "section .text\n";
       out << "global _start\n\n";
       out << "_start:\n";

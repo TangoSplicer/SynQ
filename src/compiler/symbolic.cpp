@@ -84,7 +84,7 @@ SymbolicExpr SymbolicAlgebra::parse(const std::string& expr_str) {
 }
 
 SymbolicExpr SymbolicAlgebra::identity() {
-    return SymbolicExpr({});
+    return SymbolicExpr(std::vector<std::string>());
 }
 
 SymbolicExpr SymbolicAlgebra::dagger(const SymbolicExpr& expr) {

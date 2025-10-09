@@ -22,6 +22,7 @@
 // backend_synqvm.cpp
 #include "codegen_backend.h"
 #include <sstream>
+#include <memory>
 
 namespace synq::compiler {
 

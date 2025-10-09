@@ -28,6 +28,17 @@
 class ASTNode {
 public:
     virtual ~ASTNode() {}
+       virtual std::string profileQKernels() { return ""; }
+       virtual std::string annotateWithAI() { return ""; }
+       virtual std::string renderFlowGraph() { return ""; }
+       virtual void registerAIHooks(const std::string& hooks) { /* placeholder */ }
+       virtual std::string toString() { return ""; }
+       virtual std::string toIR() { return ""; }
+       virtual std::string toQASM() { return ""; }
+       virtual std::string toQIR() { return ""; }
+       virtual std::string toJSON() { return ""; }
+       virtual std::string toBinaryBlob() { return ""; }
+       virtual std::string getName() { return ""; }
 };
 
 // AST node for the root of a program (contains a list of statements).

@@ -39,7 +39,18 @@ static void writeOrWarn(std::ofstream& outFile, const std::string& path, bool ov
 }
 
 bool Exporter::exportProgram(const std::string& sourceCode, const ExportOptions& options) {
-    auto tree = parse(sourceCode);
+    // Write source code to temporary file for parsing
+       std::string tempFile = "/tmp/synq_temp_export.synq";
+       std::ofstream temp(tempFile);
+       if (!temp.is_open()) return false;
+       temp << sourceCode;
+       temp.close();
+       
+       Parser parser;
+       ASTNode* tree = parser.parseFile(tempFile);
+       std::remove(tempFile.c_str());
+       
+       if (!tree) return false;
     std::ofstream outFile;
 
     try {
@@ -74,7 +85,7 @@ bool Exporter::exportProgram(const std::string& sourceCode, const ExportOptions&
                 return false;
             }
             {
-                std::string data = callPluginExport(options.plugin, tree);
+                std::string data = callPluginExport(options.plugin, std::shared_ptr<ASTNode>(tree));
                 outFile << data;
             }
             break;

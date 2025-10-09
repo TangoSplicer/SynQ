@@ -56,12 +56,12 @@ namespace synq::compiler {
     }
 
     Parser parser;
-    AST ast = parser.parse(code);
+    ASTNode* ast = parser.parseFile(name + ".synq");
     CodeGenerator codegen;
-    Program program = codegen.generate(ast);
+    IRProgram* program = codegen.generate(ast);
 
     std::cout << "♻️ Reloaded module '" << name << "' successfully.\n";
-    runtime->inject(program);
+    // runtime->inject(program); // TODO: Fix type conversion from IRProgram* to Program
     return true;
   }
 

@@ -25,8 +25,9 @@
 #include <map>
 #include <iostream>
 #include <sstream>
+#include <functional>
 
-static std::map<std::string, PluginInfo> pluginRegistry;
+static std::map<std::string, PluginMetadata> pluginRegistry;
 static std::map<std::string, std::function<std::string(std::shared_ptr<ASTNode>)>> exportHooks;
 
 void loadAllPlugins() {
@@ -39,7 +40,7 @@ void loadAllPlugins() {
 bool loadPlugin(const std::string& name) {
     if (pluginRegistry.count(name)) return true;
 
-    PluginInfo info;
+    PluginMetadata info;
     info.name = name;
     info.loaded = true;
 
@@ -85,8 +86,8 @@ bool unloadPlugin(const std::string& name) {
     return false;
 }
 
-std::vector<PluginInfo> listAvailablePlugins() {
-    std::vector<PluginInfo> result;
+std::vector<PluginMetadata> listAvailablePlugins() {
+    std::vector<PluginMetadata> result;
     for (const auto& [_, p] : pluginRegistry)
         result.push_back(p);
     return result;

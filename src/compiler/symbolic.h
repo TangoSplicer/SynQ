@@ -43,7 +43,8 @@ public:
 private:
     std::vector<std::string> gates;
 
-    SymbolicExpr(const std::vector<std::string>& gates);
+    public:
+       SymbolicExpr(const std::vector<std::string>& gates);
 };
 
 class SymbolicAlgebra {
