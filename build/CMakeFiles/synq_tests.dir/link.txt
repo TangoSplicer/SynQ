@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.o CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.o CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.o CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.o CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.o -o synq_tests  -lpybind11::all --coverage

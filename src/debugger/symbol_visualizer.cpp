@@ -1,9 +1,26 @@
-// SynQ Commercial Attribution License v1.0
-// © 2025 SynQ Contributors. All rights reserved.
-// This file is part of the SynQ programming ecosystem.
-
+// MIT License
+// 
+// Copyright (c) 2025 SynQ Contributors
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 #include "symbol_visualizer.h"
-#include "eval_context.h"
+#include "../runtime/eval_context.h"
 
 #include <iostream>
 #include <iomanip>
@@ -15,14 +32,15 @@ void SymbolVisualizer::showAll() {
     std::cout << std::setw(16) << "Name" << std::setw(20) << "Value" << "\n";
     std::cout << std::string(36, '-') << "\n";
 
-    for (const auto& [k, v] : EvalContext::variables) {
+    for (const auto& [k, v] : EvalContext::getVariables()) {
         std::cout << std::setw(16) << k << std::setw(20) << v << "\n";
     }
 }
 
 void SymbolVisualizer::show(const std::string& name) {
-    auto it = EvalContext::variables.find(name);
-    if (it != EvalContext::variables.end()) {
+    auto vars = EvalContext::getVariables();
+     auto it = vars.find(name);
+    if (it != vars.end()) {
         std::cout << "[Visualizer] " << name << " = " << it->second << "\n";
     } else {
         std::cout << "[Visualizer] No such symbol: " << name << "\n";

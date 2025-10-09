@@ -1,4 +1,4 @@
-# Install script for directory: /app/src/cli
+# Install script for directory: /workspace/SynQ/src/cli
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -41,3 +41,4 @@ endif()
 if(NOT DEFINED CMAKE_OBJDUMP)
   set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
+

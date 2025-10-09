@@ -1,7 +1,24 @@
-// SynQ Commercial Attribution License v1.0
-// © 2025 SynQ Contributors. All rights reserved.
-// This file is part of the SynQ programming ecosystem.
-
+// MIT License
+// 
+// Copyright (c) 2025 SynQ Contributors
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 // exporter.cpp
 #include "exporter.h"
 #include "ast.h"
@@ -22,7 +39,18 @@ static void writeOrWarn(std::ofstream& outFile, const std::string& path, bool ov
 }
 
 bool Exporter::exportProgram(const std::string& sourceCode, const ExportOptions& options) {
-    auto tree = parse(sourceCode);
+    // Write source code to temporary file for parsing
+       std::string tempFile = "/tmp/synq_temp_export.synq";
+       std::ofstream temp(tempFile);
+       if (!temp.is_open()) return false;
+       temp << sourceCode;
+       temp.close();
+       
+       Parser parser;
+       ASTNode* tree = parser.parseFile(tempFile);
+       std::remove(tempFile.c_str());
+       
+       if (!tree) return false;
     std::ofstream outFile;
 
     try {
@@ -57,7 +85,7 @@ bool Exporter::exportProgram(const std::string& sourceCode, const ExportOptions&
                 return false;
             }
             {
-                std::string data = callPluginExport(options.plugin, tree);
+                std::string data = callPluginExport(options.plugin, std::shared_ptr<ASTNode>(tree));
                 outFile << data;
             }
             break;

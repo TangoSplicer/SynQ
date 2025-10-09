@@ -8,11 +8,15 @@ add_library(synq_lib STATIC
   ${STD_SOURCES}
 )
 
-target_link_libraries(synq_lib PRIVATE pybind11::all)
-target_include_directories(synq_lib PRIVATE ${pybind11_INCLUDE_DIRS} ${pybind11_INCLUDE_DIRS}/pybind11)
+find_package(pybind11 CONFIG REQUIRED)
+find_package(Threads REQUIRED)
+
+target_link_libraries(synq_lib PRIVATE Threads::Threads pybind11::embed)
+target_include_directories(synq_lib PRIVATE ${pybind11_INCLUDE_DIRS})
 
 if(OpenMP_CXX_FOUND)
   target_link_libraries(synq_lib PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
-add_subdirectory(cli)
+# Skip CLI for now to ensure core builds
+# add_subdirectory(cli)

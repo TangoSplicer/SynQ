@@ -1,19 +1,36 @@
-// SynQ Commercial Attribution License v1.0
-// © 2025 SynQ Contributors. All rights reserved.
-// This file is part of the SynQ programming ecosystem.
-
+// MIT License
+// 
+// Copyright (c) 2025 SynQ Contributors
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 #include "ghostframe.h"
 #include <iostream>
 
 namespace synq {
 
-std::vector<GhostFrame> GhostFrame::frameLog;
+std::vector<GhostFrame> GhostFrameManager::frameLog;
 
-void GhostFrame::record(int tick, const std::map<std::string, std::string>& state) {
+void GhostFrameManager::record(int tick, const std::map<std::string, std::string>& state) {
     frameLog.push_back({tick, state});
 }
 
-void GhostFrame::rewind(int tick) {
+void GhostFrameManager::rewind(int tick) {
     for (auto it = frameLog.rbegin(); it != frameLog.rend(); ++it) {
         if (it->tickId <= tick) {
             std::cout << "[GhostFrame Rewind to Tick " << it->tickId << "]\n";
@@ -25,7 +42,7 @@ void GhostFrame::rewind(int tick) {
     }
 }
 
-void GhostFrame::play() {
+void GhostFrameManager::play() {
     for (const auto& gf : frameLog) {
         std::cout << "[Tick " << gf.tickId << "]\n";
         for (const auto& [k, v] : gf.state) {
@@ -34,7 +51,7 @@ void GhostFrame::play() {
     }
 }
 
-void GhostFrame::reset() {
+void GhostFrameManager::reset() {
     frameLog.clear();
 }
 

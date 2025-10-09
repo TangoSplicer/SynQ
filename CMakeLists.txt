@@ -1,6 +1,6 @@
 # CMakeLists.txt — SynQ Compiler Ecosystem
-# SynQ Commercial Attribution License v1.0
-# © 2025 SynQ Contributors. All rights reserved.
+# MIT License
+# © 2025 SynQ Contributors
 
 cmake_minimum_required(VERSION 3.18)
 project(SynQ LANGUAGES C CXX)
@@ -17,11 +17,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(dependencies)
 include(packaging)
-include(gtest)
-include(coverage)
+
+# Only include tests if building with tests enabled
+option(BUILD_TESTS "Build test suite" ON)
+if(BUILD_TESTS)
+    include(gtest)
+    include(coverage)
+endif()
 
 # Global includes
-include_directories(/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${CMAKE_SOURCE_DIR}/compiler)
 include_directories(${CMAKE_SOURCE_DIR}/tools)
@@ -33,8 +37,6 @@ include_directories(${CMAKE_SOURCE_DIR}/src/backend)
 include_directories(${CMAKE_SOURCE_DIR}/src/optimizer)
 include_directories(${CMAKE_SOURCE_DIR}/src/bindings)
 
-target_link_libraries(synq_lib PRIVATE Threads::Threads pybind11::embed)
-
 # Helper macro to collect sources
 file(GLOB_RECURSE COMPILER_SOURCES CONFIGURE_DEPENDS compiler/*.cpp)
 file(GLOB_RECURSE TOOLS_SOURCES CONFIGURE_DEPENDS tools/*.cpp)
@@ -42,5 +44,3 @@ file(GLOB_RECURSE REPL_SOURCES CONFIGURE_DEPENDS repl/*.cpp)
 file(GLOB_RECURSE PLUGIN_SOURCES CONFIGURE_DEPENDS plugins/*.cpp)
 file(GLOB_RECURSE LSP_SOURCES CONFIGURE_DEPENDS lsp/*.cpp)
 file(GLOB_RECURSE STD_SOURCES CONFIGURE_DEPENDS stdlib/*.cpp)
-
-find_package(pybind11 CONFIG REQUIRED)

@@ -1,7 +1,24 @@
-// SynQ Commercial Attribution License v1.0
-// © 2025 SynQ Contributors. All rights reserved.
-// This file is part of the SynQ programming ecosystem.
-
+// MIT License
+// 
+// Copyright (c) 2025 SynQ Contributors
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 // main.cpp
 #include <iostream>
 #include <string>
@@ -12,7 +29,7 @@
 #include "compiler/runtime.h"
 #include "compiler/exporter.h"
 #include "compiler/plugin_loader.h"
-#include "compiler/debug_hooks.h"
+#include "debugger/debugger_core.h"
 
 namespace fs = std::filesystem;
 
@@ -50,22 +67,23 @@ int main(int argc, char** argv) {
     bool do_repl = false;
 
     ExportOptions export_opts;
-    export_opts.outputDir = "";
-    export_opts.dryRun = false;
-    export_opts.target = ExportTarget::UNKNOWN;
+    export_opts.outputPath = "output.ast";
+    export_opts.overwrite = false;
+    export_opts.format = ExportFormat::AST;
+       export_opts.includeMetadata = true;
 
     for (int i = 2; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "--run") do_run = true;
         else if (arg == "--export") do_export = true;
-        else if (arg.starts_with("--target=")) {
+        else if (arg.rfind("--target=", 0) == 0) {
             std::string tgt = arg.substr(9);
-            export_opts.target = Exporter().parseTarget(tgt);
+            // TODO: Add target parsing logic
         }
-        else if (arg == "--dry-run") export_opts.dryRun = true;
+        else if (arg == "--dry-run") export_opts.overwrite = false;
         else if (arg == "--repl") do_repl = true;
-        else if (arg.starts_with("--out=")) {
-            export_opts.outputDir = arg.substr(6);
+        else if (arg.rfind("--out=", 0) == 0) {
+            export_opts.outputPath = arg.substr(6);
         }
     }
 
@@ -74,12 +92,12 @@ int main(int argc, char** argv) {
         std::cout << "📄 Loaded: " << filepath << std::endl;
 
         if (do_export) {
-            if (export_opts.target == ExportTarget::UNKNOWN) {
-                std::cerr << "❌ Export failed: --target must be specified.\n";
+            // TODO: Add target validation
+            std::cerr << "❌ Export failed: --target must be specified.\n";
                 return 2;
             }
             Exporter exporter;
-            std::string compiled = compileToTarget(code, export_opts.target);
+            std::string compiled = compileToTarget(code, ExportFormat::AST);
             exporter.exportCode(filepath, compiled, export_opts);
         }
 
