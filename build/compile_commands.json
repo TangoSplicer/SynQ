@@ -1,32 +1,27 @@
 [
 {
-  "directory": "/app/build",
-  "command": "/usr/bin/c++  -I/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -I/home/jules/.pyenv/versions/3.12.11/include/python3.12 -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings -std=gnu++17 -fPIE --coverage -o CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.o -c /app/tests/unit/test_ai.cpp",
-  "file": "/app/tests/unit/test_ai.cpp",
-  "output": "CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.o"
+  "directory": "/workspace/SynQ/build",
+  "command": "/usr/bin/c++  -I/usr/local/include/python3.11/pybind11 -I/workspace/SynQ/src -I/workspace/SynQ/compiler -I/workspace/SynQ/tools -I/workspace/SynQ/repl -I/workspace/SynQ/plugins -I/workspace/SynQ/stdlib -I/workspace/SynQ/lsp -I/workspace/SynQ/src/backend -I/workspace/SynQ/src/optimizer -I/workspace/SynQ/src/bindings -isystem /usr/local/include/python3.11 -O3 -DNDEBUG -fPIE --coverage -std=gnu++17 -o CMakeFiles/synq_tests.dir/tests/unit/test_ai.cpp.o -c /workspace/SynQ/tests/unit/test_ai.cpp",
+  "file": "/workspace/SynQ/tests/unit/test_ai.cpp"
 },
 {
-  "directory": "/app/build",
-  "command": "/usr/bin/c++  -I/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -I/home/jules/.pyenv/versions/3.12.11/include/python3.12 -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings -std=gnu++17 -fPIE --coverage -o CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.o -c /app/tests/unit/test_meta_circuit.cpp",
-  "file": "/app/tests/unit/test_meta_circuit.cpp",
-  "output": "CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.o"
+  "directory": "/workspace/SynQ/build",
+  "command": "/usr/bin/c++  -I/usr/local/include/python3.11/pybind11 -I/workspace/SynQ/src -I/workspace/SynQ/compiler -I/workspace/SynQ/tools -I/workspace/SynQ/repl -I/workspace/SynQ/plugins -I/workspace/SynQ/stdlib -I/workspace/SynQ/lsp -I/workspace/SynQ/src/backend -I/workspace/SynQ/src/optimizer -I/workspace/SynQ/src/bindings -isystem /usr/local/include/python3.11 -O3 -DNDEBUG -fPIE --coverage -std=gnu++17 -o CMakeFiles/synq_tests.dir/tests/unit/test_meta_circuit.cpp.o -c /workspace/SynQ/tests/unit/test_meta_circuit.cpp",
+  "file": "/workspace/SynQ/tests/unit/test_meta_circuit.cpp"
 },
 {
-  "directory": "/app/build",
-  "command": "/usr/bin/c++  -I/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -I/home/jules/.pyenv/versions/3.12.11/include/python3.12 -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings -std=gnu++17 -fPIE --coverage -o CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.o -c /app/tests/unit/test_mock_plugin.cpp",
-  "file": "/app/tests/unit/test_mock_plugin.cpp",
-  "output": "CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.o"
+  "directory": "/workspace/SynQ/build",
+  "command": "/usr/bin/c++  -I/usr/local/include/python3.11/pybind11 -I/workspace/SynQ/src -I/workspace/SynQ/compiler -I/workspace/SynQ/tools -I/workspace/SynQ/repl -I/workspace/SynQ/plugins -I/workspace/SynQ/stdlib -I/workspace/SynQ/lsp -I/workspace/SynQ/src/backend -I/workspace/SynQ/src/optimizer -I/workspace/SynQ/src/bindings -isystem /usr/local/include/python3.11 -O3 -DNDEBUG -fPIE --coverage -std=gnu++17 -o CMakeFiles/synq_tests.dir/tests/unit/test_mock_plugin.cpp.o -c /workspace/SynQ/tests/unit/test_mock_plugin.cpp",
+  "file": "/workspace/SynQ/tests/unit/test_mock_plugin.cpp"
 },
 {
-  "directory": "/app/build",
-  "command": "/usr/bin/c++  -I/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -I/home/jules/.pyenv/versions/3.12.11/include/python3.12 -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings -std=gnu++17 -fPIE --coverage -o CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.o -c /app/tests/unit/test_optimizer.cpp",
-  "file": "/app/tests/unit/test_optimizer.cpp",
-  "output": "CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.o"
+  "directory": "/workspace/SynQ/build",
+  "command": "/usr/bin/c++  -I/usr/local/include/python3.11/pybind11 -I/workspace/SynQ/src -I/workspace/SynQ/compiler -I/workspace/SynQ/tools -I/workspace/SynQ/repl -I/workspace/SynQ/plugins -I/workspace/SynQ/stdlib -I/workspace/SynQ/lsp -I/workspace/SynQ/src/backend -I/workspace/SynQ/src/optimizer -I/workspace/SynQ/src/bindings -isystem /usr/local/include/python3.11 -O3 -DNDEBUG -fPIE --coverage -std=gnu++17 -o CMakeFiles/synq_tests.dir/tests/unit/test_optimizer.cpp.o -c /workspace/SynQ/tests/unit/test_optimizer.cpp",
+  "file": "/workspace/SynQ/tests/unit/test_optimizer.cpp"
 },
 {
-  "directory": "/app/build",
-  "command": "/usr/bin/c++  -I/home/jules/.pyenv/versions/3.12.11/lib/python3.12/site-packages/pybind11/include -I/home/jules/.pyenv/versions/3.12.11/include/python3.12 -I/home/jules/.pyenv/versions/3.12.11/include/python3.12/pybind11 -I/app/src -I/app/compiler -I/app/tools -I/app/repl -I/app/plugins -I/app/stdlib -I/app/lsp -I/app/src/backend -I/app/src/optimizer -I/app/src/bindings -std=gnu++17 -fPIE --coverage -o CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.o -c /app/tests/unit/test_runtime.cpp",
-  "file": "/app/tests/unit/test_runtime.cpp",
-  "output": "CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.o"
+  "directory": "/workspace/SynQ/build",
+  "command": "/usr/bin/c++  -I/usr/local/include/python3.11/pybind11 -I/workspace/SynQ/src -I/workspace/SynQ/compiler -I/workspace/SynQ/tools -I/workspace/SynQ/repl -I/workspace/SynQ/plugins -I/workspace/SynQ/stdlib -I/workspace/SynQ/lsp -I/workspace/SynQ/src/backend -I/workspace/SynQ/src/optimizer -I/workspace/SynQ/src/bindings -isystem /usr/local/include/python3.11 -O3 -DNDEBUG -fPIE --coverage -std=gnu++17 -o CMakeFiles/synq_tests.dir/tests/unit/test_runtime.cpp.o -c /workspace/SynQ/tests/unit/test_runtime.cpp",
+  "file": "/workspace/SynQ/tests/unit/test_runtime.cpp"
 }
 ]

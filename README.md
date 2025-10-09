@@ -1,13 +1,26 @@
-// SynQ Commercial Attribution License v1.0
-// © 2025 SynQ Contributors. All rights reserved.
-// This file is part of the SynQ programming ecosystem.
+// MIT License
+// 
+// Copyright (c) 2025 SynQ Contributors
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-// © 2025 SynQ Project. All rights reserved.
-// This file is part of the proprietary SynQ language platform.
-// Commercial use, redistribution, or modification is strictly prohibited
-// without explicit written permission. See LICENSE.txt for full terms.
-
-# 🌌 SynQ Language — Quantum-Classical-AI Programming Platform
+# 🌐 SynQ Language — Quantum-Classical-AI Programming Platform
 
 > **As simple as Python, as powerful as Java.**
 >  
@@ -29,7 +42,7 @@
 
 ## 📁 Project Structure
 
-synq/ ├── src/              # Core compiler, runtime, REPL, plugin, and encryption logic │   ├── repl/         # REPL core + inspect + interactive commands │   ├── cli/          # CLI toolchain (ai, mutate, fuzz, sign, debug, etc.) │   ├── core/         # Language internals, tokenization, type system │   ├── plugins/      # Plugin loader, mutation, registry management │   └── quantum/      # Quantum simulation and logic (QPELA, QEBET, QGraphISO) ├── stdlib/           # Built-in modules for quantum, AI, classical operations ├── tests/            # Full unit/integration test suite ├── notebooks/        # AI demos, circuit visualization, plugin mutation ├── docs/             # Reference guides and manuals ├── build/            # Compiled output, binaries, signed bundles ├── CMakeLists.txt    # Cross-platform build config └── README.md         # Project entry point (this file)
+synq/ ├─ src/              # Core compiler, runtime, REPL, plugin, and encryption logic │   ├─ repl/         # REPL core + inspect + interactive commands │   ├─ cli/          # CLI toolchain (ai, mutate, fuzz, sign, debug, etc.) │   ├─ core/         # Language internals, tokenization, type system │   ├─ plugins/      # Plugin loader, mutation, registry management │   └─ quantum/      # Quantum simulation and logic (QPELA, QEBET, QGraphISO) ├─ stdlib/           # Built-in modules for quantum, AI, classical operations ├─ tests/            # Full unit/integration test suite ├─ notebooks/        # AI demos, circuit visualization, plugin mutation ├─ docs/             # Reference guides and manuals ├─ build/            # Compiled output, binaries, signed bundles ├─ CMakeLists.txt    # Cross-platform build config └─ README.md         # Project entry point (this file)
 
 ---
 
@@ -48,6 +61,7 @@ circuit Bell {
 }
 
 print(run GPT("Explain the Bell circuit"))
+```
 
 Supports:
 
@@ -88,7 +102,7 @@ Includes AI trace explanations, REPL visualization, plugin debugger overlay, and
 
 ---
 
-🛠 CLI Toolchain
+🔧 CLI Toolchain
 
 Invoke with synq [command]. Available tools:
 
@@ -104,6 +118,9 @@ skillmap	Developer interaction + learning visualizer
 chain	Distributed job + pipeline execution
 debug	Interactive debugger and quantum backtrace
 config	Edit CLI/runtime configuration profiles
+
+
+
 
 
 
@@ -142,6 +159,8 @@ qtms.py	Tensorized message signing (AEBS)
 
 
 
+
+
 ---
 
 📦 Building & Running
@@ -154,6 +173,8 @@ make -j8
 For signed plugin output:
 
 synq sign build/plugin.so
+
+
 
 
 ---
@@ -178,20 +199,19 @@ VisualTools.md
 
 
 
+
 ---
 
-⚠️ Licensing
+⚖️ Open Source License
 
-This project is proprietary.
-See LICENSE.txt for full legal terms.
+This project is released under the MIT License.
+See LICENSE.txt for full terms.
 
-Use of SynQ for commercial or derivative works requires explicit licensing.
+The SynQ language is now free and open source for everyone to use, modify, and distribute.
 
 
 ---
 
 ✅ Conclusion
 
-Welcome to SynQ — the future of computation.
-.
-
+Welcome to SynQ — the future of hybrid quantum-classical-AI computation, now open source for the community.

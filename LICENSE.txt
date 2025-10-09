@@ -1,41 +1,21 @@
-SynQ Commercial Attribution License v1.0 (SCAL-1.0)
+MIT License
 
-© 2025 SynQ Contributors. All rights reserved.
+Copyright (c) 2025 SynQ Contributors
 
-This software is part of the SynQ Programming Ecosystem, a commercial hybrid quantum-classical-AI compiler platform.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
----
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Permission is granted to individual licensees and verified organizations to use, develop, and redistribute this software subject to the following terms:
-
-1. Commercial License
-
-   This work is released under a paid commercial license. Access, modification, and redistribution require an active license key issued by SynQHQ or an authorized distributor.
-
-2. Usage Scope
-
-   - Licensees may use this software for internal research, commercial application, and educational demonstration.
-   - Public redistribution is prohibited without written consent.
-   - Modifications must retain this license notice and attribution.
-
-3. Plugin & Extension Rights
-
-   - Extensions and plugins built on this platform remain owned by their authors.
-   - Distribution of plugins via SynQHUB is permitted under license terms.
-
-4. Signature & Trust Enforcement
-
-   - This system includes a distributed keyring and plugin signing infrastructure.
-   - Signed artifacts must conform to security, compliance, and audit protocols.
-
-5. Disclaimer
-
-   This software is provided “as is” without warranty. SynQ contributors are not liable for damages arising from use.
-
----
-
-For license pricing, terms, or deployment consulting:
-Visit: https://synq.dev/pricing  
-Contact: licensing@synq.dev
-
-SCAL-1.0 — Last updated 2025-06-18
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
