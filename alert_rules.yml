@@ -1,0 +1,122 @@
+groups:
+  - name: synq_alerts
+    interval: 30s
+    rules:
+      # Backend alerts
+      - alert: BackendDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        annotations:
+          summary: "Backend service is down"
+          description: "Backend service has been down for more than 1 minute"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job="backend", status=~"5.."}[5m]) > 0.05
+        for: 5m
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 5% for the last 5 minutes"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, http_request_duration_seconds{job="backend"}) > 1
+        for: 5m
+        annotations:
+          summary: "High API latency"
+          description: "95th percentile latency is above 1 second"
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="backend"} / 1024 / 1024 > 1500
+        for: 5m
+        annotations:
+          summary: "High memory usage"
+          description: "Backend memory usage is above 1.5GB"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="backend"}[5m]) > 0.8
+        for: 5m
+        annotations:
+          summary: "High CPU usage"
+          description: "Backend CPU usage is above 80%"
+
+      # Database alerts
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been down for more than 1 minute"
+
+      - alert: HighDatabaseConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        annotations:
+          summary: "High database connections"
+          description: "Database connections are above 80"
+
+      - alert: SlowDatabaseQueries
+        expr: pg_slow_queries > 10
+        for: 5m
+        annotations:
+          summary: "Slow database queries detected"
+          description: "More than 10 slow queries detected in the last 5 minutes"
+
+      # Redis alerts
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been down for more than 1 minute"
+
+      - alert: HighRedisMemory
+        expr: redis_memory_used_bytes / 1024 / 1024 > 500
+        for: 5m
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis memory usage is above 500MB"
+
+      # WebSocket alerts
+      - alert: HighWebSocketConnections
+        expr: websocket_connections_active > 8000
+        for: 5m
+        annotations:
+          summary: "High WebSocket connections"
+          description: "Active WebSocket connections are above 8000"
+
+      - alert: WebSocketConnectionErrors
+        expr: rate(websocket_connection_errors_total[5m]) > 0.1
+        for: 5m
+        annotations:
+          summary: "WebSocket connection errors"
+          description: "WebSocket connection error rate is above 0.1 per second"
+
+      # ML Pipeline alerts
+      - alert: MLTrainingFailed
+        expr: ml_training_failed_total > 0
+        for: 5m
+        annotations:
+          summary: "ML training job failed"
+          description: "ML training pipeline has failed"
+
+      - alert: LongMLTrainingTime
+        expr: ml_training_duration_seconds > 3600
+        for: 5m
+        annotations:
+          summary: "Long ML training time"
+          description: "ML training is taking longer than 1 hour"
+
+      # Disk space alerts
+      - alert: LowDiskSpace
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.1
+        for: 5m
+        annotations:
+          summary: "Low disk space"
+          description: "Less than 10% disk space available"
+
+      # Certificate expiry alerts
+      - alert: CertificateExpiringSoon
+        expr: certmanager_certificate_expiration_timestamp_seconds - time() < 604800
+        for: 1h
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate will expire in less than 7 days"
