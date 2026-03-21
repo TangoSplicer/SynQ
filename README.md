@@ -1,4 +1,9 @@
-# SynQ: The Universal Programming Language Platform
+# SynQ: The Universal Programming Language
+
+[![codecov](https://codecov.io/gh/TangoSplicer/SynQ/branch/main/graph/badge.svg)](https://codecov.io/gh/TangoSplicer/SynQ)
+[![Backend Coverage](https://codecov.io/gh/TangoSplicer/SynQ/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/TangoSplicer/SynQ)
+[![Frontend Coverage](https://codecov.io/gh/TangoSplicer/SynQ/branch/main/graph/badge.svg?flag=frontend)](https://codecov.io/gh/TangoSplicer/SynQ)
+[![Compiler Coverage](https://codecov.io/gh/TangoSplicer/SynQ/branch/main/graph/badge.svg?flag=compiler)](https://codecov.io/gh/TangoSplicer/SynQ) Platform
 
 > **SynQ combines quantum computing, AI/ML, and classical programming into one powerful, secure, and interoperable language ecosystem.**
 
