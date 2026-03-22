@@ -1,0 +1,336 @@
+{
+  "ide_plugins": {
+    "vscode": {
+      "package.json": {
+        "name": "synq-language-support",
+        "version": "1.0.0",
+        "publisher": "synq",
+        "engines": {
+          "vscode": "^1.50.0"
+        },
+        "categories": [
+          "Programming Languages"
+        ],
+        "contributes": {
+          "languages": [
+            {
+              "id": "synq",
+              "aliases": [
+                "SynQ",
+                "synq"
+              ],
+              "extensions": [
+                ".synq"
+              ],
+              "configuration": "./language-configuration.json"
+            }
+          ],
+          "grammars": [
+            {
+              "language": "synq",
+              "scopeName": "source.synq",
+              "path": "./syntaxes/synq.tmLanguage.json"
+            }
+          ],
+          "debuggers": [
+            {
+              "type": "synq",
+              "label": "SynQ Debugger",
+              "program": "./out/debugAdapter.js"
+            }
+          ]
+        }
+      },
+      "features": {
+        "syntax_highlighting": "enabled",
+        "intellisense": "enabled",
+        "debugging": "enabled",
+        "testing": "enabled",
+        "formatting": "enabled",
+        "linting": "enabled"
+      },
+      "status": "template_created"
+    },
+    "jetbrains": {
+      "plugin.xml": {
+        "id": "com.synq.language",
+        "name": "SynQ Language Support",
+        "version": "1.0.0",
+        "description": "SynQ language support for JetBrains IDEs",
+        "extensions": [
+          {
+            "name": "com.intellij.lang.parserDefinition",
+            "implementation": "com.synq.SynQParserDefinition"
+          },
+          {
+            "name": "com.intellij.lang.syntaxHighlighterFactory",
+            "implementation": "com.synq.SynQSyntaxHighlighterFactory"
+          }
+        ]
+      },
+      "features": {
+        "language_support": "enabled",
+        "syntax_highlighting": "enabled",
+        "code_completion": "enabled",
+        "inspections": "enabled",
+        "refactoring": "enabled",
+        "debugging": "enabled",
+        "testing": "enabled"
+      },
+      "status": "template_created"
+    },
+    "vim": {
+      "plugin_structure": {
+        "plugin/synq.vim": "Main plugin file",
+        "autoload/synq.vim": "Autoload functions",
+        "ftplugin/synq.vim": "Filetype plugin",
+        "syntax/synq.vim": "Syntax highlighting",
+        "indent/synq.vim": "Indentation rules",
+        "compiler/synq.vim": "Compiler settings"
+      },
+      "features": {
+        "syntax_highlighting": "enabled",
+        "lsp_integration": "enabled",
+        "debugging": "enabled",
+        "formatting": "enabled",
+        "linting": "enabled",
+        "completion": "enabled"
+      },
+      "status": "template_created"
+    }
+  },
+  "debugging_tools": {
+    "debugger": {
+      "features": {
+        "breakpoints": {
+          "line_breakpoints": "enabled",
+          "conditional_breakpoints": "enabled",
+          "function_breakpoints": "enabled",
+          "exception_breakpoints": "enabled"
+        },
+        "execution_control": {
+          "step_over": "enabled",
+          "step_into": "enabled",
+          "step_out": "enabled",
+          "continue": "enabled",
+          "pause": "enabled"
+        },
+        "inspection": {
+          "variable_inspection": "enabled",
+          "watch_expressions": "enabled",
+          "stack_trace": "enabled",
+          "call_stack": "enabled",
+          "local_variables": "enabled"
+        },
+        "advanced": {
+          "remote_debugging": "enabled",
+          "multi_threaded_debugging": "enabled",
+          "memory_inspection": "enabled",
+          "performance_profiling": "enabled"
+        }
+      },
+      "protocols": {
+        "dap": "Debug Adapter Protocol",
+        "gdb": "GNU Debugger Protocol",
+        "lldb": "LLDB Protocol"
+      },
+      "status": "framework_created"
+    },
+    "guide": {
+      "basic_debugging": {
+        "setting_breakpoints": "documented",
+        "stepping_through_code": "documented",
+        "inspecting_variables": "documented",
+        "viewing_stack_trace": "documented"
+      },
+      "advanced_debugging": {
+        "conditional_breakpoints": "documented",
+        "watch_expressions": "documented",
+        "remote_debugging": "documented",
+        "multi_threaded_debugging": "documented"
+      },
+      "debugging_techniques": {
+        "print_debugging": "documented",
+        "logging": "documented",
+        "assertions": "documented",
+        "profiling": "documented"
+      },
+      "common_issues": {
+        "segmentation_faults": "documented",
+        "memory_leaks": "documented",
+        "deadlocks": "documented",
+        "race_conditions": "documented"
+      },
+      "status": "guide_created"
+    }
+  },
+  "profiling_tools": {
+    "profiler": {
+      "cpu_profiling": {
+        "sampling_profiler": "enabled",
+        "instrumentation_profiler": "enabled",
+        "flame_graphs": "enabled",
+        "call_graphs": "enabled",
+        "hotspot_analysis": "enabled"
+      },
+      "memory_profiling": {
+        "heap_analysis": "enabled",
+        "memory_leak_detection": "enabled",
+        "allocation_tracking": "enabled",
+        "gc_analysis": "enabled"
+      },
+      "io_profiling": {
+        "disk_io_tracking": "enabled",
+        "network_io_tracking": "enabled",
+        "database_query_profiling": "enabled",
+        "cache_analysis": "enabled"
+      },
+      "thread_profiling": {
+        "thread_analysis": "enabled",
+        "lock_contention": "enabled",
+        "deadlock_detection": "enabled",
+        "thread_timeline": "enabled"
+      },
+      "status": "framework_created"
+    },
+    "guide": {
+      "cpu_profiling_guide": {
+        "getting_started": "documented",
+        "interpreting_results": "documented",
+        "optimization_strategies": "documented",
+        "best_practices": "documented"
+      },
+      "memory_profiling_guide": {
+        "heap_analysis": "documented",
+        "leak_detection": "documented",
+        "optimization_strategies": "documented",
+        "best_practices": "documented"
+      },
+      "io_profiling_guide": {
+        "disk_io_analysis": "documented",
+        "network_io_analysis": "documented",
+        "optimization_strategies": "documented",
+        "best_practices": "documented"
+      },
+      "profiling_tools": {
+        "perf": "documented",
+        "instruments": "documented",
+        "windows_performance_analyzer": "documented",
+        "custom_profilers": "documented"
+      },
+      "status": "guide_created"
+    }
+  },
+  "library_templates": {
+    "library": {
+      "directory_structure": {
+        "src/": "Source code",
+        "tests/": "Unit tests",
+        "docs/": "Documentation",
+        "examples/": "Usage examples",
+        "benches/": "Benchmarks",
+        "Cargo.toml": "Package manifest",
+        "README.md": "Project readme",
+        "LICENSE": "License file"
+      },
+      "library_components": {
+        "core_module": {
+          "file": "src/lib.rs",
+          "exports": "public API",
+          "documentation": "enabled"
+        },
+        "submodules": {
+          "file": "src/module_name.rs",
+          "exports": "module API",
+          "documentation": "enabled"
+        },
+        "tests": {
+          "file": "tests/integration_tests.rs",
+          "coverage": "90%+",
+          "documentation": "enabled"
+        },
+        "examples": {
+          "file": "examples/example_name.rs",
+          "count": "5+",
+          "documentation": "enabled"
+        }
+      },
+      "publishing": {
+        "registry": "registry.synq.dev",
+        "versioning": "semantic",
+        "changelog": "maintained",
+        "documentation": "published"
+      },
+      "status": "template_created"
+    },
+    "framework": {
+      "framework_architecture": {
+        "core": "Framework core",
+        "plugins": "Plugin system",
+        "middleware": "Middleware system",
+        "routing": "Routing engine",
+        "utilities": "Utility functions"
+      },
+      "framework_components": {
+        "request_handler": {
+          "file": "src/handler.rs",
+          "functionality": "Handle HTTP requests",
+          "documentation": "enabled"
+        },
+        "middleware": {
+          "file": "src/middleware.rs",
+          "functionality": "Request/response processing",
+          "documentation": "enabled"
+        },
+        "router": {
+          "file": "src/router.rs",
+          "functionality": "Route requests to handlers",
+          "documentation": "enabled"
+        },
+        "plugin_system": {
+          "file": "src/plugins.rs",
+          "functionality": "Plugin management",
+          "documentation": "enabled"
+        }
+      },
+      "framework_features": {
+        "routing": "enabled",
+        "middleware": "enabled",
+        "error_handling": "enabled",
+        "logging": "enabled",
+        "testing_utilities": "enabled"
+      },
+      "status": "template_created"
+    },
+    "guide": {
+      "library_development": {
+        "architecture_design": "documented",
+        "api_design": "documented",
+        "testing_strategy": "documented",
+        "documentation_standards": "documented",
+        "publishing_process": "documented"
+      },
+      "framework_development": {
+        "architecture_design": "documented",
+        "plugin_system": "documented",
+        "middleware_system": "documented",
+        "routing_system": "documented",
+        "documentation_standards": "documented"
+      },
+      "best_practices": {
+        "code_organization": "documented",
+        "error_handling": "documented",
+        "performance_optimization": "documented",
+        "security_considerations": "documented",
+        "backward_compatibility": "documented"
+      },
+      "community_guidelines": {
+        "contributing": "documented",
+        "code_of_conduct": "documented",
+        "issue_management": "documented",
+        "pull_request_process": "documented"
+      },
+      "status": "guide_created"
+    }
+  }
+}
