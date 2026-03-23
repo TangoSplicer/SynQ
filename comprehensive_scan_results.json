@@ -1,0 +1,198 @@
+{
+  "scan_timestamp": "2026-03-22T20:06:03.946266",
+  "repo_path": "/tmp/synq_phase12",
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "critical_issues": [],
+  "summary": {
+    "total_issues": 421,
+    "critical_issues": 8,
+    "warnings": 421,
+    "errors": 0,
+    "severity": "CRITICAL"
+  },
+  "scans": {
+    "code_quality": {
+      "status": "complete",
+      "findings": {
+        "files_scanned": 75,
+        "warnings": 2,
+        "critical_issues": 0
+      }
+    },
+    "security": {
+      "status": "complete",
+      "vulnerabilities": {
+        "critical": 8,
+        "warnings": 404
+      }
+    },
+    "test_coverage": {
+      "status": "complete",
+      "findings": {
+        "test_files": 4,
+        "source_files": 71,
+        "estimated_coverage_ratio": "5.6%",
+        "missing_tests": [
+          "/tmp/synq_phase12/minimal_build.py",
+          "/tmp/synq_phase12/update_license.py",
+          "/tmp/synq_phase12/scripts/benchmark.py",
+          "/tmp/synq_phase12/scripts/security_check.py",
+          "/tmp/synq_phase12/scripts/production_readiness_automation.py",
+          "/tmp/synq_phase12/scripts/ecosystem_maturity_automation.py",
+          "/tmp/synq_phase12/scripts/community_infrastructure_automation.py",
+          "/tmp/synq_phase12/scripts/full_deployment_automation.py",
+          "/tmp/synq_phase12/scripts/comprehensive_repo_scan.py",
+          "/tmp/synq_phase12/backend/app/main.py",
+          "/tmp/synq_phase12/backend/app/stdlib_examples.py",
+          "/tmp/synq_phase12/backend/app/community_metrics.py",
+          "/tmp/synq_phase12/backend/app/debugger/__init__.py",
+          "/tmp/synq_phase12/backend/app/debugger/debugger.py",
+          "/tmp/synq_phase12/backend/app/graphql/__init__.py",
+          "/tmp/synq_phase12/backend/app/graphql/schema.py",
+          "/tmp/synq_phase12/backend/app/lsp/__init__.py",
+          "/tmp/synq_phase12/backend/app/lsp/server.py",
+          "/tmp/synq_phase12/backend/app/ml/__init__.py",
+          "/tmp/synq_phase12/backend/app/ml/inference_engine.py",
+          "/tmp/synq_phase12/backend/app/ml/training_pipeline.py",
+          "/tmp/synq_phase12/backend/app/models/__init__.py",
+          "/tmp/synq_phase12/backend/app/models/api_gateway.py",
+          "/tmp/synq_phase12/backend/app/models/collaboration.py",
+          "/tmp/synq_phase12/backend/app/models/ml_prediction.py",
+          "/tmp/synq_phase12/backend/app/routers/api_gateway.py",
+          "/tmp/synq_phase12/backend/app/routers/collaboration.py",
+          "/tmp/synq_phase12/backend/app/routers/debugger_router.py",
+          "/tmp/synq_phase12/backend/app/routers/graphql_router.py",
+          "/tmp/synq_phase12/backend/app/routers/lsp_router.py",
+          "/tmp/synq_phase12/backend/app/routers/ml_prediction.py",
+          "/tmp/synq_phase12/backend/app/routers/ml_training_router.py",
+          "/tmp/synq_phase12/backend/app/routers/websocket_router.py",
+          "/tmp/synq_phase12/backend/app/schemas/api_gateway.py",
+          "/tmp/synq_phase12/backend/app/schemas/collaboration.py",
+          "/tmp/synq_phase12/backend/app/schemas/ml_prediction.py",
+          "/tmp/synq_phase12/backend/app/services/api_gateway.py",
+          "/tmp/synq_phase12/backend/app/services/collaboration.py",
+          "/tmp/synq_phase12/backend/app/services/ml_prediction.py",
+          "/tmp/synq_phase12/backend/app/stdlib/__init__.py",
+          "/tmp/synq_phase12/backend/app/stdlib/collections.py",
+          "/tmp/synq_phase12/backend/app/stdlib/io.py",
+          "/tmp/synq_phase12/backend/app/stdlib/math.py",
+          "/tmp/synq_phase12/backend/app/stdlib/performance.py",
+          "/tmp/synq_phase12/backend/app/stdlib/strings.py",
+          "/tmp/synq_phase12/backend/app/websocket/__init__.py",
+          "/tmp/synq_phase12/backend/app/websocket/auth.py",
+          "/tmp/synq_phase12/backend/app/websocket/connection_manager.py",
+          "/tmp/synq_phase12/backend/app/websocket/message_handler.py",
+          "/tmp/synq_phase12/backend/app/websocket/security.py",
+          "/tmp/synq_phase12/compiler/exporter.py",
+          "/tmp/synq_phase12/compiler/repl/hooks/tutor_hook.py",
+          "/tmp/synq_phase12/compiler/src/ai/linter/linter_engine.py",
+          "/tmp/synq_phase12/compiler/src/ai/skillmap/skill_tracker.py",
+          "/tmp/synq_phase12/compiler/src/ai/tutor/agent_manager.py",
+          "/tmp/synq_phase12/compiler/src/ai/tutor/ai_tutor.py",
+          "/tmp/synq_phase12/compiler/src/ai/tutor/doc_generator.py",
+          "/tmp/synq_phase12/compiler/src/ai/tutor/trace_explainer.py",
+          "/tmp/synq_phase12/compiler/src/ai/tutor/tutor_registry.py",
+          "/tmp/synq_phase12/compiler/src/ai/tutor/tutorial_builder.py",
+          "/tmp/synq_phase12/compiler/src/chain/execution_graph.py",
+          "/tmp/synq_phase12/compiler/src/plugins/registry/plugin_registry.py",
+          "/tmp/synq_phase12/compiler/src/plugins/registry/remote_hub.py",
+          "/tmp/synq_phase12/compiler/src/quantum_subsystem/quantum_walker.py",
+          "/tmp/synq_phase12/compiler/src/quantum_subsystem/secure_storage.py",
+          "/tmp/synq_phase12/compiler/src/quantum_subsystem/transmission_protocol.py",
+          "/tmp/synq_phase12/compiler/src/security/distributed_keyring.py",
+          "/tmp/synq_phase12/compiler/src/security/signer_core.py",
+          "/tmp/synq_phase12/compiler/src/security/signing_engine.py",
+          "/tmp/synq_phase12/compiler/src/security/verifier_core.py",
+          "/tmp/synq_phase12/compiler/tests/tools/html_report.py"
+        ]
+      }
+    },
+    "documentation": {
+      "status": "complete",
+      "findings": {
+        "readme_exists": true,
+        "doc_files": 90,
+        "undocumented_functions": 744,
+        "doc_files_list": [
+          "CONTRIBUTING.md",
+          "PHASE10_DOCUMENTATION.md",
+          "README.md",
+          "TESTING.md",
+          "CODECOV_SETUP.md",
+          "PERFORMANCE_OPTIMIZATION.md",
+          "PHASE10_PRODUCTION_DEPLOYMENT.md",
+          "PHASE11_PERFORMANCE_COMPILATION.md",
+          "PHASE11_STAGE1_IMPLEMENTATION_PLAN.md",
+          "PHASE12_SECURITY_HARDENING.md"
+        ]
+      }
+    },
+    "dependencies": {
+      "status": "complete",
+      "findings": {
+        "requirements_files": [
+          "requirements.txt"
+        ],
+        "count": 1
+      }
+    },
+    "performance": {
+      "status": "complete",
+      "findings": {
+        "potential_issues": 124,
+        "issues": [
+          "String concatenation in loop in /tmp/synq_phase12/update_license.py",
+          "String concatenation in loop in /tmp/synq_phase12/scripts/security_check.py",
+          "Potential N+1 query in /tmp/synq_phase12/scripts/production_readiness_automation.py",
+          "Potential N+1 query in /tmp/synq_phase12/scripts/ecosystem_maturity_automation.py",
+          "Nested loops in /tmp/synq_phase12/scripts/comprehensive_repo_scan.py:66"
+        ]
+      }
+    },
+    "architecture": {
+      "status": "complete",
+      "findings": {
+        "directories": [
+          "scripts",
+          "tests",
+          "backend",
+          "compiler",
+          "frontend",
+          "k8s",
+          "stdlib",
+          "ide"
+        ],
+        "directory_count": 8,
+        "python_files": 75,
+        "structure_issues": []
+      }
+    },
+    "integration": {
+      "status": "complete",
+      "findings": {
+        "api_endpoints": 57,
+        "external_integrations": 7,
+        "endpoints_sample": [
+          "/breakpoints",
+          "/breakpoints/{breakpoint_id}",
+          "/breakpoints",
+          "/start",
+          "/pause"
+        ],
+        "integration_files": [
+          "benchmark.py",
+          "comprehensive_repo_scan.py",
+          "api_gateway.py",
+          "strings.py",
+          "test_comprehensive_coverage.py"
+        ]
+      }
+    }
+  },
+  "issues_found": 0,
+  "warnings_found": 421,
+  "errors_found": 0,
+  "critical_issues_found": 8
+}
