@@ -1,0 +1,8 @@
+title: SynQ
+description: Hybrid Quantum-Classical-AI Programming Language
+theme: jekyll-theme-minimal
+show_downloads: true
+github:
+  repository_url: https://github.com/TangoSplicer/SynQ
+  is_project_page: true
+  project_tagline: Unified Platform for Quantum, Classical, and AI Computing

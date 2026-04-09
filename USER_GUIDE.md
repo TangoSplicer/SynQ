@@ -1,7 +1,8 @@
 # SynQ Platform - Comprehensive User Guide
 
-**Version:** 1.0  
-**Last Updated:** March 2025  
+**Version:** 1.0.0  
+**Release Date:** March 26, 2026  
+**Last Updated:** April 8, 2026  
 **Author:** Manus AI
 
 ---
