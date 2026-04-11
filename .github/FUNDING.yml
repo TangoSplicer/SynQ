@@ -1,0 +1,7 @@
+# GitHub Sponsors Configuration
+# This file enables the GitHub Sponsors button and directs supporters to funding options
+
+github: TangoSplicer
+patreon: synq
+ko_fi: synq
+custom: ['https://github.com/sponsors/TangoSplicer']
