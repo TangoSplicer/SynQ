@@ -83,6 +83,23 @@ if(BUILD_CORE_SMOKE_TESTS)
     set_target_properties(synq_c_abi_smoke PROPERTIES LINKER_LANGUAGE CXX)
     add_test(NAME synq_c_abi_smoke COMMAND synq_c_abi_smoke)
 
+    find_program(SYNQ_RUSTC_EXECUTABLE rustc REQUIRED)
+    set(SYNQ_RUST_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_abi_smoke)
+    add_custom_command(
+        OUTPUT ${SYNQ_RUST_ABI_SMOKE}
+        COMMAND ${SYNQ_RUSTC_EXECUTABLE} --edition=2021 ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/rust_abi_smoke.rs
+                -L native=$<TARGET_FILE_DIR:synq_lib>
+                -l static=synq_lib
+                -l dylib=stdc++
+                -l dylib=crypto
+                -l dylib=pthread
+                -o ${SYNQ_RUST_ABI_SMOKE}
+        DEPENDS synq_lib ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/rust_abi_smoke.rs
+        VERBATIM
+    )
+    add_custom_target(synq_rust_abi_smoke_target ALL DEPENDS ${SYNQ_RUST_ABI_SMOKE})
+    add_test(NAME synq_rust_abi_smoke COMMAND ${SYNQ_RUST_ABI_SMOKE})
+
     add_executable(synq_openqasm3_exporter_smoke tests/smoke/openqasm3_exporter_smoke.cpp)
     target_include_directories(synq_openqasm3_exporter_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_openqasm3_exporter_smoke PRIVATE synq_lib)

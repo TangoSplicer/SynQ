@@ -88,7 +88,7 @@ shared library.
 
 | Next adapter | Safe first implementation route | Not yet implemented or claimed |
 | --- | --- | --- |
-| Rust | Wrap the header with `extern "C"`, then expose ownership through Rust RAII types and test it in Rust. | A Rust crate, a Rust-native ABI, automatic bindings, or an in-process C++ interface. |
+| Rust | A dependency-free `rustc` smoke consumer now declares the opaque v1 C ABI directly, validates parse/export/error ownership flows, and is registered in the core profile. A future wrapper can introduce RAII types after a separate API review. | A Rust crate, a Rust-native ABI, automatic bindings, safe wrapper types, or an in-process C++ interface. |
 | Mercury | Map only released C functions through `pragma foreign_proc` on a C backend, with a Mercury toolchain smoke test. | A Mercury package, all Mercury backends, or bidirectional foreign calls. |
 | Common Lisp | Define the released functions and opaque pointers using CFFI, with an implementation-specific test. | A published CFFI system, callbacks, or all Lisp implementations. |
 | Clojure | Call a small Java facade through normal Java interop; the facade can use JNI only once its native-load contract is tested. | A Clojure library, direct C ABI access from Clojure, or a portable JNI solution. |

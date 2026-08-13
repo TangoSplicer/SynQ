@@ -72,3 +72,6 @@
 - [x] Specify a bounded typed measurement statement, validation rules, and OpenQASM 3 interoperability contract.
 - [x] Implement typed measurement parsing, diagnostics, and OpenQASM lowering with focused tests.
 - [x] Re-run full checks, independently validate exported measurement syntax, and publish the measurement increment.
+- [x] Confirm the available Rust toolchain and define the smallest safe opaque-handle C-ABI consumer contract.
+- [x] Implement and test a dependency-free Rust consumer of the SynQ C ABI.
+- [ ] Integrate the Rust consumer into compiler-core CI, document the verified boundary, and publish the increment.
