@@ -23,4 +23,4 @@
 - [x] Reduce the frontend production bundle warning through verified code splitting.
 - [x] Replace unsupported repository-frontend capability claims with verified recovery-status messaging.
 - [x] Re-run local checks and update evidence for the completed recovery increment.
-- [ ] Push the completed recovery increment and observe both generated CI workflows.
+- [x] Push the completed recovery increment and observe both generated CI workflows.
