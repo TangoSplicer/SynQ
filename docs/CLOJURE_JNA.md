@@ -1,7 +1,7 @@
 # SynQ Clojure/JNA Consumer Proof
 
-**Status:** Locally validated test-only Clojure/JNA consumer proof; remote
-compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated test-only Clojure/JNA consumer proof in
+[Compiler Core #19][2]; this is not a distributed language binding.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -41,16 +41,20 @@ or reflection-based package discovery; guarantee portability across JDKs,
 operating systems, or Clojure runtimes; or establish Clojure, Java, or JVM
 interoperability beyond this one tested consumer flow.
 
-## Exit criteria
+## Verified evidence and exit criteria
 
-The increment can be promoted from local to remote evidence only when
-Clojure/JNA loads the test-only shared artifact in compiler-core CI; validates
-the opaque in-memory parse/export/error ownership flow; and leaves every C,
-Rust, Common Lisp, compiler, frontend, backend, and independent OpenQASM check
-passing.
+The local cross-project validation passed all 12 compiler-core CTest checks,
+33 frontend tests, the frontend type check and production build, the backend
+health smoke test, and `git diff --check`. Compiler Core #19 then completed
+successfully for commit `cccf61b`, installing Clojure/JNA and reporting the same
+12/12 CTest pass, including `synq_clojure_jna_abi_smoke`.[2]
+
+This establishes only the tested Clojure/JNA opaque in-memory
+parse/export/error ownership flow for the CMake-build-directory Linux artifact.
 Documentation must call this a **Clojure/JNA consumer proof**, not a Clojure
 binding or full JVM interoperability.
 
 ## References
 
 [1]: https://clojure.org/reference/java_interop "Clojure Java Interop"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31726350746 "SynQ Compiler Core #19"

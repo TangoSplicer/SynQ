@@ -1,10 +1,9 @@
 # SynQ C ABI Foundation
 
-**Status:** Remotely validated experimental foundation for C, Rust, and
-test-only Common Lisp consumption; a Clojure/JNA consumer is locally validated
-and awaits remote compiler-core evidence. This is **not** a declaration of a
-frozen production ABI, a shared library distribution, or a language-specific
-SDK.
+**Status:** Remotely validated experimental foundation for C, Rust, test-only
+Common Lisp, and test-only Clojure/JNA consumption in [Compiler Core #19][13].
+This is **not** a declaration of a frozen production ABI, a shared library
+distribution, or a language-specific SDK.
 **Last reviewed:** 13 August 2026
 
 ## Purpose and scope
@@ -85,9 +84,10 @@ passing** tests, including `synq_c_abi_smoke`, `synq_clojure_jna_abi_smoke`, the
 gate-validation and feature-gate smoke tests, the parser/exporter tests, and
 the two independent OpenQASM downstream validations. The earlier C/Rust
 in-memory profile passed remotely in [Compiler Core #17][11] for commit
-`65906d0`, while the later Common Lisp profile passed remotely in [Compiler Core
-#18][12]. The Clojure configuration is published but has not yet run remotely. None
-of these results freeze the ABI or test a distributed shared library.
+`65906d0`, the later Common Lisp profile passed remotely in [Compiler Core
+#18][12], and the Clojure/JNA consumer passed remotely in [Compiler Core #19][13]
+for commit `cccf61b`. None of these results freeze the ABI or test a distributed
+shared library.
 
 ## What this enables next—and what it does not
 
@@ -96,7 +96,7 @@ of these results freeze the ABI or test a distributed shared library.
 | Rust | A dependency-free `rustc` smoke consumer declares the opaque v1 C ABI directly, validates parse/export/error ownership flows, and passed remotely in [Compiler Core #16][9]. A future wrapper can introduce RAII types after a separate API review. | A Rust crate, a Rust-native ABI, automatic bindings, safe wrapper types, or an in-process C++ interface. |
 | Mercury | Map only released C functions through `pragma foreign_proc` on a C backend, with a Mercury toolchain smoke test. | A Mercury package, all Mercury backends, or bidirectional foreign calls. |
 | Common Lisp | A test-only `libsynq_ffi.so` and SBCL/CFFI consumer load the opaque v1 C ABI from the build directory, validate in-memory parse/export/error ownership flows, and passed remotely in [Compiler Core #18][11]. | A published CFFI system, installed shared library, callbacks, or all Lisp implementations. |
-| Clojure | A test-only Clojure 1.11.1/JNA 5.14.0 script loads CMake’s absolute `libsynq_ffi.so` path, calls opaque ABI v1 functions, validates in-memory parse/export/error ownership flows, and passes locally. | A Clojure library, Java API, JNI bridge, portable JVM binding, installed native library, or remote-CI-validated consumer until this increment is published. |
+| Clojure | A test-only Clojure 1.11.1/JNA 5.14.0 script loads CMake’s absolute `libsynq_ffi.so` path, calls opaque ABI v1 functions, validates in-memory parse/export/error ownership flows, and passed remotely in [Compiler Core #19][13]. | A Clojure library, Java API, JNI bridge, portable JVM binding, or installed native library. |
 
 The C ABI is therefore **a foundation for interoperability, not proof of full
 interoperability**. Each later binding must be independently built and tested,
@@ -128,3 +128,4 @@ tests.
 [10]: https://github.com/TangoSplicer/SynQ/actions/runs/31724123316 "SynQ Compiler Core #16"
 [11]: https://github.com/TangoSplicer/SynQ/actions/runs/31724839027 "SynQ Compiler Core #17"
 [12]: https://github.com/TangoSplicer/SynQ/actions/runs/31725431911 "SynQ Compiler Core #18"
+[13]: https://github.com/TangoSplicer/SynQ/actions/runs/31726350746 "SynQ Compiler Core #19"

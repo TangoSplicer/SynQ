@@ -83,4 +83,4 @@
 - [x] Integrate the Lisp consumer into compiler-core CI, document verified boundaries, and publish the increment.
 - [x] Confirm free Clojure/JNA toolchain availability and define a test-only JVM shared-library boundary.
 - [x] Implement and locally test a Clojure/JNA consumer of the opaque SynQ C ABI.
-- [ ] Commit and publish the Clojure/JNA CI configuration, then record its remote compiler-core evidence.
+- [x] Commit and publish the Clojure/JNA CI configuration, then record its remote compiler-core evidence.

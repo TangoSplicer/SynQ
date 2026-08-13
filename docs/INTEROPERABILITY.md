@@ -33,11 +33,10 @@ C ABI consumer compiles and runs remotely against that same contract, including
 in-memory text parsing; it is a proof of call and ownership flow, not a Rust
 binding. A test-only SBCL/CFFI consumer remotely loads the same C ABI from a
 build-directory shared library; it is not a Common Lisp package or general
-binding. A separate test-only Clojure/JNA script now passes locally by loading
-the same build-directory shared library through JNA, invoking the opaque ABI,
-and checking in-memory parse/export/error ownership; it has not yet received
-remote CI evidence and is not a Clojure/JVM library. Mercury remains
-unimplemented. The full C API is documented in [C ABI Foundation](./C_ABI.md);
+binding. A separate test-only Clojure/JNA script loads the same build-directory
+shared library through JNA, invokes the opaque ABI, checks in-memory
+parse/export/error ownership, and passed remotely in [Compiler Core #19](https://github.com/TangoSplicer/SynQ/actions/runs/31726350746); it is not a Clojure/JVM
+library. Mercury remains unimplemented. The full C API is documented in [C ABI Foundation](./C_ABI.md);
 the Rust proof and non-goals are documented in [Rust C-ABI Consumer Proof](./RUST_C_ABI.md),
 the Lisp proof is documented in [Common Lisp CFFI Consumer Proof](./COMMON_LISP_CFFI.md),
 and the Clojure local-proof boundary is documented in [Clojure JNA Consumer Proof](./CLOJURE_JNA.md).
