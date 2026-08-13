@@ -1,7 +1,6 @@
 # SynQ Typed Classical Literal Boundary
 
-**Status:** Locally verified recovery-profile implementation boundary; remote CI
-evidence for this increment is pending publication.
+**Status:** Remotely validated recovery-profile implementation boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -62,6 +61,9 @@ Parsed declarations now receive the documented classification; source
 preservation and legacy direct construction remain tested; the bounded typed
 quantum and OpenQASM path remains unchanged; and compiler, frontend, and
 backend checks pass locally. Repository status describes this as **literal
-classification**, not as a classical type system or evaluator. Remote
-compiler-core evidence is required before the increment is described as
-remotely validated.
+classification**, not as a classical type system or evaluator. The same
+compiler profile passed in [Compiler Core #11][1] for commit `4cc1b13`.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31720781396 "SynQ Compiler Core #11"
