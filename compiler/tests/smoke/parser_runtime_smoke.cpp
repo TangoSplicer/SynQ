@@ -136,6 +136,54 @@ bool parser_rejects_malformed_qubit_operands() {
            require(spacing == nullptr, "parser rejects operands without commas");
 }
 
+bool parser_accepts_literal_angle_parameters() {
+    const std::string path = write_fixture(
+        "synq_parser_parameter_fixture.synq",
+        "quantum rx(pi/2) q[0];\n"
+        "quantum rz(-pi/4) q[3];\n"
+        "quantum p(0.125) q[2]\n");
+
+    Parser parser;
+    std::unique_ptr<ASTNode> root(parser.parseFile(path));
+    std::remove(path.c_str());
+    auto* program = dynamic_cast<ProgramNode*>(root.get());
+    if (!require(program != nullptr, "parser accepts literal-angle parameter fixture")) return false;
+
+    const std::vector<std::vector<std::string>> expected = {
+        {"rx(pi/2)", "q[0]"},
+        {"rz(-pi/4)", "q[3]"},
+        {"p(0.125)", "q[2]"},
+    };
+    if (!require(program->statements.size() == expected.size(), "parser retains parameterized instructions")) return false;
+    for (std::size_t index = 0; index < expected.size(); ++index) {
+        auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index]);
+        if (!require(instruction != nullptr && instruction->op == "quantum" && instruction->args == expected[index],
+                     "parser preserves parameterized quantum arguments")) return false;
+    }
+    return true;
+}
+
+bool parser_rejects_unsupported_parameter_forms() {
+    const std::string empty_path = write_fixture("synq_parser_empty_parameter_fixture.synq", "quantum rx() q[0]\n");
+    const std::string variable_path = write_fixture("synq_parser_variable_parameter_fixture.synq", "quantum rx(theta) q[0]\n");
+    const std::string missing_operand_path = write_fixture("synq_parser_missing_parameter_operand_fixture.synq", "quantum rx(pi/2)\n");
+    const std::string two_operand_path = write_fixture("synq_parser_two_parameter_operand_fixture.synq", "quantum rx(pi/2) q[0], q[1]\n");
+    Parser parser;
+    std::unique_ptr<ASTNode> empty(parser.parseFile(empty_path));
+    std::unique_ptr<ASTNode> variable(parser.parseFile(variable_path));
+    std::unique_ptr<ASTNode> missing_operand(parser.parseFile(missing_operand_path));
+    std::unique_ptr<ASTNode> two_operands(parser.parseFile(two_operand_path));
+    std::remove(empty_path.c_str());
+    std::remove(variable_path.c_str());
+    std::remove(missing_operand_path.c_str());
+    std::remove(two_operand_path.c_str());
+
+    return require(empty == nullptr, "parser rejects empty parameter list") &&
+           require(variable == nullptr, "parser rejects variable parameter expression") &&
+           require(missing_operand == nullptr, "parser rejects parameterized gate without operand") &&
+           require(two_operands == nullptr, "parser rejects parameterized gate with two operands");
+}
+
 bool runtime_executes_supported_and_fallback_paths() {
     synq::compiler::Program program{
         {
@@ -180,6 +228,8 @@ int main() {
     if (!parser_rejects_invalid_fixture()) return 1;
     if (!parser_accepts_explicit_qubit_operands()) return 1;
     if (!parser_rejects_malformed_qubit_operands()) return 1;
+    if (!parser_accepts_literal_angle_parameters()) return 1;
+    if (!parser_rejects_unsupported_parameter_forms()) return 1;
     if (!runtime_executes_supported_and_fallback_paths()) return 1;
 
     std::cout << "SynQ parser and runtime smoke test passed\n";

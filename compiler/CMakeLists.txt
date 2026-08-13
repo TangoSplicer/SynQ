@@ -74,6 +74,12 @@ if(BUILD_CORE_SMOKE_TESTS)
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
     )
     set_tests_properties(synq_openqasm3_reference_parse PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
+
+    add_test(
+        NAME synq_openqasm3_qiskit_import
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_qiskit_qasm3_import.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
+    )
+    set_tests_properties(synq_openqasm3_qiskit_import PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
 endif()
 
 # Global includes

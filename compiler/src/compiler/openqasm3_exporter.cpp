@@ -1,6 +1,7 @@
 #include "compiler/openqasm3_exporter.h"
 
 #include <algorithm>
+#include <cctype>
 #include <limits>
 #include <sstream>
 
@@ -38,6 +39,47 @@ void write_single_qubit_gate(std::ostringstream& body, const std::string& gate, 
     body << gate << " q[" << qubit << "];\n";
 }
 
+bool is_decimal_parameter(const std::string& value) {
+    std::size_t position = !value.empty() && value.front() == '-' ? 1 : 0;
+    if (position == value.size()) return false;
+    bool has_digit = false;
+    bool has_decimal_point = false;
+    for (; position < value.size(); ++position) {
+        const unsigned char character = static_cast<unsigned char>(value[position]);
+        if (std::isdigit(character) != 0) {
+            has_digit = true;
+        } else if (value[position] == '.' && !has_decimal_point) {
+            has_decimal_point = true;
+        } else {
+            return false;
+        }
+    }
+    return has_digit;
+}
+
+bool is_literal_angle_parameter(const std::string& value) {
+    if (value == "pi" || value == "-pi" || is_decimal_parameter(value)) return true;
+    const std::string prefix = value.rfind("-pi/", 0) == 0 ? "-pi/" : "pi/";
+    const std::string denominator = value.rfind(prefix, 0) == 0 ? value.substr(prefix.size()) : "";
+    return !denominator.empty() && denominator != "0" &&
+           std::all_of(denominator.begin(), denominator.end(), [](unsigned char character) {
+               return std::isdigit(character) != 0;
+           });
+}
+
+bool split_parameterized_kernel(const std::string& kernel, std::string& gate, std::string& parameter) {
+    const std::size_t open = kernel.find('(');
+    if (open == std::string::npos || kernel.back() != ')' || kernel.find('(', open + 1) != std::string::npos) return false;
+    gate = kernel.substr(0, open);
+    parameter = kernel.substr(open + 1, kernel.size() - open - 2);
+    return !gate.empty() && is_literal_angle_parameter(parameter);
+}
+
+void write_parameterized_single_qubit_gate(
+    std::ostringstream& body, const std::string& gate, const std::string& parameter, std::size_t qubit) {
+    body << gate << "(" << parameter << ") q[" << qubit << "];\n";
+}
+
 }  // namespace
 
 OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
@@ -67,7 +109,23 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
                            "OpenQASM 3 export requires explicit operands in the form `q[index]`");
             continue;
         }
-        if (kernel == "h" || kernel == "x" || kernel == "y" || kernel == "z") {
+        std::string parameterized_gate;
+        std::string parameter;
+        if (split_parameterized_kernel(kernel, parameterized_gate, parameter)) {
+            if (parameterized_gate != "rx" && parameterized_gate != "ry" &&
+                parameterized_gate != "rz" && parameterized_gate != "p") {
+                add_diagnostic(result, instruction->line,
+                               "unsupported parameterized gate `" + parameterized_gate + "` for the OpenQASM 3 recovery exporter");
+                continue;
+            }
+            if (operands.size() != 1) {
+                add_diagnostic(result, instruction->line,
+                               "parameterized gate `" + parameterized_gate + "` requires exactly one explicit qubit operand");
+                continue;
+            }
+            write_parameterized_single_qubit_gate(body, parameterized_gate, parameter, operands.front());
+            qubit_count = std::max(qubit_count, operands.front() + 1);
+        } else if (kernel == "h" || kernel == "x" || kernel == "y" || kernel == "z") {
             if (operands.size() > 1) {
                 add_diagnostic(result, instruction->line, "single-qubit kernel `" + kernel + "` accepts at most one operand");
                 continue;

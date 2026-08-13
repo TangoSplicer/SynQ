@@ -37,3 +37,8 @@
 - [x] Expand OpenQASM mappings one supported gate form at a time with exact-output fixtures.
 - [x] Add external OpenQASM parser validation without adding runtime or hardware claims.
 - [x] Run full checks, observe CI, document, and publish the expanded compatibility increment.
+- [x] Establish parameterized-gate grammar and independent downstream-parser baselines.
+- [x] Add bounded parameterized quantum syntax with parser fixtures.
+- [x] Export parameterized gate mappings with exact-output and rejection fixtures.
+- [x] Validate generated OpenQASM with a second independent downstream parser.
+- [ ] Run full checks, observe CI, document, and publish the parameterized compatibility increment.
