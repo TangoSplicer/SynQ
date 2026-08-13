@@ -1,7 +1,6 @@
 # SynQ Structured Diagnostics
 
-**Status:** Locally verified recovery-profile implementation boundary; remote CI
-evidence for this increment is pending publication.  
+**Status:** Remotely validated recovery-profile implementation boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -90,6 +89,9 @@ The compiler now contains the typed model; every initial code has a focused
 fixture; the legacy API behavior remains covered; and the C ABI exposes a
 formatted `SYNQ-P001` missing-file diagnostic. The full local validation run
 passes **8/8** compiler checks alongside the existing frontend and backend
-checks. The project status record retains the non-claims above; a remote
-compiler-core CI result is still required before this increment is described as
-remotely validated.
+checks. The same compiler profile passed in [Compiler Core #9][1] for commit
+`5be6747`. The project status record retains the non-claims above.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31719597241 "SynQ Compiler Core #9"

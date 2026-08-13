@@ -52,4 +52,4 @@
 - [x] Specify source spans, diagnostic codes, and compatibility boundaries for the recovery parser.
 - [x] Implement and test the selected structured-diagnostics and typed-AST capability.
 - [x] Re-run compiler, frontend, and backend checks; document only verified outcomes.
-- [ ] Publish the next language-core increment and observe its compiler-core CI result.
+- [x] Publish the next language-core increment and observe its compiler-core CI result.
