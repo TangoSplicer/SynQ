@@ -15,6 +15,7 @@ static int require(int condition, const char* message) {
 int main(void) {
     const char* path = "/tmp/synq_c_abi_smoke.synq";
     const char* semantic_path = "/tmp/synq_c_abi_semantic_smoke.synq";
+    const char* duplicate_path = "/tmp/synq_c_abi_duplicate_smoke.synq";
     FILE* source = fopen(path, "w");
     synq_program* program = NULL;
     char* diagnostic = NULL;
@@ -120,6 +121,29 @@ int main(void) {
     }
     synq_string_free(diagnostic);
     remove(semantic_path);
+
+    source = fopen(duplicate_path, "w");
+    if (!require(source != NULL, "consumer opens a duplicate-declaration source fixture")) return 1;
+    fputs("let theta = 0.5\n", source);
+    fputs("let theta = 1.0\n", source);
+    fclose(source);
+    program = NULL;
+    diagnostic = NULL;
+    status = synq_parse_file(duplicate_path, &program, &diagnostic);
+    if (!require(status == SYNQ_STATUS_PARSE_ERROR && program == NULL,
+                 "C consumer receives a parse error for a duplicate declaration")) {
+        synq_string_free(diagnostic);
+        remove(duplicate_path);
+        return 1;
+    }
+    if (!require(diagnostic != NULL && strstr(diagnostic, "SYNQ-S004") != NULL,
+                 "C consumer receives the duplicate-declaration semantic diagnostic code")) {
+        synq_string_free(diagnostic);
+        remove(duplicate_path);
+        return 1;
+    }
+    synq_string_free(diagnostic);
+    remove(duplicate_path);
 
     puts("SynQ C ABI smoke test passed");
     return 0;

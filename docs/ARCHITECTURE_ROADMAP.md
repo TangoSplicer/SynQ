@@ -84,14 +84,15 @@ flowchart TB
 
 The recovery parser is being expanded incrementally rather than by a rewrite.
 The first expansion now includes source spans, structured diagnostics with
-stable `SYNQ-P001` through `SYNQ-P007` parser/configuration codes, and bounded
-`SYNQ-S001` through `SYNQ-S003` typed known-gate shape errors. A diagnostic
+stable `SYNQ-P001` through `SYNQ-P007` parser/configuration codes, bounded
+`SYNQ-S001` through `SYNQ-S003` typed known-gate shape errors, and `SYNQ-S004`
+for duplicate top-level declarations. A diagnostic
 contains a machine-readable code, severity, source span, plain-language
 explanation, and a possible remediation. This is essential for a language
 designed to be approachable: an unfamiliar quantum constraint can identify the
-exact gate, operand, or feature gate that caused the rejection. Tokenisation,
-multi-error recovery, general semantic analysis, and type diagnostics remain
-planned work.
+exact gate, operand, feature gate, or duplicate binding that caused the
+rejection. Tokenisation, multi-error recovery, scoped name resolution, general
+semantic analysis, and type diagnostics remain planned work.
 
 | Planned type | Minimum fields | Why it is needed |
 | --- | --- | --- |

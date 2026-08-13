@@ -66,3 +66,6 @@
 - [x] Define backward-compatible source-span ownership and provenance rules for the typed recovery AST.
 - [x] Implement source spans on parsed typed AST nodes and add focused parser coverage.
 - [x] Re-run full checks, document verified provenance boundaries, and publish the source-span increment.
+- [x] Define bounded top-level declaration uniqueness and structured diagnostic behavior.
+- [x] Implement duplicate-declaration tracking in the parser and add focused diagnostics coverage.
+- [ ] Re-run full checks, document verified classical semantic boundaries, and publish the declaration-validation increment.

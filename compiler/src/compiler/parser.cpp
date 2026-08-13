@@ -24,6 +24,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <unordered_map>
 #include <utility>
 
 #include "gate_validation.h"
@@ -245,6 +246,7 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
 
     auto root = std::make_unique<ProgramNode>();
     synq::compiler::FeatureRegistry active_features = configured_features_;
+    std::unordered_map<std::string, synq::compiler::SourceSpan> declared_names;
     std::string raw_line;
     std::size_t line_number = 0;
     while (std::getline(infile, raw_line)) {
@@ -276,6 +278,13 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
             const std::string value = assignment == std::string::npos ? "" : trim(argument.substr(assignment + 1));
             if (!is_identifier(identifier) || value.empty()) {
                 return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
+            }
+            const auto inserted = declared_names.emplace(identifier, span);
+            if (!inserted.second) {
+                return fail_parse("SYNQ-S004", span,
+                                  "duplicate top-level declaration `" + identifier +
+                                      "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                  "rename the later binding or reuse the existing declaration according to future language semantics");
             }
             root->statements.push_back(new DeclarationNode(identifier, value, line_number,
                                                            classify_declaration_literal(value), span));
