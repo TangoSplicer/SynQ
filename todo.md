@@ -68,4 +68,4 @@
 - [x] Re-run full checks, document verified provenance boundaries, and publish the source-span increment.
 - [x] Define bounded top-level declaration uniqueness and structured diagnostic behavior.
 - [x] Implement duplicate-declaration tracking in the parser and add focused diagnostics coverage.
-- [ ] Re-run full checks, document verified classical semantic boundaries, and publish the declaration-validation increment.
+- [x] Re-run full checks, document verified classical semantic boundaries, and publish the declaration-validation increment.

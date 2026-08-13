@@ -1,7 +1,6 @@
 # SynQ Bounded Declaration Validation
 
-**Status:** Locally verified recovery-profile classical semantic boundary;
-remote CI evidence for this increment is pending publication.
+**Status:** Remotely validated recovery-profile classical semantic boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -55,5 +54,9 @@ statement span and a first-line reference; separate parse invocations remain
 independent; parser diagnostics and C ABI consumers cover the code; and
 compiler, frontend, backend, exporter, and external OpenQASM checks pass
 locally. Repository status calls this **bounded declaration validation**, not a
-symbol table or name-resolution system. Remote compiler-core evidence is
-required before the increment is described as remotely validated.
+symbol table or name-resolution system. The same compiler profile passed in
+[Compiler Core #14][1] for commit `fd5345c`.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31722554030 "SynQ Compiler Core #14"

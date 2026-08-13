@@ -79,9 +79,9 @@ ctest --test-dir /tmp/synq-c-abi --output-on-failure
 At review time, the expanded recovery profile reported **9/9 passing** tests,
 including `synq_c_abi_smoke`, the gate-validation and feature-gate smoke tests,
 the parser/exporter tests, and the two independent OpenQASM downstream
-validations. Remote CI evidence for the duplicate-declaration increment is
-pending publication. This local result does not freeze the ABI or test a
-distributed shared library.
+validations. The same profile then passed remotely in [Compiler Core #14][7]
+for commit `fd5345c`. This result does not freeze the ABI or test a distributed
+shared library.
 
 ## What this enables next—and what it does not
 
@@ -113,3 +113,4 @@ tests.
 [4]: https://clojure.org/reference/java_interop "Clojure Java Interop"
 [5]: https://github.com/TangoSplicer/SynQ/actions/runs/31718265429 "SynQ Compiler Core #8"
 [6]: https://github.com/TangoSplicer/SynQ/actions/runs/31721517239 "SynQ Compiler Core #12"
+[7]: https://github.com/TangoSplicer/SynQ/actions/runs/31722554030 "SynQ Compiler Core #14"
