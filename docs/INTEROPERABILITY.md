@@ -36,10 +36,15 @@ build-directory shared library; it is not a Common Lisp package or general
 binding. A separate test-only Clojure/JNA script loads the same build-directory
 shared library through JNA, invokes the opaque ABI, checks in-memory
 parse/export/error ownership, and passed remotely in [Compiler Core #19](https://github.com/TangoSplicer/SynQ/actions/runs/31726350746); it is not a Clojure/JVM
-library. Mercury remains unimplemented. The full C API is documented in [C ABI Foundation](./C_ABI.md);
+library. A test-only Mercury 22.01.8 C-backend consumer now passes locally by
+using `pragma foreign_proc("C", ...)` to invoke the same opaque ABI through
+the generated C program; its checksum-pinned toolchain bootstrap is configured
+for CI but has not yet run remotely. It is not a Mercury package, foreign type,
+or general backend-support claim. The full C API is documented in [C ABI Foundation](./C_ABI.md);
 the Rust proof and non-goals are documented in [Rust C-ABI Consumer Proof](./RUST_C_ABI.md),
 the Lisp proof is documented in [Common Lisp CFFI Consumer Proof](./COMMON_LISP_CFFI.md),
 and the Clojure local-proof boundary is documented in [Clojure JNA Consumer Proof](./CLOJURE_JNA.md).
+The Mercury local-proof boundary is documented in [Mercury C-Backend Consumer Proof](./MERCURY_C_ABI.md).
 
 ## Promotion Rule
 

@@ -84,3 +84,10 @@
 - [x] Confirm free Clojure/JNA toolchain availability and define a test-only JVM shared-library boundary.
 - [x] Implement and locally test a Clojure/JNA consumer of the opaque SynQ C ABI.
 - [x] Commit and publish the Clojure/JNA CI configuration, then record its remote compiler-core evidence.
+- [x] Confirm an available Mercury C-backend toolchain and define the smallest safe opaque-handle C-ABI consumer contract.
+- [x] Implement and locally test a Mercury `pragma foreign_proc` consumer of the opaque SynQ C ABI.
+- [ ] Integrate the Mercury consumer into compiler-core CI, document verified boundaries, and publish its remote evidence.
+- [ ] Specify and implement a minimal typed Hybrid IR that can represent the bounded parsed quantum and classical nodes without execution semantics.
+- [ ] Add scoped name resolution with focused diagnostics and parser-to-IR provenance coverage.
+- [ ] Add bounded typed classical control flow with focused parser, semantic, and non-execution tests.
+- [ ] Re-run the complete validation suite, document every verified boundary, and publish the language-core increments.

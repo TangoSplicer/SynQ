@@ -105,6 +105,28 @@ if(BUILD_CORE_SMOKE_TESTS)
                 $<TARGET_FILE:synq_ffi_shared>
     )
 
+    find_program(SYNQ_MMC_EXECUTABLE mmc REQUIRED)
+    get_filename_component(SYNQ_MMC_DIRECTORY ${SYNQ_MMC_EXECUTABLE} DIRECTORY)
+    set(SYNQ_MERCURY_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/mercury_abi_smoke)
+    set(SYNQ_MERCURY_ABI_SMOKE_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/mercury_abi_smoke.m)
+    add_custom_command(
+        OUTPUT ${SYNQ_MERCURY_ABI_SMOKE}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/mercury_abi_smoke.m
+                ${SYNQ_MERCURY_ABI_SMOKE_SOURCE}
+        COMMAND ${CMAKE_COMMAND} -E env "PATH=${SYNQ_MMC_DIRECTORY}:$ENV{PATH}"
+                ${SYNQ_MMC_EXECUTABLE} --make --grade asm_fast.gc
+                --c-include-directory ${CMAKE_CURRENT_SOURCE_DIR}/include
+                --link-object $<TARGET_FILE:synq_ffi_shared>
+                --ld-flag=-Wl,-rpath,$<TARGET_FILE_DIR:synq_ffi_shared>
+                mercury_abi_smoke
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        DEPENDS synq_ffi_shared ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/mercury_abi_smoke.m
+        VERBATIM
+    )
+    add_custom_target(synq_mercury_abi_smoke_target ALL DEPENDS ${SYNQ_MERCURY_ABI_SMOKE})
+    add_test(NAME synq_mercury_abi_smoke COMMAND ${SYNQ_MERCURY_ABI_SMOKE})
+
     find_program(SYNQ_RUSTC_EXECUTABLE rustc REQUIRED)
     set(SYNQ_RUST_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_abi_smoke)
     add_custom_command(
