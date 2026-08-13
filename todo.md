@@ -56,4 +56,4 @@
 - [x] Define the smallest typed quantum AST vocabulary and parser compatibility boundary.
 - [x] Implement typed quantum AST nodes and construction from the recovery parser.
 - [x] Adapt the bounded OpenQASM exporter and fixtures to consume the typed quantum nodes.
-- [ ] Run full checks, record factual evidence, and publish the typed-AST increment.
+- [x] Run full checks, record factual evidence, and publish the typed-AST increment.

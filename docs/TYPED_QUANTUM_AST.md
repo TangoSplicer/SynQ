@@ -1,7 +1,6 @@
 # SynQ Typed Quantum AST Boundary
 
-**Status:** Locally verified recovery-profile implementation boundary; remote CI
-evidence for this increment is pending publication.  
+**Status:** Remotely validated recovery-profile implementation boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -69,6 +68,9 @@ The parser now constructs typed nodes; parser fixtures assert their fields and
 exact output; unsupported typed nodes remain diagnosable; legacy direct
 instruction fixtures continue to behave as documented; and compiler, frontend,
 and backend validation pass locally. The status record identifies this as a
-typed quantum **AST boundary**, not a complete type system or Hybrid IR. Remote
-compiler-core evidence is required before the implementation is described as
-remotely validated.
+typed quantum **AST boundary**, not a complete type system or Hybrid IR. The
+same compiler profile passed in [Compiler Core #10][1] for commit `5f626d1`.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31720290203 "SynQ Compiler Core #10"
