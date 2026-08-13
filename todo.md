@@ -65,4 +65,4 @@
 - [x] Re-run full checks, record verified semantic boundaries, and publish the gate-validation increment.
 - [x] Define backward-compatible source-span ownership and provenance rules for the typed recovery AST.
 - [x] Implement source spans on parsed typed AST nodes and add focused parser coverage.
-- [ ] Re-run full checks, document verified provenance boundaries, and publish the source-span increment.
+- [x] Re-run full checks, document verified provenance boundaries, and publish the source-span increment.

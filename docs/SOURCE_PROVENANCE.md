@@ -1,7 +1,6 @@
 # SynQ AST Source Provenance
 
-**Status:** Locally verified recovery-profile language-core boundary; remote CI
-evidence for this increment is pending publication.
+**Status:** Remotely validated recovery-profile language-core boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -53,5 +52,9 @@ documented span; legacy constructors retain their previous call shape and
 receive an unknown-column span; parser fixtures assert line/column invariants;
 and compiler, frontend, backend, exporter, and C ABI checks pass locally.
 Repository material describes this as **AST source provenance**, not an IDE,
-source-map, or Hybrid IR feature. Remote compiler-core evidence is required
-before the increment is described as remotely validated.
+source-map, or Hybrid IR feature. The same compiler profile passed in
+[Compiler Core #13][1] for commit `952495a`.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31722040872 "SynQ Compiler Core #13"
