@@ -1,7 +1,6 @@
 # SynQ In-Memory Source Parsing Contract
 
-**Status:** Locally verified native interoperability increment; remote CI
-evidence for `synq_parse_source` is pending publication.
+**Status:** Remotely validated native interoperability increment.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -61,7 +60,11 @@ submission path.
 
 File and memory parsing now share the documented grammar path; C and Rust
 consumers compile and execute the memory parse/export and diagnostic flows; and
-all existing compiler/frontend/backend/external OpenQASM checks pass locally.
-Compiler-core CI must validate the expanded profile before this increment is
-described as remotely verified. Documentation calls this **bounded in-memory
-C-ABI parsing**, not a full language embedding interface.
+all existing compiler/frontend/backend/external OpenQASM checks pass. The same
+compiler profile passed in [Compiler Core #17][1] for commit `65906d0`.
+Documentation calls this **bounded in-memory C-ABI parsing**, not a full
+language embedding interface.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31724839027 "SynQ Compiler Core #17"

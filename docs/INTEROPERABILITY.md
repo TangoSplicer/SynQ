@@ -29,7 +29,8 @@ The initial native interoperability seam is a C header with opaque program
 handles and explicit ownership functions. Its compiled C consumer verifies
 version identification, feature-gated file and in-memory parsing, typed
 measurement export, diagnostic ownership, and cleanup. A dependency-free Rust C ABI consumer now
-compiles and runs remotely against that same contract; it is a proof of call and
+compiles and runs remotely against that same contract, including in-memory text
+parsing; it is a proof of call and
 ownership flow, not a Rust binding. Mercury, Common Lisp, and JVM-facing work
 remain unimplemented. The full C API is documented in [C ABI Foundation](./C_ABI.md);
 the Rust proof and non-goals are documented in [Rust C-ABI Consumer Proof](./RUST_C_ABI.md).

@@ -1,8 +1,8 @@
 # SynQ C ABI Foundation
 
-**Status:** Locally verified experimental foundation. The C header and compiled
-C consumer smoke test are present in the working-tree language-foundation
-increment. This is **not** a declaration of a frozen production ABI, a shared
+**Status:** Remotely validated experimental foundation. The C header and its
+compiled C/Rust consumers are covered by the recovery-profile compiler-core
+workflow. This is **not** a declaration of a frozen production ABI, a shared
 library distribution, or a language-specific SDK.  
 **Last reviewed:** 13 August 2026
 
@@ -81,9 +81,9 @@ ctest --test-dir /tmp/synq-c-abi --output-on-failure
 At review time, the expanded recovery profile reported **10/10 passing** tests,
 including `synq_c_abi_smoke`, the gate-validation and feature-gate smoke tests,
 the parser/exporter tests, and the two independent OpenQASM downstream
-validations. The in-memory parsing increment has local evidence and awaits a
-remote compiler-core run. This result does not freeze the ABI or test a
-distributed shared library.
+validations. The same profile then passed remotely in [Compiler Core #17][10]
+for commit `65906d0`. This result does not freeze the ABI or test a distributed
+shared library.
 
 ## What this enables next—and what it does not
 
@@ -119,3 +119,4 @@ tests.
 [7]: https://github.com/TangoSplicer/SynQ/actions/runs/31722554030 "SynQ Compiler Core #14"
 [8]: https://github.com/TangoSplicer/SynQ/actions/runs/31723306294 "SynQ Compiler Core #15"
 [9]: https://github.com/TangoSplicer/SynQ/actions/runs/31724123316 "SynQ Compiler Core #16"
+[10]: https://github.com/TangoSplicer/SynQ/actions/runs/31724839027 "SynQ Compiler Core #17"
