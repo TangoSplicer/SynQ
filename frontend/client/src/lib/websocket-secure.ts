@@ -206,6 +206,7 @@ export class SecureWebSocketClient {
       if (message.type === 'authenticated') {
         this.isAuthenticated = true;
         this.userId = message.userId;
+        this.processMessageQueue();
         console.log('WebSocket authenticated');
         return;
       }

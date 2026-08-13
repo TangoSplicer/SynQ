@@ -22,8 +22,10 @@
 #ifndef SYNQ_COMPILER_AST_H
 #define SYNQ_COMPILER_AST_H
 
-#include <vector>
+#include <cstddef>
 #include <string>
+#include <utility>
+#include <vector>
 
 class ASTNode {
 public:
@@ -48,6 +50,23 @@ public:
     ~ProgramNode();
 };
 
-// (Additional AST node classes like FunctionNode, ClassNode, etc. would be defined here.)
+// A deliberately small instruction node used by the recovery parser profile.
+// It represents only the line-oriented instruction grammar documented in parser.cpp;
+// it is not a complete SynQ language AST.
+class InstructionNode : public ASTNode {
+public:
+    std::string op;
+    std::vector<std::string> args;
+    std::size_t line = 0;
+
+    InstructionNode(std::string operation, std::vector<std::string> arguments, std::size_t line_number)
+        : op(std::move(operation)), args(std::move(arguments)), line(line_number) {}
+
+    std::string toString() override {
+        return op + (args.empty() ? "" : " " + args.front());
+    }
+};
+
+// (Additional AST node classes like FunctionNode and ClassNode remain future work.)
 
 #endif

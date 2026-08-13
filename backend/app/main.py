@@ -1,107 +1,65 @@
-"""FastAPI application entry point."""
+"""Minimal FastAPI recovery surface for the SynQ backend prototype.
 
-from contextlib import asynccontextmanager
+Only the root and health endpoints are implemented here. Historical router
+modules, database wiring, GraphQL, WebSocket, ML, and collaboration features
+remain unavailable until they are separately restored and tested.
+"""
+
+from os import getenv
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-
-from app.config import get_settings
-from app.database import close_db, init_db
-from app.routers import auth, qml, synthesis, plugins, collaboration, ml_prediction, api_gateway, websocket_router, ml_training_router, graphql_router, lsp_router, debugger_router
-
-settings = get_settings()
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    \"\"\"Application lifespan context manager.\"\"\"
-    # Startup
-    print(\"Starting SynQ Backend...\")
-    await init_db()
-    print(\"Database initialized\")
-    yield
-    # Shutdown
-    print(\"Shutting down SynQ Backend...\")
-    await close_db()
-    print(\"Database connection closed\")
+APP_NAME = "SynQ Backend Recovery"
+APP_VERSION = "0.1.0-recovery"
+API_PREFIX = "/api/v1"
 
-
-# Create FastAPI app
 app = FastAPI(
-    title=settings.app_name,
-    version=settings.app_version,
-    description=\"Unified platform for hybrid quantum-classical-AI computing\",
-    lifespan=lifespan,
+    title=APP_NAME,
+    version=APP_VERSION,
+    description="Minimal health surface for the experimental SynQ backend recovery.",
 )
 
-# Add CORS middleware
+allowed_origins = [origin.strip() for origin in getenv("CORS_ORIGINS", "*").split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=settings.cors_allow_credentials,
-    allow_methods=settings.cors_allow_methods,
-    allow_headers=settings.cors_allow_headers,
+    allow_origins=allowed_origins,
+    allow_credentials=allowed_origins != ["*"],
+    allow_methods=["GET"],
+    allow_headers=["Content-Type"],
 )
 
 
-# Health check endpoint
-@app.get(\"/health\", status_code=status.HTTP_200_OK)
-async def health_check():
-    \"\"\"Health check endpoint.\"\"\"
+@app.get("/health", status_code=status.HTTP_200_OK)
+async def health_check() -> dict[str, str]:
+    """Return the bounded recovery-service health state."""
     return {
-        \"status\": \"healthy\",
-        \"service\": settings.app_name,
-        \"version\": settings.app_version,
+        "status": "ok",
+        "service": APP_NAME,
+        "version": APP_VERSION,
+        "scope": "health-only recovery surface",
     }
 
 
-# Root endpoint
-@app.get(\"/\", status_code=status.HTTP_200_OK)
-async def root():
-    \"\"\"Root endpoint.\"\"\"
+@app.get("/", status_code=status.HTTP_200_OK)
+async def root() -> dict[str, str]:
+    """Describe the currently implemented backend boundary."""
     return {
-        \"message\": f\"Welcome to {settings.app_name}\",
-        \"version\": settings.app_version,
-        \"docs\": \"/docs\",
-        \"redoc\": \"/redoc\",
+        "message": "SynQ backend recovery service",
+        "version": APP_VERSION,
+        "health": "/health",
+        "docs": "/docs",
+        "scope": "Only root and health endpoints are currently implemented.",
     }
 
 
-# Include routers
-app.include_router(auth.router, prefix=settings.api_prefix)
-app.include_router(qml.router, prefix=settings.api_prefix)
-app.include_router(synthesis.router, prefix=settings.api_prefix)
-app.include_router(plugins.router, prefix=settings.api_prefix)
-app.include_router(collaboration.router, prefix=settings.api_prefix)
-app.include_router(ml_prediction.router, prefix=settings.api_prefix)
-app.include_router(api_gateway.router, prefix=settings.api_prefix)
-app.include_router(websocket_router.router)  # WebSocket router without prefix
-app.include_router(ml_training_router.router, prefix=settings.api_prefix)
-app.include_router(graphql_router.router)  # GraphQL router without prefix
-app.include_router(lsp_router.router, prefix=settings.api_prefix)
-app.include_router(debugger_router.router, prefix=settings.api_prefix)
-
-
-# Exception handlers
-@app.exception_handler(Exception)
-async def general_exception_handler(request, exc):
-    \"\"\"Handle general exceptions.\"\"\"
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            \"detail\": \"Internal server error\",
-            \"error\": str(exc) if settings.debug else None,
-        },
-    )
-
-
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
-        app,
-        host=settings.api_host,
-        port=settings.api_port,
-        reload=settings.debug,
+        "app.main:app",
+        host=getenv("API_HOST", "0.0.0.0"),
+        port=int(getenv("API_PORT", "8000")),
+        reload=getenv("APP_RELOAD", "false").lower() == "true",
     )

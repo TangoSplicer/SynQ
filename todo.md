@@ -12,3 +12,8 @@
 - [x] Align the public showcase with the verified repository recovery status.
 - [x] Re-run relevant checks and record evidence in a factual review report.
 - [x] Commit, push, and tag reviewed changes if all required checks permit it.
+- [x] Establish baseline outcomes for parser/runtime fixtures and all frontend tests.
+- [x] Add focused parser and runtime smoke fixtures to the compiler recovery profile.
+- [x] Repair, configure, and run the entire frontend test suite locally.
+- [x] Perform a new cross-component review, repair verified defects, and record evidence.
+- [x] Commit, push, and tag the expanded validation work when all required checks permit it.

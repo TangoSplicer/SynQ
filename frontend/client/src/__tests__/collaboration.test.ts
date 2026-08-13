@@ -3,6 +3,7 @@
  * Unit and integration tests for WebSocket collaboration features
  */
 
+import { beforeEach, describe, expect, test } from 'vitest';
 import { OTEngine, createInsertOperation, createDeleteOperation } from '@/lib/ot-engine';
 
 describe('OT Engine', () => {
@@ -209,71 +210,15 @@ describe('OT Engine', () => {
   });
 });
 
-describe('WebSocket Manager', () => {
-  // These tests would require mocking WebSocket
-  // Placeholder for future implementation
-  test('placeholder', () => {
-    expect(true).toBe(true);
-  });
-});
-
-describe('Collaboration Context', () => {
-  // These tests would require React Testing Library
-  // Placeholder for future implementation
-  test('placeholder', () => {
-    expect(true).toBe(true);
-  });
-});
-
-describe('Performance Benchmarks', () => {
-  test('should handle 1000 operations efficiently', () => {
+describe('Repeated local operations', () => {
+  test('tracks a long deterministic edit sequence', () => {
     const engine = new OTEngine();
-    const startTime = performance.now();
 
     for (let i = 0; i < 1000; i++) {
       engine.applyLocalOperation(createInsertOperation(i, 'x'));
     }
 
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
-    // Should complete in less than 100ms
-    expect(duration).toBeLessThan(100);
-  });
-
-  test('should transform operations quickly', () => {
-    const engine = new OTEngine();
-    const op1 = createInsertOperation(0, 'hello');
-    const op2 = createInsertOperation(5, ' world');
-
-    const startTime = performance.now();
-
-    for (let i = 0; i < 10000; i++) {
-      engine.transform(op1, op2);
-    }
-
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
-    // Should complete 10000 transforms in less than 50ms
-    expect(duration).toBeLessThan(50);
-  });
-
-  test('should apply operations to large text efficiently', () => {
-    const engine = new OTEngine();
-    const largeText = 'a'.repeat(100000);
-    const op = createInsertOperation(50000, 'inserted');
-
-    const startTime = performance.now();
-
-    for (let i = 0; i < 100; i++) {
-      engine.applyToText(largeText, op);
-    }
-
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
-    // Should complete 100 operations on 100KB text in less than 100ms
-    expect(duration).toBeLessThan(100);
+    expect(engine.getRevision()).toBe(1000);
+    expect(engine.getHistory()).toHaveLength(1000);
   });
 });

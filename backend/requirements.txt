@@ -1,4 +1,5 @@
 # Minimal dependencies required by the checked-in FastAPI application source.
 fastapi>=0.115,<1.0
+httpx>=0.27,<1.0
 uvicorn[standard]>=0.30,<1.0
 pydantic>=2.0,<3.0

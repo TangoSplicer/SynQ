@@ -238,7 +238,7 @@ export class OTEngine {
     }
 
     const undoOp = this.undoStack.pop()!;
-    this.redoStack.push(undoOp);
+    this.redoStack.push(this.invertOperation(undoOp));
     return undoOp;
   }
 
@@ -251,7 +251,7 @@ export class OTEngine {
     }
 
     const redoOp = this.redoStack.pop()!;
-    this.undoStack.push(redoOp);
+    this.undoStack.push(this.invertOperation(redoOp));
     return redoOp;
   }
 

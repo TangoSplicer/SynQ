@@ -56,6 +56,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_include_directories(synq_core_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_core_smoke PRIVATE synq_lib)
     add_test(NAME synq_core_smoke COMMAND synq_core_smoke)
+
+    add_executable(synq_parser_runtime_smoke tests/smoke/parser_runtime_smoke.cpp)
+    target_include_directories(synq_parser_runtime_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_parser_runtime_smoke PRIVATE synq_lib)
+    add_test(NAME synq_parser_runtime_smoke COMMAND synq_parser_runtime_smoke)
 endif()
 
 # Global includes

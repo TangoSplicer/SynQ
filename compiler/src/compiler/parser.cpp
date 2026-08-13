@@ -19,9 +19,32 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "parser.h"
+
+namespace {
+
+std::string trim(const std::string& value) {
+    const auto first = std::find_if_not(value.begin(), value.end(), [](unsigned char ch) {
+        return std::isspace(ch) != 0;
+    });
+    const auto last = std::find_if_not(value.rbegin(), value.rend(), [](unsigned char ch) {
+        return std::isspace(ch) != 0;
+    }).base();
+    return first >= last ? "" : std::string(first, last);
+}
+
+bool is_non_negative_integer(const std::string& value) {
+    return !value.empty() && std::all_of(value.begin(), value.end(), [](unsigned char ch) {
+        return std::isdigit(ch) != 0;
+    });
+}
+
+}  // namespace
 
 ASTNode* Parser::parseFile(const std::string& filename) {
     std::ifstream infile(filename);
@@ -29,9 +52,45 @@ ASTNode* Parser::parseFile(const std::string& filename) {
         std::cerr << "Error: could not open file " << filename << std::endl;
         return nullptr;
     }
+
     std::cout << "Parsing " << filename << "..." << std::endl;
-    // Actual parsing logic would go here.
-    // For now, return a dummy AST (an empty ProgramNode).
     ProgramNode* root = new ProgramNode();
+
+    // Recovery-profile grammar: one instruction per line, with an optional
+    // trailing semicolon. Supported instructions are `print <text>`,
+    // `delay <non-negative milliseconds>`, `quantum <kernel>`, and
+    // `ai <prompt>`. Blank lines and full-line `//` comments are ignored.
+    std::string raw_line;
+    std::size_t line_number = 0;
+    while (std::getline(infile, raw_line)) {
+        ++line_number;
+        std::string line = trim(raw_line);
+        if (line.empty() || line.rfind("//", 0) == 0) {
+            continue;
+        }
+        if (line.back() == ';') {
+            line = trim(line.substr(0, line.size() - 1));
+        }
+
+        std::istringstream tokens(line);
+        std::string operation;
+        tokens >> operation;
+        std::string argument;
+        std::getline(tokens, argument);
+        argument = trim(argument);
+
+        const bool known_instruction = operation == "print" || operation == "delay" ||
+                                       operation == "quantum" || operation == "ai";
+        if (!known_instruction || argument.empty() ||
+            (operation == "delay" && !is_non_negative_integer(argument))) {
+            std::cerr << "Error: unsupported or malformed instruction at " << filename
+                      << ":" << line_number << std::endl;
+            delete root;
+            return nullptr;
+        }
+
+        root->statements.push_back(new InstructionNode(operation, {argument}, line_number));
+    }
+
     return root;
 }
