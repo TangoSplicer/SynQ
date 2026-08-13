@@ -22,9 +22,35 @@
 #ifndef SYNQ_COMPILER_PARSER_H
 #define SYNQ_COMPILER_PARSER_H
 
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
+
 #include "ast.h"
+#include "diagnostic.h"
 #include "feature_gate.h"
+
+namespace synq::compiler {
+
+struct ParseResult {
+    std::unique_ptr<ProgramNode> program;
+    std::vector<Diagnostic> diagnostics;
+
+    bool ok() const {
+        if (program == nullptr) return false;
+        for (const Diagnostic& diagnostic : diagnostics) {
+            if (diagnostic.severity == DiagnosticSeverity::Error) return false;
+        }
+        return true;
+    }
+
+    std::unique_ptr<ProgramNode> take_program() {
+        return std::move(program);
+    }
+};
+
+}  // namespace synq::compiler
 
 class Parser {
 public:
@@ -34,7 +60,12 @@ public:
     // instance. Source annotations can opt in for a single parsed file too.
     bool enableExperimentalFeature(const std::string& feature_name);
 
+    // Parses a source file and retains structured errors for C ABI and future
+    // editor/binding callers. The program is present only when `ok()` is true.
+    synq::compiler::ParseResult parseFileWithDiagnostics(const std::string& filename);
+
     // Parse a source file and return the AST root node (or nullptr on error).
+    // This compatibility wrapper renders structured diagnostics to stderr.
     ASTNode* parseFile(const std::string& filename);
 
 private:

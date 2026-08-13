@@ -1,17 +1,16 @@
-// MIT License
-// 
+//
 // Copyright (c) 2025 SynQ Contributors
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,9 +20,12 @@
 // SOFTWARE.
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <sstream>
+#include <utility>
+
 #include "parser.h"
 
 namespace {
@@ -116,7 +118,6 @@ bool parse_quantum_arguments(const std::string& source, std::vector<std::string>
     arguments = {kernel};
 
     const bool has_parameter = kernel.find('(') != std::string::npos;
-
     std::string operands = trim(source.substr(kernel.size()));
     if (operands.empty()) return !has_parameter;  // Preserve only the documented legacy kernel form.
 
@@ -133,9 +134,9 @@ bool parse_quantum_arguments(const std::string& source, std::vector<std::string>
 }
 
 std::string strip_comment(const std::string& value) {
-    // Recovery-profile comment rule: `//` begins a comment only at the start
-    // of a trimmed line or when preceded by whitespace. This preserves values
-    // such as `https://example.invalid` while accepting ordinary inline notes.
+    // Recovery-profile rule: `//` begins a comment only at the start of a
+    // trimmed line or when preceded by whitespace. This preserves source text
+    // such as `https://example.invalid`.
     std::size_t marker = value.find("//");
     while (marker != std::string::npos) {
         if (marker == 0 || std::isspace(static_cast<unsigned char>(value[marker - 1])) != 0) {
@@ -144,6 +145,23 @@ std::string strip_comment(const std::string& value) {
         marker = value.find("//", marker + 2);
     }
     return trim(value);
+}
+
+synq::compiler::SourceSpan span_for_line(const std::string& raw_line,
+                                         const std::string& trimmed_line,
+                                         std::size_t line_number) {
+    const std::size_t first = raw_line.find_first_not_of(" \t\r\n");
+    const std::size_t column_start = first == std::string::npos ? 1 : first + 1;
+    return {line_number, column_start, column_start + trimmed_line.size()};
+}
+
+synq::compiler::ParseResult fail_parse(const std::string& code,
+                                       const synq::compiler::SourceSpan& span,
+                                       const std::string& message,
+                                       const std::string& help) {
+    synq::compiler::ParseResult result;
+    result.diagnostics.push_back({code, synq::compiler::DiagnosticSeverity::Error, span, message, help});
+    return result;
 }
 
 }  // namespace
@@ -155,44 +173,28 @@ bool Parser::enableExperimentalFeature(const std::string& feature_name) {
     return configured_features_.enable(feature_name);
 }
 
-ASTNode* Parser::parseFile(const std::string& filename) {
+synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& filename) {
     std::ifstream infile(filename);
     if (!infile) {
-        std::cerr << "Error: could not open file " << filename << std::endl;
-        return nullptr;
+        return fail_parse("SYNQ-P001", {}, "could not open source file", "verify the file path and read permission");
     }
 
-    std::cout << "Parsing " << filename << "..." << std::endl;
-    ProgramNode* root = new ProgramNode();
+    auto root = std::make_unique<ProgramNode>();
     synq::compiler::FeatureRegistry active_features = configured_features_;
-
-    // Recovery-profile grammar: one statement per line, with an optional
-    // trailing semicolon. Supported statements are `let <identifier> = <value>`
-    // plus the instructions `print <text>`, `delay <non-negative milliseconds>`,
-    // `quantum <kernel> [q[index](, q[index])*]`, including a strict literal-angle
-    // parameter form such as `rx(pi/2) q[0]`, and `ai <prompt>`. Declaration values are preserved as
-    // source text; expression parsing is intentionally out of scope. Blank lines
-    // and `//` comments at line start or after whitespace are ignored. The latter
-    // rule deliberately preserves `//` in unquoted source text such as URLs.
     std::string raw_line;
     std::size_t line_number = 0;
     while (std::getline(infile, raw_line)) {
         ++line_number;
         std::string line = strip_comment(trim(raw_line));
-        if (line.empty()) {
-            continue;
-        }
-        if (line.back() == ';') {
-            line = trim(line.substr(0, line.size() - 1));
-        }
+        if (line.empty()) continue;
+        if (line.back() == ';') line = trim(line.substr(0, line.size() - 1));
+        const synq::compiler::SourceSpan span = span_for_line(raw_line, line, line_number);
 
         if (line.rfind("#[", 0) == 0) {
             std::string feature_name;
             if (!parse_experimental_feature_annotation(line, feature_name) || !active_features.enable(feature_name)) {
-                std::cerr << "Error: unknown or malformed experimental feature annotation at " << filename
-                          << ":" << line_number << std::endl;
-                delete root;
-                return nullptr;
+                return fail_parse("SYNQ-P006", span, "unknown or malformed experimental feature annotation",
+                                  "use a registered annotation such as #[experimental(feature = \"parameterized-quantum-gates\")]" );
             }
             continue;
         }
@@ -209,10 +211,7 @@ ASTNode* Parser::parseFile(const std::string& filename) {
             const std::string identifier = assignment == std::string::npos ? "" : trim(argument.substr(0, assignment));
             const std::string value = assignment == std::string::npos ? "" : trim(argument.substr(assignment + 1));
             if (!is_identifier(identifier) || value.empty()) {
-                std::cerr << "Error: malformed declaration at " << filename
-                          << ":" << line_number << std::endl;
-                delete root;
-                return nullptr;
+                return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
             }
             root->statements.push_back(new DeclarationNode(identifier, value, line_number));
             continue;
@@ -220,28 +219,25 @@ ASTNode* Parser::parseFile(const std::string& filename) {
 
         const bool known_instruction = operation == "print" || operation == "delay" ||
                                        operation == "quantum" || operation == "ai";
-        if (!known_instruction || argument.empty() ||
-            (operation == "delay" && !is_non_negative_integer(argument))) {
-            std::cerr << "Error: unsupported or malformed instruction at " << filename
-                      << ":" << line_number << std::endl;
-            delete root;
-            return nullptr;
+        if (!known_instruction || argument.empty()) {
+            return fail_parse("SYNQ-P003", span, "unsupported or incomplete recovery-profile instruction",
+                              "use let, print, delay, quantum, or ai with the documented argument form");
+        }
+        if (operation == "delay" && !is_non_negative_integer(argument)) {
+            return fail_parse("SYNQ-P004", span, "delay requires a non-negative integer number of milliseconds",
+                              "use a non-negative whole number, such as delay 0");
         }
 
         if (operation == "quantum") {
             std::vector<std::string> quantum_arguments;
             if (!parse_quantum_arguments(argument, quantum_arguments)) {
-                std::cerr << "Error: malformed quantum operands at " << filename
-                          << ":" << line_number << std::endl;
-                delete root;
-                return nullptr;
+                return fail_parse("SYNQ-P005", span, "malformed quantum kernel, operands, or literal-angle parameter",
+                                  "use explicit operands such as q[0] or q[0], q[1]");
             }
             if (quantum_arguments.front().find('(') != std::string::npos &&
                 !active_features.is_enabled("parameterized-quantum-gates")) {
-                std::cerr << "Error: parameterized quantum gates require #[experimental(feature = \"parameterized-quantum-gates\")] at "
-                          << filename << ":" << line_number << std::endl;
-                delete root;
-                return nullptr;
+                return fail_parse("SYNQ-P007", span, "parameterized quantum gates require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct");
             }
             root->statements.push_back(new InstructionNode(operation, std::move(quantum_arguments), line_number));
         } else {
@@ -249,5 +245,18 @@ ASTNode* Parser::parseFile(const std::string& filename) {
         }
     }
 
-    return root;
+    synq::compiler::ParseResult result;
+    result.program = std::move(root);
+    return result;
+}
+
+ASTNode* Parser::parseFile(const std::string& filename) {
+    synq::compiler::ParseResult result = parseFileWithDiagnostics(filename);
+    if (!result.ok()) {
+        for (const synq::compiler::Diagnostic& diagnostic : result.diagnostics) {
+            std::cerr << synq::compiler::format_diagnostic(filename, diagnostic) << std::endl;
+        }
+        return nullptr;
+    }
+    return result.take_program().release();
 }

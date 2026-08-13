@@ -80,20 +80,21 @@ flowchart TB
     JVM --> CLOJURE[Clojure binding - planned]
 ```
 
-### Planned frontend and diagnostics
+### Frontend and diagnostics
 
-The recovery parser will be replaced incrementally rather than by a rewrite.
-The first expansion is a token and source-span layer, followed by structured
-diagnostics. A diagnostic must contain a stable machine-readable code, severity,
-source span, plain-language explanation, and a possible remediation. This is
-essential for a language designed to be approachable: an unfamiliar quantum
-constraint should explain the exact gate, operand, or feature gate that caused
-the rejection.
+The recovery parser is being expanded incrementally rather than by a rewrite.
+The first expansion is now implemented: source spans and structured parser
+diagnostics with stable `SYNQ-P001` through `SYNQ-P007` codes. A diagnostic
+contains a machine-readable code, severity, source span, plain-language
+explanation, and a possible remediation. This is essential for a language
+designed to be approachable: an unfamiliar quantum constraint can identify the
+exact gate, operand, or feature gate that caused the rejection. Tokenisation,
+multi-error recovery, and semantic/type diagnostics remain planned work.
 
 | Planned type | Minimum fields | Why it is needed |
 | --- | --- | --- |
-| `SourceSpan` | file identifier, start/end byte positions, start/end line and column | Allows precise errors, editor integration, and backend rejection attribution. |
-| `Diagnostic` | code, severity, span, message, note, help | Separates user-facing compiler output from ad hoc `stderr` messages. |
+| `SourceSpan` | current: line and one-based half-open columns; future: file identifier and byte positions | Allows precise errors, editor integration, and backend rejection attribution. |
+| `Diagnostic` | current: code, severity, span, message, help; future: structured note collection | Separates user-facing compiler output from ad hoc `stderr` messages. |
 | `Module` | declarations, imports, feature opt-ins, top-level items | Gives a home for edition, gate, and module semantics. |
 | `Type` | scalar, boolean, integer, float, angle, bit, qubit, result, function, aggregate variants | Makes the classical–quantum boundary explicit instead of encoding it in strings. |
 

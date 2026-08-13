@@ -90,6 +90,11 @@ int main(void) {
         remove(path);
         return 1;
     }
+    if (!require(strstr(diagnostic, "SYNQ-P001") != NULL, "C consumer receives the structured parser diagnostic code")) {
+        synq_string_free(diagnostic);
+        remove(path);
+        return 1;
+    }
     synq_string_free(diagnostic);
     remove(path);
 

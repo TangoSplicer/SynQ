@@ -68,17 +68,16 @@ extern "C" synq_status synq_parse_file(const char* utf8_path,
 
     try {
         Parser parser;
-        std::unique_ptr<ASTNode> root(parser.parseFile(utf8_path));
-        if (root == nullptr) {
-            return return_error(SYNQ_STATUS_PARSE_ERROR, "SynQ parser rejected the source file", out_diagnostic);
-        }
-        auto* parsed_program = dynamic_cast<ProgramNode*>(root.get());
-        if (parsed_program == nullptr) {
-            return return_error(SYNQ_STATUS_INTERNAL_ERROR, "SynQ parser did not produce a program node", out_diagnostic);
+        synq::compiler::ParseResult result = parser.parseFileWithDiagnostics(utf8_path);
+        if (!result.ok()) {
+            const std::string diagnostic = result.diagnostics.empty()
+                ? "SynQ parser rejected the source file without a diagnostic"
+                : synq::compiler::format_diagnostic(utf8_path, result.diagnostics.front());
+            return return_error(SYNQ_STATUS_PARSE_ERROR, diagnostic, out_diagnostic);
         }
 
         std::unique_ptr<synq_program> handle(new synq_program());
-        handle->program.reset(static_cast<ProgramNode*>(root.release()));
+        handle->program = result.take_program();
         *out_program = handle.release();
         return SYNQ_STATUS_OK;
     } catch (const std::bad_alloc&) {

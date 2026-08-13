@@ -48,3 +48,8 @@
 - [x] Implement a minimal explicit experimental-feature declaration and enforcement mechanism.
 - [x] Implement and test the first general-purpose interoperability contract without claiming universal language compatibility.
 - [x] Run full checks, document verified outcomes, and publish the language-foundation increment.
+- [x] Reassess the published compiler state and select the smallest typed-AST and structured-diagnostics increment.
+- [x] Specify source spans, diagnostic codes, and compatibility boundaries for the recovery parser.
+- [x] Implement and test the selected structured-diagnostics and typed-AST capability.
+- [x] Re-run compiler, frontend, and backend checks; document only verified outcomes.
+- [ ] Publish the next language-core increment and observe its compiler-core CI result.
