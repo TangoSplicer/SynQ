@@ -217,7 +217,7 @@ execution.[4]
 | Backend | Status | Near-term role | Evidence required before support claim |
 | --- | --- | --- | --- |
 | OpenQASM 3 | **Bounded, verified source exporter** | Maintain the supported subset while migrating its input from recovery AST toward HIR. | Exact output fixtures, rejection fixtures, reference parser validation, and Qiskit importer validation. |
-| C ABI services | **Locally tested experimental foundation** | Parse and export services for external native callers. | Compiled C consumer test and ownership/error cases pass locally; CI evidence, installation/distribution, and a released ABI policy remain required. |
+| C ABI services | **Remotely validated experimental foundation** | Parse and export services for external native callers. | The compiled C consumer and ownership/error cases passed locally and in [Compiler Core #8][9]. Installation/distribution and a released ABI policy remain future work. |
 | LLVM IR / QIR | **Planned research target** | Possible future native classical lowering and quantum IR integration. | A written subset mapping, independent toolchain validation, and no hardware claims. |
 | JVM bytecode / facade | **Planned research target** | A Java-facing service layer for Clojure and other JVM users. | JVM build/test matrix, explicit native-loading behavior if JNI is used, and a Clojure invocation test. |
 | AI transformation API | **Not designed as an execution backend** | Future opt-in analysis or proposal interface. | Provenance, deterministic validation path, user acceptance boundary, and security review appropriate to the concrete capability. |
@@ -261,3 +261,4 @@ from a single local build.
 [6]: https://mercurylang.org/information/doc-release/mercury_user_guide/Foreign-language-interface.html "The Mercury User’s Guide: Foreign language interface"
 [7]: https://cffi.common-lisp.dev/manual/cffi-manual.html "CFFI User Manual"
 [8]: https://clojure.org/reference/java_interop "Clojure Java Interop"
+[9]: https://github.com/TangoSplicer/SynQ/actions/runs/31718265429 "SynQ Compiler Core #8"

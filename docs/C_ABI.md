@@ -77,9 +77,10 @@ ctest --test-dir /tmp/synq-c-abi --output-on-failure
 
 At review time, this command reported **7/7 passing** tests, including
 `synq_c_abi_smoke`, the feature-gate smoke test, the parser/exporter tests, and
-the two existing independent OpenQASM downstream validations. A future CI run
-and committed evidence record are still required before claiming published CI
-coverage for this increment.
+the two existing independent OpenQASM downstream validations. The same
+compiler profile then passed remotely in [Compiler Core #8][5] for commit
+`0ff71ba`. This remote result validates the configured CMake profile; it does
+not freeze the ABI or test a distributed shared library.
 
 ## What this enables next—and what it does not
 
@@ -109,3 +110,4 @@ tests.
 [2]: https://mercurylang.org/information/doc-release/mercury_user_guide/Foreign-language-interface.html "The Mercury User’s Guide: Foreign language interface"
 [3]: https://cffi.common-lisp.dev/manual/cffi-manual.html "CFFI User Manual"
 [4]: https://clojure.org/reference/java_interop "Clojure Java Interop"
+[5]: https://github.com/TangoSplicer/SynQ/actions/runs/31718265429 "SynQ Compiler Core #8"

@@ -47,4 +47,4 @@
 - [x] Write and review a source-grounded SynQ language charter and staged architecture roadmap.
 - [x] Implement a minimal explicit experimental-feature declaration and enforcement mechanism.
 - [x] Implement and test the first general-purpose interoperability contract without claiming universal language compatibility.
-- [ ] Run full checks, document verified outcomes, and publish the language-foundation increment.
+- [x] Run full checks, document verified outcomes, and publish the language-foundation increment.
