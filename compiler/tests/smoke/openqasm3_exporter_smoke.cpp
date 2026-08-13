@@ -102,6 +102,7 @@ bool rejects_invalid_explicit_operands() {
 bool exports_literal_angle_gates() {
     const std::string path = "/tmp/synq_openqasm3_parameter_fixture.synq";
     std::ofstream fixture(path);
+    fixture << "#[experimental(feature = \"parameterized-quantum-gates\")]\n";
     fixture << "quantum rx(pi/2) q[0];\n";
     fixture << "quantum ry(-pi/4) q[2];\n";
     fixture << "quantum rz(0.125) q[1];\n";

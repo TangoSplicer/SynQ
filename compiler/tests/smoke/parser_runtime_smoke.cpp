@@ -139,6 +139,7 @@ bool parser_rejects_malformed_qubit_operands() {
 bool parser_accepts_literal_angle_parameters() {
     const std::string path = write_fixture(
         "synq_parser_parameter_fixture.synq",
+        "#[experimental(feature = \"parameterized-quantum-gates\")]\n"
         "quantum rx(pi/2) q[0];\n"
         "quantum rz(-pi/4) q[3];\n"
         "quantum p(0.125) q[2]\n");
@@ -182,6 +183,31 @@ bool parser_rejects_unsupported_parameter_forms() {
            require(variable == nullptr, "parser rejects variable parameter expression") &&
            require(missing_operand == nullptr, "parser rejects parameterized gate without operand") &&
            require(two_operands == nullptr, "parser rejects parameterized gate with two operands");
+}
+
+bool parser_enforces_experimental_feature_gate() {
+    const std::string disabled_path = write_fixture(
+        "synq_parser_disabled_experimental_fixture.synq",
+        "quantum rx(pi/2) q[0]\n");
+    const std::string unknown_path = write_fixture(
+        "synq_parser_unknown_experimental_fixture.synq",
+        "#[experimental(feature = \"missing-feature\")]\n"
+        "quantum h q[0]\n");
+    const std::string configured_path = write_fixture(
+        "synq_parser_configured_experimental_fixture.synq",
+        "quantum rx(pi/2) q[0]\n");
+    Parser parser;
+    std::unique_ptr<ASTNode> disabled(parser.parseFile(disabled_path));
+    std::unique_ptr<ASTNode> unknown(parser.parseFile(unknown_path));
+    parser.enableExperimentalFeature("parameterized-quantum-gates");
+    std::unique_ptr<ASTNode> configured(parser.parseFile(configured_path));
+    std::remove(disabled_path.c_str());
+    std::remove(unknown_path.c_str());
+    std::remove(configured_path.c_str());
+
+    return require(disabled == nullptr, "parser rejects a disabled alpha feature") &&
+           require(unknown == nullptr, "parser rejects an unknown feature annotation") &&
+           require(configured != nullptr, "parser accepts an explicitly configured alpha feature");
 }
 
 bool runtime_executes_supported_and_fallback_paths() {
@@ -230,6 +256,7 @@ int main() {
     if (!parser_rejects_malformed_qubit_operands()) return 1;
     if (!parser_accepts_literal_angle_parameters()) return 1;
     if (!parser_rejects_unsupported_parameter_forms()) return 1;
+    if (!parser_enforces_experimental_feature_gate()) return 1;
     if (!runtime_executes_supported_and_fallback_paths()) return 1;
 
     std::cout << "SynQ parser and runtime smoke test passed\n";

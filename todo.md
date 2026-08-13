@@ -42,3 +42,9 @@
 - [x] Export parameterized gate mappings with exact-output and rejection fixtures.
 - [x] Validate generated OpenQASM with a second independent downstream parser.
 - [x] Run full checks, observe CI, document, and publish the parameterized compatibility increment.
+- [x] Define the practical SynQ language vision, compatibility layers, and non-goals for a zero-budget solo project.
+- [x] Research safe experimental-feature controls and viable interoperability patterns for target ecosystems.
+- [x] Write and review a source-grounded SynQ language charter and staged architecture roadmap.
+- [x] Implement a minimal explicit experimental-feature declaration and enforcement mechanism.
+- [x] Implement and test the first general-purpose interoperability contract without claiming universal language compatibility.
+- [ ] Run full checks, document verified outcomes, and publish the language-foundation increment.

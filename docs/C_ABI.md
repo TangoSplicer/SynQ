@@ -1,0 +1,111 @@
+# SynQ C ABI Foundation
+
+**Status:** Locally verified experimental foundation. The C header and compiled
+C consumer smoke test are present in the working-tree language-foundation
+increment. This is **not** a declaration of a frozen production ABI, a shared
+library distribution, or a language-specific SDK.  
+**Last reviewed:** 13 August 2026
+
+## Purpose and scope
+
+The C ABI is SynQ’s first native interoperability contract. It lets a native
+consumer compile against `compiler/include/synq/synq_ffi.h`, parse a recovery
+profile source file, obtain an opaque program handle, request bounded OpenQASM
+3 export, read diagnostics, and release library-owned resources. The contract
+does not expose C++ AST classes, parsers, containers, exceptions, or a general
+SynQ runtime.
+
+This is the appropriate first bridge for the project’s target ecosystems. Rust
+supports explicit external ABI selection; Mercury documents a C foreign
+language interface for applicable C backends; CFFI calls C functions from
+Common Lisp; and Clojure interoperates with Java, supporting a later JVM facade
+rather than an untested direct native claim.[1] [2] [3] [4]
+
+| Contract property | Current implementation | Boundary |
+| --- | --- | --- |
+| ABI identifier | `synq_abi_version()` returns `SYNQ_ABI_VERSION` (`1`); `synq_version()` returns `synq-c-abi/1`. | The identifier versioned the initial contract; no long-term ABI stability policy has been released yet. |
+| Parse service | `synq_parse_file()` accepts a non-empty UTF-8 path and returns an opaque `synq_program*` on success. | It delegates to the recovery-profile parser; it does not parse a complete SynQ language. |
+| Export service | `synq_export_openqasm3()` exports the current bounded OpenQASM 3 subset. | Export remains source generation, not execution, hardware submission, or provider integration. |
+| Error reporting | Every fallible service returns `synq_status`; an optional library-owned UTF-8 diagnostic explains the failure. | Diagnostics are currently concise service-level messages. Rich source spans and stable diagnostic codes are future work. |
+| Resource lifetime | `synq_program_free()` releases program handles and `synq_string_free()` releases strings returned by the library. Both accept `NULL`. | Callers must not free SynQ-owned values with another allocator or retain them after release. |
+
+## Public surface
+
+The full declaration is the source of truth: [`compiler/include/synq/synq_ffi.h`](../compiler/include/synq/synq_ffi.h).
+The function set below describes the only public native functions in this
+increment.
+
+| Function | Success result | Failure behavior |
+| --- | --- | --- |
+| `unsigned int synq_abi_version(void)` | Returns the ABI-major integer `1`. | Does not fail. |
+| `const char *synq_version(void)` | Returns a static, NUL-terminated identifier. | Does not fail; the pointer is not caller-owned. |
+| `synq_parse_file(path, &program, &diagnostic)` | Returns `SYNQ_STATUS_OK` and an opaque handle. | Returns `SYNQ_STATUS_INVALID_ARGUMENT`, `SYNQ_STATUS_PARSE_ERROR`, or `SYNQ_STATUS_INTERNAL_ERROR`; a diagnostic is supplied when requested and allocation succeeds. |
+| `synq_export_openqasm3(program, &text, &diagnostic)` | Returns `SYNQ_STATUS_OK` and a library-allocated UTF-8 OpenQASM string. | Returns `SYNQ_STATUS_INVALID_ARGUMENT`, `SYNQ_STATUS_EXPORT_ERROR`, or `SYNQ_STATUS_INTERNAL_ERROR`; no partial OpenQASM output is returned. |
+| `synq_string_free(value)` | Releases a library-allocated string. | Accepts `NULL`. |
+| `synq_program_free(program)` | Releases a program handle. | Accepts `NULL`. |
+
+### Ownership rules
+
+The caller owns the `synq_program*` only after a successful parse and must
+release it exactly once using `synq_program_free()`. The caller owns any
+non-`NULL` output or diagnostic string returned by the two fallible functions
+and must release it exactly once using `synq_string_free()`. The library owns
+the string returned by `synq_version()` permanently; the caller must neither
+free nor modify it.
+
+This design avoids allocator crossing and C++ layout coupling. It also means
+that a future internal AST or HIR refactor need not break callers that stay
+within this header’s functions. The opaque handle is intentionally unsuitable
+for serialisation, copying, cross-process transfer, or access after a library
+version change.
+
+## Verified consumer evidence
+
+`compiler/tests/interop/c_abi_smoke.c` is compiled as **C**, includes only the
+public header, and links against `synq_lib` using the C++ linker only for the
+library’s C++ implementation dependencies. It verifies ABI identification,
+successful parsing of a feature-gated parameterized circuit, OpenQASM output,
+resource release, and a missing-file parse error. It does not use C++ headers
+or internal types.
+
+```bash
+cd /home/ubuntu/SynQ
+cmake -S compiler -B /tmp/synq-c-abi -DCMAKE_BUILD_TYPE=Release
+cmake --build /tmp/synq-c-abi --parallel 2
+ctest --test-dir /tmp/synq-c-abi --output-on-failure
+```
+
+At review time, this command reported **7/7 passing** tests, including
+`synq_c_abi_smoke`, the feature-gate smoke test, the parser/exporter tests, and
+the two existing independent OpenQASM downstream validations. A future CI run
+and committed evidence record are still required before claiming published CI
+coverage for this increment.
+
+## What this enables next—and what it does not
+
+| Next adapter | Safe first implementation route | Not yet implemented or claimed |
+| --- | --- | --- |
+| Rust | Wrap the header with `extern "C"`, then expose ownership through Rust RAII types and test it in Rust. | A Rust crate, a Rust-native ABI, automatic bindings, or an in-process C++ interface. |
+| Mercury | Map only released C functions through `pragma foreign_proc` on a C backend, with a Mercury toolchain smoke test. | A Mercury package, all Mercury backends, or bidirectional foreign calls. |
+| Common Lisp | Define the released functions and opaque pointers using CFFI, with an implementation-specific test. | A published CFFI system, callbacks, or all Lisp implementations. |
+| Clojure | Call a small Java facade through normal Java interop; the facade can use JNI only once its native-load contract is tested. | A Clojure library, direct C ABI access from Clojure, or a portable JNI solution. |
+
+The C ABI is therefore **a foundation for interoperability, not proof of full
+interoperability**. Each later binding must be independently built and tested,
+and it may expose a smaller, safer surface than the raw C header.
+
+## Deliberate non-goals
+
+This release does not install a system-wide library, produce a shared library,
+publish a package, expose callbacks, accept in-memory source strings, guarantee
+thread safety, provide stable error codes across releases, execute quantum
+programs, submit to quantum hardware, or expose arbitrary SynQ AST/IR objects.
+Those decisions require separate design, threat modelling, API review, and
+tests.
+
+## References
+
+[1]: https://doc.rust-lang.org/reference/abi.html "The Rust Reference: Application binary interface"
+[2]: https://mercurylang.org/information/doc-release/mercury_user_guide/Foreign-language-interface.html "The Mercury User’s Guide: Foreign language interface"
+[3]: https://cffi.common-lisp.dev/manual/cffi-manual.html "CFFI User Manual"
+[4]: https://clojure.org/reference/java_interop "Clojure Java Interop"

@@ -13,7 +13,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 target_link_libraries(synq_lib PRIVATE Threads::Threads nlohmann_json::nlohmann_json OpenSSL::Crypto)
-target_include_directories(synq_lib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(synq_lib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 if(BUILD_PYTHON_BINDINGS)
   find_package(pybind11 CONFIG REQUIRED)

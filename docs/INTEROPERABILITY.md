@@ -1,6 +1,6 @@
 # SynQ Interoperability Boundary
 
-**Status:** The adapter passes local fixture-based recovery-profile smoke coverage, OpenQASM reference-parser acceptance, Qiskit downstream conversion, and [Compiler Core #7](https://github.com/TangoSplicer/SynQ/actions/runs/31715249016) for parameterized revision `d0de770`. This remains a source-export claim only.
+**Status:** The bounded OpenQASM adapter remains the verified source-export boundary. The language-foundation working-tree increment additionally has a locally tested C ABI for parsing this recovery profile and requesting the same export; it does not yet have published CI evidence for that new ABI increment. See [C ABI Foundation](./C_ABI.md).
 
 > SynQ does not currently provide general-purpose source compatibility, bidirectional translation, package interoperability, or hardware-provider execution. This document defines the first deliberately narrow compatibility boundary that can be tested within the compiler recovery profile.
 
@@ -20,7 +20,17 @@ Every successful export emits `OPENQASM 3.0;`, includes `stdgates.inc`, and allo
 
 ## Explicit Non-Goals
 
-This first adapter will **not** import OpenQASM, execute OpenQASM, invoke Qiskit or any other SDK, submit to a provider, validate output with an external OpenQASM parser, translate general classical code, infer qubit counts, or translate the older unverified Qiskit backend. It establishes a testable source-export seam only.
+This first adapter will **not** import OpenQASM, execute OpenQASM, invoke Qiskit or any other SDK, submit to a provider, translate general classical code, infer qubit counts, or translate the older unverified Qiskit backend. The emitted source is validated by an external OpenQASM parser and a Qiskit importer, but this does not make SynQ a runtime integration or provider adapter.
+
+## Native C ABI Foundation
+
+The initial native interoperability seam is a C header with opaque program
+handles and explicit ownership functions. Its compiled C consumer verifies
+version identification, feature-gated parsing, OpenQASM export, diagnostic
+ownership, and cleanup. The C ABI is a contract-level starting point for future
+Rust, Mercury, Common Lisp, and JVM-facing work; no binding for any of those
+ecosystems exists yet. The full API, exact ownership rules, and non-goals are
+documented in [C ABI Foundation](./C_ABI.md).
 
 ## Promotion Rule
 

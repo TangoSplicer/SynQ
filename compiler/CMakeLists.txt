@@ -62,6 +62,17 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_parser_runtime_smoke PRIVATE synq_lib)
     add_test(NAME synq_parser_runtime_smoke COMMAND synq_parser_runtime_smoke)
 
+    add_executable(synq_feature_gate_smoke tests/smoke/feature_gate_smoke.cpp)
+    target_include_directories(synq_feature_gate_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_feature_gate_smoke PRIVATE synq_lib)
+    add_test(NAME synq_feature_gate_smoke COMMAND synq_feature_gate_smoke)
+
+    add_executable(synq_c_abi_smoke tests/interop/c_abi_smoke.c)
+    target_include_directories(synq_c_abi_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(synq_c_abi_smoke PRIVATE synq_lib)
+    set_target_properties(synq_c_abi_smoke PROPERTIES LINKER_LANGUAGE CXX)
+    add_test(NAME synq_c_abi_smoke COMMAND synq_c_abi_smoke)
+
     add_executable(synq_openqasm3_exporter_smoke tests/smoke/openqasm3_exporter_smoke.cpp)
     target_include_directories(synq_openqasm3_exporter_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_openqasm3_exporter_smoke PRIVATE synq_lib)

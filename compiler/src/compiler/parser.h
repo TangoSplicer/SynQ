@@ -24,11 +24,21 @@
 
 #include <string>
 #include "ast.h"
+#include "feature_gate.h"
 
 class Parser {
 public:
+    Parser();
+
+    // Enables a compiler-registered experimental feature for this parser
+    // instance. Source annotations can opt in for a single parsed file too.
+    bool enableExperimentalFeature(const std::string& feature_name);
+
     // Parse a source file and return the AST root node (or nullptr on error).
     ASTNode* parseFile(const std::string& filename);
+
+private:
+    synq::compiler::FeatureRegistry configured_features_;
 };
 
 #endif

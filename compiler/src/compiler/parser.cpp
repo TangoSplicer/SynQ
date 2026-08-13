@@ -90,6 +90,24 @@ bool is_parameterized_kernel(const std::string& kernel) {
     return is_identifier(kernel.substr(0, open)) && is_parameter_expression(kernel.substr(open + 1, kernel.size() - open - 2));
 }
 
+bool is_feature_name(const std::string& value) {
+    if (value.empty()) return false;
+    return std::all_of(value.begin(), value.end(), [](unsigned char character) {
+        return std::islower(character) != 0 || std::isdigit(character) != 0 || character == '-';
+    });
+}
+
+bool parse_experimental_feature_annotation(const std::string& line, std::string& feature_name) {
+    const std::string prefix = "#[experimental(feature = \"";
+    const std::string suffix = "\")]";
+    if (line.rfind(prefix, 0) != 0 || line.size() <= prefix.size() + suffix.size() ||
+        line.substr(line.size() - suffix.size()) != suffix) {
+        return false;
+    }
+    feature_name = line.substr(prefix.size(), line.size() - prefix.size() - suffix.size());
+    return is_feature_name(feature_name);
+}
+
 bool parse_quantum_arguments(const std::string& source, std::vector<std::string>& arguments) {
     std::istringstream tokens(source);
     std::string kernel;
@@ -130,6 +148,13 @@ std::string strip_comment(const std::string& value) {
 
 }  // namespace
 
+Parser::Parser()
+    : configured_features_(synq::compiler::make_default_feature_registry()) {}
+
+bool Parser::enableExperimentalFeature(const std::string& feature_name) {
+    return configured_features_.enable(feature_name);
+}
+
 ASTNode* Parser::parseFile(const std::string& filename) {
     std::ifstream infile(filename);
     if (!infile) {
@@ -139,6 +164,7 @@ ASTNode* Parser::parseFile(const std::string& filename) {
 
     std::cout << "Parsing " << filename << "..." << std::endl;
     ProgramNode* root = new ProgramNode();
+    synq::compiler::FeatureRegistry active_features = configured_features_;
 
     // Recovery-profile grammar: one statement per line, with an optional
     // trailing semicolon. Supported statements are `let <identifier> = <value>`
@@ -158,6 +184,17 @@ ASTNode* Parser::parseFile(const std::string& filename) {
         }
         if (line.back() == ';') {
             line = trim(line.substr(0, line.size() - 1));
+        }
+
+        if (line.rfind("#[", 0) == 0) {
+            std::string feature_name;
+            if (!parse_experimental_feature_annotation(line, feature_name) || !active_features.enable(feature_name)) {
+                std::cerr << "Error: unknown or malformed experimental feature annotation at " << filename
+                          << ":" << line_number << std::endl;
+                delete root;
+                return nullptr;
+            }
+            continue;
         }
 
         std::istringstream tokens(line);
@@ -196,6 +233,13 @@ ASTNode* Parser::parseFile(const std::string& filename) {
             if (!parse_quantum_arguments(argument, quantum_arguments)) {
                 std::cerr << "Error: malformed quantum operands at " << filename
                           << ":" << line_number << std::endl;
+                delete root;
+                return nullptr;
+            }
+            if (quantum_arguments.front().find('(') != std::string::npos &&
+                !active_features.is_enabled("parameterized-quantum-gates")) {
+                std::cerr << "Error: parameterized quantum gates require #[experimental(feature = \"parameterized-quantum-gates\")] at "
+                          << filename << ":" << line_number << std::endl;
                 delete root;
                 return nullptr;
             }
