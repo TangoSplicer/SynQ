@@ -14,7 +14,8 @@ reliably.
 This increment implements the smallest durable replacement: a typed parser
 result containing an optional parsed program and a collection of structured
 diagnostics. It does **not** define a complete lexer, a type checker, module
-system, package manager, or Hybrid IR.
+system, or package manager. A later internal Hybrid IR reuses the same
+diagnostic struct for its bounded lowering rejection.
 
 > **Design rule:** every recovery-parser failure represented by this increment
 > receives a stable code, a severity, a half-open source span, a message, and
@@ -58,6 +59,14 @@ same span, severity, message, help, legacy rendering, and C ABI formatting
 path. Backend export diagnostics and C ABI status values keep their own
 namespaces because they represent different layers and different recovery
 actions.
+
+| Code | Layer | Failure condition | Default remediation |
+| --- | --- | --- | --- |
+| `SYNQ-H001` | Internal Hybrid IR lowering | A successful recovery parse contains a retained legacy AST instruction that the minimal Hybrid IR does not model. | Use only current typed declarations, quantum gates, and measurements until the internal IR expands. |
+
+`SYNQ-H001` is not emitted by the parser and is not propagated through the C
+ABI. It preserves source provenance for an internal post-parse conversion
+boundary; it does not define a general HIR diagnostics protocol.
 
 ## Compatibility boundaries
 
