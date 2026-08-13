@@ -50,9 +50,12 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P006` | An experimental annotation is malformed or names an unknown feature. | Use a registered exact annotation such as `#[experimental(feature = "parameterized-quantum-gates")]`. |
 | `SYNQ-P007` | A gated construct is used without its required alpha opt-in. | Add the documented file-scoped feature annotation or use an ungated construct. |
 
-Code values are specific to parser failures. Backend export diagnostics and C
-ABI status values keep their own namespaces because they represent different
-layers and different recovery actions.
+Code values are specific to parser failures. The recovery profile also has a
+small `SYNQ-S001`–`SYNQ-S003` namespace for typed known-gate shape validation;
+those semantic errors use the same span, severity, message, help, legacy
+rendering, and C ABI formatting path. Backend export diagnostics and C ABI
+status values keep their own namespaces because they represent different layers
+and different recovery actions.
 
 ## Compatibility boundaries
 

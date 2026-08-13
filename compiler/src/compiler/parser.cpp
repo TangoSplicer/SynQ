@@ -26,6 +26,7 @@
 #include <sstream>
 #include <utility>
 
+#include "gate_validation.h"
 #include "parser.h"
 
 namespace {
@@ -296,15 +297,21 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
                 return fail_parse("SYNQ-P005", span, "malformed quantum kernel, operands, or literal-angle parameter",
                                   "use explicit operands such as q[0] or q[0], q[1]");
             }
-            if (quantum_arguments.front().find('(') != std::string::npos &&
-                !active_features.is_enabled("parameterized-quantum-gates")) {
-                return fail_parse("SYNQ-P007", span, "parameterized quantum gates require an alpha feature opt-in",
-                                  "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct");
-            }
             QuantumGateNode* gate = make_quantum_gate_node(quantum_arguments, line_number);
             if (gate == nullptr) {
                 return fail_parse("SYNQ-P005", span, "could not construct typed quantum operands",
                                   "use explicit operands such as q[0] or q[0], q[1]");
+            }
+            const auto validation_error = synq::compiler::validate_quantum_gate_shape(*gate);
+            if (validation_error.has_value()) {
+                delete gate;
+                return fail_parse(validation_error->code, span, validation_error->message, validation_error->help);
+            }
+            if (gate->literal_angle.has_value() &&
+                !active_features.is_enabled("parameterized-quantum-gates")) {
+                delete gate;
+                return fail_parse("SYNQ-P007", span, "parameterized quantum gates require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct");
             }
             root->statements.push_back(gate);
         } else {
