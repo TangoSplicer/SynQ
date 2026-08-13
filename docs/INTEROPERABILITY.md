@@ -1,6 +1,6 @@
 # SynQ Interoperability Boundary
 
-**Status:** The first adapter is implemented and passes its local fixture-based recovery-profile smoke test. A remote compiler-core CI result must be observed for the publication revision before a CI-backed claim is made.
+**Status:** The first adapter is implemented and passes local fixture-based recovery-profile smoke coverage and [Compiler Core #5](https://github.com/TangoSplicer/SynQ/actions/runs/31707219450) for revision `f570cc9`. This is a CI-backed source-export claim only.
 
 > SynQ does not currently provide general-purpose source compatibility, bidirectional translation, package interoperability, or hardware-provider execution. This document defines the first deliberately narrow compatibility boundary that can be tested within the compiler recovery profile.
 

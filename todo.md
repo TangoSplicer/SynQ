@@ -31,4 +31,4 @@
 - [x] Re-run full checks, observe CI, document results, and publish the continued recovery increment.
 - [x] Assess the current compiler recovery profile and select one realistic interoperability boundary.
 - [x] Implement one bounded SynQ interoperability adapter with fixture-based tests.
-- [ ] Verify, document, and publish only the interoperability behavior that passes locally and in CI.
+- [x] Verify, document, and publish only the interoperability behavior that passes locally and in CI.
