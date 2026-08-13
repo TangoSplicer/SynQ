@@ -44,6 +44,15 @@ bool is_non_negative_integer(const std::string& value) {
     });
 }
 
+bool is_identifier(const std::string& value) {
+    if (value.empty() || !(std::isalpha(static_cast<unsigned char>(value.front())) != 0 || value.front() == '_')) {
+        return false;
+    }
+    return std::all_of(value.begin() + 1, value.end(), [](unsigned char ch) {
+        return std::isalnum(ch) != 0 || ch == '_';
+    });
+}
+
 }  // namespace
 
 ASTNode* Parser::parseFile(const std::string& filename) {
@@ -56,10 +65,12 @@ ASTNode* Parser::parseFile(const std::string& filename) {
     std::cout << "Parsing " << filename << "..." << std::endl;
     ProgramNode* root = new ProgramNode();
 
-    // Recovery-profile grammar: one instruction per line, with an optional
-    // trailing semicolon. Supported instructions are `print <text>`,
-    // `delay <non-negative milliseconds>`, `quantum <kernel>`, and
-    // `ai <prompt>`. Blank lines and full-line `//` comments are ignored.
+    // Recovery-profile grammar: one statement per line, with an optional
+    // trailing semicolon. Supported statements are `let <identifier> = <value>`
+    // plus the instructions `print <text>`, `delay <non-negative milliseconds>`,
+    // `quantum <kernel>`, and `ai <prompt>`. Declaration values are preserved as
+    // source text; expression parsing is intentionally out of scope. Blank lines
+    // and full-line `//` comments are ignored.
     std::string raw_line;
     std::size_t line_number = 0;
     while (std::getline(infile, raw_line)) {
@@ -78,6 +89,20 @@ ASTNode* Parser::parseFile(const std::string& filename) {
         std::string argument;
         std::getline(tokens, argument);
         argument = trim(argument);
+
+        if (operation == "let") {
+            const auto assignment = argument.find('=');
+            const std::string identifier = assignment == std::string::npos ? "" : trim(argument.substr(0, assignment));
+            const std::string value = assignment == std::string::npos ? "" : trim(argument.substr(assignment + 1));
+            if (!is_identifier(identifier) || value.empty()) {
+                std::cerr << "Error: malformed declaration at " << filename
+                          << ":" << line_number << std::endl;
+                delete root;
+                return nullptr;
+            }
+            root->statements.push_back(new DeclarationNode(identifier, value, line_number));
+            continue;
+        }
 
         const bool known_instruction = operation == "print" || operation == "delay" ||
                                        operation == "quantum" || operation == "ai";

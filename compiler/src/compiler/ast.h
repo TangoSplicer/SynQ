@@ -67,6 +67,23 @@ public:
     }
 };
 
+// A small declaration node for the recovery parser's `let name = value` form.
+// The value is retained as source text; expression evaluation is outside this
+// recovery profile.
+class DeclarationNode : public ASTNode {
+public:
+    std::string name;
+    std::string value;
+    std::size_t line = 0;
+
+    DeclarationNode(std::string identifier, std::string source_value, std::size_t line_number)
+        : name(std::move(identifier)), value(std::move(source_value)), line(line_number) {}
+
+    std::string toString() override {
+        return "let " + name + " = " + value;
+    }
+};
+
 // (Additional AST node classes like FunctionNode and ClassNode remain future work.)
 
 #endif

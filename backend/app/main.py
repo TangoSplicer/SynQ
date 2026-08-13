@@ -7,8 +7,10 @@ remain unavailable until they are separately restored and tested.
 
 from os import getenv
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.example_catalog import available_domains, find_example, list_examples
 
 
 APP_NAME = "SynQ Backend Recovery"
@@ -18,7 +20,7 @@ API_PREFIX = "/api/v1"
 app = FastAPI(
     title=APP_NAME,
     version=APP_VERSION,
-    description="Minimal health surface for the experimental SynQ backend recovery.",
+    description="Bounded health and source-only example catalog for the experimental SynQ backend recovery.",
 )
 
 allowed_origins = [origin.strip() for origin in getenv("CORS_ORIGINS", "*").split(",") if origin.strip()]
@@ -38,7 +40,7 @@ async def health_check() -> dict[str, str]:
         "status": "ok",
         "service": APP_NAME,
         "version": APP_VERSION,
-        "scope": "health-only recovery surface",
+        "scope": "health and source-only example catalog recovery surface",
     }
 
 
@@ -50,7 +52,37 @@ async def root() -> dict[str, str]:
         "version": APP_VERSION,
         "health": "/health",
         "docs": "/docs",
-        "scope": "Only root and health endpoints are currently implemented.",
+        "examples": f"{API_PREFIX}/examples",
+        "scope": "Only root, health, and source-only example catalog endpoints are currently implemented.",
+    }
+
+
+@app.get(f"{API_PREFIX}/examples", status_code=status.HTTP_200_OK)
+async def examples(domain: str | None = Query(default=None, pattern=r"^[a-z-]+$")) -> dict[str, object]:
+    """List source-only example metadata, optionally filtered by a known domain."""
+    if domain is not None and domain not in available_domains():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Unknown example domain", "available_domains": sorted(available_domains())},
+        )
+    entries = list_examples(domain)
+    return {
+        "examples": entries,
+        "count": len(entries),
+        "verification": "source-only-unverified",
+        "scope": "Metadata only; these examples are not compiled or executed by this service.",
+    }
+
+
+@app.get(f"{API_PREFIX}/examples/{{example_id}}", status_code=status.HTTP_200_OK)
+async def example_detail(example_id: str) -> dict[str, object]:
+    """Return one source-only example metadata record by its stable identifier."""
+    entry = find_example(example_id)
+    if entry is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Example not found")
+    return {
+        "example": entry,
+        "scope": "Metadata only; this example is not compiled or executed by this service.",
     }
 
 

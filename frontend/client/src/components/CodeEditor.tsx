@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Copy, Check } from 'lucide-react';
 
@@ -15,26 +15,18 @@ export default function CodeEditor({ defaultCode, language = 'python', title }: 
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    // Simple code execution simulation (for demo purposes)
-    // In production, this would call a backend API
-  }, []);
-
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput('Executing code...\n');
+    setOutput('Preparing local demonstration...\n');
     
-    // Simulate code execution
+    // This is deliberately a UI-only demonstration. It must not suggest that
+    // edited source has been compiled, sent to a backend, or run on hardware.
     setTimeout(() => {
       setOutput(
-        `// SynQ Code Execution Output\n` +
-        `// Language: ${language}\n` +
-        `// Status: Success\n\n` +
-        `// Output:\n` +
-        `Ground state energy: -1.137 Ha\n` +
-        `Circuit depth: 12 gates\n` +
-        `Execution time: 2.34ms\n\n` +
-        `// Note: For live execution, connect to SynQ backend API`
+        `// Local UI demonstration\n` +
+        `// Selected language: ${language}\n` +
+        `// No SynQ compiler, backend request, or quantum hardware execution occurred.\n\n` +
+        `// The editor retained your source locally for inspection only.`
       );
       setIsRunning(false);
     }, 1500);
@@ -109,7 +101,7 @@ export default function CodeEditor({ defaultCode, language = 'python', title }: 
       </div>
 
       <div className="bg-slate-800 px-4 py-2 border-t border-slate-700 text-xs text-slate-400">
-        <p>💡 Tip: Edit the code and click "Run" to see the output. For production use, connect to a real SynQ backend.</p>
+        <p>Tip: Edit the source and click "Run" to view the local demonstration notice. No code execution is performed.</p>
       </div>
     </div>
   );

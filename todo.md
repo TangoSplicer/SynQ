@@ -17,3 +17,10 @@
 - [x] Repair, configure, and run the entire frontend test suite locally.
 - [x] Perform a new cross-component review, repair verified defects, and record evidence.
 - [x] Commit, push, and tag the expanded validation work when all required checks permit it.
+- [x] Establish parser, backend-feature, and frontend bundle-composition baselines.
+- [x] Extend the bounded parser grammar and fixture coverage with documented behavior.
+- [x] Add one non-health backend feature with a tested route contract.
+- [x] Reduce the frontend production bundle warning through verified code splitting.
+- [x] Replace unsupported repository-frontend capability claims with verified recovery-status messaging.
+- [x] Re-run local checks and update evidence for the completed recovery increment.
+- [ ] Push the completed recovery increment and observe both generated CI workflows.
