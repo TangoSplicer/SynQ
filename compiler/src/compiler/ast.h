@@ -23,6 +23,7 @@
 #define SYNQ_COMPILER_AST_H
 
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -64,6 +65,53 @@ public:
 
     std::string toString() override {
         return op + (args.empty() ? "" : " " + args.front());
+    }
+};
+
+// Typed representation of the bounded recovery-profile quantum statement.
+// `Unknown` preserves a syntactically valid gate name without implying that it
+// is supported by a backend or has a defined SynQ semantic meaning.
+enum class QuantumGateKind {
+    H,
+    X,
+    Y,
+    Z,
+    Cx,
+    BellPair,
+    Rx,
+    Ry,
+    Rz,
+    Phase,
+    Unknown,
+};
+
+class QuantumGateNode : public ASTNode {
+public:
+    QuantumGateKind kind;
+    std::string source_name;
+    std::optional<std::string> literal_angle;
+    std::vector<std::size_t> qubit_indices;
+    std::size_t line = 0;
+
+    QuantumGateNode(QuantumGateKind gate_kind,
+                    std::string original_name,
+                    std::optional<std::string> angle,
+                    std::vector<std::size_t> operands,
+                    std::size_t line_number)
+        : kind(gate_kind),
+          source_name(std::move(original_name)),
+          literal_angle(std::move(angle)),
+          qubit_indices(std::move(operands)),
+          line(line_number) {}
+
+    std::string toString() override {
+        std::string text = "quantum " + source_name;
+        if (literal_angle.has_value()) text += "(" + *literal_angle + ")";
+        for (std::size_t index = 0; index < qubit_indices.size(); ++index) {
+            text += index == 0 ? " q[" : ", q[";
+            text += std::to_string(qubit_indices[index]) + "]";
+        }
+        return text;
     }
 };
 

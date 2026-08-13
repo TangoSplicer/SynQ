@@ -53,3 +53,7 @@
 - [x] Implement and test the selected structured-diagnostics and typed-AST capability.
 - [x] Re-run compiler, frontend, and backend checks; document only verified outcomes.
 - [x] Publish the next language-core increment and observe its compiler-core CI result.
+- [x] Define the smallest typed quantum AST vocabulary and parser compatibility boundary.
+- [x] Implement typed quantum AST nodes and construction from the recovery parser.
+- [x] Adapt the bounded OpenQASM exporter and fixtures to consume the typed quantum nodes.
+- [ ] Run full checks, record factual evidence, and publish the typed-AST increment.

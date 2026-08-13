@@ -58,9 +58,9 @@ bool parser_accepts_supported_fixture() {
                  "parser preserves non-comment URL text")) return false;
     if (!require(url_declaration->line == 3, "parser records URL declaration source line")) return false;
 
-    const std::string expected_operations[] = {"print", "delay", "quantum", "ai"};
-    const std::string expected_arguments[] = {"theta", "0", "bell_pair", "concise_summary"};
-    for (std::size_t index = 0; index < 4; ++index) {
+    const std::string expected_operations[] = {"print", "delay", "ai"};
+    const std::string expected_arguments[] = {"theta", "0", "concise_summary"};
+    for (std::size_t index = 0; index < 2; ++index) {
         auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index + 2]);
         if (!require(instruction != nullptr, "parser creates InstructionNode")) return false;
         if (!require(instruction->op == expected_operations[index], "parser preserves instruction operation")) return false;
@@ -68,7 +68,14 @@ bool parser_accepts_supported_fixture() {
                      "parser preserves instruction argument")) return false;
         if (!require(instruction->line == index + 4, "parser records source line")) return false;
     }
-    return true;
+    auto* gate = dynamic_cast<QuantumGateNode*>(program->statements[4]);
+    if (!require(gate != nullptr, "parser creates a typed quantum gate node")) return false;
+    if (!require(gate->kind == QuantumGateKind::BellPair && gate->source_name == "bell_pair" &&
+                 !gate->literal_angle.has_value() && gate->qubit_indices.empty() && gate->line == 6,
+                 "parser preserves typed bell-pair fields")) return false;
+    auto* ai = dynamic_cast<InstructionNode*>(program->statements[5]);
+    return require(ai != nullptr && ai->op == expected_operations[2] && ai->args.front() == expected_arguments[2] && ai->line == 7,
+                   "parser retains the instruction after a typed quantum node");
 }
 
 bool parser_rejects_invalid_fixture() {
@@ -105,16 +112,21 @@ bool parser_accepts_explicit_qubit_operands() {
     if (!require(program != nullptr, "parser accepts explicit quantum operands")) return false;
     if (!require(program->statements.size() == 3, "parser retains every explicit quantum instruction")) return false;
 
-    const std::vector<std::vector<std::string>> expected = {
-        {"h", "q[3]"},
-        {"cx", "q[3]", "q[5]"},
-        {"bell_pair", "q[1]", "q[4]"},
+    const std::vector<QuantumGateKind> expected_kinds = {
+        QuantumGateKind::H,
+        QuantumGateKind::Cx,
+        QuantumGateKind::BellPair,
     };
-    for (std::size_t index = 0; index < expected.size(); ++index) {
-        auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index]);
-        if (!require(instruction != nullptr, "parser creates a quantum instruction node")) return false;
-        if (!require(instruction->op == "quantum" && instruction->args == expected[index],
-                     "parser preserves explicit quantum operands")) return false;
+    const std::vector<std::vector<std::size_t>> expected_operands = {
+        {3},
+        {3, 5},
+        {1, 4},
+    };
+    for (std::size_t index = 0; index < expected_kinds.size(); ++index) {
+        auto* gate = dynamic_cast<QuantumGateNode*>(program->statements[index]);
+        if (!require(gate != nullptr, "parser creates a typed quantum gate node")) return false;
+        if (!require(gate->kind == expected_kinds[index] && gate->qubit_indices == expected_operands[index] &&
+                     !gate->literal_angle.has_value(), "parser preserves typed explicit quantum operands")) return false;
     }
     return true;
 }
@@ -150,16 +162,24 @@ bool parser_accepts_literal_angle_parameters() {
     auto* program = dynamic_cast<ProgramNode*>(root.get());
     if (!require(program != nullptr, "parser accepts literal-angle parameter fixture")) return false;
 
-    const std::vector<std::vector<std::string>> expected = {
-        {"rx(pi/2)", "q[0]"},
-        {"rz(-pi/4)", "q[3]"},
-        {"p(0.125)", "q[2]"},
+    const std::vector<QuantumGateKind> expected_kinds = {
+        QuantumGateKind::Rx,
+        QuantumGateKind::Rz,
+        QuantumGateKind::Phase,
     };
-    if (!require(program->statements.size() == expected.size(), "parser retains parameterized instructions")) return false;
-    for (std::size_t index = 0; index < expected.size(); ++index) {
-        auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index]);
-        if (!require(instruction != nullptr && instruction->op == "quantum" && instruction->args == expected[index],
-                     "parser preserves parameterized quantum arguments")) return false;
+    const std::vector<std::string> expected_angles = {"pi/2", "-pi/4", "0.125"};
+    const std::vector<std::vector<std::size_t>> expected_operands = {
+        {0},
+        {3},
+        {2},
+    };
+    if (!require(program->statements.size() == expected_kinds.size(), "parser retains parameterized instructions")) return false;
+    for (std::size_t index = 0; index < expected_kinds.size(); ++index) {
+        auto* gate = dynamic_cast<QuantumGateNode*>(program->statements[index]);
+        if (!require(gate != nullptr && gate->kind == expected_kinds[index] &&
+                     gate->literal_angle.has_value() && *gate->literal_angle == expected_angles[index] &&
+                     gate->qubit_indices == expected_operands[index],
+                     "parser preserves typed parameterized quantum fields")) return false;
     }
     return true;
 }

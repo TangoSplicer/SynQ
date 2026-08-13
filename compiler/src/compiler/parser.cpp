@@ -133,6 +133,49 @@ bool parse_quantum_arguments(const std::string& source, std::vector<std::string>
     return false;
 }
 
+bool parse_qubit_index(const std::string& operand, std::size_t& index) {
+    if (!is_qubit_operand(operand)) return false;
+    index = 0;
+    for (std::size_t position = 2; position + 1 < operand.size(); ++position) {
+        index = index * 10 + static_cast<std::size_t>(operand[position] - '0');
+    }
+    return true;
+}
+
+QuantumGateKind quantum_gate_kind(const std::string& source_name) {
+    if (source_name == "h") return QuantumGateKind::H;
+    if (source_name == "x") return QuantumGateKind::X;
+    if (source_name == "y") return QuantumGateKind::Y;
+    if (source_name == "z") return QuantumGateKind::Z;
+    if (source_name == "cx") return QuantumGateKind::Cx;
+    if (source_name == "bell_pair") return QuantumGateKind::BellPair;
+    if (source_name == "rx") return QuantumGateKind::Rx;
+    if (source_name == "ry") return QuantumGateKind::Ry;
+    if (source_name == "rz") return QuantumGateKind::Rz;
+    if (source_name == "p") return QuantumGateKind::Phase;
+    return QuantumGateKind::Unknown;
+}
+
+QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& arguments, std::size_t line_number) {
+    const std::string& kernel = arguments.front();
+    const std::size_t open = kernel.find('(');
+    const bool parameterized = open != std::string::npos;
+    const std::string source_name = parameterized ? kernel.substr(0, open) : kernel;
+    const std::optional<std::string> literal_angle = parameterized
+        ? std::optional<std::string>(kernel.substr(open + 1, kernel.size() - open - 2))
+        : std::nullopt;
+
+    std::vector<std::size_t> operands;
+    operands.reserve(arguments.size() - 1);
+    for (std::size_t position = 1; position < arguments.size(); ++position) {
+        std::size_t index = 0;
+        if (!parse_qubit_index(arguments[position], index)) return nullptr;
+        operands.push_back(index);
+    }
+    return new QuantumGateNode(quantum_gate_kind(source_name), source_name, literal_angle,
+                               std::move(operands), line_number);
+}
+
 std::string strip_comment(const std::string& value) {
     // Recovery-profile rule: `//` begins a comment only at the start of a
     // trimmed line or when preceded by whitespace. This preserves source text
@@ -239,7 +282,12 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
                 return fail_parse("SYNQ-P007", span, "parameterized quantum gates require an alpha feature opt-in",
                                   "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct");
             }
-            root->statements.push_back(new InstructionNode(operation, std::move(quantum_arguments), line_number));
+            QuantumGateNode* gate = make_quantum_gate_node(quantum_arguments, line_number);
+            if (gate == nullptr) {
+                return fail_parse("SYNQ-P005", span, "could not construct typed quantum operands",
+                                  "use explicit operands such as q[0] or q[0], q[1]");
+            }
+            root->statements.push_back(gate);
         } else {
             root->statements.push_back(new InstructionNode(operation, {argument}, line_number));
         }
