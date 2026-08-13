@@ -1,7 +1,6 @@
 # SynQ Bounded Measurement Profile
 
-**Status:** Locally verified recovery-profile quantum source-export boundary;
-remote CI evidence for this increment is pending publication.
+**Status:** Remotely validated recovery-profile quantum source-export boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -68,5 +67,9 @@ the independent OpenQASM 3 parser and Qiskit importer.
 
 Completion establishes a **typed measurement source-export profile**, not a
 quantum execution model, observed result API, general measurement syntax,
-classical runtime, or hardware integration. Remote compiler-core evidence is
-required before the increment is described as remotely validated.
+classical runtime, or hardware integration. The same compiler profile passed in
+[Compiler Core #15][1] for commit `b03e2bc`.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31723306294 "SynQ Compiler Core #15"

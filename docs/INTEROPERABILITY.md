@@ -1,6 +1,6 @@
 # SynQ Interoperability Boundary
 
-**Status:** The bounded OpenQASM adapter remains the verified source-export boundary. The C ABI foundation for parsing this recovery profile and requesting the same export has remote compiler-core evidence; typed measurement export is locally verified and awaiting its own remote run. See [C ABI Foundation](./C_ABI.md).
+**Status:** The bounded OpenQASM adapter remains the verified source-export boundary. The C ABI foundation and typed measurement export both have remote compiler-core evidence. See [C ABI Foundation](./C_ABI.md).
 
 > SynQ does not currently provide general-purpose source compatibility, bidirectional translation, package interoperability, or hardware-provider execution. This document defines the first deliberately narrow compatibility boundary that can be tested within the compiler recovery profile.
 
