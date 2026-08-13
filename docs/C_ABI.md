@@ -91,7 +91,7 @@ shared library.
 | --- | --- | --- |
 | Rust | A dependency-free `rustc` smoke consumer declares the opaque v1 C ABI directly, validates parse/export/error ownership flows, and passed remotely in [Compiler Core #16][9]. A future wrapper can introduce RAII types after a separate API review. | A Rust crate, a Rust-native ABI, automatic bindings, safe wrapper types, or an in-process C++ interface. |
 | Mercury | Map only released C functions through `pragma foreign_proc` on a C backend, with a Mercury toolchain smoke test. | A Mercury package, all Mercury backends, or bidirectional foreign calls. |
-| Common Lisp | A test-only `libsynq_ffi.so` and SBCL/CFFI consumer now load the opaque v1 C ABI from the build directory, validate in-memory parse/export/error ownership flows, and are registered locally in the core profile. | A published CFFI system, installed shared library, callbacks, or all Lisp implementations. |
+| Common Lisp | A test-only `libsynq_ffi.so` and SBCL/CFFI consumer load the opaque v1 C ABI from the build directory, validate in-memory parse/export/error ownership flows, and passed remotely in [Compiler Core #18][11]. | A published CFFI system, installed shared library, callbacks, or all Lisp implementations. |
 | Clojure | Call a small Java facade through normal Java interop; the facade can use JNI only once its native-load contract is tested. | A Clojure library, direct C ABI access from Clojure, or a portable JNI solution. |
 
 The C ABI is therefore **a foundation for interoperability, not proof of full
@@ -121,3 +121,4 @@ tests.
 [8]: https://github.com/TangoSplicer/SynQ/actions/runs/31723306294 "SynQ Compiler Core #15"
 [9]: https://github.com/TangoSplicer/SynQ/actions/runs/31724123316 "SynQ Compiler Core #16"
 [10]: https://github.com/TangoSplicer/SynQ/actions/runs/31724839027 "SynQ Compiler Core #17"
+[11]: https://github.com/TangoSplicer/SynQ/actions/runs/31725431911 "SynQ Compiler Core #18"

@@ -31,7 +31,7 @@ version identification, feature-gated file and in-memory parsing, typed
 measurement export, diagnostic ownership, and cleanup. A dependency-free Rust C ABI consumer now
 compiles and runs remotely against that same contract, including in-memory text
 parsing; it is a proof of call and
-ownership flow, not a Rust binding. A test-only SBCL/CFFI consumer locally
+ownership flow, not a Rust binding. A test-only SBCL/CFFI consumer remotely
 loads the same C ABI from a build-directory shared library; it is not a
 Common Lisp package or general binding. Mercury and JVM-facing work remain
 unimplemented. The full C API is documented in [C ABI Foundation](./C_ABI.md);

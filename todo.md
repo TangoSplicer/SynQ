@@ -80,4 +80,4 @@
 - [x] Extend C and Rust consumers, run full checks, document verified boundaries, and publish the text-parsing increment.
 - [x] Confirm free Common Lisp/CFFI toolchain availability and define a test-only shared C-ABI library boundary.
 - [x] Implement and test a Common Lisp CFFI consumer of the opaque SynQ C ABI.
-- [ ] Integrate the Lisp consumer into compiler-core CI, document verified boundaries, and publish the increment.
+- [x] Integrate the Lisp consumer into compiler-core CI, document verified boundaries, and publish the increment.

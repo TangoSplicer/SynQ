@@ -1,7 +1,6 @@
 # SynQ Common Lisp CFFI Consumer Proof
 
-**Status:** Locally verified Common Lisp CFFI consumer proof; remote CI evidence
-for this increment is pending publication.
+**Status:** Remotely validated Common Lisp CFFI consumer proof.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -47,13 +46,14 @@ rules; or deliver Mercury, Clojure, JVM, or any other language binding.
 
 ## Exit criteria
 
-The shared target and SBCL/CFFI test now build and run locally; they validate
-the documented opaque C ABI ownership and in-memory measurement flow; and every
-compiler, frontend, backend, Rust, and independent OpenQASM check passes.
-Compiler-core CI must validate this profile before the proof is described as
-remotely verified. Documentation calls this a **Common Lisp CFFI consumer
-proof**, not a Common Lisp binding or full interoperability.
+The shared target and SBCL/CFFI test build and run; they validate the documented
+opaque C ABI ownership and in-memory measurement flow; and every compiler,
+frontend, backend, Rust, and independent OpenQASM check passes. The same
+compiler profile passed in [Compiler Core #18][2] for commit `a6601dd`.
+Documentation calls this a **Common Lisp CFFI consumer proof**, not a Common
+Lisp binding or full interoperability.
 
 ## References
 
 [1]: https://cffi.common-lisp.dev/manual/cffi-manual.html "CFFI User Manual"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31725431911 "SynQ Compiler Core #18"
