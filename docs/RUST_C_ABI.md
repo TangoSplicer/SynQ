@@ -1,7 +1,6 @@
 # SynQ Rust C-ABI Consumer Proof
 
-**Status:** Locally verified Rust C-ABI consumer proof; remote CI evidence for
-this increment is pending publication.
+**Status:** Remotely validated Rust C-ABI consumer proof.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -63,10 +62,11 @@ its own API/design, toolchain test, and ownership review.
 The standalone Rust source now compiles and runs through CTest locally; it
 validates ABI version, measurement source export, ownership cleanup, and a
 structured error; and all existing compiler, frontend, backend, and independent
-OpenQASM checks pass. Remote compiler-core evidence is required before the
-increment is described as remotely validated. Documentation calls this a **Rust
+OpenQASM checks pass. The same compiler profile passed in
+[Compiler Core #16][2] for commit `41edd99`. Documentation calls this a **Rust
 C-ABI consumer proof**, not a Rust binding or interoperability completion.
 
 ## References
 
 [1]: https://doc.rust-lang.org/reference/abi.html "The Rust Reference: Application binary interface"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31724123316 "SynQ Compiler Core #16"

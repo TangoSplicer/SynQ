@@ -74,4 +74,4 @@
 - [x] Re-run full checks, independently validate exported measurement syntax, and publish the measurement increment.
 - [x] Confirm the available Rust toolchain and define the smallest safe opaque-handle C-ABI consumer contract.
 - [x] Implement and test a dependency-free Rust consumer of the SynQ C ABI.
-- [ ] Integrate the Rust consumer into compiler-core CI, document the verified boundary, and publish the increment.
+- [x] Integrate the Rust consumer into compiler-core CI, document the verified boundary, and publish the increment.
