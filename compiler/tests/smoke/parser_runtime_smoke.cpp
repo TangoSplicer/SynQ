@@ -49,13 +49,16 @@ bool parser_accepts_supported_fixture() {
 
     auto* declaration = dynamic_cast<DeclarationNode*>(program->statements[0]);
     if (!require(declaration != nullptr, "parser creates DeclarationNode")) return false;
-    if (!require(declaration->name == "theta" && declaration->value == "0.5", "parser preserves declaration fields")) return false;
+    if (!require(declaration->name == "theta" && declaration->value == "0.5" &&
+                 declaration->literal_kind == ClassicalLiteralKind::Decimal,
+                 "parser preserves decimal declaration fields and classification")) return false;
     if (!require(declaration->line == 2, "parser records declaration source line")) return false;
 
     auto* url_declaration = dynamic_cast<DeclarationNode*>(program->statements[1]);
     if (!require(url_declaration != nullptr, "parser retains URL declaration")) return false;
-    if (!require(url_declaration->name == "endpoint" && url_declaration->value == "https://example.invalid",
-                 "parser preserves non-comment URL text")) return false;
+    if (!require(url_declaration->name == "endpoint" && url_declaration->value == "https://example.invalid" &&
+                 url_declaration->literal_kind == ClassicalLiteralKind::SourceText,
+                 "parser preserves non-comment URL source text")) return false;
     if (!require(url_declaration->line == 3, "parser records URL declaration source line")) return false;
 
     const std::string expected_operations[] = {"print", "delay", "ai"};
@@ -96,6 +99,41 @@ bool parser_rejects_invalid_fixture() {
            require(unsupported == nullptr, "parser rejects unsupported operation") &&
            require(malformed_declaration == nullptr, "parser rejects malformed declaration") &&
            require(missing == nullptr, "parser rejects missing input file");
+}
+
+bool parser_classifies_classical_literals() {
+    const std::string path = write_fixture(
+        "synq_parser_classical_literals_fixture.synq",
+        "let shots = 1024\n"
+        "let theta = -0.25\n"
+        "let enabled = true\n"
+        "let label = \"bell state\"\n"
+        "let expression = theta + delta\n");
+
+    Parser parser;
+    std::unique_ptr<ASTNode> root(parser.parseFile(path));
+    std::remove(path.c_str());
+    auto* program = dynamic_cast<ProgramNode*>(root.get());
+    if (!require(program != nullptr && program->statements.size() == 5,
+                 "parser accepts classical literal classification fixture")) return false;
+
+    const std::vector<ClassicalLiteralKind> expected = {
+        ClassicalLiteralKind::Integer,
+        ClassicalLiteralKind::Decimal,
+        ClassicalLiteralKind::Boolean,
+        ClassicalLiteralKind::QuotedString,
+        ClassicalLiteralKind::SourceText,
+    };
+    for (std::size_t index = 0; index < expected.size(); ++index) {
+        auto* declaration = dynamic_cast<DeclarationNode*>(program->statements[index]);
+        if (!require(declaration != nullptr && declaration->literal_kind == expected[index],
+                     "parser assigns the expected classical literal kind")) return false;
+    }
+
+    DeclarationNode direct_legacy("legacy", "42", 99);
+    return require(direct_legacy.literal_kind == ClassicalLiteralKind::SourceText &&
+                   direct_legacy.toString() == "let legacy = 42",
+                   "direct legacy declaration construction defaults to source text without changing rendering");
 }
 
 bool parser_accepts_explicit_qubit_operands() {
@@ -272,6 +310,7 @@ bool runtime_executes_supported_and_fallback_paths() {
 int main() {
     if (!parser_accepts_supported_fixture()) return 1;
     if (!parser_rejects_invalid_fixture()) return 1;
+    if (!parser_classifies_classical_literals()) return 1;
     if (!parser_accepts_explicit_qubit_operands()) return 1;
     if (!parser_rejects_malformed_qubit_operands()) return 1;
     if (!parser_accepts_literal_angle_parameters()) return 1;

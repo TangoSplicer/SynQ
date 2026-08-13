@@ -115,17 +115,31 @@ public:
     }
 };
 
+// A non-evaluating hint for the bounded declaration right-hand side. SourceText
+// means the parser preserved accepted source that a later expression/type layer
+// must understand; it does not mean that the value was rejected.
+enum class ClassicalLiteralKind {
+    Integer,
+    Decimal,
+    Boolean,
+    QuotedString,
+    SourceText,
+};
+
 // A small declaration node for the recovery parser's `let name = value` form.
 // The value is retained as source text; expression evaluation is outside this
-// recovery profile.
+// recovery profile. Parsed nodes receive a literal hint, while direct legacy
+// construction defaults deliberately to SourceText.
 class DeclarationNode : public ASTNode {
 public:
     std::string name;
     std::string value;
+    ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
     std::size_t line = 0;
 
-    DeclarationNode(std::string identifier, std::string source_value, std::size_t line_number)
-        : name(std::move(identifier)), value(std::move(source_value)), line(line_number) {}
+    DeclarationNode(std::string identifier, std::string source_value, std::size_t line_number,
+                    ClassicalLiteralKind kind = ClassicalLiteralKind::SourceText)
+        : name(std::move(identifier)), value(std::move(source_value)), literal_kind(kind), line(line_number) {}
 
     std::string toString() override {
         return "let " + name + " = " + value;

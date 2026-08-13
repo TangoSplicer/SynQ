@@ -85,6 +85,24 @@ bool is_parameter_expression(const std::string& value) {
            value.substr(prefix.size()) != "0";
 }
 
+bool is_integer_literal(const std::string& value) {
+    const std::size_t start = !value.empty() && value.front() == '-' ? 1 : 0;
+    if (start == value.size()) return false;
+    return std::all_of(value.begin() + start, value.end(), [](unsigned char character) {
+        return std::isdigit(character) != 0;
+    });
+}
+
+ClassicalLiteralKind classify_declaration_literal(const std::string& value) {
+    if (is_integer_literal(value)) return ClassicalLiteralKind::Integer;
+    if (value.find('.') != std::string::npos && is_decimal_parameter(value)) return ClassicalLiteralKind::Decimal;
+    if (value == "true" || value == "false") return ClassicalLiteralKind::Boolean;
+    if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
+        return ClassicalLiteralKind::QuotedString;
+    }
+    return ClassicalLiteralKind::SourceText;
+}
+
 bool is_parameterized_kernel(const std::string& kernel) {
     const std::size_t open = kernel.find('(');
     if (open == std::string::npos) return is_identifier(kernel);
@@ -256,7 +274,8 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
             if (!is_identifier(identifier) || value.empty()) {
                 return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
             }
-            root->statements.push_back(new DeclarationNode(identifier, value, line_number));
+            root->statements.push_back(new DeclarationNode(identifier, value, line_number,
+                                                           classify_declaration_literal(value)));
             continue;
         }
 

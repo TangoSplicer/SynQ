@@ -57,3 +57,6 @@
 - [x] Implement typed quantum AST nodes and construction from the recovery parser.
 - [x] Adapt the bounded OpenQASM exporter and fixtures to consume the typed quantum nodes.
 - [x] Run full checks, record factual evidence, and publish the typed-AST increment.
+- [x] Define a minimal typed classical literal vocabulary that preserves existing declaration source text.
+- [x] Implement literal classification for parsed declarations and add focused parser tests.
+- [ ] Run full checks, document verified hybrid-AST outcomes, and publish the classical-boundary increment.
