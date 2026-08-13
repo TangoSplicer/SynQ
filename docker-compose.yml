@@ -34,7 +34,7 @@ services:
   # Backend API
   backend:
     build:
-      context: ./synqhub_backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: synq-backend
     environment:
@@ -50,7 +50,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./synqhub_backend:/app
+      - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -61,7 +61,7 @@ services:
   # Frontend
   frontend:
     build:
-      context: ./synq_expansion_showcase
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: synq-frontend
     ports:

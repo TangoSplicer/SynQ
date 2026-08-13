@@ -90,7 +90,7 @@ private:
     /**
      * @brief Get cached type information
      */
-    ir::TypedOptimizedIR get_cached_result(const ir::ParsedIR& parsed_ir) const;
+    ir::TypedOptimizedIR get_cached_result(const ir::ParsedIR& parsed_ir);
 
     /**
      * @brief Build symbol table from AST

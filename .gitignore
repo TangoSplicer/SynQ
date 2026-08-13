@@ -111,3 +111,6 @@ pip-cache/
 
 # Generated files
 *.generated.*
+
+# Repository-local compiler build tree
+compiler/build/

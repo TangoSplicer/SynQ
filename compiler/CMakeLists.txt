@@ -5,12 +5,38 @@
 cmake_minimum_required(VERSION 3.18)
 project(SynQ LANGUAGES C CXX)
 
-file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS src/*.cpp)
-add_subdirectory(src)
-
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# The historical test and Python-binding targets are incomplete. Keep the
+# default build focused on the compiler library until those targets are repaired.
+option(BUILD_TESTS "Build test suite" OFF)
+option(BUILD_PYTHON_BINDINGS "Build Python REPL bindings" OFF)
+option(BUILD_CLI_TOOLS "Build standalone CLI tool sources" OFF)
+option(BUILD_COMPILER_EXECUTABLE "Build the unfinished compiler command-line entry point" OFF)
+option(BUILD_EXPERIMENTAL_COMPONENTS "Build experimental debugger, network, optimizer, and plugin subsystems" OFF)
+option(BUILD_REPL "Build experimental REPL command sources" OFF)
+option(BUILD_CORE_SMOKE_TESTS "Build focused smoke tests for the compiler core profile" ON)
+
+file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS src/*.cpp)
+if(NOT BUILD_PYTHON_BINDINGS)
+    list(FILTER SRC_SOURCES EXCLUDE REGEX ".*/bindings/.*\\.cpp$")
+endif()
+if(NOT BUILD_CLI_TOOLS)
+    list(FILTER SRC_SOURCES EXCLUDE REGEX ".*/cli/.*\\.cpp$")
+endif()
+if(NOT BUILD_COMPILER_EXECUTABLE)
+    list(FILTER SRC_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
+endif()
+if(NOT BUILD_EXPERIMENTAL_COMPONENTS)
+    list(FILTER SRC_SOURCES EXCLUDE REGEX ".*/(debugger|net|optimizer|plugins|runtime)/.*\\.cpp$")
+endif()
+if(NOT BUILD_REPL)
+    list(FILTER SRC_SOURCES EXCLUDE REGEX ".*/repl/.*\\.cpp$")
+endif()
+add_subdirectory(src)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
@@ -18,11 +44,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 include(dependencies)
 include(packaging)
 
-# Only include tests if building with tests enabled
-option(BUILD_TESTS "Build test suite" ON)
+# Only include tests if building with tests enabled.
 if(BUILD_TESTS)
     include(gtest)
     include(coverage)
+endif()
+
+if(BUILD_CORE_SMOKE_TESTS)
+    enable_testing()
+    add_executable(synq_core_smoke tests/smoke/core_smoke.cpp)
+    target_include_directories(synq_core_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_core_smoke PRIVATE synq_lib)
+    add_test(NAME synq_core_smoke COMMAND synq_core_smoke)
 endif()
 
 # Global includes

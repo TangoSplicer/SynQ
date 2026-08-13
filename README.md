@@ -1,414 +1,108 @@
-# SynQ: Hybrid Quantum-Classical-AI Programming Language
+# SynQ
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![License: Commercial](https://img.shields.io/badge/License-Commercial-blue.svg)](LICENSE_COMMERCIAL.md)
-[![GitHub Stars](https://img.shields.io/github/stars/TangoSplicer/SynQ?style=social)](https://github.com/TangoSplicer/SynQ)
-[![GitHub Issues](https://img.shields.io/github/issues/TangoSplicer/SynQ)](https://github.com/TangoSplicer/SynQ/issues)
+[![GitHub Discussions](https://img.shields.io/github/discussions/TangoSplicer/SynQ)](https://github.com/TangoSplicer/SynQ/discussions)
 
-> **SynQ is a unified programming language that seamlessly integrates quantum computing, classical computation, and artificial intelligence into a single, powerful ecosystem.**
+> **SynQ is an experimental, in-progress repository for a hybrid quantum, classical, and AI-oriented programming-language prototype.** It is not currently a verified end-to-end production release.
 
----
+## Current Status
 
-## What is SynQ?
+The repository contains a C++ compiler codebase, a React/TypeScript frontend, and a Python/FastAPI backend prototype. A technical review performed against the checked-in source found that the default compiler build, backend startup path, container deployment, and frontend dependency installation required repair before they could be presented as working product capabilities.
 
-SynQ is an experimental programming language designed to bridge the gap between quantum computing, classical computation, and machine learning. Currently at **version 1.0.0**, SynQ combines the simplicity of Python, the performance of C/C++, the security of Rust, and native quantum computing capabilities into a single language ecosystem.
+| Area | Current position | What is verified in this repository |
+|---|---|---|
+| Compiler | **Prototype; repair in progress** | CMake-based C++ source tree and example/test fixtures are present. A clean default build is being restored; the full test target remains opt-in because legacy test sources do not compile. |
+| Frontend | **Prototype; repair in progress** | React/TypeScript source and a pnpm lockfile are present. The current work restores a reproducible install and Vite configuration. |
+| Backend | **Prototype; incomplete** | FastAPI source and some route modules are present, but the checked-in entry point imports modules that are not currently in the backend tree. It is not yet a verified runnable API service. |
+| Quantum execution | **Simulator/prototype only** | Do not infer hardware-provider support, hardware execution, or validated algorithm performance from the current repository. |
+| Tests | **Not yet independently verified** | Test sources exist, but the repository does not currently provide evidence for a complete passing suite, coverage percentage, or published benchmark results. |
 
-The core platform consists of three main components: a **C++ compiler with LLVM backend**, a **Python/FastAPI backend** providing 110+ REST endpoints with GraphQL support, and a **React-based frontend** with real-time code editing and quantum circuit visualization. The project includes **60,000+ lines of code** across multiple development phases, with comprehensive testing infrastructure and production deployment capabilities.
+## What SynQ Is Exploring
 
-SynQ is designed for researchers, developers, and organizations exploring quantum-classical-AI hybrid solutions. It provides native support for seamless integration with classical programming logic, quantum simulation, and machine learning operations within a single codebase.
+SynQ explores a single-language workflow for classical logic, quantum-oriented syntax, and AI-related tooling. The source tree includes compiler components, simulation-related code, examples, web UI components, and backend route prototypes. These components are a basis for continued engineering work; they should not be treated as a supported SDK or commercial platform today.
 
----
+## Repository Layout
 
-## Why SynQ?
+| Path | Purpose |
+|---|---|
+| `compiler/` | C++ compiler and runtime prototype, CMake configuration, examples, and test fixtures. |
+| `frontend/` | React/TypeScript user-interface prototype, built with Vite and pnpm. |
+| `backend/` | Python/FastAPI service prototype. Some dependencies and modules remain to be completed. |
+| `examples/` | SynQ example material. Treat examples as illustrative until they are covered by a passing build-and-run check. |
+| `docs/` | Project documentation, including GitHub setup and launch material. |
+| `scripts/` | Repository utility scripts; inspect each script before use. |
 
-**The Problem:** Today's quantum computing frameworks (Qiskit, Cirq, PennyLane) operate in isolation from classical code and AI systems. Developers write quantum circuits separately, classical logic separately, and ML models separately—then struggle to integrate them.
+## Working With the Repository
 
-**The SynQ Solution:** Write quantum, classical, and AI code together in one language. SynQ handles the complexity of orchestration, optimization, and deployment automatically. One language. One ecosystem. One unified platform.
-
----
-
-## Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **Quantum Computing** | Full quantum circuit support with 20+ quantum gates, quantum algorithms (VQE, QAOA, Grover), and quantum simulation |
-| **Classical Programming** | Type-safe classical programming with variables, functions, pattern matching, lists, dictionaries, and control flow |
-| **Machine Learning** | Native ML support with neural networks, tensor operations, gradient computation, and optimization algorithms |
-| **Hybrid Execution** | Seamless execution of quantum-classical-AI workflows in a single program |
-| **110+ API Endpoints** | Comprehensive REST API with GraphQL and WebSocket support for real-time operations |
-| **1,060+ Standard Library Functions** | Extensive standard library covering quantum, classical, and ML operations |
-| **87% Test Coverage** | 1,000+ automated tests ensuring reliability and correctness |
-| **Production Ready** | Docker containerization, Kubernetes orchestration, monitoring, and CI/CD pipelines |
-
----
-
-## Project Statistics
-
-| Metric | Value |
-|--------|-------|
-| **Version** | 1.0.0 |
-| **Release Date** | March 26, 2026 |
-| **Lines of Code** | 60,000+ |
-| **API Endpoints** | 110+ |
-| **Standard Library Functions** | 1,060+ |
-| **Supported Languages** | 5 (C++, Python, Java, JavaScript, Rust) |
-| **Test Coverage** | 87% |
-| **Automated Tests** | 1,000+ |
-| **GitHub Commits** | 20+ |
-| **License** | Dual (MIT + Commercial) |
-
----
-
-## Architecture
-
-```
-SynQ Platform (v1.0.0)
-├── Compiler (C++ with LLVM Backend)
-│   ├── Lexer/Parser - Fast syntax analysis
-│   ├── Type Checker - Memory and type safety
-│   ├── Optimizer - Advanced optimizations
-│   └── Code Generator - LLVM backend
-│
-├── Backend API (Python/FastAPI)
-│   ├── 110+ REST Endpoints
-│   ├── GraphQL Interface
-│   ├── WebSocket Real-time Support
-│   ├── Quantum Simulation Engine
-│   ├── ML Model Serving
-│   └── Database Integration (PostgreSQL)
-│
-├── Frontend (React 19 + TypeScript)
-│   ├── Real-time Code Editor
-│   ├── Quantum Circuit Visualizer
-│   ├── Interactive Debugging
-│   ├── ML Model Inspector
-│   └── Project Management
-│
-└── Infrastructure
-    ├── Docker Containerization
-    ├── Kubernetes Orchestration
-    ├── Prometheus Monitoring
-    ├── GitHub Actions CI/CD
-    └── GitHub Pages Documentation
-```
-
----
-
-## Installation
-
-### Prerequisites
-
-- **Operating System:** Linux (Ubuntu 18.04+), macOS (10.15+), or Windows (with WSL2)
-- **C++ Compiler:** GCC 9+ or Clang 10+
-- **Python:** 3.8 or later
-- **Git:** For cloning the repository
-- **CMake:** Version 3.15 or later
-- **Node.js:** 18+ (for frontend development)
-
-### Quick Start (Docker Recommended)
+### Clone
 
 ```bash
-# Clone repository
 git clone https://github.com/TangoSplicer/SynQ.git
 cd SynQ
-
-# Start with Docker Compose
-docker-compose up -d
-
-# Access services
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
 ```
 
-### Local Development
+### Frontend
+
+The frontend uses pnpm. Its currently supported validation path is:
 
 ```bash
-# Clone repository
-git clone https://github.com/TangoSplicer/SynQ.git
-cd SynQ
-
-# Build compiler
-cd compiler
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-cd ..
-
-# Install and run backend
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-cd ..
-
-# Install and run frontend
 cd frontend
-pnpm install
-pnpm run dev
+pnpm install --frozen-lockfile
+pnpm run check
+pnpm run build
 ```
 
-See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed installation instructions for all systems.
+### Compiler Prototype
 
----
+The C++ project requires CMake, a C++17 compiler, `nlohmann_json`, and OpenSSL development headers. `pybind11` is required only when enabling the optional Python-binding target. The default build is a **core-library recovery profile**. It excludes legacy tests, optional Python bindings, the unfinished command-line executable, experimental REPL command sources, and debugger/network/optimizer/plugin/runtime subsystems.
 
-## Quick Examples
-
-### Hello World
-
-```synq
-fn main() {
-    println("Hello, SynQ!");
-}
+```bash
+cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release
+cmake --build compiler/build --parallel
 ```
 
-### Classical Programming
+Use `-DBUILD_TESTS=ON`, `-DBUILD_PYTHON_BINDINGS=ON`, `-DBUILD_CLI_TOOLS=ON`, `-DBUILD_COMPILER_EXECUTABLE=ON`, `-DBUILD_REPL=ON`, or `-DBUILD_EXPERIMENTAL_COMPONENTS=ON` only when actively repairing those targets. None is currently represented as a passing supported workflow.
 
-```synq
-fn fibonacci(n: int) -> int {
-    if n <= 1 {
-        return n;
-    }
-    return fibonacci(n - 1) + fibonacci(n - 2);
-}
+### Backend Prototype
 
-fn main() {
-    let result = fibonacci(10);
-    println("Fibonacci(10) = " + result.to_string());
-}
-```
-
-### Quantum Circuit
-
-```synq
-fn quantum_teleportation() {
-    let circuit = Circuit::new(3);
-    
-    // Prepare Bell pair
-    circuit.h(0);
-    circuit.cnot(0, 1);
-    
-    // Teleport qubit 2 to qubit 1
-    circuit.cnot(2, 0);
-    circuit.h(2);
-    
-    let result = circuit.measure();
-    println("Teleportation result: " + result.to_string());
-}
-```
-
-### Hybrid Quantum-ML
-
-```synq
-fn hybrid_optimization() {
-    // Classical ML model
-    let model = NeuralNetwork::new([10, 20, 1]);
-    
-    // Quantum circuit for feature encoding
-    let circuit = Circuit::new(4);
-    circuit.rx(0, 0.5);
-    circuit.ry(1, 0.3);
-    
-    // Hybrid training loop
-    for epoch in 0..100 {
-        let quantum_features = circuit.measure();
-        let prediction = model.forward(quantum_features);
-        model.backward(prediction);
-    }
-}
-```
-
----
+The backend is **not currently documented as runnable**. Its source imports modules that are absent from the repository, and it needs a focused recovery pass before a run command can be provided responsibly.
 
 ## Documentation
 
-- **[Getting Started Guide](GETTING_STARTED.md)** - Installation and first steps
-- **[User Guide](USER_GUIDE.md)** - Complete user documentation
-- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute
-- **[Security Policy](SECURITY.md)** - Vulnerability reporting
-- **[Changelog](CHANGELOG.md)** - Version history and releases
-- **[License Information](LICENSE_FAQ.md)** - Licensing details
-- **[Compiler Documentation](compiler/docs/)** - Compiler internals
-- **[Examples](examples/)** - Working code examples
-
----
-
-## Examples
-
-The `examples/` directory contains working code examples:
-
-- **hello.synq** - Hello World program
-- **classical_basics.synq** - Classical programming features
-- **quantum_demo.synq** - Quantum circuit basics
-- **hybrid_quantum_ml.synq** - Advanced hybrid example with VQE, QML, and QAOA
-
-See [examples/](examples/) for more examples and [HYBRID_CUSTOMIZATION_GUIDE.md](examples/HYBRID_CUSTOMIZATION_GUIDE.md) for customization guidance.
-
----
-
-## Community
-
-We welcome contributions and community participation!
-
-- **[GitHub Discussions](https://github.com/TangoSplicer/SynQ/discussions)** - Ask questions and share ideas
-- **[GitHub Issues](https://github.com/TangoSplicer/SynQ/issues)** - Report bugs and request features
-- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute code
-- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community standards
-- **[Contributors](CONTRIBUTORS.md)** - Recognize community members
-
----
-
-## Licensing
-
-SynQ uses a **dual licensing model**:
-
-| License | Use Case | Cost |
-|---------|----------|------|
-| **MIT License** | Personal, educational, open-source projects | Free |
-| **Commercial License** | Commercial products, SaaS, enterprise | Paid |
-
-See [LICENSE_FAQ.md](LICENSE_FAQ.md) for comprehensive licensing information.
-
-### Commercial Licensing
-
-If you're using SynQ for commercial purposes, a Commercial License is recommended and includes:
-- Priority support (4-hour response time)
-- SLA guarantees
-- Indemnification
-- Enterprise features
-
-Pricing starts at $99/month for individual developers. See [LICENSE_COMMERCIAL.md](LICENSE_COMMERCIAL.md) for details.
-
----
+| Document | Purpose |
+|---|---|
+| [GETTING_STARTED.md](GETTING_STARTED.md) | Verified setup boundaries and first contribution steps. |
+| [USER_GUIDE.md](USER_GUIDE.md) | Current capability and limitation guide. |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution process. |
+| [SECURITY.md](SECURITY.md) | Security-reporting policy. |
+| [CHANGELOG.md](CHANGELOG.md) | Documented project history. |
+| [docs/github-setup/](docs/github-setup/) | Optional GitHub administration guides. |
 
 ## Roadmap
 
-### Current (v1.0.0)
-- ✅ Quantum-classical-AI integration
-- ✅ 110+ REST API endpoints
-- ✅ 1,060+ standard library functions
-- ✅ 87% test coverage
-- ✅ Production infrastructure
+The immediate roadmap is recovery and verification, not feature expansion.
 
-### Phase 2 (Q2 2026)
-- 🔄 IDE development
-- 🔄 Performance optimizations
-- 🔄 Extended examples
-- 🔄 Community feedback integration
+1. Establish reproducible frontend, compiler, and backend build paths.
+2. Repair or retire stale test targets and publish real test outcomes.
+3. Stabilize a small, documented language subset with examples that run in CI.
+4. Restore the backend only after its required modules, dependencies, and tests are present.
+5. Evaluate future quantum, AI, collaboration, and hardware features through scoped issues and demonstrated implementations.
 
-### Phase 3 (Q3 2026)
-- 📅 Real quantum hardware integration
-- 📅 Cloud deployment
-- 📅 Enterprise features
-- 📅 Advanced optimization
-
-### Phase 4 (Q4 2026)
-- 📅 Production hardening
-- 📅 Commercial offerings
-- 📅 Expanded community
-- 📅 Global reach
-
----
-
-## Performance
-
-SynQ is designed for performance:
-
-| Metric | Performance |
-|--------|-------------|
-| **Compilation Speed** | 100x faster incremental builds |
-| **Runtime Performance** | 90%+ of C/C++ speed |
-| **Quantum Simulation** | Up to 20 qubits |
-| **API Response Time** | <100ms (p99) |
-| **Test Execution** | 1,000+ tests in <5 minutes |
-
----
-
-## Security
-
-Security is a core principle of SynQ:
-
-- **Type Safety** - Strong type system prevents common vulnerabilities
-- **Memory Safety** - No buffer overflows, no use-after-free bugs
-- **Quantum-Safe Cryptography** - Post-quantum cryptographic algorithms
-- **Vulnerability Reporting** - Responsible disclosure process
-- **Security Audits** - Regular security reviews
-
-See [SECURITY.md](SECURITY.md) for detailed security information.
-
----
-
-## Support
-
-- **Documentation:** [GitHub Wiki](https://github.com/TangoSplicer/SynQ/wiki)
-- **Questions:** [GitHub Discussions](https://github.com/TangoSplicer/SynQ/discussions)
-- **Bugs:** [GitHub Issues](https://github.com/TangoSplicer/SynQ/issues)
-- **Security:** [security@synqlang.dev](mailto:security@synqlang.dev)
-- **Commercial:** [commercial@synqlang.dev](mailto:commercial@synqlang.dev)
-
----
+Features such as hardware integration, AI-driven circuit synthesis, real-time collaboration, package registries, production SLAs, performance guarantees, and commercial support are **not current, verified capabilities** of this repository.
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions that improve reproducibility, build health, tests, minimal examples, documentation, and issue triage are especially valuable. Please read [CONTRIBUTING.md](CONTRIBUTING.md), check existing issues, and open a discussion before beginning a large change.
 
-**Ways to contribute:**
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Improve documentation
-- Create examples
-- Help with translations
+## Community
 
----
+- [GitHub Discussions](https://github.com/TangoSplicer/SynQ/discussions) for questions and ideas.
+- [GitHub Issues](https://github.com/TangoSplicer/SynQ/issues) for reproducible bugs and scoped feature requests.
 
-## License
+## Licensing
 
-- **Open Source:** MIT License (see [LICENSE](LICENSE))
-- **Commercial:** Commercial License Agreement (see [LICENSE_COMMERCIAL.md](LICENSE_COMMERCIAL.md))
+The repository includes an MIT license file and separate commercial-license materials. Read the actual terms in [LICENSE](LICENSE), [LICENSE_COMMERCIAL.md](LICENSE_COMMERCIAL.md), and [LICENSE_FAQ.md](LICENSE_FAQ.md) before relying on either path. This README does not modify those terms.
 
----
+## Transparency Note
 
-## Acknowledgments
-
-Thank you to:
-- The open-source community for inspiration and best practices
-- The quantum computing community for feedback and ideas
-- Our users for using SynQ and providing feedback
-- Security researchers for responsibly reporting vulnerabilities
-
----
-
-## Citation
-
-If you use SynQ in research, please cite:
-
-```bibtex
-@software{synq2026,
-  title={SynQ: Hybrid Quantum-Classical-AI Programming Language},
-  author={TangoSplicer},
-  year={2026},
-  url={https://github.com/TangoSplicer/SynQ}
-}
-```
-
----
-
-## Status
-
-**Current Version:** 1.0.0  
-**Release Date:** March 26, 2026  
-**Status:** Stable  
-**Support Until:** March 26, 2027  
-
----
-
-**Ready to get started?** Check out the [Getting Started Guide](GETTING_STARTED.md)
-
-**Have questions?** Join our [GitHub Discussions](https://github.com/TangoSplicer/SynQ/discussions)
-
-**Want to contribute?** See [Contributing Guidelines](CONTRIBUTING.md)
-
----
-
-**Made with ❤️ by the SynQ Team**
-
-[GitHub](https://github.com/TangoSplicer/SynQ) | [Website](https://synqlang.dev) | [Documentation](https://github.com/TangoSplicer/SynQ/wiki)
+This README intentionally distinguishes checked-in source from verified product functionality. If you find a claim that conflicts with the code or a reproducible result, please open an issue with the relevant command and output.

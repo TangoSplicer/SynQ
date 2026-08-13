@@ -73,7 +73,7 @@ bool IncrementalTypeChecker::needs_recompilation(const ir::ParsedIR& parsed_ir) 
 }
 
 ir::TypedOptimizedIR IncrementalTypeChecker::get_cached_result(
-    const ir::ParsedIR& parsed_ir) const {
+    const ir::ParsedIR& parsed_ir) {
     
     auto cached_data = cache.get_cached(parsed_ir.get_file_path());
     if (cached_data.empty()) {

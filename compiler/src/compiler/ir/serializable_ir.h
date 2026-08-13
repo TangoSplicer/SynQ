@@ -75,6 +75,12 @@ public:
     uint64_t get_timestamp() const { return timestamp; }
 
     /**
+     * @brief Set the compilation timestamp explicitly when carrying metadata
+     * between intermediate-representation stages.
+     */
+    void set_timestamp(uint64_t value) { timestamp = value; }
+
+    /**
      * @brief Set the source file path
      */
     void set_file_path(const std::string& path) { file_path = path; }

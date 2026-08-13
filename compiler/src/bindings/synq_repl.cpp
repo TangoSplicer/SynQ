@@ -32,11 +32,17 @@ PYBIND11_MODULE(synq_repl, m) {
     py::class_<REPL>(m, "REPL")
         .def(py::init<>())
         .def("execute", &REPL::execute, "Execute a SynQ DSL command")
-        .def("list_plugins", &REPL::list_plugins, "List all registered plugins")
+        .def("list_plugins_json", [](REPL& repl) {
+            return repl.list_plugins().dump();
+        }, "List registered plugins as a JSON string")
         .def("register_plugin", &REPL::register_plugin,
             py::arg("name"), py::arg("version"), py::arg("desc"), py::arg("handler"),
             "Register a plugin into the system")
-        .def("invoke_plugin", &REPL::invoke_plugin,
-            py::arg("name"), py::arg("payload"),
-            "Invoke a registered plugin");
+        .def("invoke_plugin_json", [](REPL& repl, const std::string& name, const std::string& payload) {
+            try {
+                return repl.invoke_plugin(name, nlohmann::json::parse(payload)).dump();
+            } catch (const nlohmann::json::exception& error) {
+                throw py::value_error(error.what());
+            }
+        }, py::arg("name"), py::arg("payload"), "Invoke a registered plugin with a JSON payload string");
 }

@@ -176,13 +176,13 @@ const OwnershipMetadata* OwnershipTracker::get_metadata(uint64_t value_id) const
     return &it->second;
 }
 
-bool OwnershipTracker::validate() const {
+bool OwnershipTracker::validate() {
     violations.clear();
 
     // Check for orphaned values
     for (const auto& [value_id, metadata] : ownership_map) {
         if (metadata.owner_id == 0) {
-            const_cast<OwnershipTracker*>(this)->record_violation(
+            record_violation(
                 "Value " + std::to_string(value_id) + " has no owner");
         }
     }
@@ -192,7 +192,7 @@ bool OwnershipTracker::validate() const {
         auto it = ownership_map.find(value_id);
         if (it != ownership_map.end()) {
             if (it->second.borrow_count != borrowers.size()) {
-                const_cast<OwnershipTracker*>(this)->record_violation(
+                record_violation(
                     "Value " + std::to_string(value_id) +
                     " has inconsistent borrow count");
             }

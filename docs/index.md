@@ -1,24 +1,24 @@
 # SynQ Documentation
 
-Welcome to SynQ documentation!
+## SynQ Documentation
 
----
+> **Current project status:** SynQ is an experimental repository under active recovery. Read [Project Status](PROJECT_STATUS.md) before relying on installation, deployment, test-coverage, performance, API, hardware, or feature claims in older documents.
 
 ## Getting Started
 
-- [Installation Guide](../GETTING_STARTED.md) - Step-by-step installation
-- [Quick Start](../README.md) - Quick introduction
-- [Examples](../examples/) - Working code examples
-- [Hybrid Example](../examples/HYBRID_EXAMPLE_README.md) - Advanced example
+- [Getting Started](../GETTING_STARTED.md) - Verified setup boundaries and contribution workflow.
+- [Repository Overview](../README.md) - Current component status and recovery roadmap.
+- [User Guide](../USER_GUIDE.md) - Safe interpretation of current prototype capabilities.
+- [Project Status](PROJECT_STATUS.md) - Dated build, test, and documentation review results.
 
 ---
 
-## Documentation
+## Reference Material
 
-- [User Guide](user-guide.md) - Complete user guide
-- [API Reference](api-reference.md) - API documentation
-- [Contributing](../CONTRIBUTING.md) - How to contribute
-- [License Information](../LICENSE_FAQ.md) - Licensing details
+- [Contributing](../CONTRIBUTING.md) - Contribution process.
+- [Testing](../TESTING.md) - Historical testing material; compare it against the current status record.
+- [License Information](../LICENSE_FAQ.md) - Licensing information; read the source terms as well.
+- [GitHub Setup](github-setup/COMPLETE_GITHUB_SETUP_GUIDE.md) - Optional repository-administration guidance.
 
 ---
 
@@ -26,7 +26,6 @@ Welcome to SynQ documentation!
 
 - [GitHub Discussions](https://github.com/TangoSplicer/SynQ/discussions) - Ask questions
 - [Issues](https://github.com/TangoSplicer/SynQ/issues) - Report bugs
-- [Code of Conduct](../CODE_OF_CONDUCT.md) - Community guidelines
 - [Security Policy](../SECURITY.md) - Reporting vulnerabilities
 
 ---
@@ -34,9 +33,9 @@ Welcome to SynQ documentation!
 ## Resources
 
 - [GitHub Repository](https://github.com/TangoSplicer/SynQ)
-- [Project Website](https://synqlang.dev)
-- [Changelog](../CHANGELOG.md) - Version history
-- [Contributors](../CONTRIBUTORS.md) - Community members
+- [Project Showcase](https://synqshowcase-ee5qsvs3.manus.space/)
+- [Changelog](../CHANGELOG.md) - Historical version material; not proof of current operability.
+- [Contributors](../CONTRIBUTORS.md) - Contributor recognition.
 
 ---
 
@@ -44,47 +43,15 @@ Welcome to SynQ documentation!
 
 | Resource | Link |
 |----------|------|
-| **Installation** | [GETTING_STARTED.md](../GETTING_STARTED.md) |
-| **Examples** | [examples/](../examples/) |
-| **API Docs** | [api-reference.md](api-reference.md) |
+| **Current status** | [PROJECT_STATUS.md](PROJECT_STATUS.md) |
+| **Getting started** | [GETTING_STARTED.md](../GETTING_STARTED.md) |
 | **Contributing** | [CONTRIBUTING.md](../CONTRIBUTING.md) |
 | **Community** | [GitHub Discussions](https://github.com/TangoSplicer/SynQ/discussions) |
 | **Issues** | [GitHub Issues](https://github.com/TangoSplicer/SynQ/issues) |
-| **License** | [LICENSE_FAQ.md](../LICENSE_FAQ.md) |
 | **Security** | [SECURITY.md](../SECURITY.md) |
 
 ---
 
-## FAQ
+## Documentation Reliability
 
-**Q: How do I get started with SynQ?**
-A: Start with [Getting Started Guide](../GETTING_STARTED.md)
-
-**Q: Where can I find examples?**
-A: Check [examples/](../examples/) directory
-
-**Q: How do I contribute?**
-A: See [Contributing Guidelines](../CONTRIBUTING.md)
-
-**Q: What license is SynQ under?**
-A: See [License Information](../LICENSE_FAQ.md)
-
-**Q: How do I report a bug?**
-A: [Create an issue](https://github.com/TangoSplicer/SynQ/issues)
-
-**Q: How do I ask a question?**
-A: [Start a discussion](https://github.com/TangoSplicer/SynQ/discussions)
-
----
-
-## Latest Updates
-
-- **v1.0.0 Released** - March 26, 2026
-- **GitHub Setup Complete** - Professional infrastructure ready
-- **Community Launched** - Join discussions and contribute
-
----
-
-**Happy coding with SynQ!** 🚀
-
-**For more information, visit:** https://synqlang.dev
+Some historical files describe planned phases or unsupported claims. They are retained as historical material, not as product specifications. When documents conflict, the source code, reproducible command output, and [Project Status](PROJECT_STATUS.md) take precedence.

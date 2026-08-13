@@ -42,7 +42,6 @@ ENV PATH="/opt/venv/bin:$PATH" \
 
 # Copy application code
 COPY app /app/app
-COPY main.py /app/main.py
 
 # Create non-root user
 RUN useradd -m -u 1000 synq && chown -R synq:synq /app

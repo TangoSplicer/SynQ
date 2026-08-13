@@ -53,7 +53,7 @@ struct Task {
 class ComputeNode {
 public:
     ComputeNode(std::string id, NodeType type);
-    DistributedResult execute(const Task& task);
+    DistributedResult execute(const Task& task) const;
 
     std::string get_id() const;
     NodeType get_type() const;

@@ -34,11 +34,12 @@ void ContextSnapshot::save(const std::string& filename) {
         std::cerr << "[Snapshot] Failed to save: " << filename << "\n";
         return;
     }
-    for (const auto& [k, v] : EvalContext::variables) {
+    const auto variables = EvalContext::getVariables();
+    for (const auto& [k, v] : variables) {
         out << k << "=" << v << "\n";
     }
     out.close();
-    std::cout << "[Snapshot] Saved " << EvalContext::variables.size() << " variables to: " << filename << "\n";
+    std::cout << "[Snapshot] Saved " << variables.size() << " variables to: " << filename << "\n";
 }
 
 void ContextSnapshot::restore(const std::string& filename) {

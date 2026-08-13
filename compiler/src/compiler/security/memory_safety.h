@@ -148,7 +148,7 @@ public:
      * @brief Validate ownership rules
      * @return true if all ownership rules are satisfied
      */
-    bool validate() const;
+    bool validate();
 
     /**
      * @brief Get all violations

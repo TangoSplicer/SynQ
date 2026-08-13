@@ -33,8 +33,12 @@ namespace classical {
 
 ParamMap gridSearch(const Objective& f, const ParamMap& init, int max_iters) {
     ParamMap best_params = init;
+    if (init.empty() || max_iters <= 0) {
+        return best_params;
+    }
+
     double best_score = std::numeric_limits<double>::max();
-    int steps = std::max(1, max_iters / init.size());
+    int steps = std::max(1, max_iters / static_cast<int>(init.size()));
     double step_size = 0.1;
 
     for (int step = 0; step < steps; ++step) {

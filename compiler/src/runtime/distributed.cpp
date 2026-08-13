@@ -33,7 +33,7 @@ namespace synq {
 ComputeNode::ComputeNode(std::string id, NodeType type)
     : id(id), type(type) {}
 
-DistributedResult ComputeNode::execute(const Task& task) {
+DistributedResult ComputeNode::execute(const Task& task) const {
     std::ostringstream out;
     out << "[Node " << id << "] Executing task: " << task.id;
 

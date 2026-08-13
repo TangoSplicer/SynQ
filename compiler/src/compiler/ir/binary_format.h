@@ -11,6 +11,7 @@
 #include <string>
 #include <memory>
 #include <cstring>
+#include <stdexcept>
 
 namespace synq::compiler::ir {
 

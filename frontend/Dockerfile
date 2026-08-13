@@ -13,10 +13,13 @@ RUN npm install -g pnpm && \
     pnpm install --frozen-lockfile
 
 # Copy source code
-COPY client ./client
+COPY client/index.html ./client/index.html
+COPY client/public ./client/public
+COPY client/src ./client/src
+COPY vite.config.ts tsconfig.json ./
 
 # Build application
-RUN cd client && pnpm build
+RUN pnpm build
 
 # Stage 2: Runtime
 FROM nginx:alpine
@@ -25,7 +28,7 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built application
-COPY --from=builder /build/client/dist /usr/share/nginx/html
+COPY --from=builder /build/dist /usr/share/nginx/html
 
 # Create non-root user
 RUN addgroup -g 1000 nginx && \

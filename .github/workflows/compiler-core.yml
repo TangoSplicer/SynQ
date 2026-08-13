@@ -1,0 +1,45 @@
+name: Compiler Core
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "compiler/**"
+      - ".github/workflows/compiler-core.yml"
+  pull_request:
+    paths:
+      - "compiler/**"
+      - ".github/workflows/compiler-core.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke-test:
+    name: Build compiler core and run smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ nlohmann-json3-dev libssl-dev
+
+      - name: Configure verified recovery profile
+        run: |
+          cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_CLI_TOOLS=OFF \
+            -DBUILD_COMPILER_EXECUTABLE=OFF \
+            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
+            -DBUILD_REPL=OFF \
+            -DBUILD_CORE_SMOKE_TESTS=ON
+
+      - name: Build compiler core
+        run: cmake --build compiler/build --parallel 2
+
+      - name: Run compiler-core smoke test
+        run: ctest --test-dir compiler/build --output-on-failure
