@@ -24,7 +24,7 @@ The reviewed checkout was `/home/ubuntu/SynQ` on Ubuntu 24.04. The review began 
 
 ## Automated workflow status
 
-The repository contains `.github/workflows/compiler-core.yml`. It uses Ubuntu, installs the same native dependencies, configures the recovery profile, builds it, and runs CTest. Its first observed remote result, [Compiler Core #1](https://github.com/TangoSplicer/SynQ/actions/runs/31688057478), completed successfully for commit `38e3c41` in 51 seconds. The run confirms the configured recovery profile only. The newly added `.github/workflows/frontend.yml` will run frozen installation, TypeScript checking, Vitest, and build steps after the expanded review changes are pushed; no remote result is claimed yet.
+The repository contains `.github/workflows/compiler-core.yml`. It uses Ubuntu, installs the same native dependencies, configures the recovery profile, builds it, and runs CTest. Its first observed remote result, [Compiler Core #1](https://github.com/TangoSplicer/SynQ/actions/runs/31688057478), completed successfully for commit `38e3c41` in 51 seconds; [Compiler Core #2](https://github.com/TangoSplicer/SynQ/actions/runs/31693461955) also passed for the expanded fixture revision `5c11c36`. These runs confirm the configured recovery profile only. The newly added `.github/workflows/frontend.yml` ran frozen installation, TypeScript checking, Vitest, and build steps successfully in [Frontend #2](https://github.com/TangoSplicer/SynQ/actions/runs/31693553476) for revision `ce05438` in 30 seconds.
 
 ## Changes made after evidence collection
 
