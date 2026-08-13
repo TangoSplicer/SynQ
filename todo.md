@@ -41,4 +41,4 @@
 - [x] Add bounded parameterized quantum syntax with parser fixtures.
 - [x] Export parameterized gate mappings with exact-output and rejection fixtures.
 - [x] Validate generated OpenQASM with a second independent downstream parser.
-- [ ] Run full checks, observe CI, document, and publish the parameterized compatibility increment.
+- [x] Run full checks, observe CI, document, and publish the parameterized compatibility increment.
