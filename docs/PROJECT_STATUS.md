@@ -19,7 +19,7 @@
 | Frontend automated tests | **Not verified** | Historical `client/src/__tests__` files are excluded from the application type-check because there is no configured test command and the files contain stale expectations for unavailable backend services. No frontend test-suite pass count is claimed. |
 | Backend service | **Not runnable as checked in** | `backend/app/main.py` imports local modules such as `app.config`, `app.database`, and several routers that are absent from the current backend tree. The backend must be recovered before it is offered as an API service. |
 | Docker Compose | **Experimental; not verified** | Compose paths and Dockerfile paths were corrected to point to the existing `backend/` and `frontend/` directories. The frontend now builds locally, but an end-to-end container run remains blocked by backend recovery and Docker is not installed in the review environment. |
-| Compiler-core CI workflow | **Defined and pushed; remote result not recorded here** | `.github/workflows/compiler-core.yml` configures Ubuntu-based build and smoke-test steps for the verified recovery profile. The workflow was pushed with revision `38e3c41`; check the GitHub Actions page for its current or subsequent run result. |
+| Compiler-core CI workflow | **Passes on GitHub Actions** | `.github/workflows/compiler-core.yml` configures Ubuntu-based build and smoke-test steps for the verified recovery profile. Its first observed run, [Compiler Core #1](https://github.com/TangoSplicer/SynQ/actions/runs/31688057478), completed successfully for revision `38e3c41` in 51 seconds. This does not validate optional compiler targets. |
 | Quantum hardware, hosted services, collaboration, AI automation | **Not verified** | The presence of source files, names, examples, or older documentation does not establish that these capabilities are available or supported. |
 
 ## Changes Made During This Review
@@ -37,7 +37,7 @@ This project currently makes no verified claim of a stable release, production d
 The next practical phase is **reproducible baseline engineering**:
 
 1. Expand compiler smoke coverage with a small executable and one end-to-end parser/runtime test.
-2. Observe the compiler-core GitHub Actions result before advertising CI status.
+2. Keep the compiler-core workflow green as the recovery profile and its smoke coverage expand.
 3. Recover the FastAPI application around a minimal health endpoint with complete local modules and tests.
 4. Configure, repair, or remove stale frontend tests; then establish frontend type-check/build CI for the repository frontend.
 5. Repair or remove stale optional compiler targets one subsystem at a time, promoting only features with a documented command, test, and expected output.

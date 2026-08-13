@@ -22,7 +22,7 @@ The reviewed checkout was `/home/ubuntu/SynQ` on Ubuntu 24.04. The review began 
 
 ## Automated workflow status
 
-The repository now contains `.github/workflows/compiler-core.yml`. It uses Ubuntu, installs the same native dependencies, configures the recovery profile, builds it, and runs CTest. It has not yet produced a GitHub-hosted result because the reviewed changes have not yet been pushed.
+The repository contains `.github/workflows/compiler-core.yml`. It uses Ubuntu, installs the same native dependencies, configures the recovery profile, builds it, and runs CTest. Its first observed remote result, [Compiler Core #1](https://github.com/TangoSplicer/SynQ/actions/runs/31688057478), completed successfully for commit `38e3c41` in 51 seconds. The run confirms the configured recovery profile only.
 
 ## Changes made after evidence collection
 
