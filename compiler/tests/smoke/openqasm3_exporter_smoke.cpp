@@ -57,6 +57,48 @@ bool exports_parsed_quantum_fixture() {
            require(result.program.find("h q[0];\ny q[0];\n") != std::string::npos, "parsed instruction order is preserved");
 }
 
+bool exports_explicit_qubit_operands() {
+    const std::string path = "/tmp/synq_openqasm3_explicit_fixture.synq";
+    std::ofstream fixture(path);
+    fixture << "quantum h q[3];\n";
+    fixture << "quantum cx q[3], q[5];\n";
+    fixture << "quantum bell_pair q[1], q[4];\n";
+    fixture.close();
+
+    Parser parser;
+    std::unique_ptr<ASTNode> root(parser.parseFile(path));
+    std::remove(path.c_str());
+    const auto* program = dynamic_cast<const ProgramNode*>(root.get());
+    if (!require(program != nullptr, "parser produces an explicit-operand export fixture")) return false;
+
+    const auto result = synq::compiler::export_openqasm3(*program);
+    const std::string expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[6] q;\n"
+        "h q[3];\n"
+        "cx q[3], q[5];\n"
+        "h q[1];\n"
+        "cx q[1], q[4];\n";
+    return require(result.ok(), "explicit operands export successfully") &&
+           require(result.program == expected, "explicit operands and cx preserve exact OpenQASM qubit indices");
+}
+
+bool rejects_invalid_explicit_operands() {
+    ProgramNode program;
+    program.statements.push_back(new InstructionNode("quantum", {"cx", "q[0]"}, 7));
+    program.statements.push_back(new InstructionNode("quantum", {"h", "q[0]", "q[1]"}, 8));
+    program.statements.push_back(new InstructionNode("quantum", {"x", "q[not-an-index]"}, 9));
+
+    const auto result = synq::compiler::export_openqasm3(program);
+    return require(!result.ok(), "invalid explicit operand forms fail export") &&
+           require(result.program.empty(), "invalid explicit operand forms do not produce partial OpenQASM") &&
+           require(result.diagnostics.size() == 3, "invalid explicit operand forms produce three diagnostics") &&
+           require(result.diagnostics[0].find("line 7") != std::string::npos, "cx arity error retains source line") &&
+           require(result.diagnostics[1].find("line 8") != std::string::npos, "single-qubit arity error retains source line") &&
+           require(result.diagnostics[2].find("line 9") != std::string::npos, "invalid operand error retains source line");
+}
+
 bool rejects_unsupported_recovery_statements() {
     ProgramNode program;
     program.statements.push_back(new DeclarationNode("theta", "0.5", 4));
@@ -72,12 +114,32 @@ bool rejects_unsupported_recovery_statements() {
            require(result.diagnostics[2].find("line 6") != std::string::npos, "instruction diagnostic retains source line");
 }
 
+bool writes_reference_parser_fixture(const std::string& path) {
+    ProgramNode program;
+    program.statements.push_back(new InstructionNode("quantum", {"h", "q[3]"}, 1));
+    program.statements.push_back(new InstructionNode("quantum", {"cx", "q[3]", "q[5]"}, 2));
+    program.statements.push_back(new InstructionNode("quantum", {"bell_pair", "q[1]", "q[4]"}, 3));
+    const auto result = synq::compiler::export_openqasm3(program);
+    if (!require(result.ok(), "reference-parser fixture exports successfully")) return false;
+
+    std::ofstream fixture(path);
+    fixture << result.program;
+    return require(static_cast<bool>(fixture), "exporter writes the reference-parser fixture");
+}
+
 }  // namespace
 
-int main() {
+int main(int argc, char* argv[]) {
     if (!exports_supported_kernels_in_order()) return 1;
     if (!exports_parsed_quantum_fixture()) return 1;
+    if (!exports_explicit_qubit_operands()) return 1;
+    if (!rejects_invalid_explicit_operands()) return 1;
     if (!rejects_unsupported_recovery_statements()) return 1;
+    if (argc == 2 && !writes_reference_parser_fixture(argv[1])) return 1;
+    if (argc > 2) {
+        std::cerr << "usage: synq_openqasm3_exporter_smoke [reference-fixture-path]\n";
+        return 2;
+    }
 
     std::cout << "SynQ OpenQASM 3 exporter smoke test passed\n";
     return 0;

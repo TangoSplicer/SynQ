@@ -65,7 +65,15 @@ if(BUILD_CORE_SMOKE_TESTS)
     add_executable(synq_openqasm3_exporter_smoke tests/smoke/openqasm3_exporter_smoke.cpp)
     target_include_directories(synq_openqasm3_exporter_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_openqasm3_exporter_smoke PRIVATE synq_lib)
-    add_test(NAME synq_openqasm3_exporter_smoke COMMAND synq_openqasm3_exporter_smoke)
+    set(SYNQ_OPENQASM3_REFERENCE_FIXTURE ${CMAKE_CURRENT_BINARY_DIR}/synq_openqasm3_reference.qasm)
+    add_test(NAME synq_openqasm3_exporter_smoke COMMAND synq_openqasm3_exporter_smoke ${SYNQ_OPENQASM3_REFERENCE_FIXTURE})
+
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(
+        NAME synq_openqasm3_reference_parse
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
+    )
+    set_tests_properties(synq_openqasm3_reference_parse PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
 endif()
 
 # Global includes

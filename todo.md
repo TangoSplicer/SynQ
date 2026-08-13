@@ -32,3 +32,8 @@
 - [x] Assess the current compiler recovery profile and select one realistic interoperability boundary.
 - [x] Implement one bounded SynQ interoperability adapter with fixture-based tests.
 - [x] Verify, document, and publish only the interoperability behavior that passes locally and in CI.
+- [x] Establish current grammar, OpenQASM exporter, and external-parser validation baselines.
+- [x] Add explicit qubit operands to the bounded SynQ quantum grammar with fixtures.
+- [x] Expand OpenQASM mappings one supported gate form at a time with exact-output fixtures.
+- [x] Add external OpenQASM parser validation without adding runtime or hardware claims.
+- [ ] Run full checks, observe CI, document, and publish the expanded compatibility increment.

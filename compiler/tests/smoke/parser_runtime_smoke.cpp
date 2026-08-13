@@ -91,6 +91,51 @@ bool parser_rejects_invalid_fixture() {
            require(missing == nullptr, "parser rejects missing input file");
 }
 
+bool parser_accepts_explicit_qubit_operands() {
+    const std::string path = write_fixture(
+        "synq_parser_explicit_qubits_fixture.synq",
+        "quantum h q[3];\n"
+        "quantum cx q[3], q[5] // controlled gate\n"
+        "quantum bell_pair q[1], q[4]\n");
+
+    Parser parser;
+    std::unique_ptr<ASTNode> root(parser.parseFile(path));
+    std::remove(path.c_str());
+    auto* program = dynamic_cast<ProgramNode*>(root.get());
+    if (!require(program != nullptr, "parser accepts explicit quantum operands")) return false;
+    if (!require(program->statements.size() == 3, "parser retains every explicit quantum instruction")) return false;
+
+    const std::vector<std::vector<std::string>> expected = {
+        {"h", "q[3]"},
+        {"cx", "q[3]", "q[5]"},
+        {"bell_pair", "q[1]", "q[4]"},
+    };
+    for (std::size_t index = 0; index < expected.size(); ++index) {
+        auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index]);
+        if (!require(instruction != nullptr, "parser creates a quantum instruction node")) return false;
+        if (!require(instruction->op == "quantum" && instruction->args == expected[index],
+                     "parser preserves explicit quantum operands")) return false;
+    }
+    return true;
+}
+
+bool parser_rejects_malformed_qubit_operands() {
+    const std::string negative_path = write_fixture("synq_parser_negative_qubit_fixture.synq", "quantum h q[-1]\n");
+    const std::string trailing_path = write_fixture("synq_parser_trailing_qubit_fixture.synq", "quantum cx q[0],\n");
+    const std::string spacing_path = write_fixture("synq_parser_spacing_qubit_fixture.synq", "quantum h q[0] q[1]\n");
+    Parser parser;
+    std::unique_ptr<ASTNode> negative(parser.parseFile(negative_path));
+    std::unique_ptr<ASTNode> trailing(parser.parseFile(trailing_path));
+    std::unique_ptr<ASTNode> spacing(parser.parseFile(spacing_path));
+    std::remove(negative_path.c_str());
+    std::remove(trailing_path.c_str());
+    std::remove(spacing_path.c_str());
+
+    return require(negative == nullptr, "parser rejects negative qubit index") &&
+           require(trailing == nullptr, "parser rejects trailing qubit comma") &&
+           require(spacing == nullptr, "parser rejects operands without commas");
+}
+
 bool runtime_executes_supported_and_fallback_paths() {
     synq::compiler::Program program{
         {
@@ -133,6 +178,8 @@ bool runtime_executes_supported_and_fallback_paths() {
 int main() {
     if (!parser_accepts_supported_fixture()) return 1;
     if (!parser_rejects_invalid_fixture()) return 1;
+    if (!parser_accepts_explicit_qubit_operands()) return 1;
+    if (!parser_rejects_malformed_qubit_operands()) return 1;
     if (!runtime_executes_supported_and_fallback_paths()) return 1;
 
     std::cout << "SynQ parser and runtime smoke test passed\n";

@@ -53,6 +53,33 @@ bool is_identifier(const std::string& value) {
     });
 }
 
+bool is_qubit_operand(const std::string& value) {
+    return value.size() > 3 && value.rfind("q[", 0) == 0 && value.back() == ']' &&
+           is_non_negative_integer(value.substr(2, value.size() - 3));
+}
+
+bool parse_quantum_arguments(const std::string& source, std::vector<std::string>& arguments) {
+    std::istringstream tokens(source);
+    std::string kernel;
+    tokens >> kernel;
+    if (kernel.empty()) return false;
+    arguments = {kernel};
+
+    std::string operands = trim(source.substr(kernel.size()));
+    if (operands.empty()) return true;  // Preserve the documented legacy kernel form.
+
+    std::size_t start = 0;
+    while (start <= operands.size()) {
+        const std::size_t comma = operands.find(',', start);
+        const std::string operand = trim(operands.substr(start, comma == std::string::npos ? std::string::npos : comma - start));
+        if (!is_qubit_operand(operand)) return false;
+        arguments.push_back(operand);
+        if (comma == std::string::npos) return true;
+        start = comma + 1;
+    }
+    return false;
+}
+
 std::string strip_comment(const std::string& value) {
     // Recovery-profile comment rule: `//` begins a comment only at the start
     // of a trimmed line or when preceded by whitespace. This preserves values
@@ -82,7 +109,7 @@ ASTNode* Parser::parseFile(const std::string& filename) {
     // Recovery-profile grammar: one statement per line, with an optional
     // trailing semicolon. Supported statements are `let <identifier> = <value>`
     // plus the instructions `print <text>`, `delay <non-negative milliseconds>`,
-    // `quantum <kernel>`, and `ai <prompt>`. Declaration values are preserved as
+    // `quantum <kernel> [q[index](, q[index])*]`, and `ai <prompt>`. Declaration values are preserved as
     // source text; expression parsing is intentionally out of scope. Blank lines
     // and `//` comments at line start or after whitespace are ignored. The latter
     // rule deliberately preserves `//` in unquoted source text such as URLs.
@@ -129,7 +156,18 @@ ASTNode* Parser::parseFile(const std::string& filename) {
             return nullptr;
         }
 
-        root->statements.push_back(new InstructionNode(operation, {argument}, line_number));
+        if (operation == "quantum") {
+            std::vector<std::string> quantum_arguments;
+            if (!parse_quantum_arguments(argument, quantum_arguments)) {
+                std::cerr << "Error: malformed quantum operands at " << filename
+                          << ":" << line_number << std::endl;
+                delete root;
+                return nullptr;
+            }
+            root->statements.push_back(new InstructionNode(operation, std::move(quantum_arguments), line_number));
+        } else {
+            root->statements.push_back(new InstructionNode(operation, {argument}, line_number));
+        }
     }
 
     return root;
