@@ -28,15 +28,19 @@ This first adapter will **not** import OpenQASM, execute OpenQASM, invoke Qiskit
 The initial native interoperability seam is a C header with opaque program
 handles and explicit ownership functions. Its compiled C consumer verifies
 version identification, feature-gated file and in-memory parsing, typed
-measurement export, diagnostic ownership, and cleanup. A dependency-free Rust C ABI consumer now
-compiles and runs remotely against that same contract, including in-memory text
-parsing; it is a proof of call and
-ownership flow, not a Rust binding. A test-only SBCL/CFFI consumer remotely
-loads the same C ABI from a build-directory shared library; it is not a
-Common Lisp package or general binding. Mercury and JVM-facing work remain
+measurement export, diagnostic ownership, and cleanup. A dependency-free Rust
+C ABI consumer compiles and runs remotely against that same contract, including
+in-memory text parsing; it is a proof of call and ownership flow, not a Rust
+binding. A test-only SBCL/CFFI consumer remotely loads the same C ABI from a
+build-directory shared library; it is not a Common Lisp package or general
+binding. A separate test-only Clojure/JNA script now passes locally by loading
+the same build-directory shared library through JNA, invoking the opaque ABI,
+and checking in-memory parse/export/error ownership; it has not yet received
+remote CI evidence and is not a Clojure/JVM library. Mercury remains
 unimplemented. The full C API is documented in [C ABI Foundation](./C_ABI.md);
 the Rust proof and non-goals are documented in [Rust C-ABI Consumer Proof](./RUST_C_ABI.md),
-and the Lisp proof is documented in [Common Lisp CFFI Consumer Proof](./COMMON_LISP_CFFI.md).
+the Lisp proof is documented in [Common Lisp CFFI Consumer Proof](./COMMON_LISP_CFFI.md),
+and the Clojure local-proof boundary is documented in [Clojure JNA Consumer Proof](./CLOJURE_JNA.md).
 
 ## Promotion Rule
 

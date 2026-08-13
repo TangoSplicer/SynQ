@@ -1,9 +1,10 @@
 # SynQ C ABI Foundation
 
-**Status:** Remotely validated experimental foundation. The C header and its
-compiled C/Rust consumers are covered by the recovery-profile compiler-core
-workflow. This is **not** a declaration of a frozen production ABI, a shared
-library distribution, or a language-specific SDK.  
+**Status:** Remotely validated experimental foundation for C, Rust, and
+test-only Common Lisp consumption; a Clojure/JNA consumer is locally validated
+and awaits remote compiler-core evidence. This is **not** a declaration of a
+frozen production ABI, a shared library distribution, or a language-specific
+SDK.
 **Last reviewed:** 13 August 2026
 
 ## Purpose and scope
@@ -18,8 +19,9 @@ SynQ runtime.
 This is the appropriate first bridge for the project’s target ecosystems. Rust
 supports explicit external ABI selection; Mercury documents a C foreign
 language interface for applicable C backends; CFFI calls C functions from
-Common Lisp; and Clojure interoperates with Java, supporting a later JVM facade
-rather than an untested direct native claim.[1] [2] [3] [4]
+Common Lisp; and Clojure interoperates with Java, where JNA provides a small
+locally tested direct consumer path through the existing opaque ABI.[1] [2] [3]
+[4] [5]
 
 | Contract property | Current implementation | Boundary |
 | --- | --- | --- |
@@ -78,12 +80,14 @@ cmake --build /tmp/synq-c-abi --parallel 2
 ctest --test-dir /tmp/synq-c-abi --output-on-failure
 ```
 
-At review time, the expanded recovery profile reported **10/10 passing** tests,
-including `synq_c_abi_smoke`, the gate-validation and feature-gate smoke tests,
-the parser/exporter tests, and the two independent OpenQASM downstream
-validations. The same profile then passed remotely in [Compiler Core #17][10]
-for commit `65906d0`. This result does not freeze the ABI or test a distributed
-shared library.
+At the latest local review, the expanded recovery profile reported **12/12
+passing** tests, including `synq_c_abi_smoke`, `synq_clojure_jna_abi_smoke`, the
+gate-validation and feature-gate smoke tests, the parser/exporter tests, and
+the two independent OpenQASM downstream validations. The earlier C/Rust
+in-memory profile passed remotely in [Compiler Core #17][11] for commit
+`65906d0`, while the later Common Lisp profile passed remotely in [Compiler Core
+#18][12]. The Clojure configuration is not yet committed or remotely run. None
+of these results freeze the ABI or test a distributed shared library.
 
 ## What this enables next—and what it does not
 
@@ -92,7 +96,7 @@ shared library.
 | Rust | A dependency-free `rustc` smoke consumer declares the opaque v1 C ABI directly, validates parse/export/error ownership flows, and passed remotely in [Compiler Core #16][9]. A future wrapper can introduce RAII types after a separate API review. | A Rust crate, a Rust-native ABI, automatic bindings, safe wrapper types, or an in-process C++ interface. |
 | Mercury | Map only released C functions through `pragma foreign_proc` on a C backend, with a Mercury toolchain smoke test. | A Mercury package, all Mercury backends, or bidirectional foreign calls. |
 | Common Lisp | A test-only `libsynq_ffi.so` and SBCL/CFFI consumer load the opaque v1 C ABI from the build directory, validate in-memory parse/export/error ownership flows, and passed remotely in [Compiler Core #18][11]. | A published CFFI system, installed shared library, callbacks, or all Lisp implementations. |
-| Clojure | Call a small Java facade through normal Java interop; the facade can use JNI only once its native-load contract is tested. | A Clojure library, direct C ABI access from Clojure, or a portable JNI solution. |
+| Clojure | A test-only Clojure 1.11.1/JNA 5.14.0 script loads CMake’s absolute `libsynq_ffi.so` path, calls opaque ABI v1 functions, validates in-memory parse/export/error ownership flows, and passes locally. | A Clojure library, Java API, JNI bridge, portable JVM binding, installed native library, or remote-CI-validated consumer until this increment is published. |
 
 The C ABI is therefore **a foundation for interoperability, not proof of full
 interoperability**. Each later binding must be independently built and tested,
@@ -105,7 +109,8 @@ callbacks, accept length-aware or embedded-NUL source buffers, guarantee thread
 safety, provide stable error codes across releases, execute quantum programs,
 submit to quantum hardware, or expose arbitrary SynQ AST/IR objects. A
 test-only Linux shared artifact exists in the CMake build directory solely for
-the Common Lisp CFFI smoke test; it is not a distributed shared library.
+the Common Lisp CFFI and Clojure/JNA smoke tests; it is not a distributed shared
+library.
 Those decisions require separate design, threat modelling, API review, and
 tests.
 
@@ -115,10 +120,11 @@ tests.
 [2]: https://mercurylang.org/information/doc-release/mercury_user_guide/Foreign-language-interface.html "The Mercury User’s Guide: Foreign language interface"
 [3]: https://cffi.common-lisp.dev/manual/cffi-manual.html "CFFI User Manual"
 [4]: https://clojure.org/reference/java_interop "Clojure Java Interop"
-[5]: https://github.com/TangoSplicer/SynQ/actions/runs/31718265429 "SynQ Compiler Core #8"
-[6]: https://github.com/TangoSplicer/SynQ/actions/runs/31721517239 "SynQ Compiler Core #12"
-[7]: https://github.com/TangoSplicer/SynQ/actions/runs/31722554030 "SynQ Compiler Core #14"
-[8]: https://github.com/TangoSplicer/SynQ/actions/runs/31723306294 "SynQ Compiler Core #15"
-[9]: https://github.com/TangoSplicer/SynQ/actions/runs/31724123316 "SynQ Compiler Core #16"
-[10]: https://github.com/TangoSplicer/SynQ/actions/runs/31724839027 "SynQ Compiler Core #17"
-[11]: https://github.com/TangoSplicer/SynQ/actions/runs/31725431911 "SynQ Compiler Core #18"
+[5]: https://github.com/java-native-access/jna "Java Native Access"
+[6]: https://github.com/TangoSplicer/SynQ/actions/runs/31718265429 "SynQ Compiler Core #8"
+[7]: https://github.com/TangoSplicer/SynQ/actions/runs/31721517239 "SynQ Compiler Core #12"
+[8]: https://github.com/TangoSplicer/SynQ/actions/runs/31722554030 "SynQ Compiler Core #14"
+[9]: https://github.com/TangoSplicer/SynQ/actions/runs/31723306294 "SynQ Compiler Core #15"
+[10]: https://github.com/TangoSplicer/SynQ/actions/runs/31724123316 "SynQ Compiler Core #16"
+[11]: https://github.com/TangoSplicer/SynQ/actions/runs/31724839027 "SynQ Compiler Core #17"
+[12]: https://github.com/TangoSplicer/SynQ/actions/runs/31725431911 "SynQ Compiler Core #18"

@@ -96,6 +96,15 @@ if(BUILD_CORE_SMOKE_TESTS)
                 $<TARGET_FILE:synq_ffi_shared>
     )
 
+    find_program(SYNQ_CLOJURE_EXECUTABLE clojure REQUIRED)
+    find_file(SYNQ_JNA_JAR NAMES jna.jar PATHS /usr/share/java REQUIRED)
+    add_test(
+        NAME synq_clojure_jna_abi_smoke
+        COMMAND ${SYNQ_CLOJURE_EXECUTABLE} -cp ${SYNQ_JNA_JAR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/clojure_jna_abi_smoke.clj
+                $<TARGET_FILE:synq_ffi_shared>
+    )
+
     find_program(SYNQ_RUSTC_EXECUTABLE rustc REQUIRED)
     set(SYNQ_RUST_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_abi_smoke)
     add_custom_command(

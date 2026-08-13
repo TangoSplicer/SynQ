@@ -25,7 +25,7 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ rustc cargo sbcl cl-cffi nlohmann-json3-dev libssl-dev
+          sudo apt-get install -y cmake g++ rustc cargo sbcl cl-cffi clojure libjna-java nlohmann-json3-dev libssl-dev
           python3 -m pip install --disable-pip-version-check -r compiler/tests/requirements-openqasm3.txt
 
       - name: Configure verified recovery profile
