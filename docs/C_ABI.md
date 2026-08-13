@@ -66,8 +66,9 @@ public header, and links against `synq_lib` using the C++ linker only for the
 library’s C++ implementation dependencies. It verifies ABI identification,
 successful parsing of a feature-gated parameterized circuit, OpenQASM output,
 resource release, a missing-file parse error, a malformed known-gate shape that
-propagates `SYNQ-S002`, and a duplicate declaration that propagates `SYNQ-S004`.
-It does not use C++ headers or internal types.
+propagates `SYNQ-S002`, a duplicate declaration that propagates `SYNQ-S004`,
+successful bounded measurement export, and a malformed measurement that
+propagates `SYNQ-P008`. It does not use C++ headers or internal types.
 
 ```bash
 cd /home/ubuntu/SynQ
@@ -79,8 +80,8 @@ ctest --test-dir /tmp/synq-c-abi --output-on-failure
 At review time, the expanded recovery profile reported **9/9 passing** tests,
 including `synq_c_abi_smoke`, the gate-validation and feature-gate smoke tests,
 the parser/exporter tests, and the two independent OpenQASM downstream
-validations. The same profile then passed remotely in [Compiler Core #14][7]
-for commit `fd5345c`. This result does not freeze the ABI or test a distributed
+validations. Remote CI evidence for the measurement increment is pending
+publication. This local result does not freeze the ABI or test a distributed
 shared library.
 
 ## What this enables next—and what it does not

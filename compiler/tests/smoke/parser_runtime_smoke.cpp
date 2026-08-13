@@ -167,6 +167,24 @@ bool parser_assigns_source_provenance() {
                    "parsed instruction retains source provenance");
 }
 
+bool parser_constructs_typed_measurements() {
+    const std::string path = write_fixture(
+        "synq_parser_measurement_fixture.synq",
+        "quantum h q[2]\n"
+        " measure q[2] // observed qubit\n");
+    Parser parser;
+    std::unique_ptr<ASTNode> root(parser.parseFile(path));
+    std::remove(path.c_str());
+    auto* program = dynamic_cast<ProgramNode*>(root.get());
+    if (!require(program != nullptr && program->statements.size() == 2,
+                 "parser accepts bounded measurement fixture")) return false;
+
+    auto* measurement = dynamic_cast<MeasurementNode*>(program->statements[1]);
+    return require(measurement != nullptr && measurement->qubit_index == 2 &&
+                   measurement->toString() == "measure q[2]" && has_span(measurement->span, 2, 2, 14),
+                   "parser constructs a typed measurement with source provenance");
+}
+
 bool parser_accepts_explicit_qubit_operands() {
     const std::string path = write_fixture(
         "synq_parser_explicit_qubits_fixture.synq",
@@ -343,6 +361,7 @@ int main() {
     if (!parser_rejects_invalid_fixture()) return 1;
     if (!parser_classifies_classical_literals()) return 1;
     if (!parser_assigns_source_provenance()) return 1;
+    if (!parser_constructs_typed_measurements()) return 1;
     if (!parser_accepts_explicit_qubit_operands()) return 1;
     if (!parser_rejects_malformed_qubit_operands()) return 1;
     if (!parser_accepts_literal_angle_parameters()) return 1;

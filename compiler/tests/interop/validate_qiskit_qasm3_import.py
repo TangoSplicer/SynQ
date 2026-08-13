@@ -28,11 +28,11 @@ def main() -> int:
         print(f"Qiskit OpenQASM 3 importer rejected {fixture}: {error}", file=sys.stderr)
         return 1
 
-    expected_operations = ["h", "cx", "h", "cx", "rx", "ry", "rz", "p"]
+    expected_operations = ["h", "cx", "h", "cx", "rx", "ry", "rz", "p", "measure"]
     actual_operations = [instruction.operation.name for instruction in circuit.data]
-    if circuit.num_qubits != 6 or actual_operations != expected_operations:
+    if circuit.num_qubits != 6 or circuit.num_clbits != 6 or actual_operations != expected_operations:
         print(
-            f"unexpected imported circuit: qubits={circuit.num_qubits}, operations={actual_operations}",
+            f"unexpected imported circuit: qubits={circuit.num_qubits}, clbits={circuit.num_clbits}, operations={actual_operations}",
             file=sys.stderr,
         )
         return 1

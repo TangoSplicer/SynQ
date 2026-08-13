@@ -84,6 +84,26 @@ bool exports_explicit_qubit_operands() {
            require(result.program == expected, "explicit operands and cx preserve exact OpenQASM qubit indices");
 }
 
+bool exports_typed_measurements() {
+    ProgramNode program;
+    program.statements.push_back(new QuantumGateNode(QuantumGateKind::H, "h", std::nullopt,
+                                                     std::vector<std::size_t>{3}, 1));
+    program.statements.push_back(new MeasurementNode(3, 2));
+    program.statements.push_back(new MeasurementNode(1, 3));
+
+    const auto result = synq::compiler::export_openqasm3(program);
+    const std::string expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[4] q;\n"
+        "bit[4] c;\n"
+        "h q[3];\n"
+        "c[3] = measure q[3];\n"
+        "c[1] = measure q[1];\n";
+    return require(result.ok(), "typed measurements export successfully") &&
+           require(result.program == expected, "measurements allocate matching classical bits and preserve source order");
+}
+
 bool rejects_invalid_explicit_operands() {
     ProgramNode program;
     program.statements.push_back(new InstructionNode("quantum", {"cx", "q[0]"}, 7));
@@ -167,6 +187,7 @@ bool writes_reference_parser_fixture(const std::string& path) {
     program.statements.push_back(new InstructionNode("quantum", {"ry(-pi/4)", "q[2]"}, 5));
     program.statements.push_back(new InstructionNode("quantum", {"rz(0.125)", "q[1]"}, 6));
     program.statements.push_back(new InstructionNode("quantum", {"p(pi)", "q[3]"}, 7));
+    program.statements.push_back(new MeasurementNode(5, 8));
     const auto result = synq::compiler::export_openqasm3(program);
     if (!require(result.ok(), "reference-parser fixture exports successfully")) return false;
 
@@ -181,6 +202,7 @@ int main(int argc, char* argv[]) {
     if (!exports_supported_kernels_in_order()) return 1;
     if (!exports_parsed_quantum_fixture()) return 1;
     if (!exports_explicit_qubit_operands()) return 1;
+    if (!exports_typed_measurements()) return 1;
     if (!rejects_invalid_explicit_operands()) return 1;
     if (!exports_literal_angle_gates()) return 1;
     if (!rejects_invalid_parameterized_gates()) return 1;

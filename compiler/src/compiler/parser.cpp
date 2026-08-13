@@ -292,10 +292,10 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
         }
 
         const bool known_instruction = operation == "print" || operation == "delay" ||
-                                       operation == "quantum" || operation == "ai";
+                                       operation == "quantum" || operation == "measure" || operation == "ai";
         if (!known_instruction || argument.empty()) {
             return fail_parse("SYNQ-P003", span, "unsupported or incomplete recovery-profile instruction",
-                              "use let, print, delay, quantum, or ai with the documented argument form");
+                              "use let, print, delay, quantum, measure, or ai with the documented argument form");
         }
         if (operation == "delay" && !is_non_negative_integer(argument)) {
             return fail_parse("SYNQ-P004", span, "delay requires a non-negative integer number of milliseconds",
@@ -325,6 +325,13 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
                                   "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct");
             }
             root->statements.push_back(gate);
+        } else if (operation == "measure") {
+            std::size_t qubit_index = 0;
+            if (!parse_qubit_index(argument, qubit_index)) {
+                return fail_parse("SYNQ-P008", span, "measurement requires exactly one explicit qubit operand",
+                                  "use measure q[index], for example measure q[0]");
+            }
+            root->statements.push_back(new MeasurementNode(qubit_index, line_number, span));
         } else {
             root->statements.push_back(new InstructionNode(operation, {argument}, line_number, span));
         }

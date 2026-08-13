@@ -133,6 +133,27 @@ public:
     }
 };
 
+// Typed representation of the bounded recovery-profile quantum-to-classical
+// source boundary. It records an indexed qubit but does not model a SynQ result
+// value, execution, or classical control flow.
+class MeasurementNode : public ASTNode {
+public:
+    std::size_t qubit_index = 0;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    MeasurementNode(std::size_t index, std::size_t line_number)
+        : MeasurementNode(index, line_number, {line_number, 0, 0}) {}
+
+    MeasurementNode(std::size_t index, std::size_t line_number,
+                    synq::compiler::SourceSpan source_span)
+        : qubit_index(index), line(line_number), span(source_span) {}
+
+    std::string toString() override {
+        return "measure q[" + std::to_string(qubit_index) + "]";
+    }
+};
+
 // A non-evaluating hint for the bounded declaration right-hand side. SourceText
 // means the parser preserved accepted source that a later expression/type layer
 // must understand; it does not mean that the value was rejected.

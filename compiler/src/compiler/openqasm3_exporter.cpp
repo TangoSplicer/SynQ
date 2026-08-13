@@ -180,8 +180,16 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
     OpenQasm3ExportResult result;
     std::ostringstream body;
     std::size_t qubit_count = 0;
+    bool has_measurements = false;
 
     for (const ASTNode* statement : program.statements) {
+        const auto* measurement = dynamic_cast<const MeasurementNode*>(statement);
+        if (measurement != nullptr) {
+            body << "c[" << measurement->qubit_index << "] = measure q[" << measurement->qubit_index << "];\n";
+            qubit_count = std::max(qubit_count, measurement->qubit_index + 1);
+            has_measurements = true;
+            continue;
+        }
         const auto* typed_gate = dynamic_cast<const QuantumGateNode*>(statement);
         std::unique_ptr<QuantumGateNode> legacy_gate;
         if (typed_gate == nullptr) {
@@ -222,6 +230,7 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
     output << "OPENQASM 3.0;\n";
     output << "include \"stdgates.inc\";\n";
     output << "qubit[" << qubit_count << "] q;\n";
+    if (has_measurements) output << "bit[" << qubit_count << "] c;\n";
     output << body.str();
     result.program = output.str();
     return result;

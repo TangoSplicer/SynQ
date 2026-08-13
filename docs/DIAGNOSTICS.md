@@ -44,11 +44,12 @@ recovery-profile parser and covered by a focused smoke test.
 | --- | --- | --- |
 | `SYNQ-P001` | Source file cannot be opened. | Verify the path and read permission. |
 | `SYNQ-P002` | A `let` declaration has no valid identifier or value. | Use `let <identifier> = <value>`. |
-| `SYNQ-P003` | The line does not start with a supported recovery-profile instruction or a required argument is absent. | Use `let`, `print`, `delay`, `quantum`, or `ai` with the documented argument form. |
+| `SYNQ-P003` | The line does not start with a supported recovery-profile instruction or a required argument is absent. | Use `let`, `print`, `delay`, `quantum`, `measure`, or `ai` with the documented argument form. |
 | `SYNQ-P004` | `delay` does not use a non-negative integer number of milliseconds. | Use a non-negative whole number, such as `delay 0`. |
 | `SYNQ-P005` | Quantum operands or parameter syntax do not match the bounded grammar. | Use explicit `q[index]` operands and the documented literal-angle form. |
 | `SYNQ-P006` | An experimental annotation is malformed or names an unknown feature. | Use a registered exact annotation such as `#[experimental(feature = "parameterized-quantum-gates")]`. |
 | `SYNQ-P007` | A gated construct is used without its required alpha opt-in. | Add the documented file-scoped feature annotation or use an ungated construct. |
+| `SYNQ-P008` | A measurement does not use exactly one explicit non-negative qubit operand. | Use `measure q[index]`, for example `measure q[0]`. |
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation

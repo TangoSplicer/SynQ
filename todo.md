@@ -69,3 +69,6 @@
 - [x] Define bounded top-level declaration uniqueness and structured diagnostic behavior.
 - [x] Implement duplicate-declaration tracking in the parser and add focused diagnostics coverage.
 - [x] Re-run full checks, document verified classical semantic boundaries, and publish the declaration-validation increment.
+- [x] Specify a bounded typed measurement statement, validation rules, and OpenQASM 3 interoperability contract.
+- [x] Implement typed measurement parsing, diagnostics, and OpenQASM lowering with focused tests.
+- [ ] Re-run full checks, independently validate exported measurement syntax, and publish the measurement increment.
