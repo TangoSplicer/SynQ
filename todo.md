@@ -11,4 +11,4 @@
 - [x] Repair the repository frontend type-check configuration and stale test expectations.
 - [x] Align the public showcase with the verified repository recovery status.
 - [x] Re-run relevant checks and record evidence in a factual review report.
-- [ ] Commit, push, and tag reviewed changes if all required checks permit it.
+- [x] Commit, push, and tag reviewed changes if all required checks permit it.

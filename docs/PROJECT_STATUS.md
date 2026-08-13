@@ -1,7 +1,7 @@
 # SynQ Project Status
 
 **Review date:** 13 August 2026
-**Repository revision reviewed:** `b4ae020` plus the uncommitted recovery changes described below.
+**Repository revision reviewed:** `38e3c41` (`Recover build baseline and add compiler core CI`), tagged `v1.0.0-review`.
 
 > This file is the current operational-status record. It deliberately distinguishes **source present** from **capability verified**.
 
@@ -19,7 +19,7 @@
 | Frontend automated tests | **Not verified** | Historical `client/src/__tests__` files are excluded from the application type-check because there is no configured test command and the files contain stale expectations for unavailable backend services. No frontend test-suite pass count is claimed. |
 | Backend service | **Not runnable as checked in** | `backend/app/main.py` imports local modules such as `app.config`, `app.database`, and several routers that are absent from the current backend tree. The backend must be recovered before it is offered as an API service. |
 | Docker Compose | **Experimental; not verified** | Compose paths and Dockerfile paths were corrected to point to the existing `backend/` and `frontend/` directories. The frontend now builds locally, but an end-to-end container run remains blocked by backend recovery and Docker is not installed in the review environment. |
-| Compiler-core CI workflow | **Defined; no remote run observed yet** | `.github/workflows/compiler-core.yml` configures Ubuntu-based build and smoke-test steps for the verified recovery profile. It requires a push to GitHub before a remote workflow result can be claimed. |
+| Compiler-core CI workflow | **Defined and pushed; remote result not recorded here** | `.github/workflows/compiler-core.yml` configures Ubuntu-based build and smoke-test steps for the verified recovery profile. The workflow was pushed with revision `38e3c41`; check the GitHub Actions page for its current or subsequent run result. |
 | Quantum hardware, hosted services, collaboration, AI automation | **Not verified** | The presence of source files, names, examples, or older documentation does not establish that these capabilities are available or supported. |
 
 ## Changes Made During This Review
@@ -37,7 +37,7 @@ This project currently makes no verified claim of a stable release, production d
 The next practical phase is **reproducible baseline engineering**:
 
 1. Expand compiler smoke coverage with a small executable and one end-to-end parser/runtime test.
-2. Push the reviewed changes and observe the compiler-core GitHub Actions result before advertising CI status.
+2. Observe the compiler-core GitHub Actions result before advertising CI status.
 3. Recover the FastAPI application around a minimal health endpoint with complete local modules and tests.
 4. Configure, repair, or remove stale frontend tests; then establish frontend type-check/build CI for the repository frontend.
 5. Repair or remove stale optional compiler targets one subsystem at a time, promoting only features with a documented command, test, and expected output.
