@@ -1,6 +1,6 @@
 # SynQ Interoperability Boundary
 
-**Status:** The adapter now passes local fixture-based recovery-profile smoke coverage, including the external OpenQASM reference parser. A new compiler-core CI result is pending for the explicit-qubit expansion; the previously published fixed-kernel export passed [Compiler Core #5](https://github.com/TangoSplicer/SynQ/actions/runs/31707219450) for revision `f570cc9`. This remains a source-export claim only.
+**Status:** The adapter passes local fixture-based recovery-profile smoke coverage and [Compiler Core #6](https://github.com/TangoSplicer/SynQ/actions/runs/31710413666) for revision `d2168de`, including the external OpenQASM reference parser. This remains a source-export claim only.
 
 > SynQ does not currently provide general-purpose source compatibility, bidirectional translation, package interoperability, or hardware-provider execution. This document defines the first deliberately narrow compatibility boundary that can be tested within the compiler recovery profile.
 

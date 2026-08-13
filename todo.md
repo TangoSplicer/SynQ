@@ -36,4 +36,4 @@
 - [x] Add explicit qubit operands to the bounded SynQ quantum grammar with fixtures.
 - [x] Expand OpenQASM mappings one supported gate form at a time with exact-output fixtures.
 - [x] Add external OpenQASM parser validation without adding runtime or hardware claims.
-- [ ] Run full checks, observe CI, document, and publish the expanded compatibility increment.
+- [x] Run full checks, observe CI, document, and publish the expanded compatibility increment.
