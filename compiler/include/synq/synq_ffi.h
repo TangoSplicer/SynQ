@@ -47,6 +47,16 @@ synq_status synq_parse_file(const char* utf8_path,
                             char** out_diagnostic);
 
 /*
+ * Parses one NUL-terminated UTF-8 source string into an opaque program handle.
+ * It uses the same bounded recovery grammar as synq_parse_file but does not
+ * open or retain a source file. Output and diagnostic ownership follow the
+ * rules of synq_parse_file.
+ */
+synq_status synq_parse_source(const char* utf8_source,
+                              synq_program** out_program,
+                              char** out_diagnostic);
+
+/*
  * Exports the bounded, supported quantum subset of an opaque parsed program as
  * UTF-8 OpenQASM 3 source. Output and diagnostic ownership follow the same
  * rules as `synq_parse_file`.

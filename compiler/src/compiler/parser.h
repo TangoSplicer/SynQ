@@ -23,6 +23,7 @@
 #define SYNQ_COMPILER_PARSER_H
 
 #include <memory>
+#include <istream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -64,11 +65,16 @@ public:
     // editor/binding callers. The program is present only when `ok()` is true.
     synq::compiler::ParseResult parseFileWithDiagnostics(const std::string& filename);
 
+    // Parses one NUL-free in-memory source string using the same bounded
+    // recovery grammar as file parsing. It does not retain source storage.
+    synq::compiler::ParseResult parseSourceWithDiagnostics(const std::string& source);
+
     // Parse a source file and return the AST root node (or nullptr on error).
     // This compatibility wrapper renders structured diagnostics to stderr.
     ASTNode* parseFile(const std::string& filename);
 
 private:
+    synq::compiler::ParseResult parseStreamWithDiagnostics(std::istream& input);
     synq::compiler::FeatureRegistry configured_features_;
 };
 

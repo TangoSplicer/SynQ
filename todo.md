@@ -75,3 +75,6 @@
 - [x] Confirm the available Rust toolchain and define the smallest safe opaque-handle C-ABI consumer contract.
 - [x] Implement and test a dependency-free Rust consumer of the SynQ C ABI.
 - [x] Integrate the Rust consumer into compiler-core CI, document the verified boundary, and publish the increment.
+- [x] Define bounded in-memory UTF-8 source parsing and C-ABI compatibility semantics.
+- [x] Implement shared parser-stream handling and a `synq_parse_source` C-ABI operation.
+- [ ] Extend C and Rust consumers, run full checks, document verified boundaries, and publish the text-parsing increment.

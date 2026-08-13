@@ -89,6 +89,41 @@ extern "C" synq_status synq_parse_file(const char* utf8_path,
     }
 }
 
+extern "C" synq_status synq_parse_source(const char* utf8_source,
+                                          synq_program** out_program,
+                                          char** out_diagnostic) {
+    clear_output(out_diagnostic);
+    if (out_program == nullptr) {
+        return return_error(SYNQ_STATUS_INVALID_ARGUMENT, "out_program must not be NULL", out_diagnostic);
+    }
+    *out_program = nullptr;
+    if (utf8_source == nullptr) {
+        return return_error(SYNQ_STATUS_INVALID_ARGUMENT, "utf8_source must not be NULL", out_diagnostic);
+    }
+
+    try {
+        Parser parser;
+        synq::compiler::ParseResult result = parser.parseSourceWithDiagnostics(utf8_source);
+        if (!result.ok()) {
+            const std::string diagnostic = result.diagnostics.empty()
+                ? "SynQ parser rejected the in-memory source without a diagnostic"
+                : synq::compiler::format_diagnostic("<memory>", result.diagnostics.front());
+            return return_error(SYNQ_STATUS_PARSE_ERROR, diagnostic, out_diagnostic);
+        }
+
+        std::unique_ptr<synq_program> handle(new synq_program());
+        handle->program = result.take_program();
+        *out_program = handle.release();
+        return SYNQ_STATUS_OK;
+    } catch (const std::bad_alloc&) {
+        return return_error(SYNQ_STATUS_INTERNAL_ERROR, "SynQ could not allocate parser state", out_diagnostic);
+    } catch (const std::exception&) {
+        return return_error(SYNQ_STATUS_INTERNAL_ERROR, "SynQ parser raised an internal exception", out_diagnostic);
+    } catch (...) {
+        return return_error(SYNQ_STATUS_INTERNAL_ERROR, "SynQ parser raised an unknown internal exception", out_diagnostic);
+    }
+}
+
 extern "C" synq_status synq_export_openqasm3(const synq_program* program,
                                               char** out_openqasm3,
                                               char** out_diagnostic) {

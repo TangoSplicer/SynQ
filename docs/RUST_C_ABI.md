@@ -44,10 +44,11 @@ native dependencies required by the library, and registers the resulting binary
 as a CTest check. Compiler-core CI now installs the distribution Rust toolchain
 via APT before configuration so the same test can run remotely.
 
-The smoke consumer verifies ABI v1 identity, a successful parse/export/cleanup
-path for a measurement fixture, and a structured missing-file error. It does
-not rely on C++ headers, internal source classes, the C consumer fixture,
-generated bindings, or an installed shared library.
+The smoke consumer verifies ABI v1 identity, a successful in-memory
+parse/export/cleanup path for a measurement fixture, and a structured
+`<memory>` measurement error. It does not rely on C++ headers, internal source
+classes, the C consumer fixture, generated bindings, or an installed shared
+library.
 
 ## Explicit non-goals
 

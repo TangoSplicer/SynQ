@@ -238,18 +238,13 @@ bool Parser::enableExperimentalFeature(const std::string& feature_name) {
     return configured_features_.enable(feature_name);
 }
 
-synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& filename) {
-    std::ifstream infile(filename);
-    if (!infile) {
-        return fail_parse("SYNQ-P001", {}, "could not open source file", "verify the file path and read permission");
-    }
-
+synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& input) {
     auto root = std::make_unique<ProgramNode>();
     synq::compiler::FeatureRegistry active_features = configured_features_;
     std::unordered_map<std::string, synq::compiler::SourceSpan> declared_names;
     std::string raw_line;
     std::size_t line_number = 0;
-    while (std::getline(infile, raw_line)) {
+    while (std::getline(input, raw_line)) {
         ++line_number;
         std::string line = strip_comment(trim(raw_line));
         if (line.empty()) continue;
@@ -340,6 +335,19 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
     synq::compiler::ParseResult result;
     result.program = std::move(root);
     return result;
+}
+
+synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& filename) {
+    std::ifstream infile(filename);
+    if (!infile) {
+        return fail_parse("SYNQ-P001", {}, "could not open source file", "verify the file path and read permission");
+    }
+    return parseStreamWithDiagnostics(infile);
+}
+
+synq::compiler::ParseResult Parser::parseSourceWithDiagnostics(const std::string& source) {
+    std::istringstream input(source);
+    return parseStreamWithDiagnostics(input);
 }
 
 ASTNode* Parser::parseFile(const std::string& filename) {

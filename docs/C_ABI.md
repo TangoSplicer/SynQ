@@ -24,7 +24,7 @@ rather than an untested direct native claim.[1] [2] [3] [4]
 | Contract property | Current implementation | Boundary |
 | --- | --- | --- |
 | ABI identifier | `synq_abi_version()` returns `SYNQ_ABI_VERSION` (`1`); `synq_version()` returns `synq-c-abi/1`. | The identifier versioned the initial contract; no long-term ABI stability policy has been released yet. |
-| Parse service | `synq_parse_file()` accepts a non-empty UTF-8 path and returns an opaque `synq_program*` on success. | It delegates to the recovery-profile parser; it does not parse a complete SynQ language. |
+| Parse services | `synq_parse_file()` accepts a non-empty UTF-8 path, and `synq_parse_source()` accepts one NUL-terminated in-memory source string; both return an opaque `synq_program*` on success. | They delegate to the recovery-profile parser; neither parses a complete SynQ language, retains caller source storage, or accepts embedded NUL bytes. |
 | Export service | `synq_export_openqasm3()` exports the current bounded OpenQASM 3 subset. | Export remains source generation, not execution, hardware submission, or provider integration. |
 | Error reporting | Every fallible service returns `synq_status`; an optional library-owned UTF-8 diagnostic explains the failure. | Diagnostics are currently concise service-level messages. Rich source spans and stable diagnostic codes are future work. |
 | Resource lifetime | `synq_program_free()` releases program handles and `synq_string_free()` releases strings returned by the library. Both accept `NULL`. | Callers must not free SynQ-owned values with another allocator or retain them after release. |
@@ -40,6 +40,7 @@ increment.
 | `unsigned int synq_abi_version(void)` | Returns the ABI-major integer `1`. | Does not fail. |
 | `const char *synq_version(void)` | Returns a static, NUL-terminated identifier. | Does not fail; the pointer is not caller-owned. |
 | `synq_parse_file(path, &program, &diagnostic)` | Returns `SYNQ_STATUS_OK` and an opaque handle. | Returns `SYNQ_STATUS_INVALID_ARGUMENT`, `SYNQ_STATUS_PARSE_ERROR`, or `SYNQ_STATUS_INTERNAL_ERROR`; a diagnostic is supplied when requested and allocation succeeds. |
+| `synq_parse_source(text, &program, &diagnostic)` | Returns `SYNQ_STATUS_OK` and an opaque handle after parsing one NUL-terminated source string. | Returns `SYNQ_STATUS_INVALID_ARGUMENT`, `SYNQ_STATUS_PARSE_ERROR`, or `SYNQ_STATUS_INTERNAL_ERROR`; diagnostics use the synthetic source label `<memory>`. |
 | `synq_export_openqasm3(program, &text, &diagnostic)` | Returns `SYNQ_STATUS_OK` and a library-allocated UTF-8 OpenQASM string. | Returns `SYNQ_STATUS_INVALID_ARGUMENT`, `SYNQ_STATUS_EXPORT_ERROR`, or `SYNQ_STATUS_INTERNAL_ERROR`; no partial OpenQASM output is returned. |
 | `synq_string_free(value)` | Releases a library-allocated string. | Accepts `NULL`. |
 | `synq_program_free(program)` | Releases a program handle. | Accepts `NULL`. |
@@ -48,7 +49,7 @@ increment.
 
 The caller owns the `synq_program*` only after a successful parse and must
 release it exactly once using `synq_program_free()`. The caller owns any
-non-`NULL` output or diagnostic string returned by the two fallible functions
+non-`NULL` output or diagnostic string returned by the three fallible functions
 and must release it exactly once using `synq_string_free()`. The library owns
 the string returned by `synq_version()` permanently; the caller must neither
 free nor modify it.
@@ -77,12 +78,12 @@ cmake --build /tmp/synq-c-abi --parallel 2
 ctest --test-dir /tmp/synq-c-abi --output-on-failure
 ```
 
-At review time, the expanded recovery profile reported **9/9 passing** tests,
+At review time, the expanded recovery profile reported **10/10 passing** tests,
 including `synq_c_abi_smoke`, the gate-validation and feature-gate smoke tests,
 the parser/exporter tests, and the two independent OpenQASM downstream
-validations. The same profile then passed remotely in [Compiler Core #15][8]
-for commit `b03e2bc`. This result does not freeze the ABI or test a distributed
-shared library.
+validations. The in-memory parsing increment has local evidence and awaits a
+remote compiler-core run. This result does not freeze the ABI or test a
+distributed shared library.
 
 ## What this enables next—and what it does not
 
@@ -100,9 +101,10 @@ and it may expose a smaller, safer surface than the raw C header.
 ## Deliberate non-goals
 
 This release does not install a system-wide library, produce a shared library,
-publish a package, expose callbacks, accept in-memory source strings, guarantee
-thread safety, provide stable error codes across releases, execute quantum
-programs, submit to quantum hardware, or expose arbitrary SynQ AST/IR objects.
+publish a package, expose callbacks, accept length-aware or embedded-NUL source
+buffers, guarantee thread safety, provide stable error codes across releases,
+execute quantum programs, submit to quantum hardware, or expose arbitrary SynQ
+AST/IR objects.
 Those decisions require separate design, threat modelling, API review, and
 tests.
 

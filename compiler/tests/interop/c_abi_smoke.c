@@ -17,6 +17,7 @@ int main(void) {
     const char* semantic_path = "/tmp/synq_c_abi_semantic_smoke.synq";
     const char* duplicate_path = "/tmp/synq_c_abi_duplicate_smoke.synq";
     const char* measurement_path = "/tmp/synq_c_abi_measurement_smoke.synq";
+    const char* in_memory_source = "quantum h q[0]\nmeasure q[0]\n";
     FILE* source = fopen(path, "w");
     synq_program* program = NULL;
     char* diagnostic = NULL;
@@ -83,6 +84,30 @@ int main(void) {
     }
     synq_string_free(openqasm);
     synq_string_free(diagnostic);
+    synq_program_free(program);
+
+    program = NULL;
+    diagnostic = NULL;
+    status = synq_parse_source(in_memory_source, &program, &diagnostic);
+    if (!require(status == SYNQ_STATUS_OK && program != NULL && diagnostic == NULL,
+                 "C consumer parses bounded source text directly from memory")) {
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    openqasm = NULL;
+    status = synq_export_openqasm3(program, &openqasm, &diagnostic);
+    if (!require(status == SYNQ_STATUS_OK && openqasm != NULL && diagnostic == NULL &&
+                 strstr(openqasm, "c[0] = measure q[0];") != NULL,
+                 "C consumer exports a program parsed from in-memory source")) {
+        synq_string_free(openqasm);
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    synq_string_free(openqasm);
     synq_program_free(program);
 
     program = NULL;
@@ -176,6 +201,22 @@ int main(void) {
     }
     synq_string_free(diagnostic);
     remove(measurement_path);
+
+    program = NULL;
+    diagnostic = NULL;
+    status = synq_parse_source("measure q[0], q[1]", &program, &diagnostic);
+    if (!require(status == SYNQ_STATUS_PARSE_ERROR && program == NULL,
+                 "C consumer receives a parse error for malformed in-memory source")) {
+        synq_string_free(diagnostic);
+        return 1;
+    }
+    if (!require(diagnostic != NULL && strstr(diagnostic, "<memory>:1") != NULL &&
+                 strstr(diagnostic, "SYNQ-P008") != NULL,
+                 "C consumer receives a source-labelled in-memory diagnostic")) {
+        synq_string_free(diagnostic);
+        return 1;
+    }
+    synq_string_free(diagnostic);
 
     puts("SynQ C ABI smoke test passed");
     return 0;
