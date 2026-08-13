@@ -28,7 +28,7 @@
 - [x] Add bounded parser comment handling with focused smoke coverage.
 - [x] Connect the frontend to the source-only catalog and add browser-level contract coverage.
 - [x] Validate Docker Compose or document the environment-specific blocker with an exact command.
-- [ ] Re-run full checks, observe CI, document results, and publish the continued recovery increment.
+- [x] Re-run full checks, observe CI, document results, and publish the continued recovery increment.
 - [ ] Assess the current compiler recovery profile and select one realistic interoperability boundary.
 - [ ] Implement one bounded SynQ interoperability adapter with fixture-based tests.
 - [ ] Verify, document, and publish only the interoperability behavior that passes locally and in CI.
