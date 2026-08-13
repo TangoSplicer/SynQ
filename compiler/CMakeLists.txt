@@ -83,6 +83,19 @@ if(BUILD_CORE_SMOKE_TESTS)
     set_target_properties(synq_c_abi_smoke PROPERTIES LINKER_LANGUAGE CXX)
     add_test(NAME synq_c_abi_smoke COMMAND synq_c_abi_smoke)
 
+    add_library(synq_ffi_shared SHARED tests/interop/synq_ffi_shared_anchor.cpp)
+    target_include_directories(synq_ffi_shared PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(synq_ffi_shared PRIVATE synq_lib)
+    set_target_properties(synq_ffi_shared PROPERTIES OUTPUT_NAME synq_ffi)
+
+    find_program(SYNQ_SBCL_EXECUTABLE sbcl REQUIRED)
+    add_test(
+        NAME synq_common_lisp_abi_smoke
+        COMMAND ${SYNQ_SBCL_EXECUTABLE} --noinform --script
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/common_lisp_abi_smoke.lisp
+                $<TARGET_FILE:synq_ffi_shared>
+    )
+
     find_program(SYNQ_RUSTC_EXECUTABLE rustc REQUIRED)
     set(SYNQ_RUST_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_abi_smoke)
     add_custom_command(

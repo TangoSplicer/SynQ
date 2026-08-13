@@ -78,3 +78,6 @@
 - [x] Define bounded in-memory UTF-8 source parsing and C-ABI compatibility semantics.
 - [x] Implement shared parser-stream handling and a `synq_parse_source` C-ABI operation.
 - [x] Extend C and Rust consumers, run full checks, document verified boundaries, and publish the text-parsing increment.
+- [x] Confirm free Common Lisp/CFFI toolchain availability and define a test-only shared C-ABI library boundary.
+- [x] Implement and test a Common Lisp CFFI consumer of the opaque SynQ C ABI.
+- [ ] Integrate the Lisp consumer into compiler-core CI, document verified boundaries, and publish the increment.

@@ -91,7 +91,7 @@ shared library.
 | --- | --- | --- |
 | Rust | A dependency-free `rustc` smoke consumer declares the opaque v1 C ABI directly, validates parse/export/error ownership flows, and passed remotely in [Compiler Core #16][9]. A future wrapper can introduce RAII types after a separate API review. | A Rust crate, a Rust-native ABI, automatic bindings, safe wrapper types, or an in-process C++ interface. |
 | Mercury | Map only released C functions through `pragma foreign_proc` on a C backend, with a Mercury toolchain smoke test. | A Mercury package, all Mercury backends, or bidirectional foreign calls. |
-| Common Lisp | Define the released functions and opaque pointers using CFFI, with an implementation-specific test. | A published CFFI system, callbacks, or all Lisp implementations. |
+| Common Lisp | A test-only `libsynq_ffi.so` and SBCL/CFFI consumer now load the opaque v1 C ABI from the build directory, validate in-memory parse/export/error ownership flows, and are registered locally in the core profile. | A published CFFI system, installed shared library, callbacks, or all Lisp implementations. |
 | Clojure | Call a small Java facade through normal Java interop; the facade can use JNI only once its native-load contract is tested. | A Clojure library, direct C ABI access from Clojure, or a portable JNI solution. |
 
 The C ABI is therefore **a foundation for interoperability, not proof of full
@@ -100,11 +100,12 @@ and it may expose a smaller, safer surface than the raw C header.
 
 ## Deliberate non-goals
 
-This release does not install a system-wide library, produce a shared library,
-publish a package, expose callbacks, accept length-aware or embedded-NUL source
-buffers, guarantee thread safety, provide stable error codes across releases,
-execute quantum programs, submit to quantum hardware, or expose arbitrary SynQ
-AST/IR objects.
+This release does not install a system-wide library, publish a package, expose
+callbacks, accept length-aware or embedded-NUL source buffers, guarantee thread
+safety, provide stable error codes across releases, execute quantum programs,
+submit to quantum hardware, or expose arbitrary SynQ AST/IR objects. A
+test-only Linux shared artifact exists in the CMake build directory solely for
+the Common Lisp CFFI smoke test; it is not a distributed shared library.
 Those decisions require separate design, threat modelling, API review, and
 tests.
 
