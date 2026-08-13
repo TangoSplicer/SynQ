@@ -86,7 +86,7 @@ gate-validation and feature-gate smoke tests, the parser/exporter tests, and
 the two independent OpenQASM downstream validations. The earlier C/Rust
 in-memory profile passed remotely in [Compiler Core #17][11] for commit
 `65906d0`, while the later Common Lisp profile passed remotely in [Compiler Core
-#18][12]. The Clojure configuration is not yet committed or remotely run. None
+#18][12]. The Clojure configuration is published but has not yet run remotely. None
 of these results freeze the ABI or test a distributed shared library.
 
 ## What this enables next—and what it does not
