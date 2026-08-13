@@ -28,6 +28,8 @@
 #include <utility>
 #include <vector>
 
+#include "diagnostic.h"
+
 class ASTNode {
 public:
     virtual ~ASTNode() {}
@@ -59,9 +61,14 @@ public:
     std::string op;
     std::vector<std::string> args;
     std::size_t line = 0;
+    synq::compiler::SourceSpan span;
 
     InstructionNode(std::string operation, std::vector<std::string> arguments, std::size_t line_number)
-        : op(std::move(operation)), args(std::move(arguments)), line(line_number) {}
+        : InstructionNode(std::move(operation), std::move(arguments), line_number, {line_number, 0, 0}) {}
+
+    InstructionNode(std::string operation, std::vector<std::string> arguments, std::size_t line_number,
+                    synq::compiler::SourceSpan source_span)
+        : op(std::move(operation)), args(std::move(arguments)), line(line_number), span(source_span) {}
 
     std::string toString() override {
         return op + (args.empty() ? "" : " " + args.front());
@@ -92,17 +99,28 @@ public:
     std::optional<std::string> literal_angle;
     std::vector<std::size_t> qubit_indices;
     std::size_t line = 0;
+    synq::compiler::SourceSpan span;
 
     QuantumGateNode(QuantumGateKind gate_kind,
                     std::string original_name,
                     std::optional<std::string> angle,
                     std::vector<std::size_t> operands,
                     std::size_t line_number)
+        : QuantumGateNode(gate_kind, std::move(original_name), std::move(angle), std::move(operands),
+                          line_number, {line_number, 0, 0}) {}
+
+    QuantumGateNode(QuantumGateKind gate_kind,
+                    std::string original_name,
+                    std::optional<std::string> angle,
+                    std::vector<std::size_t> operands,
+                    std::size_t line_number,
+                    synq::compiler::SourceSpan source_span)
         : kind(gate_kind),
           source_name(std::move(original_name)),
           literal_angle(std::move(angle)),
           qubit_indices(std::move(operands)),
-          line(line_number) {}
+          line(line_number),
+          span(source_span) {}
 
     std::string toString() override {
         std::string text = "quantum " + source_name;
@@ -136,10 +154,16 @@ public:
     std::string value;
     ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
     std::size_t line = 0;
+    synq::compiler::SourceSpan span;
 
     DeclarationNode(std::string identifier, std::string source_value, std::size_t line_number,
                     ClassicalLiteralKind kind = ClassicalLiteralKind::SourceText)
-        : name(std::move(identifier)), value(std::move(source_value)), literal_kind(kind), line(line_number) {}
+        : DeclarationNode(std::move(identifier), std::move(source_value), line_number, kind, {line_number, 0, 0}) {}
+
+    DeclarationNode(std::string identifier, std::string source_value, std::size_t line_number,
+                    ClassicalLiteralKind kind, synq::compiler::SourceSpan source_span)
+        : name(std::move(identifier)), value(std::move(source_value)), literal_kind(kind), line(line_number),
+          span(source_span) {}
 
     std::string toString() override {
         return "let " + name + " = " + value;

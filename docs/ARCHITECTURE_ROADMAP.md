@@ -95,7 +95,7 @@ planned work.
 
 | Planned type | Minimum fields | Why it is needed |
 | --- | --- | --- |
-| `SourceSpan` | current: line and one-based half-open columns; future: file identifier and byte positions | Allows precise errors, editor integration, and backend rejection attribution. |
+| `SourceSpan` | current: parser diagnostics and parsed statement AST nodes carry line and one-based half-open columns; future: file identifier and byte positions | Allows precise errors, future HIR provenance, editor integration, and backend rejection attribution. |
 | `Diagnostic` | current: code, severity, span, message, help; future: structured note collection | Separates user-facing compiler output from ad hoc `stderr` messages. |
 | `Module` | declarations, imports, feature opt-ins, top-level items | Gives a home for edition, gate, and module semantics. |
 | `Type` | scalar, boolean, integer, float, angle, bit, qubit, result, function, aggregate variants | Makes the classical–quantum boundary explicit instead of encoding it in strings. |

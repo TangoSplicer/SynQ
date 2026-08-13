@@ -27,6 +27,11 @@ std::string write_fixture(const std::string& filename, const std::string& conten
     return path;
 }
 
+bool has_span(const synq::compiler::SourceSpan& span, std::size_t line,
+              std::size_t column_start, std::size_t column_end) {
+    return span.line == line && span.column_start == column_start && span.column_end == column_end;
+}
+
 bool parser_accepts_supported_fixture() {
     const std::string path = write_fixture(
         "synq_parser_supported_fixture.synq",
@@ -132,8 +137,34 @@ bool parser_classifies_classical_literals() {
 
     DeclarationNode direct_legacy("legacy", "42", 99);
     return require(direct_legacy.literal_kind == ClassicalLiteralKind::SourceText &&
-                   direct_legacy.toString() == "let legacy = 42",
-                   "direct legacy declaration construction defaults to source text without changing rendering");
+                   direct_legacy.toString() == "let legacy = 42" && has_span(direct_legacy.span, 99, 0, 0),
+                   "direct legacy declaration construction defaults to source text and an unknown-column span");
+}
+
+bool parser_assigns_source_provenance() {
+    const std::string path = write_fixture(
+        "synq_parser_source_provenance_fixture.synq",
+        "  let count = 42\n"
+        " quantum h q[3] // local comment\n"
+        "print count\n");
+    Parser parser;
+    std::unique_ptr<ASTNode> root(parser.parseFile(path));
+    std::remove(path.c_str());
+    auto* program = dynamic_cast<ProgramNode*>(root.get());
+    if (!require(program != nullptr && program->statements.size() == 3,
+                 "parser accepts source-provenance fixture")) return false;
+
+    auto* declaration = dynamic_cast<DeclarationNode*>(program->statements[0]);
+    auto* gate = dynamic_cast<QuantumGateNode*>(program->statements[1]);
+    auto* instruction = dynamic_cast<InstructionNode*>(program->statements[2]);
+    return require(declaration != nullptr && declaration->line == declaration->span.line &&
+                   has_span(declaration->span, 1, 3, 17),
+                   "parsed declaration retains its exact trimmed source span") &&
+           require(gate != nullptr && gate->line == gate->span.line && has_span(gate->span, 2, 2, 16),
+                   "typed quantum node retains comment-free source provenance") &&
+           require(instruction != nullptr && instruction->line == instruction->span.line &&
+                   has_span(instruction->span, 3, 1, 12),
+                   "parsed instruction retains source provenance");
 }
 
 bool parser_accepts_explicit_qubit_operands() {
@@ -311,6 +342,7 @@ int main() {
     if (!parser_accepts_supported_fixture()) return 1;
     if (!parser_rejects_invalid_fixture()) return 1;
     if (!parser_classifies_classical_literals()) return 1;
+    if (!parser_assigns_source_provenance()) return 1;
     if (!parser_accepts_explicit_qubit_operands()) return 1;
     if (!parser_rejects_malformed_qubit_operands()) return 1;
     if (!parser_accepts_literal_angle_parameters()) return 1;

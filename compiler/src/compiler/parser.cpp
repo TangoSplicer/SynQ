@@ -175,7 +175,9 @@ QuantumGateKind quantum_gate_kind(const std::string& source_name) {
     return QuantumGateKind::Unknown;
 }
 
-QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& arguments, std::size_t line_number) {
+QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& arguments,
+                                        std::size_t line_number,
+                                        const synq::compiler::SourceSpan& span) {
     const std::string& kernel = arguments.front();
     const std::size_t open = kernel.find('(');
     const bool parameterized = open != std::string::npos;
@@ -192,7 +194,7 @@ QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& argument
         operands.push_back(index);
     }
     return new QuantumGateNode(quantum_gate_kind(source_name), source_name, literal_angle,
-                               std::move(operands), line_number);
+                               std::move(operands), line_number, span);
 }
 
 std::string strip_comment(const std::string& value) {
@@ -276,7 +278,7 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
                 return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
             }
             root->statements.push_back(new DeclarationNode(identifier, value, line_number,
-                                                           classify_declaration_literal(value)));
+                                                           classify_declaration_literal(value), span));
             continue;
         }
 
@@ -297,7 +299,7 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
                 return fail_parse("SYNQ-P005", span, "malformed quantum kernel, operands, or literal-angle parameter",
                                   "use explicit operands such as q[0] or q[0], q[1]");
             }
-            QuantumGateNode* gate = make_quantum_gate_node(quantum_arguments, line_number);
+            QuantumGateNode* gate = make_quantum_gate_node(quantum_arguments, line_number, span);
             if (gate == nullptr) {
                 return fail_parse("SYNQ-P005", span, "could not construct typed quantum operands",
                                   "use explicit operands such as q[0] or q[0], q[1]");
@@ -315,7 +317,7 @@ synq::compiler::ParseResult Parser::parseFileWithDiagnostics(const std::string& 
             }
             root->statements.push_back(gate);
         } else {
-            root->statements.push_back(new InstructionNode(operation, {argument}, line_number));
+            root->statements.push_back(new InstructionNode(operation, {argument}, line_number, span));
         }
     }
 
