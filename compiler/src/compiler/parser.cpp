@@ -53,6 +53,20 @@ bool is_identifier(const std::string& value) {
     });
 }
 
+std::string strip_comment(const std::string& value) {
+    // Recovery-profile comment rule: `//` begins a comment only at the start
+    // of a trimmed line or when preceded by whitespace. This preserves values
+    // such as `https://example.invalid` while accepting ordinary inline notes.
+    std::size_t marker = value.find("//");
+    while (marker != std::string::npos) {
+        if (marker == 0 || std::isspace(static_cast<unsigned char>(value[marker - 1])) != 0) {
+            return trim(value.substr(0, marker));
+        }
+        marker = value.find("//", marker + 2);
+    }
+    return trim(value);
+}
+
 }  // namespace
 
 ASTNode* Parser::parseFile(const std::string& filename) {
@@ -70,13 +84,14 @@ ASTNode* Parser::parseFile(const std::string& filename) {
     // plus the instructions `print <text>`, `delay <non-negative milliseconds>`,
     // `quantum <kernel>`, and `ai <prompt>`. Declaration values are preserved as
     // source text; expression parsing is intentionally out of scope. Blank lines
-    // and full-line `//` comments are ignored.
+    // and `//` comments at line start or after whitespace are ignored. The latter
+    // rule deliberately preserves `//` in unquoted source text such as URLs.
     std::string raw_line;
     std::size_t line_number = 0;
     while (std::getline(infile, raw_line)) {
         ++line_number;
-        std::string line = trim(raw_line);
-        if (line.empty() || line.rfind("//", 0) == 0) {
+        std::string line = strip_comment(trim(raw_line));
+        if (line.empty()) {
             continue;
         }
         if (line.back() == ';') {

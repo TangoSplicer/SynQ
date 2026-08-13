@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import CodeEditor from "@/components/CodeEditor";
+import SourceCatalog from "@/components/SourceCatalog";
 
 const examples = [
   {
@@ -76,6 +77,8 @@ export default function InteractiveExamples() {
           The editor is a local UI demonstration; it does not execute SynQ programs or submit work to quantum hardware.
         </p>
       </div>
+
+      <SourceCatalog />
 
       <div className="space-y-8">
         {examples.map((example) => (

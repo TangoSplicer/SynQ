@@ -31,11 +31,12 @@ bool parser_accepts_supported_fixture() {
     const std::string path = write_fixture(
         "synq_parser_supported_fixture.synq",
         "// A recovery-parser fixture\n"
-        "let theta = 0.5;\n"
-        "print theta;\n"
-        "delay 0\n"
-        "quantum bell_pair\n"
-        "ai concise_summary\n");
+        "let theta = 0.5; // variational parameter\n"
+        "let endpoint = https://example.invalid;\n"
+        "print theta // local-only output\n"
+        "delay 0; // zero delay\n"
+        "quantum bell_pair // placeholder path\n"
+        "ai concise_summary // placeholder path\n");
 
     Parser parser;
     std::unique_ptr<ASTNode> root(parser.parseFile(path));
@@ -44,22 +45,28 @@ bool parser_accepts_supported_fixture() {
     if (!require(root != nullptr, "parser accepts supported fixture")) return false;
     auto* program = dynamic_cast<ProgramNode*>(root.get());
     if (!require(program != nullptr, "parser returns ProgramNode")) return false;
-    if (!require(program->statements.size() == 5, "parser retains declarations and supported instructions")) return false;
+    if (!require(program->statements.size() == 6, "parser retains declarations and supported instructions")) return false;
 
     auto* declaration = dynamic_cast<DeclarationNode*>(program->statements[0]);
     if (!require(declaration != nullptr, "parser creates DeclarationNode")) return false;
     if (!require(declaration->name == "theta" && declaration->value == "0.5", "parser preserves declaration fields")) return false;
     if (!require(declaration->line == 2, "parser records declaration source line")) return false;
 
+    auto* url_declaration = dynamic_cast<DeclarationNode*>(program->statements[1]);
+    if (!require(url_declaration != nullptr, "parser retains URL declaration")) return false;
+    if (!require(url_declaration->name == "endpoint" && url_declaration->value == "https://example.invalid",
+                 "parser preserves non-comment URL text")) return false;
+    if (!require(url_declaration->line == 3, "parser records URL declaration source line")) return false;
+
     const std::string expected_operations[] = {"print", "delay", "quantum", "ai"};
     const std::string expected_arguments[] = {"theta", "0", "bell_pair", "concise_summary"};
     for (std::size_t index = 0; index < 4; ++index) {
-        auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index + 1]);
+        auto* instruction = dynamic_cast<InstructionNode*>(program->statements[index + 2]);
         if (!require(instruction != nullptr, "parser creates InstructionNode")) return false;
         if (!require(instruction->op == expected_operations[index], "parser preserves instruction operation")) return false;
         if (!require(instruction->args.size() == 1 && instruction->args.front() == expected_arguments[index],
                      "parser preserves instruction argument")) return false;
-        if (!require(instruction->line == index + 3, "parser records source line")) return false;
+        if (!require(instruction->line == index + 4, "parser records source line")) return false;
     }
     return true;
 }
