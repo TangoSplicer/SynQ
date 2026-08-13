@@ -62,4 +62,4 @@
 - [x] Run full checks, document verified hybrid-AST outcomes, and publish the classical-boundary increment.
 - [x] Define compiler-neutral typed quantum gate-shape rules and diagnostic boundaries.
 - [x] Implement and test typed gate-shape validation with structured diagnostics in the parser path.
-- [ ] Re-run full checks, record verified semantic boundaries, and publish the gate-validation increment.
+- [x] Re-run full checks, record verified semantic boundaries, and publish the gate-validation increment.

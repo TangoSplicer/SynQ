@@ -1,7 +1,6 @@
 # SynQ Bounded Quantum Gate-Shape Validation
 
-**Status:** Locally verified recovery-profile semantic boundary; remote CI
-evidence for this increment is pending publication.
+**Status:** Remotely validated recovery-profile semantic boundary.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -66,5 +65,9 @@ return the documented `SYNQ-S` code with existing structured diagnostic fields;
 unknown gates remain parseable but exporter-rejected; and the compiled C ABI
 consumer checks propagation of `SYNQ-S002`. Compiler, frontend, and backend
 suites pass locally. Status material calls this **bounded gate-shape
-validation**, not general quantum semantic validation; remote compiler-core
-evidence is required before it is described as remotely validated.
+validation**, not general quantum semantic validation. The same compiler
+profile passed in [Compiler Core #12][1] for commit `aae8e78`.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31721517239 "SynQ Compiler Core #12"
