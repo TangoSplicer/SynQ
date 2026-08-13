@@ -1,7 +1,7 @@
 # SynQ Mercury C-Backend Consumer Proof
 
-**Status:** Locally validated test-only Mercury C-backend consumer proof;
-remote compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated test-only Mercury C-backend consumer proof in
+[Compiler Core #22][4]; this is not a distributed Mercury binding.
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -57,12 +57,16 @@ define stable foreign-memory, exception, thread-safety, or cleanup policy;
 install a compiler; compile arbitrary Mercury programs; or establish full
 Mercury, Prolog, or logic-language interoperability.
 
-## Local evidence and promotion rule
+## Verified evidence and promotion rule
 
 After the isolated source toolchain bootstrap completed, a clean CMake recovery
 profile built the Mercury executable and reported **13/13** CTest checks
-passing, including `synq_mercury_abi_smoke`. This evidence is local until the
-same pinned bootstrap and consumer execute successfully in compiler-core CI.
+passing, including `synq_mercury_abi_smoke`. [Compiler Core #22][4] then built
+the same pinned Mercury toolchain, generated the consumer, and reported the
+same **13/13** CTest pass for commit `ef0505f`.
+
+This establishes only the tested Mercury C-backend opaque in-memory
+parse/export/error ownership flow for the CMake-build-directory Linux artifact.
 Documentation must call this a **Mercury C-backend consumer proof**, not a
 Mercury binding or general backend-support claim.
 
@@ -71,3 +75,4 @@ Mercury binding or general backend-support claim.
 [1]: https://mercurylang.org/information/doc-latest/mercury_user_guide/Foreign-language-interface.html "Mercury User’s Guide: Foreign language interface"
 [2]: https://mercurylang.org/information/doc-release/mercury_ref/pragma-foreign_005fproc.html "Mercury Reference Manual: pragma foreign_proc"
 [3]: https://dl.mercurylang.org/index.html "Mercury Downloads"
+[4]: https://github.com/TangoSplicer/SynQ/actions/runs/31729572407 "SynQ Compiler Core #22"
