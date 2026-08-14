@@ -51,7 +51,7 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P006` | An experimental annotation is malformed or names an unknown feature. | Use a registered exact annotation such as `#[experimental(feature = "parameterized-quantum-gates")]`. |
 | `SYNQ-P007` | A gated construct is used without its required alpha opt-in. | Add the documented file-scoped feature annotation or use an ungated construct. |
 | `SYNQ-P008` | A measurement does not use exactly one explicit non-negative qubit operand. | Use `measure q[index]`, for example `measure q[0]`. |
-| `SYNQ-P009` | Alpha-gated classical control flow does not use its exact Boolean-literal-or-identifier `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]`, `if ready then quantum h q[0]`, or the equivalent bounded `while` form after enabling the feature. |
+| `SYNQ-P009` | Alpha-gated classical control flow does not use its exact bounded Boolean-literal/identifier, `not <atom>`, or `<atom> and/or <atom>` `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]`, `if not ready then quantum h q[0]`, or `if ready and enabled then quantum h q[0]` after enabling the feature. |
 | `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
 
 `SYNQ-P009` and `SYNQ-P010` are parser diagnostics for the Alpha
@@ -89,10 +89,11 @@ Core #26][3].
 | --- | --- | --- | --- |
 | `SYNQ-R002` | Internal name resolution | An Alpha classical-control condition identifier has no earlier top-level declaration. | Declare the name on an earlier line with static type `Boolean`, or use `true`/`false`. |
 | `SYNQ-T001` | Internal static-type validation | An Alpha classical-control condition resolves to a declaration whose propagated static type is not `Boolean`. | Use a Boolean declaration/reference or a `true`/`false` literal. |
+| `SYNQ-T002` | Internal Boolean-tree validation | A manually constructed internal Boolean expression has an unsupported operator or wrong operand count. | Use the parser-produced bounded tree shape: leaf, `not <atom>`, or `<atom> and/or <atom>`. |
 
-`SYNQ-R002` and `SYNQ-T001` are internal resolver/type diagnostics. They are
-not parser diagnostics and are not propagated through the C ABI. They cover
-only the bounded Boolean-condition reference profile; they do not establish a
+`SYNQ-R002`, `SYNQ-T001`, and `SYNQ-T002` are internal resolver/type diagnostics.
+They are not parser diagnostics and are not propagated through the C ABI. They
+cover only the bounded Boolean-condition profile; they do not establish a
 general expression or type system.
 
 ## Compatibility boundaries

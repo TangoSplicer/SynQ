@@ -26,6 +26,7 @@ struct ResolvedHybridDeclaration {
 struct ResolvedHybridControlFlow {
     HybridControlFlow control;
     std::optional<std::size_t> condition_binding_index;
+    std::vector<std::size_t> condition_binding_indices;
 };
 
 using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQuantumGate, HybridMeasurement, ResolvedHybridControlFlow>;

@@ -168,6 +168,27 @@ enum class ClassicalControlKind {
 enum class ClassicalConditionKind {
     BooleanLiteral,
     IdentifierReference,
+    BooleanExpression,
+};
+
+// A bounded, non-evaluating Boolean expression tree used only by the Alpha
+// control-flow profile. The parser permits literal/identifier leaves, a single
+// unary `not`, or one binary `and`/`or`; it deliberately has no precedence,
+// parentheses, nested operators, value semantics, or execution behavior.
+enum class ClassicalBooleanExpressionKind {
+    BooleanLiteral,
+    IdentifierReference,
+    Not,
+    And,
+    Or,
+};
+
+struct ClassicalBooleanExpression {
+    ClassicalBooleanExpressionKind kind = ClassicalBooleanExpressionKind::BooleanLiteral;
+    bool boolean_value = false;
+    std::string source_text;
+    synq::compiler::SourceSpan span;
+    std::vector<ClassicalBooleanExpression> operands;
 };
 
 struct ClassicalCondition {
@@ -175,6 +196,7 @@ struct ClassicalCondition {
     bool boolean_value = false;
     std::string source_text;
     synq::compiler::SourceSpan span;
+    ClassicalBooleanExpression expression;
 };
 
 class ClassicalControlNode : public ASTNode {

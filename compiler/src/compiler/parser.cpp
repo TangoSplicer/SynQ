@@ -198,6 +198,53 @@ QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& argument
                                std::move(operands), line_number, span);
 }
 
+bool parse_boolean_expression_atom(const std::string& source,
+                                   const synq::compiler::SourceSpan& span,
+                                   ClassicalBooleanExpression& expression) {
+    if (source == "true" || source == "false") {
+        expression = {ClassicalBooleanExpressionKind::BooleanLiteral, source == "true", source, span, {}};
+        return true;
+    }
+    if (is_identifier(source)) {
+        expression = {ClassicalBooleanExpressionKind::IdentifierReference, false, source, span, {}};
+        return true;
+    }
+    return false;
+}
+
+bool parse_bounded_boolean_expression(const std::string& source,
+                                      const synq::compiler::SourceSpan& span,
+                                      ClassicalBooleanExpression& expression) {
+    std::istringstream tokens(source);
+    std::vector<std::string> words;
+    std::string word;
+    while (tokens >> word) words.push_back(word);
+
+    if (words.size() == 1) return parse_boolean_expression_atom(words.front(), span, expression);
+
+    if (words.size() == 2 && words.front() == "not") {
+        ClassicalBooleanExpression operand;
+        if (!parse_boolean_expression_atom(words[1], span, operand)) return false;
+        expression = {ClassicalBooleanExpressionKind::Not, false, source, span, {std::move(operand)}};
+        return true;
+    }
+
+    if (words.size() == 3 && (words[1] == "and" || words[1] == "or")) {
+        ClassicalBooleanExpression left;
+        ClassicalBooleanExpression right;
+        if (!parse_boolean_expression_atom(words[0], span, left) ||
+            !parse_boolean_expression_atom(words[2], span, right)) {
+            return false;
+        }
+        expression = {words[1] == "and" ? ClassicalBooleanExpressionKind::And
+                                          : ClassicalBooleanExpressionKind::Or,
+                      false, source, span, {std::move(left), std::move(right)}};
+        return true;
+    }
+
+    return false;
+}
+
 bool parse_control_flow_arguments(const std::string& source, const std::string& connector,
                                   ClassicalCondition& condition, const synq::compiler::SourceSpan& span,
                                   std::string& body_operation, std::string& body_argument) {
@@ -208,13 +255,15 @@ bool parse_control_flow_arguments(const std::string& source, const std::string& 
     }
 
     const std::string condition_text = trim(source.substr(0, boundary));
-    if (condition_text == "true" || condition_text == "false") {
-        condition = {ClassicalConditionKind::BooleanLiteral, condition_text == "true", condition_text, span};
-    } else if (is_identifier(condition_text)) {
-        condition = {ClassicalConditionKind::IdentifierReference, false, condition_text, span};
-    } else {
-        return false;
+    ClassicalBooleanExpression expression;
+    if (!parse_bounded_boolean_expression(condition_text, span, expression)) return false;
+    ClassicalConditionKind condition_kind = ClassicalConditionKind::BooleanExpression;
+    if (expression.kind == ClassicalBooleanExpressionKind::BooleanLiteral) {
+        condition_kind = ClassicalConditionKind::BooleanLiteral;
+    } else if (expression.kind == ClassicalBooleanExpressionKind::IdentifierReference) {
+        condition_kind = ClassicalConditionKind::IdentifierReference;
     }
+    condition = {condition_kind, expression.boolean_value, condition_text, span, std::move(expression)};
 
     std::istringstream body_tokens(trim(source.substr(boundary + separator.size())));
     body_tokens >> body_operation;
@@ -387,8 +436,8 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             const std::string connector = operation == "if" ? "then" : "do";
             if (!parse_control_flow_arguments(argument, connector, condition, span, body_operation, body_argument)) {
                 return fail_parse("SYNQ-P009", span, "malformed bounded classical control-flow syntax",
-                                  operation == "if" ? "use if true then quantum h q[0] or if ready then quantum h q[0]" :
-                                                      "use while false do measure q[0] or while ready do measure q[0]");
+                                  operation == "if" ? "use if true then quantum h q[0], if not ready then quantum h q[0], or if ready and enabled then quantum h q[0]" :
+                                                      "use while false do measure q[0], while not ready do measure q[0], or while ready or fallback do measure q[0]");
             }
             synq::compiler::Diagnostic body_error;
             ASTNode* body = make_control_body_node(body_operation, body_argument, active_features,

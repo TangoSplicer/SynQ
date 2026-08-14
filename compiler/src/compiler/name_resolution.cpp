@@ -40,25 +40,35 @@ Diagnostic unresolved_binding_diagnostic(const HybridDeclaration& declaration) {
     };
 }
 
-Diagnostic unresolved_control_condition_diagnostic(const HybridControlFlow& control) {
+Diagnostic unresolved_control_condition_diagnostic(const ClassicalBooleanExpression& expression) {
     return {
         "SYNQ-R002",
         DiagnosticSeverity::Error,
-        control.condition.span,
-        "unknown or forward binding `" + control.condition.source_text + "` in classical control condition",
-        "declare `" + control.condition.source_text + "` as an earlier Boolean binding or use true/false"
+        expression.span,
+        "unknown or forward binding `" + expression.source_text + "` in classical control condition",
+        "declare `" + expression.source_text + "` as an earlier Boolean binding or use true/false"
     };
 }
 
-Diagnostic non_boolean_control_condition_diagnostic(const HybridControlFlow& control,
+Diagnostic non_boolean_control_condition_diagnostic(const ClassicalBooleanExpression& expression,
                                                     ClassicalStaticType actual_type) {
     return {
         "SYNQ-T001",
         DiagnosticSeverity::Error,
-        control.condition.span,
-        "classical control condition `" + control.condition.source_text + "` has static type " +
+        expression.span,
+        "classical control condition `" + expression.source_text + "` has static type " +
             classical_static_type_name(actual_type) + ", not Boolean",
         "use an earlier Boolean declaration or a true/false literal condition"
+    };
+}
+
+Diagnostic invalid_boolean_expression_diagnostic(const ClassicalBooleanExpression& expression) {
+    return {
+        "SYNQ-T002",
+        DiagnosticSeverity::Error,
+        expression.span,
+        "bounded classical Boolean expression has an invalid internal operator shape",
+        "use one literal or identifier, not <atom>, or <atom> and/or <atom>"
     };
 }
 
@@ -66,6 +76,39 @@ struct BindingInfo {
     std::size_t index = 0;
     ClassicalStaticType static_type = ClassicalStaticType::Unknown;
 };
+
+bool resolve_boolean_expression(const ClassicalBooleanExpression& expression,
+                                const std::unordered_map<std::string, BindingInfo>& bindings,
+                                std::vector<std::size_t>& binding_indices,
+                                Diagnostic& error) {
+    if (expression.kind == ClassicalBooleanExpressionKind::BooleanLiteral) return true;
+    if (expression.kind == ClassicalBooleanExpressionKind::IdentifierReference) {
+        const auto binding = bindings.find(expression.source_text);
+        if (binding == bindings.end()) {
+            error = unresolved_control_condition_diagnostic(expression);
+            return false;
+        }
+        if (binding->second.static_type != ClassicalStaticType::Boolean) {
+            error = non_boolean_control_condition_diagnostic(expression, binding->second.static_type);
+            return false;
+        }
+        binding_indices.push_back(binding->second.index);
+        return true;
+    }
+
+    const std::size_t expected_operands = expression.kind == ClassicalBooleanExpressionKind::Not ? 1 : 2;
+    if ((expression.kind != ClassicalBooleanExpressionKind::Not &&
+         expression.kind != ClassicalBooleanExpressionKind::And &&
+         expression.kind != ClassicalBooleanExpressionKind::Or) ||
+        expression.operands.size() != expected_operands) {
+        error = invalid_boolean_expression_diagnostic(expression);
+        return false;
+    }
+    for (const ClassicalBooleanExpression& operand : expression.operands) {
+        if (!resolve_boolean_expression(operand, bindings, binding_indices, error)) return false;
+    }
+    return true;
+}
 
 }  // namespace
 
@@ -105,22 +148,20 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
 
         if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
             std::optional<std::size_t> condition_binding_index;
-            if (control->condition.kind == ClassicalConditionKind::IdentifierReference) {
-                const auto binding = bindings.find(control->condition.source_text);
-                if (binding == bindings.end()) {
-                    NameResolutionResult result;
-                    result.diagnostics.push_back(unresolved_control_condition_diagnostic(*control));
-                    return result;
-                }
-                if (binding->second.static_type != ClassicalStaticType::Boolean) {
-                    NameResolutionResult result;
-                    result.diagnostics.push_back(non_boolean_control_condition_diagnostic(*control,
-                                                                                           binding->second.static_type));
-                    return result;
-                }
-                condition_binding_index = binding->second.index;
+            std::vector<std::size_t> condition_binding_indices;
+            Diagnostic condition_error;
+            if (!resolve_boolean_expression(control->condition.expression, bindings, condition_binding_indices,
+                                            condition_error)) {
+                NameResolutionResult result;
+                result.diagnostics.push_back(std::move(condition_error));
+                return result;
             }
-            resolved.nodes.emplace_back(ResolvedHybridControlFlow{*control, condition_binding_index});
+            if (control->condition.kind == ClassicalConditionKind::IdentifierReference &&
+                condition_binding_indices.size() == 1) {
+                condition_binding_index = condition_binding_indices.front();
+            }
+            resolved.nodes.emplace_back(ResolvedHybridControlFlow{*control, condition_binding_index,
+                                                                    std::move(condition_binding_indices)});
             continue;
         }
 

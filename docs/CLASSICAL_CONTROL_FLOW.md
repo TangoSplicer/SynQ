@@ -32,8 +32,9 @@ if ready then quantum x q[0]
 | `if true then quantum h q[0]` | `ClassicalControlNode { If, true, QuantumGateNode }`, then `HybridControlFlow` with a typed gate body. | No expression condition, `else`, block, declaration, assignment, result value, execution, or lowering semantics. |
 | `while false do measure q[0]` | `ClassicalControlNode { While, false, MeasurementNode }`, then `HybridControlFlow` with a typed measurement body. | No iteration, termination analysis, measurement-dependent condition, returned bit, or runtime effect. |
 | `if ready then quantum x q[0]` | `ClassicalCondition { IdentifierReference, "ready" }`, then a `ResolvedHybridControlFlow` only after the earlier binding resolves to static type `Boolean`. | No general expression, value lookup, coercion, truthiness, runtime read, or execution semantics. |
+| `if not ready then quantum h q[0]` or `while ready and enabled do measure q[0]` | `ClassicalCondition { BooleanExpression, ... }` holding exactly one `Not` or one `And`/`Or` tree over literal or identifier leaves. | No parentheses, nesting, precedence, short-circuit behavior, value computation, or branch/loop execution semantics. |
 | Missing opt-in | `SYNQ-P007` before AST construction. | The feature remains Alpha; no implicit enablement or source-level bypass exists. |
-| Invalid condition/structure | `SYNQ-P009` for malformed Boolean-literal-or-identifier or connector form. | No expression parsing, coercion, or condition evaluation is attempted. |
+| Invalid condition/structure | `SYNQ-P009` for malformed bounded Boolean-expression or connector form. | No general expression parsing, coercion, or condition evaluation is attempted. |
 | Unsupported body | `SYNQ-P010` for anything other than exactly one typed quantum gate or measurement. | No nested control flow, `print`, `delay`, `ai`, `let`, multi-statement body, or fallback instruction body is accepted. |
 
 ## Parser, IR, and resolution behavior
@@ -41,10 +42,10 @@ if ready then quantum x q[0]
 `ClassicalControlNode` owns one typed body node. The parser validates the body
 through the same bounded gate-shape and measurement validation paths used at the
 top level. The Hybrid IR copies the typed condition, body variant, and source
-span. `resolve_hybrid_names` validates an identifier condition only against an
-earlier top-level declaration of static type `Boolean`, storing its binding
-index in `ResolvedHybridControlFlow`. It does not resolve inside control bodies
-because those bodies expose no classical variable references.
+span. `resolve_hybrid_names` validates every identifier leaf only against an
+earlier top-level declaration of static type `Boolean`, preserving ordered leaf
+binding indices in `ResolvedHybridControlFlow`. It does not resolve inside
+control bodies because those bodies expose no classical variable references.
 
 The current OpenQASM source exporter remains a typed-AST source-export subset
 and does not claim lowering of control nodes. This increment does not modify it
@@ -58,7 +59,9 @@ forms.
 quantum/measurement body preservation, Hybrid IR lowering, name-resolution
 preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The separate
 expression smoke covers Boolean identifier conditions and `SYNQ-R002`/`SYNQ-T001`.
-Compiler Core #29 reported the full **17/17** CTest pass for commit `33e98c2`.[3]
+The separate Boolean-expression smoke covers `not`, `and`, `or`, and `SYNQ-T002`.
+The expanded **18/18** profile is local evidence pending publication and
+compiler-core validation.
 
 ## Explicit non-goals
 

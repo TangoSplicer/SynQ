@@ -95,3 +95,6 @@
 - [x] Specify a bounded internal expression and static-type representation for existing declaration literals and identifier references without runtime evaluation.
 - [x] Extend Alpha classical control conditions from boolean literals to resolved boolean declaration references with focused parser, type, and provenance tests.
 - [x] Run full validation, publish the typed-expression increment, and record remote compiler-core evidence.
+- [x] Specify a bounded Alpha-gated Boolean-expression AST for `not`, `and`, and `or` over Boolean literals and prior resolved Boolean declaration references.
+- [x] Implement Boolean-expression parser, Hybrid IR/resolver validation, structured diagnostics, and focused non-evaluation smoke coverage.
+- [ ] Run full validation, publish the Boolean-expression increment, and record remote compiler-core evidence.
