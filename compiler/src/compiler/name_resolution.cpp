@@ -277,6 +277,11 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             continue;
         }
 
+        if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            resolved.nodes.emplace_back(*callable);
+            continue;
+        }
+
         if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
             if (contains_explicit_default_register) {
                 Diagnostic qubit_error;

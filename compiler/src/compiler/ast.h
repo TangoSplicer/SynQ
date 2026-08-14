@@ -180,6 +180,29 @@ public:
     }
 };
 
+enum class CallableDeclarationKind {
+    Function,
+    Kernel,
+};
+
+// Declaration-only callable metadata for the bounded recovery profile. It has
+// no parameter list, body, invocation, runtime, or backend semantics.
+class CallableDeclarationNode : public ASTNode {
+public:
+    CallableDeclarationKind kind = CallableDeclarationKind::Function;
+    std::string name;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    CallableDeclarationNode(CallableDeclarationKind declaration_kind, std::string identifier,
+                            std::size_t line_number, synq::compiler::SourceSpan source_span)
+        : kind(declaration_kind), name(std::move(identifier)), line(line_number), span(source_span) {}
+
+    std::string toString() override {
+        return std::string(kind == CallableDeclarationKind::Function ? "fn " : "kernel ") + name + "()";
+    }
+};
+
 // Typed representation of the first bounded classical-control-flow profile.
 // The condition is a parser-validated boolean literal and the owned body is
 // limited to one typed quantum gate or measurement statement.

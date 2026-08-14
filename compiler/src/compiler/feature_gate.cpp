@@ -90,6 +90,12 @@ FeatureRegistry make_default_feature_registry() {
         "Enables typed positive-size named qubit declarations without runtime allocation or operand-bound validation.",
         "synq#bounded-qubit-declarations",
     });
+    registry.register_feature({
+        "callable-declarations",
+        FeatureStage::Alpha,
+        "Enables declaration-only fn name() and kernel name() metadata without parameters, bodies, calls, or execution.",
+        "synq#bounded-callable-declarations",
+    });
     return registry;
 }
 

@@ -70,6 +70,15 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
             continue;
         }
 
+        if (const auto* callable = dynamic_cast<const CallableDeclarationNode*>(statement)) {
+            lowered.nodes.emplace_back(HybridCallableDeclaration{
+                callable->kind,
+                callable->name,
+                callable->span,
+            });
+            continue;
+        }
+
         if (const auto* gate = dynamic_cast<const QuantumGateNode*>(statement)) {
             lowered.nodes.emplace_back(HybridQuantumGate{
                 gate->kind,

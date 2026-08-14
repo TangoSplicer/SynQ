@@ -197,6 +197,12 @@ bool parse_qubit_declaration(const std::string& source, std::string& name, std::
     return true;
 }
 
+bool parse_callable_declaration(const std::string& source, std::string& name) {
+    if (source.size() < 3 || source.substr(source.size() - 2) != "()") return false;
+    name = source.substr(0, source.size() - 2);
+    return is_identifier(name);
+}
+
 QuantumGateKind quantum_gate_kind(const std::string& source_name) {
     if (source_name == "h") return QuantumGateKind::H;
     if (source_name == "x") return QuantumGateKind::X;
@@ -479,12 +485,36 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             continue;
         }
 
+        if (operation == "fn" || operation == "kernel") {
+            if (!active_features.is_enabled("callable-declarations")) {
+                return fail_parse("SYNQ-P007", span, "callable declarations require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"callable-declarations\")] before the gated construct");
+            }
+            std::string name;
+            if (!parse_callable_declaration(argument, name)) {
+                return fail_parse("SYNQ-P013", span, "malformed bounded callable declaration",
+                                  "use fn <identifier>() or kernel <identifier>() with no parameters or body");
+            }
+            const auto inserted = declared_names.emplace(name, span);
+            if (!inserted.second) {
+                return fail_parse("SYNQ-S004", span,
+                                  "duplicate top-level declaration `" + name +
+                                      "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                  "rename the callable or reuse the existing binding according to future language semantics");
+            }
+            const CallableDeclarationKind kind = operation == "fn" ? CallableDeclarationKind::Function
+                                                                     : CallableDeclarationKind::Kernel;
+            root->statements.push_back(new CallableDeclarationNode(kind, name, line_number, span));
+            continue;
+        }
+
         const bool known_instruction = operation == "print" || operation == "delay" ||
                                        operation == "quantum" || operation == "measure" || operation == "ai" ||
-                                       operation == "if" || operation == "while" || operation == "qubit";
+                                       operation == "if" || operation == "while" || operation == "qubit" ||
+                                       operation == "fn" || operation == "kernel";
         if (!known_instruction || argument.empty()) {
             return fail_parse("SYNQ-P003", span, "unsupported or incomplete recovery-profile instruction",
-                              "use let, qubit, print, delay, quantum, measure, ai, if, or while with the documented argument form");
+                              "use let, qubit, fn, kernel, print, delay, quantum, measure, ai, if, or while with the documented argument form");
         }
         if (operation == "delay" && !is_non_negative_integer(argument)) {
             return fail_parse("SYNQ-P004", span, "delay requires a non-negative integer number of milliseconds",
