@@ -1,7 +1,7 @@
 # Bounded Callable Declarations
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated Alpha-gated recovery-profile implementation in
+[Compiler Core #39][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -48,5 +48,8 @@ lowering, simulation, provider integration, or hardware submission.
 `synq_callable_declaration_smoke` covers Alpha gating, typed `fn` and `kernel`
 AST/Hybrid IR provenance, resolver preservation, malformed parameters/bodies,
 shared top-level uniqueness, and strict Hybrid OpenQASM rejection. The local
-recovery profile reported **23/23** CTest checks. This is local evidence pending
-publication and compiler-core CI.
+recovery profile and [Compiler Core #39][1] both reported **23/23** CTest checks.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31849507058 "SynQ Compiler Core #39"

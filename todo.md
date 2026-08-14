@@ -105,6 +105,6 @@
 - [x] Validate typed gate and measurement references against declared qubit-register bounds, then publish remote compiler-core evidence.
 - [x] Add a bounded typed measurement-result declaration boundary without introducing runtime values or execution semantics.
 - [x] Extend the supported OpenQASM 3 source subset only where typed qubit/control structures have exact-output and independent parser/import evidence.
-- [ ] Add Alpha-gated typed non-executing function and kernel declarations with safe parser, IR, diagnostics, and smoke-test boundaries.
+- [x] Add Alpha-gated typed non-executing function and kernel declarations with safe parser, IR, diagnostics, and smoke-test boundaries.
 - [ ] Reassess and document native/JVM interoperability contracts after the typed language-core foundations are complete.
 - [ ] Perform a final roadmap validation, capability-boundary review, and factual publication record before discussing research-stage work.

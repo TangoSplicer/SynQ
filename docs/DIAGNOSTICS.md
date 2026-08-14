@@ -77,9 +77,10 @@ while preserving the existing unnamed measurement form. It does not establish a
 runtime measurement value or named-result OpenQASM lowering.
 
 `SYNQ-P013` is restricted to source parsed after the `callable-declarations`
-Alpha opt-in. Its focused smoke coverage is local **23/23** evidence pending
-publication and compiler-core CI. The code validates declaration shape only; it
-does not define callable parameters, bodies, invocation, or execution.
+Alpha opt-in. Its focused smoke coverage passed locally and remotely with
+**23/23** CTest checks in [Compiler Core #39][10]. The code validates declaration
+shape only; it does not define callable parameters, bodies, invocation, or
+execution.
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
@@ -188,3 +189,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [7]: https://github.com/TangoSplicer/SynQ/actions/runs/31848161711 "SynQ Compiler Core #35"
 [8]: https://github.com/TangoSplicer/SynQ/actions/runs/31848568933 "SynQ Compiler Core #36"
 [9]: https://github.com/TangoSplicer/SynQ/actions/runs/31848936812 "SynQ Compiler Core #37"
+[10]: https://github.com/TangoSplicer/SynQ/actions/runs/31849507058 "SynQ Compiler Core #39"
