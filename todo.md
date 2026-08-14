@@ -100,4 +100,4 @@
 - [x] Run full validation, publish the Boolean-expression increment, and record remote compiler-core evidence.
 - [x] Specify a bounded Alpha-gated integer-arithmetic expression tree for exactly one `+`, `-`, or `*` operation over Integer literals and earlier Integer declaration references.
 - [x] Implement integer-arithmetic parsing, Hybrid IR/resolver validation, structured diagnostics, and focused non-evaluation smoke coverage.
-- [ ] Run full validation, publish the integer-arithmetic increment, and record remote compiler-core evidence.
+- [x] Run full validation, publish the integer-arithmetic increment, and record remote compiler-core evidence.

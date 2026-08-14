@@ -62,7 +62,7 @@ classical-control-flow profile. The Boolean-operator extension, including its
 `SYNQ-P011` is restricted to source parsed after the
 `integer-arithmetic-expressions` Alpha opt-in. Without that opt-in, existing
 arithmetic-looking declaration text remains opaque source. Its focused smoke
-coverage is local **19/19** evidence pending publication and compiler-core CI.
+coverage passed remotely with **19/19** CTest checks in [Compiler Core #31][6].
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
@@ -109,8 +109,8 @@ coverage passed remotely in [Compiler Core #30][5].
 `SYNQ-R003`, `SYNQ-T003`, and `SYNQ-T004` are internal resolver/type diagnostics
 for the bounded opted-in arithmetic profile. They are not parser diagnostics and
 are not propagated through the C ABI. Their focused smoke coverage is local
-**19/19** evidence pending publication and compiler-core CI; they do not
-establish arithmetic evaluation or a general expression/type system.
+and remote **19/19** evidence in [Compiler Core #31][6]; they do not establish
+arithmetic evaluation or a general expression/type system.
 
 ## Compatibility boundaries
 
@@ -157,3 +157,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [3]: https://github.com/TangoSplicer/SynQ/actions/runs/31803737501 "SynQ Compiler Core #26"
 [4]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
 [5]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"
+[6]: https://github.com/TangoSplicer/SynQ/actions/runs/31847601825 "SynQ Compiler Core #31"

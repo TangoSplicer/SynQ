@@ -1,7 +1,7 @@
 # Bounded Integer Arithmetic Expressions
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated Alpha-gated recovery-profile implementation in
+[Compiler Core #31][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -46,8 +46,16 @@ will carry static type `Integer` pending resolver validation.
 The resolver will use sequential top-level scope. An unknown or forward operand
 will use a new `SYNQ-R003` diagnostic, a non-Integer operand will use
 `SYNQ-T003`, and a manually constructed invalid internal tree will use
-`SYNQ-T004`. Malformed source will use `SYNQ-P011`. These codes are proposed
-until the implementation and documentation registry are updated together.
+`SYNQ-T004`. Malformed source uses `SYNQ-P011`.
+
+## Focused validation
+
+`synq_integer_arithmetic_expression_smoke` covers typed Add, Subtract, and
+Multiply tree construction; Hybrid IR provenance; source-ordered prior-binding
+indices; unannotated opaque-source compatibility; malformed opted-in syntax;
+unknown and non-Integer identifier atoms; and invalid manually constructed
+internal trees. The local recovery profile and [Compiler Core #31][1] both
+reported **19/19** CTest checks.
 
 ## Explicit non-goals
 
@@ -57,3 +65,7 @@ parentheses, division, modulo, exponentiation, comparisons, type coercion,
 inference beyond existing literals and resolved identifiers, assignment,
 functions, control-flow semantics, OpenQASM lowering, simulation, provider
 integration, or hardware execution.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31847601825 "SynQ Compiler Core #31"
