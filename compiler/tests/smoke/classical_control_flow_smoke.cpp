@@ -35,9 +35,13 @@ int main() {
     const auto* if_node = dynamic_cast<const ClassicalControlNode*>(parsed.program->statements[0]);
     const auto* while_node = dynamic_cast<const ClassicalControlNode*>(parsed.program->statements[1]);
     expect(if_node != nullptr && while_node != nullptr, "control statements should have typed AST nodes");
-    expect(if_node->kind == ClassicalControlKind::If && if_node->condition,
+    expect(if_node->kind == ClassicalControlKind::If &&
+               if_node->condition.kind == ClassicalConditionKind::BooleanLiteral &&
+               if_node->condition.boolean_value,
            "if node should preserve the typed true condition");
-    expect(while_node->kind == ClassicalControlKind::While && !while_node->condition,
+    expect(while_node->kind == ClassicalControlKind::While &&
+               while_node->condition.kind == ClassicalConditionKind::BooleanLiteral &&
+               !while_node->condition.boolean_value,
            "while node should preserve the typed false condition");
     expect(dynamic_cast<const QuantumGateNode*>(if_node->body) != nullptr,
            "if body should be a typed quantum gate");
@@ -59,16 +63,18 @@ int main() {
 
     auto resolved = synq::compiler::resolve_hybrid_names(*lowered.program);
     expect(resolved.ok(), "bounded name resolution should preserve control nodes unchanged");
-    expect(std::holds_alternative<synq::compiler::HybridControlFlow>(resolved.program->nodes[0]) &&
-               std::holds_alternative<synq::compiler::HybridControlFlow>(resolved.program->nodes[1]),
+    expect(std::holds_alternative<synq::compiler::ResolvedHybridControlFlow>(resolved.program->nodes[0]) &&
+               std::holds_alternative<synq::compiler::ResolvedHybridControlFlow>(resolved.program->nodes[1]),
            "resolved Hybrid IR should retain control nodes unchanged");
 
-    auto malformed_condition = parser.parseSourceWithDiagnostics(
+    auto unknown_condition = parser.parseSourceWithDiagnostics(
         "#[experimental(feature = \"classical-control-flow\")]\n"
         "if enabled then quantum h q[0]\n");
-    expect(!malformed_condition.ok(), "identifier condition should be rejected in literal-boolean profile");
-    expect(malformed_condition.diagnostics.size() == 1 && malformed_condition.diagnostics[0].code == "SYNQ-P009",
-           "malformed condition should have a dedicated bounded-control diagnostic");
+    expect(unknown_condition.ok(), "identifier condition syntax should defer to bounded name resolution");
+    auto unknown_condition_hir = synq::compiler::lower_to_hybrid_ir(*unknown_condition.program);
+    auto unknown_condition_resolved = synq::compiler::resolve_hybrid_names(*unknown_condition_hir.program);
+    expect(!unknown_condition_resolved.ok() && unknown_condition_resolved.diagnostics[0].code == "SYNQ-R002",
+           "unknown identifier condition should have a dedicated resolution diagnostic");
 
     auto malformed_body = parser.parseSourceWithDiagnostics(
         "#[experimental(feature = \"classical-control-flow\")]\n"

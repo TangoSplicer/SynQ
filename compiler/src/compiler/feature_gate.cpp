@@ -75,7 +75,7 @@ FeatureRegistry make_default_feature_registry() {
     registry.register_feature({
         "classical-control-flow",
         FeatureStage::Alpha,
-        "Enables bounded literal-boolean if/while source forms with one typed quantum or measurement body.",
+        "Enables bounded Boolean-literal or resolved Boolean-identifier if/while forms with one typed quantum or measurement body.",
         "synq#bounded-classical-control-flow",
     });
     return registry;

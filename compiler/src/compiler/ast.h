@@ -162,18 +162,33 @@ enum class ClassicalControlKind {
     While,
 };
 
+// Alpha control conditions are either parser-validated boolean literals or
+// whole identifier references. The latter are resolved and type-checked only
+// by the later internal resolver; neither condition form is evaluated here.
+enum class ClassicalConditionKind {
+    BooleanLiteral,
+    IdentifierReference,
+};
+
+struct ClassicalCondition {
+    ClassicalConditionKind kind = ClassicalConditionKind::BooleanLiteral;
+    bool boolean_value = false;
+    std::string source_text;
+    synq::compiler::SourceSpan span;
+};
+
 class ClassicalControlNode : public ASTNode {
 public:
     ClassicalControlKind kind;
-    bool condition = false;
+    ClassicalCondition condition;
     ASTNode* body = nullptr;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
-    ClassicalControlNode(ClassicalControlKind control_kind, bool boolean_condition, ASTNode* owned_body,
+    ClassicalControlNode(ClassicalControlKind control_kind, ClassicalCondition typed_condition, ASTNode* owned_body,
                          std::size_t line_number, synq::compiler::SourceSpan source_span)
         : kind(control_kind),
-          condition(boolean_condition),
+          condition(std::move(typed_condition)),
           body(owned_body),
           line(line_number),
           span(source_span) {}
@@ -182,7 +197,7 @@ public:
 
     std::string toString() override {
         return std::string(kind == ClassicalControlKind::If ? "if " : "while ") +
-               (condition ? "true" : "false") + " " + (body == nullptr ? "" : body->toString());
+               condition.source_text + " " + (body == nullptr ? "" : body->toString());
     }
 };
 

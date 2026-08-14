@@ -55,6 +55,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 declaration->name,
                 declaration->value,
                 declaration->literal_kind,
+                make_classical_expression(declaration->value, declaration->literal_kind, declaration->span),
                 declaration->span,
             });
             continue;

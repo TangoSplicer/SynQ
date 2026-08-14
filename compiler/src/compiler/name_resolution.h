@@ -20,9 +20,15 @@ struct ResolvedHybridDeclaration {
     // identifier initializer. Absent means the initializer is a literal or
     // still-uninterpreted SourceText.
     std::optional<std::size_t> initializer_binding_index;
+    ClassicalStaticType initializer_static_type = ClassicalStaticType::Unknown;
 };
 
-using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
+struct ResolvedHybridControlFlow {
+    HybridControlFlow control;
+    std::optional<std::size_t> condition_binding_index;
+};
+
+using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQuantumGate, HybridMeasurement, ResolvedHybridControlFlow>;
 
 struct ResolvedHybridProgram {
     std::vector<ResolvedHybridNode> nodes;

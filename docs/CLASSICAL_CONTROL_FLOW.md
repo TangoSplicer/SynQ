@@ -1,15 +1,18 @@
 # Bounded Typed Classical Control Flow
 
-**Status:** Remotely validated Alpha-gated recovery-profile implementation in
-[Compiler Core #27][1], with a successful manual repeat in [#28][2].
+**Status:** The earlier literal-condition Alpha profile passed remotely in
+[Compiler Core #27][1], with a successful manual repeat in [#28][2]; the
+Boolean identifier-reference extension is locally validated and awaits remote
+compiler-core evidence.
 **Last reviewed:** 14 August 2026
 
 ## Purpose
 
 The first classical-control-flow profile adds typed source and Hybrid IR nodes
-for a deliberately small, safe control boundary. It recognizes literal boolean
-conditions and a single quantum-gate or measurement body. The feature is
-**Alpha** and therefore requires an explicit file-scoped opt-in.
+for a deliberately small, safe control boundary. It recognizes literal Boolean
+conditions or resolver-checked Boolean declaration references, plus a single
+quantum-gate or measurement body. The feature is **Alpha** and therefore
+requires an explicit file-scoped opt-in.
 
 > **Design rule:** control syntax must be visible in the typed AST and Hybrid
 > IR, but it must not imply loop execution, branch execution, a classical
@@ -21,14 +24,17 @@ conditions and a single quantum-gate or measurement body. The feature is
 #[experimental(feature = "classical-control-flow")]
 if true then quantum h q[0]
 while false do measure q[0]
+let ready = true
+if ready then quantum x q[0]
 ```
 
 | Form | Typed representation | Explicit boundary |
 | --- | --- | --- |
 | `if true then quantum h q[0]` | `ClassicalControlNode { If, true, QuantumGateNode }`, then `HybridControlFlow` with a typed gate body. | No expression condition, `else`, block, declaration, assignment, result value, execution, or lowering semantics. |
 | `while false do measure q[0]` | `ClassicalControlNode { While, false, MeasurementNode }`, then `HybridControlFlow` with a typed measurement body. | No iteration, termination analysis, measurement-dependent condition, returned bit, or runtime effect. |
+| `if ready then quantum x q[0]` | `ClassicalCondition { IdentifierReference, "ready" }`, then a `ResolvedHybridControlFlow` only after the earlier binding resolves to static type `Boolean`. | No general expression, value lookup, coercion, truthiness, runtime read, or execution semantics. |
 | Missing opt-in | `SYNQ-P007` before AST construction. | The feature remains Alpha; no implicit enablement or source-level bypass exists. |
-| Invalid condition/structure | `SYNQ-P009` for a non-literal-boolean or malformed connector form. | No identifier lookup, expression parsing, coercion, or condition evaluation is attempted. |
+| Invalid condition/structure | `SYNQ-P009` for malformed Boolean-literal-or-identifier or connector form. | No expression parsing, coercion, or condition evaluation is attempted. |
 | Unsupported body | `SYNQ-P010` for anything other than exactly one typed quantum gate or measurement. | No nested control flow, `print`, `delay`, `ai`, `let`, multi-statement body, or fallback instruction body is accepted. |
 
 ## Parser, IR, and resolution behavior
@@ -36,9 +42,10 @@ while false do measure q[0]
 `ClassicalControlNode` owns one typed body node. The parser validates the body
 through the same bounded gate-shape and measurement validation paths used at the
 top level. The Hybrid IR copies the typed condition, body variant, and source
-span. `resolve_hybrid_names` preserves a `HybridControlFlow` node unchanged;
-it does not resolve inside control bodies because this first form exposes no
-classical variable references.
+span. `resolve_hybrid_names` validates an identifier condition only against an
+earlier top-level declaration of static type `Boolean`, storing its binding
+index in `ResolvedHybridControlFlow`. It does not resolve inside control bodies
+because those bodies expose no classical variable references.
 
 The current OpenQASM source exporter remains a typed-AST source-export subset
 and does not claim lowering of control nodes. This increment does not modify it

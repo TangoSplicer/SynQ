@@ -10,7 +10,7 @@
 #include <variant>
 #include <vector>
 
-#include "ast.h"
+#include "classical_expression.h"
 #include "diagnostic.h"
 
 namespace synq::compiler {
@@ -19,6 +19,7 @@ struct HybridDeclaration {
     std::string name;
     std::string source_value;
     ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
+    ClassicalExpression initializer;
     SourceSpan span;
 };
 
@@ -39,7 +40,7 @@ using HybridControlBody = std::variant<HybridQuantumGate, HybridMeasurement>;
 
 struct HybridControlFlow {
     ClassicalControlKind kind = ClassicalControlKind::If;
-    bool condition = false;
+    ClassicalCondition condition;
     HybridControlBody body;
     SourceSpan span;
 };

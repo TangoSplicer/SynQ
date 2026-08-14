@@ -199,7 +199,8 @@ QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& argument
 }
 
 bool parse_control_flow_arguments(const std::string& source, const std::string& connector,
-                                  bool& condition, std::string& body_operation, std::string& body_argument) {
+                                  ClassicalCondition& condition, const synq::compiler::SourceSpan& span,
+                                  std::string& body_operation, std::string& body_argument) {
     const std::string separator = " " + connector + " ";
     const std::size_t boundary = source.find(separator);
     if (boundary == std::string::npos || source.find(separator, boundary + separator.size()) != std::string::npos) {
@@ -207,8 +208,13 @@ bool parse_control_flow_arguments(const std::string& source, const std::string& 
     }
 
     const std::string condition_text = trim(source.substr(0, boundary));
-    if (condition_text != "true" && condition_text != "false") return false;
-    condition = condition_text == "true";
+    if (condition_text == "true" || condition_text == "false") {
+        condition = {ClassicalConditionKind::BooleanLiteral, condition_text == "true", condition_text, span};
+    } else if (is_identifier(condition_text)) {
+        condition = {ClassicalConditionKind::IdentifierReference, false, condition_text, span};
+    } else {
+        return false;
+    }
 
     std::istringstream body_tokens(trim(source.substr(boundary + separator.size())));
     body_tokens >> body_operation;
@@ -375,14 +381,14 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                 return fail_parse("SYNQ-P007", span, "classical control flow requires an alpha feature opt-in",
                                   "add #[experimental(feature = \"classical-control-flow\")] before the gated construct");
             }
-            bool condition = false;
+            ClassicalCondition condition;
             std::string body_operation;
             std::string body_argument;
             const std::string connector = operation == "if" ? "then" : "do";
-            if (!parse_control_flow_arguments(argument, connector, condition, body_operation, body_argument)) {
-                return fail_parse("SYNQ-P009", span, "malformed literal-boolean classical control-flow syntax",
-                                  operation == "if" ? "use if true then quantum h q[0]" :
-                                                      "use while false do measure q[0]");
+            if (!parse_control_flow_arguments(argument, connector, condition, span, body_operation, body_argument)) {
+                return fail_parse("SYNQ-P009", span, "malformed bounded classical control-flow syntax",
+                                  operation == "if" ? "use if true then quantum h q[0] or if ready then quantum h q[0]" :
+                                                      "use while false do measure q[0] or while ready do measure q[0]");
             }
             synq::compiler::Diagnostic body_error;
             ASTNode* body = make_control_body_node(body_operation, body_argument, active_features,

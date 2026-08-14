@@ -92,6 +92,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_classical_control_flow_smoke PRIVATE synq_lib)
     add_test(NAME synq_classical_control_flow_smoke COMMAND synq_classical_control_flow_smoke)
 
+    add_executable(synq_classical_expression_smoke tests/smoke/classical_expression_smoke.cpp)
+    target_include_directories(synq_classical_expression_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_classical_expression_smoke PRIVATE synq_lib)
+    add_test(NAME synq_classical_expression_smoke COMMAND synq_classical_expression_smoke)
+
     add_executable(synq_c_abi_smoke tests/interop/c_abi_smoke.c)
     target_include_directories(synq_c_abi_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(synq_c_abi_smoke PRIVATE synq_lib)
