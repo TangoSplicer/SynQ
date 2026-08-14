@@ -101,13 +101,16 @@ semantic analysis, and type diagnostics remain planned work.
 | `Module` | declarations, imports, feature opt-ins, top-level items | Gives a home for edition, gate, and module semantics. |
 | `Type` | scalar, boolean, integer, float, angle, bit, qubit, result, function, aggregate variants | Makes the classical–quantum boundary explicit instead of encoding it in strings. |
 
-### Planned hybrid IR
+### Minimal implemented Hybrid IR and planned expansion
 
-The Hybrid IR (HIR) is the central architectural commitment. It will be a
-typed, ownership-aware representation after parsing and semantic validation,
-but before any backend-specific lowering. HIR is *not* planned as a public ABI
-in its first version; opaque public handles and serialized artifacts prevent
-every binding from coupling to internal C++ layout.
+The Hybrid IR (HIR) is the central architectural commitment. The current
+minimal internal implementation represents already typed parser declarations,
+quantum gates, and measurements in source order, preserving source spans and
+rejecting retained legacy instructions. Future expansion will make it a typed,
+ownership-aware representation after parsing and semantic validation, but before
+any backend-specific lowering. HIR is *not* a public ABI; opaque public handles
+and serialized artifacts prevent every binding from coupling to internal C++
+layout.
 
 | HIR concern | Design direction | Initial invariants |
 | --- | --- | --- |

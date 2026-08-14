@@ -66,7 +66,8 @@ actions.
 
 `SYNQ-H001` is not emitted by the parser and is not propagated through the C
 ABI. It preserves source provenance for an internal post-parse conversion
-boundary; it does not define a general HIR diagnostics protocol.
+boundary; it does not define a general HIR diagnostics protocol. Its focused
+Hybrid IR smoke coverage passed remotely in [Compiler Core #23][2].
 
 ## Compatibility boundaries
 
@@ -109,3 +110,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 ## References
 
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31719597241 "SynQ Compiler Core #9"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31803349469 "SynQ Compiler Core #23"

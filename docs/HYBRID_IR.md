@@ -1,7 +1,7 @@
 # Minimal Hybrid IR
 
-**Status:** Locally validated internal recovery-profile implementation; remote
-compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated internal recovery-profile implementation in
+[Compiler Core #23][1], with a successful manual repeat in [#24][2].
 **Last reviewed:** 13 August 2026
 
 ## Purpose
@@ -50,6 +50,9 @@ circuit, submit work to a provider, or access hardware.
 an alpha-gated `rx(pi/2) q[1]` node, all preserved provenance fields, and
 rejection of a parser-accepted legacy instruction. The clean local recovery
 profile reported **14/14** CTest checks passing, including the new smoke test.
+Compiler Core #23 then reported the same **14/14** CTest pass for commit
+`772ede7`; Compiler Core #24 repeated the result through the manual workflow
+entry point.[1] [2]
 
 ## Explicit non-goals
 
@@ -58,3 +61,8 @@ SSA values, expression typing, qubit allocation or liveness, result values,
 classical assignment, `if` or `while`, blocks, functions, modules, imports,
 optimization, serialization, code generation, OpenQASM lowering from HIR,
 execution, simulation, or hardware integration.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31803349469 "SynQ Compiler Core #23"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31803368082 "SynQ Compiler Core #24"
