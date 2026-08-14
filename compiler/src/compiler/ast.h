@@ -191,6 +191,24 @@ struct ClassicalBooleanExpression {
     std::vector<ClassicalBooleanExpression> operands;
 };
 
+// A bounded, non-evaluating integer arithmetic tree for one Alpha-gated
+// declaration initializer operator. Parser-created trees have exactly two
+// literal/identifier atoms and no precedence, nesting, or runtime semantics.
+enum class ClassicalIntegerArithmeticExpressionKind {
+    IntegerLiteral,
+    IdentifierReference,
+    Add,
+    Subtract,
+    Multiply,
+};
+
+struct ClassicalIntegerArithmeticExpression {
+    ClassicalIntegerArithmeticExpressionKind kind = ClassicalIntegerArithmeticExpressionKind::IntegerLiteral;
+    std::string source_text;
+    synq::compiler::SourceSpan span;
+    std::vector<ClassicalIntegerArithmeticExpression> operands;
+};
+
 struct ClassicalCondition {
     ClassicalConditionKind kind = ClassicalConditionKind::BooleanLiteral;
     bool boolean_value = false;
@@ -231,13 +249,14 @@ enum class ClassicalLiteralKind {
     Decimal,
     Boolean,
     QuotedString,
+    IntegerArithmeticExpression,
     SourceText,
 };
 
 // A small declaration node for the recovery parser's `let name = value` form.
 // The value is retained as source text; expression evaluation is outside this
-// recovery profile. Parsed nodes receive a literal hint, while direct legacy
-// construction defaults deliberately to SourceText.
+// recovery profile. Parsed nodes receive a literal or Alpha expression hint,
+// while direct legacy construction defaults deliberately to SourceText.
 class DeclarationNode : public ASTNode {
 public:
     std::string name;

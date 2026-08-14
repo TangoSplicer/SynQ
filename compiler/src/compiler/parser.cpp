@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "classical_expression.h"
 #include "gate_validation.h"
 #include "parser.h"
 
@@ -401,6 +402,16 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             if (!is_identifier(identifier) || value.empty()) {
                 return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
             }
+            ClassicalLiteralKind declaration_kind = classify_declaration_literal(value);
+            if (active_features.is_enabled("integer-arithmetic-expressions") &&
+                synq::compiler::looks_like_integer_arithmetic_expression(value)) {
+                ClassicalIntegerArithmeticExpression arithmetic;
+                if (!synq::compiler::parse_bounded_integer_arithmetic_expression(value, span, arithmetic)) {
+                    return fail_parse("SYNQ-P011", span, "malformed bounded integer arithmetic expression",
+                                      "use exactly <integer-literal-or-identifier> +, -, or * <integer-literal-or-identifier>");
+                }
+                declaration_kind = ClassicalLiteralKind::IntegerArithmeticExpression;
+            }
             const auto inserted = declared_names.emplace(identifier, span);
             if (!inserted.second) {
                 return fail_parse("SYNQ-S004", span,
@@ -408,8 +419,7 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                       "`; first declared on line " + std::to_string(inserted.first->second.line),
                                   "rename the later binding or reuse the existing declaration according to future language semantics");
             }
-            root->statements.push_back(new DeclarationNode(identifier, value, line_number,
-                                                           classify_declaration_literal(value), span));
+            root->statements.push_back(new DeclarationNode(identifier, value, line_number, declaration_kind, span));
             continue;
         }
 

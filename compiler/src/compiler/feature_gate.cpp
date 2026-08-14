@@ -78,6 +78,12 @@ FeatureRegistry make_default_feature_registry() {
         "Enables bounded Boolean literals/references plus one not/and/or operator form with one typed quantum or measurement body.",
         "synq#bounded-classical-control-flow",
     });
+    registry.register_feature({
+        "integer-arithmetic-expressions",
+        FeatureStage::Alpha,
+        "Enables one non-evaluating +, -, or * declaration initializer over Integer literals or prior Integer bindings.",
+        "synq#bounded-integer-arithmetic-expressions",
+    });
     return registry;
 }
 

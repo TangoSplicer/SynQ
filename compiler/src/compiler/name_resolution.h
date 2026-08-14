@@ -21,6 +21,9 @@ struct ResolvedHybridDeclaration {
     // still-uninterpreted SourceText.
     std::optional<std::size_t> initializer_binding_index;
     ClassicalStaticType initializer_static_type = ClassicalStaticType::Unknown;
+    // Indices of earlier declaration operands used by a bounded integer
+    // arithmetic initializer. Empty means no identifier arithmetic operands.
+    std::vector<std::size_t> initializer_binding_indices;
 };
 
 struct ResolvedHybridControlFlow {

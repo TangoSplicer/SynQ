@@ -72,6 +72,38 @@ Diagnostic invalid_boolean_expression_diagnostic(const ClassicalBooleanExpressio
     };
 }
 
+Diagnostic unresolved_integer_arithmetic_diagnostic(const ClassicalIntegerArithmeticExpression& expression) {
+    return {
+        "SYNQ-R003",
+        DiagnosticSeverity::Error,
+        expression.span,
+        "unknown or forward binding `" + expression.source_text + "` in integer arithmetic initializer",
+        "declare `" + expression.source_text + "` as an earlier Integer binding or use an Integer literal"
+    };
+}
+
+Diagnostic non_integer_arithmetic_diagnostic(const ClassicalIntegerArithmeticExpression& expression,
+                                             ClassicalStaticType actual_type) {
+    return {
+        "SYNQ-T003",
+        DiagnosticSeverity::Error,
+        expression.span,
+        "integer arithmetic operand `" + expression.source_text + "` has static type " +
+            classical_static_type_name(actual_type) + ", not Integer",
+        "use an earlier Integer declaration or an Integer literal operand"
+    };
+}
+
+Diagnostic invalid_integer_arithmetic_diagnostic(const ClassicalIntegerArithmeticExpression& expression) {
+    return {
+        "SYNQ-T004",
+        DiagnosticSeverity::Error,
+        expression.span,
+        "bounded integer arithmetic expression has an invalid internal operator shape",
+        "use exactly <atom> +, -, or * <atom> with Integer literal or identifier atoms"
+    };
+}
+
 struct BindingInfo {
     std::size_t index = 0;
     ClassicalStaticType static_type = ClassicalStaticType::Unknown;
@@ -110,6 +142,37 @@ bool resolve_boolean_expression(const ClassicalBooleanExpression& expression,
     return true;
 }
 
+bool resolve_integer_arithmetic_expression(const ClassicalIntegerArithmeticExpression& expression,
+                                           const std::unordered_map<std::string, BindingInfo>& bindings,
+                                           std::vector<std::size_t>& binding_indices,
+                                           Diagnostic& error) {
+    if (expression.kind == ClassicalIntegerArithmeticExpressionKind::IntegerLiteral) return true;
+    if (expression.kind == ClassicalIntegerArithmeticExpressionKind::IdentifierReference) {
+        const auto binding = bindings.find(expression.source_text);
+        if (binding == bindings.end()) {
+            error = unresolved_integer_arithmetic_diagnostic(expression);
+            return false;
+        }
+        if (binding->second.static_type != ClassicalStaticType::Integer) {
+            error = non_integer_arithmetic_diagnostic(expression, binding->second.static_type);
+            return false;
+        }
+        binding_indices.push_back(binding->second.index);
+        return true;
+    }
+    if ((expression.kind != ClassicalIntegerArithmeticExpressionKind::Add &&
+         expression.kind != ClassicalIntegerArithmeticExpressionKind::Subtract &&
+         expression.kind != ClassicalIntegerArithmeticExpressionKind::Multiply) ||
+        expression.operands.size() != 2) {
+        error = invalid_integer_arithmetic_diagnostic(expression);
+        return false;
+    }
+    for (const ClassicalIntegerArithmeticExpression& operand : expression.operands) {
+        if (!resolve_integer_arithmetic_expression(operand, bindings, binding_indices, error)) return false;
+    }
+    return true;
+}
+
 }  // namespace
 
 NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
@@ -122,6 +185,7 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
 
         if (const auto* declaration = std::get_if<HybridDeclaration>(&node)) {
             std::optional<std::size_t> initializer_binding_index;
+            std::vector<std::size_t> initializer_binding_indices;
             ClassicalStaticType initializer_static_type = declaration->initializer.static_type;
             if (declaration->initializer.kind == ClassicalExpressionKind::IdentifierReference &&
                 is_identifier(declaration->source_value)) {
@@ -134,9 +198,21 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                 initializer_binding_index = binding->second.index;
                 initializer_static_type = binding->second.static_type;
             }
+            if (declaration->initializer.kind == ClassicalExpressionKind::IntegerArithmeticExpression) {
+                Diagnostic arithmetic_error;
+                if (!declaration->initializer.integer_arithmetic.has_value() ||
+                    !resolve_integer_arithmetic_expression(*declaration->initializer.integer_arithmetic, bindings,
+                                                           initializer_binding_indices, arithmetic_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(arithmetic_error));
+                    return result;
+                }
+                initializer_static_type = ClassicalStaticType::Integer;
+            }
 
             resolved.nodes.emplace_back(ResolvedHybridDeclaration{*declaration, initializer_binding_index,
-                                                                   initializer_static_type});
+                                                                   initializer_static_type,
+                                                                   std::move(initializer_binding_indices)});
             bindings.emplace(declaration->name, BindingInfo{node_index, initializer_static_type});
             continue;
         }

@@ -53,10 +53,16 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P008` | A measurement does not use exactly one explicit non-negative qubit operand. | Use `measure q[index]`, for example `measure q[0]`. |
 | `SYNQ-P009` | Alpha-gated classical control flow does not use its exact bounded Boolean-literal/identifier, `not <atom>`, or `<atom> and/or <atom>` `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]`, `if not ready then quantum h q[0]`, or `if ready and enabled then quantum h q[0]` after enabling the feature. |
 | `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
+| `SYNQ-P011` | An opted-in Integer arithmetic declaration does not use exactly two Integer literal/identifier atoms and one `+`, `-`, or `*` token. | Use `let total = count + 1` after enabling `integer-arithmetic-expressions`. |
 
 `SYNQ-P009` and `SYNQ-P010` are parser diagnostics for the Alpha
 classical-control-flow profile. The Boolean-operator extension, including its
 `SYNQ-P009` malformed-form coverage, passed remotely in [Compiler Core #30][5].
+
+`SYNQ-P011` is restricted to source parsed after the
+`integer-arithmetic-expressions` Alpha opt-in. Without that opt-in, existing
+arithmetic-looking declaration text remains opaque source. Its focused smoke
+coverage is local **19/19** evidence pending publication and compiler-core CI.
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
@@ -90,12 +96,21 @@ Core #26][3].
 | `SYNQ-R002` | Internal name resolution | An Alpha classical-control condition identifier has no earlier top-level declaration. | Declare the name on an earlier line with static type `Boolean`, or use `true`/`false`. |
 | `SYNQ-T001` | Internal static-type validation | An Alpha classical-control condition resolves to a declaration whose propagated static type is not `Boolean`. | Use a Boolean declaration/reference or a `true`/`false` literal. |
 | `SYNQ-T002` | Internal Boolean-tree validation | A manually constructed internal Boolean expression has an unsupported operator or wrong operand count. | Use the parser-produced bounded tree shape: leaf, `not <atom>`, or `<atom> and/or <atom>`. |
+| `SYNQ-R003` | Internal name resolution | An opted-in Integer arithmetic identifier atom has no earlier top-level declaration. | Declare the name on an earlier line with static type `Integer`, or use an Integer literal. |
+| `SYNQ-T003` | Internal static-type validation | An opted-in Integer arithmetic identifier atom resolves to a non-Integer declaration. | Use an Integer declaration/reference or an Integer literal atom. |
+| `SYNQ-T004` | Internal arithmetic-tree validation | A manually constructed internal Integer arithmetic expression has an unsupported operator or wrong operand count. | Use the parser-produced one-operator tree with two Integer literal/identifier atoms. |
 
 `SYNQ-R002`, `SYNQ-T001`, and `SYNQ-T002` are internal resolver/type diagnostics.
 They are not parser diagnostics and are not propagated through the C ABI. They
 cover only the bounded Boolean-condition profile; they do not establish a
 general expression or type system. Their focused Boolean-expression smoke
 coverage passed remotely in [Compiler Core #30][5].
+
+`SYNQ-R003`, `SYNQ-T003`, and `SYNQ-T004` are internal resolver/type diagnostics
+for the bounded opted-in arithmetic profile. They are not parser diagnostics and
+are not propagated through the C ABI. Their focused smoke coverage is local
+**19/19** evidence pending publication and compiler-core CI; they do not
+establish arithmetic evaluation or a general expression/type system.
 
 ## Compatibility boundaries
 
