@@ -1,7 +1,7 @@
 # Strict Hybrid IR OpenQASM 3 Export
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated internal source-generation extension in [Compiler
+Core #38][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -38,5 +38,9 @@ runtime execution, simulation, provider integration, or hardware submission.
 typed `qubit q[n]` declaration, a supported gate, and an unnamed measurement.
 It also verifies rejection for missing declarations, out-of-range operands,
 named measurement-result declarations, and unlowered typed control nodes. The
-local recovery profile reported **22/22** CTest checks. This is local evidence
-pending publication and compiler-core CI.
+local recovery profile and [Compiler Core #38][1] both reported **22/22** CTest
+checks.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31849244490 "SynQ Compiler Core #38"
