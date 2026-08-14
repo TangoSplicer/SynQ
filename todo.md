@@ -107,4 +107,4 @@
 - [x] Extend the supported OpenQASM 3 source subset only where typed qubit/control structures have exact-output and independent parser/import evidence.
 - [x] Add Alpha-gated typed non-executing function and kernel declarations with safe parser, IR, diagnostics, and smoke-test boundaries.
 - [x] Reassess and document native/JVM interoperability contracts after the typed language-core foundations are complete.
-- [ ] Perform a final roadmap validation, capability-boundary review, and factual publication record before discussing research-stage work.
+- [x] Perform a final roadmap validation, capability-boundary review, and factual publication record before discussing research-stage work.
