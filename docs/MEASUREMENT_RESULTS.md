@@ -1,7 +1,7 @@
 # Bounded Measurement-Result Declarations
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated recovery-profile implementation in [Compiler
+Core #37][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -51,5 +51,8 @@ simulate, execute, submit to providers, or access hardware.
 static Boolean binding for a later bounded condition, malformed and duplicate
 names, forward-use rejection, legacy unnamed measurement compatibility, and
 explicit OpenQASM-export rejection for named results. The local recovery profile
-reported **21/21** CTest checks. This is local evidence pending publication and
-compiler-core CI.
+and [Compiler Core #37][1] both reported **21/21** CTest checks.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31848936812 "SynQ Compiler Core #37"

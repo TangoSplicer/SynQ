@@ -70,6 +70,11 @@ opt-in. It has local and remote **20/20** focused smoke evidence in [Compiler
 Core #35][7]. The code validates declaration shape only; it does not yet validate
 `quantum` or `measure` operand indices against declared register sizes.
 
+The `SYNQ-P008` measurement parser boundary also covers the local named-result
+extension. [Compiler Core #37][9] validated the optional result-identifier form,
+while preserving the existing unnamed measurement form. It does not establish a
+runtime measurement value or named-result OpenQASM lowering.
+
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
 and bounded duplicate-declaration validation; those semantic errors use the
@@ -176,3 +181,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [6]: https://github.com/TangoSplicer/SynQ/actions/runs/31847601825 "SynQ Compiler Core #31"
 [7]: https://github.com/TangoSplicer/SynQ/actions/runs/31848161711 "SynQ Compiler Core #35"
 [8]: https://github.com/TangoSplicer/SynQ/actions/runs/31848568933 "SynQ Compiler Core #36"
+[9]: https://github.com/TangoSplicer/SynQ/actions/runs/31848936812 "SynQ Compiler Core #37"
