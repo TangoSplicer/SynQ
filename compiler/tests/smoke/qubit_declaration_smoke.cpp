@@ -69,18 +69,59 @@ bool enforces_gate_grammar_and_shared_top_level_names() {
                    "qubit declarations participate in existing top-level uniqueness checks");
 }
 
-bool deliberately_does_not_validate_operand_bounds_yet() {
+bool validates_default_register_operand_order_and_bounds() {
     Parser parser;
-    const auto parsed = parser.parseSourceWithDiagnostics(
+    const auto out_of_range_parsed = parser.parseSourceWithDiagnostics(
         "#[experimental(feature = \"qubit-declarations\")]\n"
         "qubit q[1]\n"
         "quantum h q[8]\n"
         "measure q[4]\n");
-    if (!require(parsed.ok(), "declarations do not yet change existing indexed operand parsing")) return false;
-    const auto lowered = synq::compiler::lower_to_hybrid_ir(*parsed.program);
-    const auto resolved = synq::compiler::resolve_hybrid_names(*lowered.program);
-    return require(lowered.ok() && resolved.ok(),
-                   "qubit declaration increment intentionally defers gate and measurement bound validation");
+    if (!require(out_of_range_parsed.ok(), "out-of-range operand fixture remains a successful parse")) return false;
+    const auto out_of_range_lowered = synq::compiler::lower_to_hybrid_ir(*out_of_range_parsed.program);
+    const auto out_of_range_resolved = synq::compiler::resolve_hybrid_names(*out_of_range_lowered.program);
+    if (!require(!out_of_range_resolved.ok() && has_code(out_of_range_resolved.diagnostics, "SYNQ-Q002"),
+                 "gate operand outside explicit default register reports SYNQ-Q002")) return false;
+
+    const auto forward_parsed = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "quantum h q[0]\n"
+        "qubit q[1]\n");
+    if (!require(forward_parsed.ok(), "forward default-register fixture remains a successful parse")) return false;
+    const auto forward_lowered = synq::compiler::lower_to_hybrid_ir(*forward_parsed.program);
+    const auto forward_resolved = synq::compiler::resolve_hybrid_names(*forward_lowered.program);
+    if (!require(!forward_resolved.ok() && has_code(forward_resolved.diagnostics, "SYNQ-Q001"),
+                 "q[index] before explicit default register reports SYNQ-Q001")) return false;
+
+    const auto valid_parsed = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[2]\n"
+        "quantum cx q[0], q[1]\n"
+        "measure q[1]\n"
+        "if true then quantum h q[0]\n");
+    if (!require(valid_parsed.ok(), "in-range gate, measurement, and control-body fixture parses")) return false;
+    const auto valid_lowered = synq::compiler::lower_to_hybrid_ir(*valid_parsed.program);
+    const auto valid_resolved = synq::compiler::resolve_hybrid_names(*valid_lowered.program);
+    if (!require(valid_lowered.ok() && valid_resolved.ok(),
+                 "in-range default-register operands resolve without execution")) return false;
+
+    const auto control_out_of_range_parsed = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "if true then quantum h q[1]\n");
+    if (!require(control_out_of_range_parsed.ok(), "out-of-range control body remains a successful parse")) return false;
+    const auto control_out_of_range_lowered = synq::compiler::lower_to_hybrid_ir(*control_out_of_range_parsed.program);
+    const auto control_out_of_range_resolved = synq::compiler::resolve_hybrid_names(*control_out_of_range_lowered.program);
+    if (!require(!control_out_of_range_resolved.ok() && has_code(control_out_of_range_resolved.diagnostics, "SYNQ-Q002"),
+                 "out-of-range control-body operand reports SYNQ-Q002")) return false;
+
+    const auto legacy_parsed = parser.parseSourceWithDiagnostics("quantum h q[8]\nmeasure q[4]\n");
+    if (!require(legacy_parsed.ok(), "legacy indexed operands without a declaration parse")) return false;
+    const auto legacy_lowered = synq::compiler::lower_to_hybrid_ir(*legacy_parsed.program);
+    const auto legacy_resolved = synq::compiler::resolve_hybrid_names(*legacy_lowered.program);
+    return require(legacy_lowered.ok() && legacy_resolved.ok(),
+                   "legacy operands retain prior behavior when no explicit default register exists");
 }
 
 }  // namespace
@@ -88,7 +129,7 @@ bool deliberately_does_not_validate_operand_bounds_yet() {
 int main() {
     if (!parses_lowers_and_resolves_qubit_declarations()) return 1;
     if (!enforces_gate_grammar_and_shared_top_level_names()) return 1;
-    if (!deliberately_does_not_validate_operand_bounds_yet()) return 1;
+    if (!validates_default_register_operand_order_and_bounds()) return 1;
     std::cout << "SynQ bounded qubit declaration smoke test passed\n";
     return 0;
 }

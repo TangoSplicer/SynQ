@@ -105,6 +105,8 @@ Core #26][3].
 | `SYNQ-R003` | Internal name resolution | An opted-in Integer arithmetic identifier atom has no earlier top-level declaration. | Declare the name on an earlier line with static type `Integer`, or use an Integer literal. |
 | `SYNQ-T003` | Internal static-type validation | An opted-in Integer arithmetic identifier atom resolves to a non-Integer declaration. | Use an Integer declaration/reference or an Integer literal atom. |
 | `SYNQ-T004` | Internal arithmetic-tree validation | A manually constructed internal Integer arithmetic expression has an unsupported operator or wrong operand count. | Use the parser-produced one-operator tree with two Integer literal/identifier atoms. |
+| `SYNQ-Q001` | Internal default-register validation | `q[index]` occurs before an explicit later `qubit q[n]` declaration. | Declare the default register before operations using `q[index]`. |
+| `SYNQ-Q002` | Internal default-register validation | A `q[index]` operand is not smaller than the explicit `qubit q[n]` size. | Use an index in the declared `q[0]` through `q[n-1]` range. |
 
 `SYNQ-R002`, `SYNQ-T001`, and `SYNQ-T002` are internal resolver/type diagnostics.
 They are not parser diagnostics and are not propagated through the C ABI. They
@@ -117,6 +119,13 @@ for the bounded opted-in arithmetic profile. They are not parser diagnostics and
 are not propagated through the C ABI. Their focused smoke coverage is local
 and remote **19/19** evidence in [Compiler Core #31][6]; they do not establish
 arithmetic evaluation or a general expression/type system.
+
+`SYNQ-Q001` and `SYNQ-Q002` are internal resolver diagnostics for the local
+default-register reference-validation extension. They apply only when a typed
+`qubit q[n]` declaration exists anywhere in the Hybrid IR program; a program
+without such a declaration retains prior indexed-operand behavior. They are not
+parser diagnostics and are not propagated through the C ABI. Their focused smoke
+coverage is local **20/20** evidence pending publication and compiler-core CI.
 
 ## Compatibility boundaries
 

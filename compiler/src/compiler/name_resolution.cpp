@@ -173,12 +173,66 @@ bool resolve_integer_arithmetic_expression(const ClassicalIntegerArithmeticExpre
     return true;
 }
 
+Diagnostic default_qubit_declaration_order_diagnostic(const SourceSpan& span) {
+    return {
+        "SYNQ-Q001",
+        DiagnosticSeverity::Error,
+        span,
+        "q[index] is used before the explicit default register `qubit q[n]` declaration",
+        "declare qubit q[positive-size] before quantum or measure statements using q[index]"
+    };
+}
+
+Diagnostic default_qubit_index_range_diagnostic(const SourceSpan& span, std::size_t index, std::size_t qubit_count) {
+    return {
+        "SYNQ-Q002",
+        DiagnosticSeverity::Error,
+        span,
+        "q[" + std::to_string(index) + "] is outside the declared default register range q[0] through q[" +
+            std::to_string(qubit_count - 1) + "]",
+        "use an index smaller than the declared qubit q[" + std::to_string(qubit_count) + "] size"
+    };
+}
+
+bool validate_default_qubit_indices(const std::vector<std::size_t>& indices,
+                                    const SourceSpan& span,
+                                    const std::optional<std::size_t>& default_qubit_count,
+                                    Diagnostic& error) {
+    if (!default_qubit_count.has_value()) {
+        error = default_qubit_declaration_order_diagnostic(span);
+        return false;
+    }
+    for (std::size_t index : indices) {
+        if (index >= *default_qubit_count) {
+            error = default_qubit_index_range_diagnostic(span, index, *default_qubit_count);
+            return false;
+        }
+    }
+    return true;
+}
+
+bool validate_default_qubit_measurement(std::size_t index,
+                                        const SourceSpan& span,
+                                        const std::optional<std::size_t>& default_qubit_count,
+                                        Diagnostic& error) {
+    return validate_default_qubit_indices({index}, span, default_qubit_count, error);
+}
+
 }  // namespace
 
 NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
     ResolvedHybridProgram resolved;
     resolved.nodes.reserve(program.nodes.size());
     std::unordered_map<std::string, BindingInfo> bindings;
+    bool contains_explicit_default_register = false;
+    for (const HybridNode& node : program.nodes) {
+        const auto* qubits = std::get_if<HybridQubitDeclaration>(&node);
+        if (qubits != nullptr && qubits->name == "q") {
+            contains_explicit_default_register = true;
+            break;
+        }
+    }
+    std::optional<std::size_t> default_qubit_count;
 
     for (std::size_t node_index = 0; node_index < program.nodes.size(); ++node_index) {
         const HybridNode& node = program.nodes[node_index];
@@ -218,11 +272,20 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
 
         if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
+            if (qubits->name == "q") default_qubit_count = qubits->qubit_count;
             resolved.nodes.emplace_back(*qubits);
             continue;
         }
 
         if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
+            if (contains_explicit_default_register) {
+                Diagnostic qubit_error;
+                if (!validate_default_qubit_indices(gate->qubit_indices, gate->span, default_qubit_count, qubit_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(qubit_error));
+                    return result;
+                }
+            }
             resolved.nodes.emplace_back(*gate);
             continue;
         }
@@ -237,6 +300,23 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                 result.diagnostics.push_back(std::move(condition_error));
                 return result;
             }
+            if (contains_explicit_default_register) {
+                Diagnostic qubit_error;
+                bool qubits_valid = false;
+                if (const auto* gate = std::get_if<HybridQuantumGate>(&control->body)) {
+                    qubits_valid = validate_default_qubit_indices(gate->qubit_indices, gate->span,
+                                                                   default_qubit_count, qubit_error);
+                } else {
+                    const auto& measurement = std::get<HybridMeasurement>(control->body);
+                    qubits_valid = validate_default_qubit_measurement(measurement.qubit_index, measurement.span,
+                                                                        default_qubit_count, qubit_error);
+                }
+                if (!qubits_valid) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(qubit_error));
+                    return result;
+                }
+            }
             if (control->condition.kind == ClassicalConditionKind::IdentifierReference &&
                 condition_binding_indices.size() == 1) {
                 condition_binding_index = condition_binding_indices.front();
@@ -246,7 +326,17 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             continue;
         }
 
-        resolved.nodes.emplace_back(std::get<HybridMeasurement>(node));
+        const auto& measurement = std::get<HybridMeasurement>(node);
+        if (contains_explicit_default_register) {
+            Diagnostic qubit_error;
+            if (!validate_default_qubit_measurement(measurement.qubit_index, measurement.span,
+                                                    default_qubit_count, qubit_error)) {
+                NameResolutionResult result;
+                result.diagnostics.push_back(std::move(qubit_error));
+                return result;
+            }
+        }
+        resolved.nodes.emplace_back(measurement);
     }
 
     NameResolutionResult result;
