@@ -241,4 +241,99 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
     return result;
 }
 
+OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
+    OpenQasm3ExportResult result;
+    std::ostringstream body;
+    std::optional<std::size_t> declared_qubit_count;
+    bool has_measurements = false;
+
+    for (const HybridNode& node : program.nodes) {
+        if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
+            if (qubits->name != "q") {
+                add_diagnostic(result, qubits->span.line,
+                               "Hybrid OpenQASM 3 export supports only the default qubit declaration qubit q[n]");
+                continue;
+            }
+            if (declared_qubit_count.has_value()) {
+                add_diagnostic(result, qubits->span.line,
+                               "Hybrid OpenQASM 3 export accepts exactly one default qubit declaration");
+                continue;
+            }
+            declared_qubit_count = qubits->qubit_count;
+            continue;
+        }
+
+        if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
+            if (!declared_qubit_count.has_value()) {
+                add_diagnostic(result, gate->span.line,
+                               "Hybrid OpenQASM 3 export requires qubit q[n] before quantum operations");
+                continue;
+            }
+            for (std::size_t index : gate->qubit_indices) {
+                if (index >= *declared_qubit_count) {
+                    add_diagnostic(result, gate->span.line,
+                                   "quantum operand is outside the explicit qubit q[n] declaration range");
+                    break;
+                }
+            }
+            if (!result.ok()) continue;
+            QuantumGateNode typed_gate(gate->kind, gate->source_name, gate->literal_angle,
+                                       gate->qubit_indices, gate->span.line, gate->span);
+            std::size_t inferred_qubit_count = 0;
+            lower_quantum_gate(typed_gate, body, inferred_qubit_count, result);
+            if (inferred_qubit_count > *declared_qubit_count) {
+                add_diagnostic(result, gate->span.line,
+                               "quantum kernel requires operands outside the explicit qubit q[n] declaration range");
+            }
+            continue;
+        }
+
+        if (const auto* measurement = std::get_if<HybridMeasurement>(&node)) {
+            if (!declared_qubit_count.has_value()) {
+                add_diagnostic(result, measurement->span.line,
+                               "Hybrid OpenQASM 3 export requires qubit q[n] before measurements");
+                continue;
+            }
+            if (measurement->result_name.has_value()) {
+                add_diagnostic(result, measurement->span.line,
+                               "Hybrid OpenQASM 3 export does not lower named SynQ measurement-result declarations");
+                continue;
+            }
+            if (measurement->qubit_index >= *declared_qubit_count) {
+                add_diagnostic(result, measurement->span.line,
+                               "measurement operand is outside the explicit qubit q[n] declaration range");
+                continue;
+            }
+            body << "c[" << measurement->qubit_index << "] = measure q[" << measurement->qubit_index << "];\n";
+            has_measurements = true;
+            continue;
+        }
+
+        if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
+            add_diagnostic(result, control->span.line,
+                           "Hybrid OpenQASM 3 export does not lower bounded classical control-flow nodes");
+            continue;
+        }
+
+        const auto* declaration = std::get_if<HybridDeclaration>(&node);
+        add_diagnostic(result, declaration == nullptr ? 0 : declaration->span.line,
+                       "Hybrid OpenQASM 3 export supports only qubit declarations, typed quantum gates, and unnamed measurements");
+    }
+
+    if (!result.ok()) return result;
+    if (!declared_qubit_count.has_value()) {
+        add_diagnostic(result, 0, "Hybrid OpenQASM 3 export requires exactly one explicit qubit q[n] declaration");
+        return result;
+    }
+
+    std::ostringstream output;
+    output << "OPENQASM 3.0;\n";
+    output << "include \"stdgates.inc\";\n";
+    output << "qubit[" << *declared_qubit_count << "] q;\n";
+    if (has_measurements) output << "bit[" << *declared_qubit_count << "] c;\n";
+    output << body.str();
+    result.program = output.str();
+    return result;
+}
+
 }  // namespace synq::compiler

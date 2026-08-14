@@ -117,6 +117,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_measurement_result_smoke PRIVATE synq_lib)
     add_test(NAME synq_measurement_result_smoke COMMAND synq_measurement_result_smoke)
 
+    add_executable(synq_hybrid_openqasm3_exporter_smoke tests/smoke/hybrid_openqasm3_exporter_smoke.cpp)
+    target_include_directories(synq_hybrid_openqasm3_exporter_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_hybrid_openqasm3_exporter_smoke PRIVATE synq_lib)
+    add_test(NAME synq_hybrid_openqasm3_exporter_smoke COMMAND synq_hybrid_openqasm3_exporter_smoke)
+
     add_executable(synq_c_abi_smoke tests/interop/c_abi_smoke.c)
     target_include_directories(synq_c_abi_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(synq_c_abi_smoke PRIVATE synq_lib)

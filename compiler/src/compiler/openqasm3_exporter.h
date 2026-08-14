@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "compiler/ast.h"
+#include "compiler/hybrid_ir.h"
 
 namespace synq::compiler {
 
@@ -21,6 +22,12 @@ struct OpenQasm3ExportResult {
 // `quantum bell_pair` instructions from a ProgramNode. Every other recovery
 // statement is rejected instead of being ignored or guessed at.
 OpenQasm3ExportResult export_openqasm3(const ProgramNode& program);
+
+// Export only the typed Hybrid IR quantum subset with one explicit default
+// `qubit q[n]` declaration, supported gates, and unnamed measurements. This is
+// an internal source-generation boundary; declarations, control nodes, named
+// measurement results, and unsupported register forms are rejected.
+OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program);
 
 }  // namespace synq::compiler
 

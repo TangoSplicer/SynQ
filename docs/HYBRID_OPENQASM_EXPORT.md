@@ -1,0 +1,42 @@
+# Strict Hybrid IR OpenQASM 3 Export
+
+**Status:** Design and implementation in progress; no remote validation claim is
+made in this record.
+**Last reviewed:** 14 August 2026
+
+## Purpose
+
+`export_hybrid_openqasm3` provides a separate internal source-generation path
+from typed Hybrid IR. It proves a narrow migration route away from direct AST
+export without changing the existing AST exporter or public C ABI.
+
+> **Design rule:** lower only typed structures with an exact mapping. Reject
+> every Hybrid node whose SynQ meaning cannot be preserved in this bounded
+> OpenQASM 3 subset.
+
+## Accepted internal subset
+
+The export path requires exactly one `HybridQubitDeclaration` named `q`, then
+accepts supported typed gates and unnamed measurements within that declaration's
+range. It emits `qubit[n] q;`, emits `bit[n] c;` only if an unnamed measurement
+exists, and reuses the existing supported gate spellings and literal-angle rules.
+
+Classical declarations, named-register declarations, named measurement-result
+declarations, typed control nodes, missing explicit `qubit q[n]` declarations,
+and out-of-range operands are rejected. The function returns a diagnostic list
+and no program text on failure.
+
+## Explicit non-goals
+
+This internal path does not change the public C ABI, OpenQASM import, named
+register operands, named measurement-result lowering, control-flow lowering,
+runtime execution, simulation, provider integration, or hardware submission.
+
+## Focused validation
+
+`synq_hybrid_openqasm3_exporter_smoke` verifies exact output for an explicit
+typed `qubit q[n]` declaration, a supported gate, and an unnamed measurement.
+It also verifies rejection for missing declarations, out-of-range operands,
+named measurement-result declarations, and unlowered typed control nodes. The
+local recovery profile reported **22/22** CTest checks. This is local evidence
+pending publication and compiler-core CI.
