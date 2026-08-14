@@ -84,6 +84,12 @@ FeatureRegistry make_default_feature_registry() {
         "Enables one non-evaluating +, -, or * declaration initializer over Integer literals or prior Integer bindings.",
         "synq#bounded-integer-arithmetic-expressions",
     });
+    registry.register_feature({
+        "qubit-declarations",
+        FeatureStage::Alpha,
+        "Enables typed positive-size named qubit declarations without runtime allocation or operand-bound validation.",
+        "synq#bounded-qubit-declarations",
+    });
     return registry;
 }
 

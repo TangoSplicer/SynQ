@@ -61,6 +61,15 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
             continue;
         }
 
+        if (const auto* qubits = dynamic_cast<const QubitDeclarationNode*>(statement)) {
+            lowered.nodes.emplace_back(HybridQubitDeclaration{
+                qubits->name,
+                qubits->qubit_count,
+                qubits->span,
+            });
+            continue;
+        }
+
         if (const auto* gate = dynamic_cast<const QuantumGateNode*>(statement)) {
             lowered.nodes.emplace_back(HybridQuantumGate{
                 gate->kind,

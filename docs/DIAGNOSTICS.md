@@ -54,6 +54,7 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P009` | Alpha-gated classical control flow does not use its exact bounded Boolean-literal/identifier, `not <atom>`, or `<atom> and/or <atom>` `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]`, `if not ready then quantum h q[0]`, or `if ready and enabled then quantum h q[0]` after enabling the feature. |
 | `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
 | `SYNQ-P011` | An opted-in Integer arithmetic declaration does not use exactly two Integer literal/identifier atoms and one `+`, `-`, or `*` token. | Use `let total = count + 1` after enabling `integer-arithmetic-expressions`. |
+| `SYNQ-P012` | An Alpha-gated qubit declaration does not use exactly one identifier and a positive decimal whole-number size. | Use `qubit q[2]` after enabling `qubit-declarations`. |
 
 `SYNQ-P009` and `SYNQ-P010` are parser diagnostics for the Alpha
 classical-control-flow profile. The Boolean-operator extension, including its
@@ -63,6 +64,11 @@ classical-control-flow profile. The Boolean-operator extension, including its
 `integer-arithmetic-expressions` Alpha opt-in. Without that opt-in, existing
 arithmetic-looking declaration text remains opaque source. Its focused smoke
 coverage passed remotely with **19/19** CTest checks in [Compiler Core #31][6].
+
+`SYNQ-P012` is restricted to source parsed after the `qubit-declarations` Alpha
+opt-in. It has local **20/20** focused smoke evidence pending publication and
+compiler-core CI. The code validates declaration shape only; it does not yet
+validate `quantum` or `measure` operand indices against declared register sizes.
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation

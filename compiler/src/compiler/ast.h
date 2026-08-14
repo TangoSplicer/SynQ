@@ -154,6 +154,25 @@ public:
     }
 };
 
+// Typed declaration of one named, positive-size qubit register in the bounded
+// recovery profile. It records source-level allocation metadata only; it does
+// not allocate runtime resources, model liveness, or validate later operands.
+class QubitDeclarationNode : public ASTNode {
+public:
+    std::string name;
+    std::size_t qubit_count = 0;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    QubitDeclarationNode(std::string identifier, std::size_t count, std::size_t line_number,
+                         synq::compiler::SourceSpan source_span)
+        : name(std::move(identifier)), qubit_count(count), line(line_number), span(source_span) {}
+
+    std::string toString() override {
+        return "qubit " + name + "[" + std::to_string(qubit_count) + "]";
+    }
+};
+
 // Typed representation of the first bounded classical-control-flow profile.
 // The condition is a parser-validated boolean literal and the owned body is
 // limited to one typed quantum gate or measurement statement.

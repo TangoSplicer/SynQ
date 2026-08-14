@@ -32,7 +32,7 @@ struct ResolvedHybridControlFlow {
     std::vector<std::size_t> condition_binding_indices;
 };
 
-using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQuantumGate, HybridMeasurement, ResolvedHybridControlFlow>;
+using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQubitDeclaration, HybridQuantumGate, HybridMeasurement, ResolvedHybridControlFlow>;
 
 struct ResolvedHybridProgram {
     std::vector<ResolvedHybridNode> nodes;

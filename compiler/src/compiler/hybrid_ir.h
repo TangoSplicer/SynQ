@@ -23,6 +23,12 @@ struct HybridDeclaration {
     SourceSpan span;
 };
 
+struct HybridQubitDeclaration {
+    std::string name;
+    std::size_t qubit_count = 0;
+    SourceSpan span;
+};
+
 struct HybridQuantumGate {
     QuantumGateKind kind = QuantumGateKind::Unknown;
     std::string source_name;
@@ -45,7 +51,7 @@ struct HybridControlFlow {
     SourceSpan span;
 };
 
-using HybridNode = std::variant<HybridDeclaration, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
+using HybridNode = std::variant<HybridDeclaration, HybridQubitDeclaration, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
 
 struct HybridProgram {
     std::vector<HybridNode> nodes;

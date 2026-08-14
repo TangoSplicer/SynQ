@@ -163,6 +163,23 @@ bool parse_qubit_index(const std::string& operand, std::size_t& index) {
     return true;
 }
 
+bool parse_qubit_declaration(const std::string& source, std::string& name, std::size_t& qubit_count) {
+    const std::size_t open = source.find('[');
+    if (open == std::string::npos || source.empty() || source.back() != ']' ||
+        source.find('[', open + 1) != std::string::npos) {
+        return false;
+    }
+    const std::string size_text = source.substr(open + 1, source.size() - open - 2);
+    name = source.substr(0, open);
+    if (!is_identifier(name) || !is_non_negative_integer(size_text) || size_text == "0") return false;
+
+    qubit_count = 0;
+    for (char character : size_text) {
+        qubit_count = qubit_count * 10 + static_cast<std::size_t>(character - '0');
+    }
+    return true;
+}
+
 QuantumGateKind quantum_gate_kind(const std::string& source_name) {
     if (source_name == "h") return QuantumGateKind::H;
     if (source_name == "x") return QuantumGateKind::X;
@@ -423,12 +440,34 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             continue;
         }
 
+        if (operation == "qubit") {
+            if (!active_features.is_enabled("qubit-declarations")) {
+                return fail_parse("SYNQ-P007", span, "qubit declarations require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"qubit-declarations\")] before the gated construct");
+            }
+            std::string name;
+            std::size_t qubit_count = 0;
+            if (!parse_qubit_declaration(argument, name, qubit_count)) {
+                return fail_parse("SYNQ-P012", span, "malformed bounded qubit declaration",
+                                  "use qubit <identifier>[positive-size], for example qubit q[2]");
+            }
+            const auto inserted = declared_names.emplace(name, span);
+            if (!inserted.second) {
+                return fail_parse("SYNQ-S004", span,
+                                  "duplicate top-level declaration `" + name +
+                                      "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                  "rename the later declaration or reuse the existing binding according to future language semantics");
+            }
+            root->statements.push_back(new QubitDeclarationNode(name, qubit_count, line_number, span));
+            continue;
+        }
+
         const bool known_instruction = operation == "print" || operation == "delay" ||
                                        operation == "quantum" || operation == "measure" || operation == "ai" ||
-                                       operation == "if" || operation == "while";
+                                       operation == "if" || operation == "while" || operation == "qubit";
         if (!known_instruction || argument.empty()) {
             return fail_parse("SYNQ-P003", span, "unsupported or incomplete recovery-profile instruction",
-                              "use let, print, delay, quantum, measure, ai, if, or while with the documented argument form");
+                              "use let, qubit, print, delay, quantum, measure, ai, if, or while with the documented argument form");
         }
         if (operation == "delay" && !is_non_negative_integer(argument)) {
             return fail_parse("SYNQ-P004", span, "delay requires a non-negative integer number of milliseconds",

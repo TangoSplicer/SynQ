@@ -101,3 +101,10 @@
 - [x] Specify a bounded Alpha-gated integer-arithmetic expression tree for exactly one `+`, `-`, or `*` operation over Integer literals and earlier Integer declaration references.
 - [x] Implement integer-arithmetic parsing, Hybrid IR/resolver validation, structured diagnostics, and focused non-evaluation smoke coverage.
 - [x] Run full validation, publish the integer-arithmetic increment, and record remote compiler-core evidence.
+- [ ] Specify and implement bounded named qubit declarations with typed source provenance, allocation metadata, and focused non-execution tests.
+- [ ] Validate typed gate and measurement references against declared qubit-register bounds, then publish remote compiler-core evidence.
+- [ ] Add a bounded typed measurement-result declaration boundary without introducing runtime values or execution semantics.
+- [ ] Extend the supported OpenQASM 3 source subset only where typed qubit/control structures have exact-output and independent parser/import evidence.
+- [ ] Add Alpha-gated typed non-executing function and kernel declarations with safe parser, IR, diagnostics, and smoke-test boundaries.
+- [ ] Reassess and document native/JVM interoperability contracts after the typed language-core foundations are complete.
+- [ ] Perform a final roadmap validation, capability-boundary review, and factual publication record before discussing research-stage work.

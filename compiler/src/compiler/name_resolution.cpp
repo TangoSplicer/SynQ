@@ -217,6 +217,11 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             continue;
         }
 
+        if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
+            resolved.nodes.emplace_back(*qubits);
+            continue;
+        }
+
         if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
             resolved.nodes.emplace_back(*gate);
             continue;
