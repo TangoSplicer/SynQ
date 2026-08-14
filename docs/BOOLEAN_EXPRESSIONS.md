@@ -1,7 +1,7 @@
 # Bounded Boolean Expressions
 
-**Status:** Locally validated Alpha-gated recovery-profile implementation;
-remote compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated Alpha-gated recovery-profile implementation in
+[Compiler Core #30][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -52,8 +52,8 @@ trees always conform to the bounded grammar.
 `synq_boolean_expression_smoke` covers typed `not`, `and`, and `or` tree
 construction; Hybrid IR provenance; ordered Boolean binding indices; unknown
 and non-Boolean leaves; unsupported operator combinations; and the existing
-Alpha feature gate. The clean local recovery profile reported **18/18** CTest
-checks passing, including this new smoke test.
+Alpha feature gate. The clean local recovery profile and [Compiler Core #30][1]
+both reported **18/18** CTest checks, including this new smoke test.
 
 ## Explicit non-goals
 
@@ -63,3 +63,7 @@ arithmetic, assignment, type coercion, type inference beyond existing literals
 and bound identifiers, measurement-result values, blocks, `else`, nested control
 flow, branch/loop execution, OpenQASM control lowering, simulation, provider
 submission, or hardware execution.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"

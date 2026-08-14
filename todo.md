@@ -97,4 +97,4 @@
 - [x] Run full validation, publish the typed-expression increment, and record remote compiler-core evidence.
 - [x] Specify a bounded Alpha-gated Boolean-expression AST for `not`, `and`, and `or` over Boolean literals and prior resolved Boolean declaration references.
 - [x] Implement Boolean-expression parser, Hybrid IR/resolver validation, structured diagnostics, and focused non-evaluation smoke coverage.
-- [ ] Run full validation, publish the Boolean-expression increment, and record remote compiler-core evidence.
+- [x] Run full validation, publish the Boolean-expression increment, and record remote compiler-core evidence.

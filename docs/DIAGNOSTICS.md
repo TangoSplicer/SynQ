@@ -55,8 +55,8 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
 
 `SYNQ-P009` and `SYNQ-P010` are parser diagnostics for the Alpha
-classical-control-flow profile. Their focused smoke coverage passed remotely in
-[Compiler Core #27][4].
+classical-control-flow profile. The Boolean-operator extension, including its
+`SYNQ-P009` malformed-form coverage, passed remotely in [Compiler Core #30][5].
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
@@ -94,7 +94,8 @@ Core #26][3].
 `SYNQ-R002`, `SYNQ-T001`, and `SYNQ-T002` are internal resolver/type diagnostics.
 They are not parser diagnostics and are not propagated through the C ABI. They
 cover only the bounded Boolean-condition profile; they do not establish a
-general expression or type system.
+general expression or type system. Their focused Boolean-expression smoke
+coverage passed remotely in [Compiler Core #30][5].
 
 ## Compatibility boundaries
 
@@ -140,3 +141,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31803349469 "SynQ Compiler Core #23"
 [3]: https://github.com/TangoSplicer/SynQ/actions/runs/31803737501 "SynQ Compiler Core #26"
 [4]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
+[5]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"

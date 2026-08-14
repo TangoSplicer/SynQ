@@ -2,7 +2,8 @@
 
 **Status:** The earlier literal-condition Alpha profile passed remotely in
 [Compiler Core #27][1], with a successful manual repeat in [#28][2]; the
-Boolean identifier-reference extension passed remotely in [Compiler Core #29][3].
+Boolean identifier-reference extension passed remotely in [Compiler Core #29][3],
+and the bounded Boolean-operator extension passed remotely in [#30][4].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -60,8 +61,7 @@ quantum/measurement body preservation, Hybrid IR lowering, name-resolution
 preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The separate
 expression smoke covers Boolean identifier conditions and `SYNQ-R002`/`SYNQ-T001`.
 The separate Boolean-expression smoke covers `not`, `and`, `or`, and `SYNQ-T002`.
-The expanded **18/18** profile is local evidence pending publication and
-compiler-core validation.
+The expanded **18/18** profile passed remotely in [Compiler Core #30][4].
 
 ## Explicit non-goals
 
@@ -78,3 +78,4 @@ execution.
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31804191932 "SynQ Compiler Core #28"
 [3]: https://github.com/TangoSplicer/SynQ/actions/runs/31837377648 "SynQ Compiler Core #29"
+[4]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"
