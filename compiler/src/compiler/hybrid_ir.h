@@ -35,7 +35,16 @@ struct HybridMeasurement {
     SourceSpan span;
 };
 
-using HybridNode = std::variant<HybridDeclaration, HybridQuantumGate, HybridMeasurement>;
+using HybridControlBody = std::variant<HybridQuantumGate, HybridMeasurement>;
+
+struct HybridControlFlow {
+    ClassicalControlKind kind = ClassicalControlKind::If;
+    bool condition = false;
+    HybridControlBody body;
+    SourceSpan span;
+};
+
+using HybridNode = std::variant<HybridDeclaration, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
 
 struct HybridProgram {
     std::vector<HybridNode> nodes;

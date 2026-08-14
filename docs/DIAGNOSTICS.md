@@ -51,6 +51,8 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P006` | An experimental annotation is malformed or names an unknown feature. | Use a registered exact annotation such as `#[experimental(feature = "parameterized-quantum-gates")]`. |
 | `SYNQ-P007` | A gated construct is used without its required alpha opt-in. | Add the documented file-scoped feature annotation or use an ungated construct. |
 | `SYNQ-P008` | A measurement does not use exactly one explicit non-negative qubit operand. | Use `measure q[index]`, for example `measure q[0]`. |
+| `SYNQ-P009` | Alpha-gated classical control flow does not use its exact literal-boolean `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]` or `while false do measure q[0]` after enabling the feature. |
+| `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation

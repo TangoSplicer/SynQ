@@ -72,6 +72,12 @@ FeatureRegistry make_default_feature_registry() {
         "Enables the recovery profile's bounded literal-angle quantum gate syntax.",
         "synq#language-foundation",
     });
+    registry.register_feature({
+        "classical-control-flow",
+        FeatureStage::Alpha,
+        "Enables bounded literal-boolean if/while source forms with one typed quantum or measurement body.",
+        "synq#bounded-classical-control-flow",
+    });
     return registry;
 }
 

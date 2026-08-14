@@ -73,6 +73,11 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             continue;
         }
 
+        if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
+            resolved.nodes.emplace_back(*control);
+            continue;
+        }
+
         resolved.nodes.emplace_back(std::get<HybridMeasurement>(node));
     }
 

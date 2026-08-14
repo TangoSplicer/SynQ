@@ -33,6 +33,16 @@ Diagnostic unsupported_node_diagnostic(const ASTNode* node) {
     };
 }
 
+Diagnostic unsupported_control_body_diagnostic(const ClassicalControlNode& control) {
+    return {
+        "SYNQ-H002",
+        DiagnosticSeverity::Error,
+        control.span,
+        "Hybrid IR control-flow body is not a typed quantum gate or measurement",
+        "use the parser-produced bounded control-flow nodes until internal control regions expand"
+    };
+}
+
 }  // namespace
 
 HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
@@ -67,6 +77,30 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 measurement->span,
             });
             continue;
+        }
+
+        if (const auto* control = dynamic_cast<const ClassicalControlNode*>(statement)) {
+            if (const auto* gate = dynamic_cast<const QuantumGateNode*>(control->body)) {
+                lowered.nodes.emplace_back(HybridControlFlow{
+                    control->kind,
+                    control->condition,
+                    HybridQuantumGate{gate->kind, gate->source_name, gate->literal_angle, gate->qubit_indices, gate->span},
+                    control->span,
+                });
+                continue;
+            }
+            if (const auto* measurement = dynamic_cast<const MeasurementNode*>(control->body)) {
+                lowered.nodes.emplace_back(HybridControlFlow{
+                    control->kind,
+                    control->condition,
+                    HybridMeasurement{measurement->qubit_index, measurement->span},
+                    control->span,
+                });
+                continue;
+            }
+            HybridLoweringResult result;
+            result.diagnostics.push_back(unsupported_control_body_diagnostic(*control));
+            return result;
         }
 
         HybridLoweringResult result;

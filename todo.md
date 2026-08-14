@@ -89,5 +89,5 @@
 - [x] Integrate the Mercury consumer into compiler-core CI, document verified boundaries, and publish its remote evidence.
 - [x] Specify and implement a minimal typed Hybrid IR that can represent the bounded parsed quantum and classical nodes without execution semantics.
 - [x] Add scoped name resolution with focused diagnostics and parser-to-IR provenance coverage.
-- [ ] Add bounded typed classical control flow with focused parser, semantic, and non-execution tests.
+- [x] Add bounded typed classical control flow with focused parser, semantic, and non-execution tests.
 - [ ] Re-run the complete validation suite, document every verified boundary, and publish the language-core increments.

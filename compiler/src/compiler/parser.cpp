@@ -198,6 +198,78 @@ QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& argument
                                std::move(operands), line_number, span);
 }
 
+bool parse_control_flow_arguments(const std::string& source, const std::string& connector,
+                                  bool& condition, std::string& body_operation, std::string& body_argument) {
+    const std::string separator = " " + connector + " ";
+    const std::size_t boundary = source.find(separator);
+    if (boundary == std::string::npos || source.find(separator, boundary + separator.size()) != std::string::npos) {
+        return false;
+    }
+
+    const std::string condition_text = trim(source.substr(0, boundary));
+    if (condition_text != "true" && condition_text != "false") return false;
+    condition = condition_text == "true";
+
+    std::istringstream body_tokens(trim(source.substr(boundary + separator.size())));
+    body_tokens >> body_operation;
+    std::getline(body_tokens, body_argument);
+    body_argument = trim(body_argument);
+    return !body_operation.empty() && !body_argument.empty();
+}
+
+ASTNode* make_control_body_node(const std::string& operation, const std::string& argument,
+                                const synq::compiler::FeatureRegistry& active_features,
+                                std::size_t line_number, const synq::compiler::SourceSpan& span,
+                                synq::compiler::Diagnostic& error) {
+    if (operation == "quantum") {
+        std::vector<std::string> quantum_arguments;
+        if (!parse_quantum_arguments(argument, quantum_arguments)) {
+            error = {"SYNQ-P010", synq::compiler::DiagnosticSeverity::Error, span,
+                     "classical control-flow body has malformed quantum syntax",
+                     "use one bounded quantum statement such as quantum h q[0]"};
+            return nullptr;
+        }
+        QuantumGateNode* gate = make_quantum_gate_node(quantum_arguments, line_number, span);
+        if (gate == nullptr) {
+            error = {"SYNQ-P010", synq::compiler::DiagnosticSeverity::Error, span,
+                     "classical control-flow body could not construct typed quantum operands",
+                     "use explicit operands such as q[0] or q[0], q[1]"};
+            return nullptr;
+        }
+        const auto validation_error = synq::compiler::validate_quantum_gate_shape(*gate);
+        if (validation_error.has_value()) {
+            error = {validation_error->code, synq::compiler::DiagnosticSeverity::Error, span,
+                     validation_error->message, validation_error->help};
+            delete gate;
+            return nullptr;
+        }
+        if (gate->literal_angle.has_value() && !active_features.is_enabled("parameterized-quantum-gates")) {
+            error = {"SYNQ-P007", synq::compiler::DiagnosticSeverity::Error, span,
+                     "parameterized quantum gates require an alpha feature opt-in",
+                     "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct"};
+            delete gate;
+            return nullptr;
+        }
+        return gate;
+    }
+
+    if (operation == "measure") {
+        std::size_t qubit_index = 0;
+        if (!parse_qubit_index(argument, qubit_index)) {
+            error = {"SYNQ-P008", synq::compiler::DiagnosticSeverity::Error, span,
+                     "measurement requires exactly one explicit qubit operand",
+                     "use measure q[index], for example measure q[0]"};
+            return nullptr;
+        }
+        return new MeasurementNode(qubit_index, line_number, span);
+    }
+
+    error = {"SYNQ-P010", synq::compiler::DiagnosticSeverity::Error, span,
+             "classical control-flow body must be one typed quantum gate or measurement",
+             "use quantum <gate> q[index] or measure q[index] as the single body statement"};
+    return nullptr;
+}
+
 std::string strip_comment(const std::string& value) {
     // Recovery-profile rule: `//` begins a comment only at the start of a
     // trimmed line or when preceded by whitespace. This preserves source text
@@ -287,17 +359,43 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
         }
 
         const bool known_instruction = operation == "print" || operation == "delay" ||
-                                       operation == "quantum" || operation == "measure" || operation == "ai";
+                                       operation == "quantum" || operation == "measure" || operation == "ai" ||
+                                       operation == "if" || operation == "while";
         if (!known_instruction || argument.empty()) {
             return fail_parse("SYNQ-P003", span, "unsupported or incomplete recovery-profile instruction",
-                              "use let, print, delay, quantum, measure, or ai with the documented argument form");
+                              "use let, print, delay, quantum, measure, ai, if, or while with the documented argument form");
         }
         if (operation == "delay" && !is_non_negative_integer(argument)) {
             return fail_parse("SYNQ-P004", span, "delay requires a non-negative integer number of milliseconds",
                               "use a non-negative whole number, such as delay 0");
         }
 
-        if (operation == "quantum") {
+        if (operation == "if" || operation == "while") {
+            if (!active_features.is_enabled("classical-control-flow")) {
+                return fail_parse("SYNQ-P007", span, "classical control flow requires an alpha feature opt-in",
+                                  "add #[experimental(feature = \"classical-control-flow\")] before the gated construct");
+            }
+            bool condition = false;
+            std::string body_operation;
+            std::string body_argument;
+            const std::string connector = operation == "if" ? "then" : "do";
+            if (!parse_control_flow_arguments(argument, connector, condition, body_operation, body_argument)) {
+                return fail_parse("SYNQ-P009", span, "malformed literal-boolean classical control-flow syntax",
+                                  operation == "if" ? "use if true then quantum h q[0]" :
+                                                      "use while false do measure q[0]");
+            }
+            synq::compiler::Diagnostic body_error;
+            ASTNode* body = make_control_body_node(body_operation, body_argument, active_features,
+                                                   line_number, span, body_error);
+            if (body == nullptr) {
+                synq::compiler::ParseResult result;
+                result.diagnostics.push_back(std::move(body_error));
+                return result;
+            }
+            root->statements.push_back(new ClassicalControlNode(
+                operation == "if" ? ClassicalControlKind::If : ClassicalControlKind::While,
+                condition, body, line_number, span));
+        } else if (operation == "quantum") {
             std::vector<std::string> quantum_arguments;
             if (!parse_quantum_arguments(argument, quantum_arguments)) {
                 return fail_parse("SYNQ-P005", span, "malformed quantum kernel, operands, or literal-angle parameter",

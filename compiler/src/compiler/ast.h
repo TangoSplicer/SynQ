@@ -154,6 +154,38 @@ public:
     }
 };
 
+// Typed representation of the first bounded classical-control-flow profile.
+// The condition is a parser-validated boolean literal and the owned body is
+// limited to one typed quantum gate or measurement statement.
+enum class ClassicalControlKind {
+    If,
+    While,
+};
+
+class ClassicalControlNode : public ASTNode {
+public:
+    ClassicalControlKind kind;
+    bool condition = false;
+    ASTNode* body = nullptr;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    ClassicalControlNode(ClassicalControlKind control_kind, bool boolean_condition, ASTNode* owned_body,
+                         std::size_t line_number, synq::compiler::SourceSpan source_span)
+        : kind(control_kind),
+          condition(boolean_condition),
+          body(owned_body),
+          line(line_number),
+          span(source_span) {}
+
+    ~ClassicalControlNode() override { delete body; }
+
+    std::string toString() override {
+        return std::string(kind == ClassicalControlKind::If ? "if " : "while ") +
+               (condition ? "true" : "false") + " " + (body == nullptr ? "" : body->toString());
+    }
+};
+
 // A non-evaluating hint for the bounded declaration right-hand side. SourceText
 // means the parser preserved accepted source that a later expression/type layer
 // must understand; it does not mean that the value was rejected.

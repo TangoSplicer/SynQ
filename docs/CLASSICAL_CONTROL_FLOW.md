@@ -1,0 +1,64 @@
+# Bounded Typed Classical Control Flow
+
+**Status:** Locally validated Alpha-gated recovery-profile implementation;
+remote compiler-core evidence is pending publication of this increment.
+**Last reviewed:** 14 August 2026
+
+## Purpose
+
+The first classical-control-flow profile adds typed source and Hybrid IR nodes
+for a deliberately small, safe control boundary. It recognizes literal boolean
+conditions and a single quantum-gate or measurement body. The feature is
+**Alpha** and therefore requires an explicit file-scoped opt-in.
+
+> **Design rule:** control syntax must be visible in the typed AST and Hybrid
+> IR, but it must not imply loop execution, branch execution, a classical
+> runtime, result handling, or backend lowering.
+
+## Alpha-gated source profile
+
+```synq
+#[experimental(feature = "classical-control-flow")]
+if true then quantum h q[0]
+while false do measure q[0]
+```
+
+| Form | Typed representation | Explicit boundary |
+| --- | --- | --- |
+| `if true then quantum h q[0]` | `ClassicalControlNode { If, true, QuantumGateNode }`, then `HybridControlFlow` with a typed gate body. | No expression condition, `else`, block, declaration, assignment, result value, execution, or lowering semantics. |
+| `while false do measure q[0]` | `ClassicalControlNode { While, false, MeasurementNode }`, then `HybridControlFlow` with a typed measurement body. | No iteration, termination analysis, measurement-dependent condition, returned bit, or runtime effect. |
+| Missing opt-in | `SYNQ-P007` before AST construction. | The feature remains Alpha; no implicit enablement or source-level bypass exists. |
+| Invalid condition/structure | `SYNQ-P009` for a non-literal-boolean or malformed connector form. | No identifier lookup, expression parsing, coercion, or condition evaluation is attempted. |
+| Unsupported body | `SYNQ-P010` for anything other than exactly one typed quantum gate or measurement. | No nested control flow, `print`, `delay`, `ai`, `let`, multi-statement body, or fallback instruction body is accepted. |
+
+## Parser, IR, and resolution behavior
+
+`ClassicalControlNode` owns one typed body node. The parser validates the body
+through the same bounded gate-shape and measurement validation paths used at the
+top level. The Hybrid IR copies the typed condition, body variant, and source
+span. `resolve_hybrid_names` preserves a `HybridControlFlow` node unchanged;
+it does not resolve inside control bodies because this first form exposes no
+classical variable references.
+
+The current OpenQASM source exporter remains a typed-AST source-export subset
+and does not claim lowering of control nodes. This increment does not modify it
+or claim that OpenQASM, a simulator, a provider, or hardware can execute these
+forms.
+
+## Focused validation
+
+`synq_classical_control_flow_smoke` verifies mandatory feature gating, typed
+`if` and `while` AST construction, literal condition preservation, typed
+quantum/measurement body preservation, Hybrid IR lowering, name-resolution
+preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The clean local
+recovery profile reported **16/16** CTest checks passing, including this smoke
+test.
+
+## Explicit non-goals
+
+This Alpha increment does not implement general boolean expressions, variable
+conditions, assignment, mutable variables, `else`, blocks, nesting, function
+scope, loop execution, branch execution, termination checks, runtime values,
+measurement-result values, resource liveness, control-flow graph construction,
+optimization, OpenQASM lowering, simulation, provider submission, or hardware
+execution.

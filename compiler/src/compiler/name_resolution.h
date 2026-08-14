@@ -22,7 +22,7 @@ struct ResolvedHybridDeclaration {
     std::optional<std::size_t> initializer_binding_index;
 };
 
-using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQuantumGate, HybridMeasurement>;
+using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
 
 struct ResolvedHybridProgram {
     std::vector<ResolvedHybridNode> nodes;
