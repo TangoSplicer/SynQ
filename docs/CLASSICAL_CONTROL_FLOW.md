@@ -2,8 +2,7 @@
 
 **Status:** The earlier literal-condition Alpha profile passed remotely in
 [Compiler Core #27][1], with a successful manual repeat in [#28][2]; the
-Boolean identifier-reference extension is locally validated and awaits remote
-compiler-core evidence.
+Boolean identifier-reference extension passed remotely in [Compiler Core #29][3].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -57,17 +56,16 @@ forms.
 `synq_classical_control_flow_smoke` verifies mandatory feature gating, typed
 `if` and `while` AST construction, literal condition preservation, typed
 quantum/measurement body preservation, Hybrid IR lowering, name-resolution
-preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The clean local
-recovery profile reported **16/16** CTest checks passing, including this smoke
-test. Compiler Core #27 then reported the same **16/16** CTest pass for commit
-`2121c2f`; Compiler Core #28 repeated that result through the manual workflow
-entry point.[1] [2]
+preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The separate
+expression smoke covers Boolean identifier conditions and `SYNQ-R002`/`SYNQ-T001`.
+Compiler Core #29 reported the full **17/17** CTest pass for commit `33e98c2`.[3]
 
 ## Explicit non-goals
 
 This Alpha increment does not implement general boolean expressions, variable
-conditions, assignment, mutable variables, `else`, blocks, nesting, function
-scope, loop execution, branch execution, termination checks, runtime values,
+conditions beyond whole resolved identifiers, assignment, mutable variables,
+`else`, blocks, nesting, function scope, loop execution, branch execution,
+termination checks, runtime values,
 measurement-result values, resource liveness, control-flow graph construction,
 optimization, OpenQASM lowering, simulation, provider submission, or hardware
 execution.
@@ -76,3 +74,4 @@ execution.
 
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31804191932 "SynQ Compiler Core #28"
+[3]: https://github.com/TangoSplicer/SynQ/actions/runs/31837377648 "SynQ Compiler Core #29"

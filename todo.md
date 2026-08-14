@@ -94,4 +94,4 @@
 - [x] Revoke the GitHub credential exposed in the task conversation and confirm a replacement credential is required for future publication.
 - [x] Specify a bounded internal expression and static-type representation for existing declaration literals and identifier references without runtime evaluation.
 - [x] Extend Alpha classical control conditions from boolean literals to resolved boolean declaration references with focused parser, type, and provenance tests.
-- [ ] Run full validation, publish the typed-expression increment, and record remote compiler-core evidence.
+- [x] Run full validation, publish the typed-expression increment, and record remote compiler-core evidence.

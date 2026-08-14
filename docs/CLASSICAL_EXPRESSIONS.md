@@ -1,7 +1,7 @@
 # Bounded Classical Expressions and Static Types
 
-**Status:** Locally validated internal recovery-profile implementation; remote
-compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated internal recovery-profile implementation in
+[Compiler Core #29][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -56,8 +56,8 @@ the branch or loop to execute.
 `synq_classical_expression_smoke` covers literal classifications, opaque source
 preservation, Boolean type propagation through a declaration alias, successful
 resolved condition references, unknown condition rejection, and non-Boolean
-condition rejection. The clean local recovery profile reported **17/17** CTest
-checks passing, including this new smoke test.
+condition rejection. The clean local recovery profile and [Compiler Core #29][1]
+both reported **17/17** CTest checks, including this new smoke test.
 
 ## Explicit non-goals
 
@@ -67,3 +67,7 @@ coercion, constraints, functions, assignments, mutability, variable values,
 measurement results, general type inference, type annotations, generics,
 blocks, `else`, nested scopes, evaluation, control-flow execution, OpenQASM
 lowering, simulation, provider submission, or hardware execution.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31837377648 "SynQ Compiler Core #29"

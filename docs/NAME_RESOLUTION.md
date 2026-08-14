@@ -1,8 +1,8 @@
 # Bounded Scoped Name Resolution
 
 **Status:** The earlier declaration-only resolver passed remotely in [Compiler
-Core #26][1]; the Boolean condition-reference extension is locally validated
-and awaits remote compiler-core evidence.
+Core #26][1]; the Boolean condition-reference extension passed remotely in
+[Compiler Core #29][2].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -45,8 +45,8 @@ its input invariant. It does not introduce a second duplicate-binding policy.
 
 `synq_name_resolution_smoke` retains coverage for earlier declaration references
 and opaque source. The separate `synq_classical_expression_smoke` covers Boolean
-type propagation and resolved control conditions. The latter has local 17-test
-evidence only until this expression/type increment is published and run in CI.
+type propagation and resolved control conditions. [Compiler Core #29][2]
+reported the same **17/17** CTest pass as the local expression/type profile.
 
 ## Explicit non-goals
 
@@ -59,3 +59,4 @@ lowering, a public API, or a stable resolved-IR serialization format.
 ## References
 
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31803737501 "SynQ Compiler Core #26"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31837377648 "SynQ Compiler Core #29"
