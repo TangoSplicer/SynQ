@@ -39,6 +39,7 @@ struct HybridQuantumGate {
 
 struct HybridMeasurement {
     std::size_t qubit_index = 0;
+    std::optional<std::string> result_name;
     SourceSpan span;
 };
 

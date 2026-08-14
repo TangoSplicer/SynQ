@@ -50,7 +50,7 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P005` | Quantum operands or parameter syntax do not match the bounded grammar. | Use explicit `q[index]` operands and the documented literal-angle form. |
 | `SYNQ-P006` | An experimental annotation is malformed or names an unknown feature. | Use a registered exact annotation such as `#[experimental(feature = "parameterized-quantum-gates")]`. |
 | `SYNQ-P007` | A gated construct is used without its required alpha opt-in. | Add the documented file-scoped feature annotation or use an ungated construct. |
-| `SYNQ-P008` | A measurement does not use exactly one explicit non-negative qubit operand. | Use `measure q[index]`, for example `measure q[0]`. |
+| `SYNQ-P008` | A measurement does not use one explicit non-negative qubit operand with an optional valid result identifier. | Use `measure q[index]` or `measure q[index] as <identifier>`, for example `measure q[0] as observed`. |
 | `SYNQ-P009` | Alpha-gated classical control flow does not use its exact bounded Boolean-literal/identifier, `not <atom>`, or `<atom> and/or <atom>` `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]`, `if not ready then quantum h q[0]`, or `if ready and enabled then quantum h q[0]` after enabling the feature. |
 | `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
 | `SYNQ-P011` | An opted-in Integer arithmetic declaration does not use exactly two Integer literal/identifier atoms and one `+`, `-`, or `*` token. | Use `let total = count + 1` after enabling `integer-arithmetic-expressions`. |

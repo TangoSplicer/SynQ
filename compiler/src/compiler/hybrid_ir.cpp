@@ -84,6 +84,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
         if (const auto* measurement = dynamic_cast<const MeasurementNode*>(statement)) {
             lowered.nodes.emplace_back(HybridMeasurement{
                 measurement->qubit_index,
+                measurement->result_name,
                 measurement->span,
             });
             continue;
@@ -103,7 +104,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 lowered.nodes.emplace_back(HybridControlFlow{
                     control->kind,
                     control->condition,
-                    HybridMeasurement{measurement->qubit_index, measurement->span},
+                    HybridMeasurement{measurement->qubit_index, measurement->result_name, measurement->span},
                     control->span,
                 });
                 continue;

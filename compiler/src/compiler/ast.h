@@ -139,6 +139,7 @@ public:
 class MeasurementNode : public ASTNode {
 public:
     std::size_t qubit_index = 0;
+    std::optional<std::string> result_name;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -147,10 +148,16 @@ public:
 
     MeasurementNode(std::size_t index, std::size_t line_number,
                     synq::compiler::SourceSpan source_span)
-        : qubit_index(index), line(line_number), span(source_span) {}
+        : MeasurementNode(index, line_number, source_span, std::nullopt) {}
+
+    MeasurementNode(std::size_t index, std::size_t line_number,
+                    synq::compiler::SourceSpan source_span,
+                    std::optional<std::string> declared_result)
+        : qubit_index(index), result_name(std::move(declared_result)), line(line_number), span(source_span) {}
 
     std::string toString() override {
-        return "measure q[" + std::to_string(qubit_index) + "]";
+        return "measure q[" + std::to_string(qubit_index) + "]" +
+               (result_name.has_value() ? " as " + *result_name : "");
     }
 };
 

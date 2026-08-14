@@ -185,6 +185,11 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
     for (const ASTNode* statement : program.statements) {
         const auto* measurement = dynamic_cast<const MeasurementNode*>(statement);
         if (measurement != nullptr) {
+            if (measurement->result_name.has_value()) {
+                add_diagnostic(result, measurement->line,
+                               "OpenQASM 3 export does not lower named SynQ measurement-result declarations");
+                continue;
+            }
             body << "c[" << measurement->qubit_index << "] = measure q[" << measurement->qubit_index << "];\n";
             qubit_count = std::max(qubit_count, measurement->qubit_index + 1);
             has_measurements = true;

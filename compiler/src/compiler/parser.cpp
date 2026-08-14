@@ -163,6 +163,23 @@ bool parse_qubit_index(const std::string& operand, std::size_t& index) {
     return true;
 }
 
+bool parse_measurement_arguments(const std::string& source,
+                                 std::size_t& qubit_index,
+                                 std::optional<std::string>& result_name) {
+    const std::string separator = " as ";
+    const std::size_t boundary = source.find(separator);
+    if (boundary == std::string::npos) {
+        result_name = std::nullopt;
+        return parse_qubit_index(source, qubit_index);
+    }
+    if (source.find(separator, boundary + separator.size()) != std::string::npos) return false;
+    const std::string operand = trim(source.substr(0, boundary));
+    const std::string name = trim(source.substr(boundary + separator.size()));
+    if (!parse_qubit_index(operand, qubit_index) || !is_identifier(name)) return false;
+    result_name = name;
+    return true;
+}
+
 bool parse_qubit_declaration(const std::string& source, std::string& name, std::size_t& qubit_count) {
     const std::size_t open = source.find('[');
     if (open == std::string::npos || source.empty() || source.back() != ']' ||
@@ -524,11 +541,22 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             root->statements.push_back(gate);
         } else if (operation == "measure") {
             std::size_t qubit_index = 0;
-            if (!parse_qubit_index(argument, qubit_index)) {
-                return fail_parse("SYNQ-P008", span, "measurement requires exactly one explicit qubit operand",
-                                  "use measure q[index], for example measure q[0]");
+            std::optional<std::string> result_name;
+            if (!parse_measurement_arguments(argument, qubit_index, result_name)) {
+                return fail_parse("SYNQ-P008", span,
+                                  "measurement requires one explicit qubit operand and an optional result identifier",
+                                  "use measure q[index] or measure q[index] as <identifier>, for example measure q[0] as observed");
             }
-            root->statements.push_back(new MeasurementNode(qubit_index, line_number, span));
+            if (result_name.has_value()) {
+                const auto inserted = declared_names.emplace(*result_name, span);
+                if (!inserted.second) {
+                    return fail_parse("SYNQ-S004", span,
+                                      "duplicate top-level declaration `" + *result_name +
+                                          "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                      "rename the measurement result or reuse the existing binding according to future language semantics");
+                }
+            }
+            root->statements.push_back(new MeasurementNode(qubit_index, line_number, span, std::move(result_name)));
         } else {
             root->statements.push_back(new InstructionNode(operation, {argument}, line_number, span));
         }

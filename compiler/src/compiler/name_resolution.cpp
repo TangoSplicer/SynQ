@@ -337,6 +337,9 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             }
         }
         resolved.nodes.emplace_back(measurement);
+        if (measurement.result_name.has_value()) {
+            bindings.emplace(*measurement.result_name, BindingInfo{node_index, ClassicalStaticType::Boolean});
+        }
     }
 
     NameResolutionResult result;
