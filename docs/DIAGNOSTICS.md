@@ -125,7 +125,8 @@ default-register reference-validation extension. They apply only when a typed
 `qubit q[n]` declaration exists anywhere in the Hybrid IR program; a program
 without such a declaration retains prior indexed-operand behavior. They are not
 parser diagnostics and are not propagated through the C ABI. Their focused smoke
-coverage is local **20/20** evidence pending publication and compiler-core CI.
+coverage passed locally and remotely with **20/20** CTest checks in [Compiler
+Core #36][8].
 
 ## Compatibility boundaries
 
@@ -174,3 +175,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [5]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"
 [6]: https://github.com/TangoSplicer/SynQ/actions/runs/31847601825 "SynQ Compiler Core #31"
 [7]: https://github.com/TangoSplicer/SynQ/actions/runs/31848161711 "SynQ Compiler Core #35"
+[8]: https://github.com/TangoSplicer/SynQ/actions/runs/31848568933 "SynQ Compiler Core #36"

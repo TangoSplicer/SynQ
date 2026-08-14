@@ -1,7 +1,7 @@
 # Bounded Default-Register Qubit Reference Validation
 
-**Status:** Locally validated extension; no remote validation claim is made in
-this record.
+**Status:** Remotely validated internal recovery-profile extension in
+[Compiler Core #36][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -36,3 +36,15 @@ This extension does not implement named-register operands, runtime allocation,
 qubit ownership, aliasing, liveness, deallocation, borrow checking, qubit
 mapping, multi-register range checks, execution, simulation, provider
 integration, hardware submission, or OpenQASM declaration lowering.
+
+## Focused validation
+
+The updated `synq_qubit_declaration_smoke` covers valid in-range default-register
+gate, measurement, and typed control-body operands; `SYNQ-Q001` forward-use
+rejection; `SYNQ-Q002` range rejection; and compatibility for legacy programs
+with no explicit default register. The local profile and [Compiler Core #36][1]
+both reported **20/20** CTest checks.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31848568933 "SynQ Compiler Core #36"
