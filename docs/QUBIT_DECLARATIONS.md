@@ -1,7 +1,7 @@
 # Bounded Qubit Declarations
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated Alpha-gated recovery-profile implementation in
+[Compiler Core #35][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -46,8 +46,8 @@ checking are a following increment.
 source-span and Hybrid IR provenance, resolver preservation, Alpha gating,
 positive-size/identifier rejection, shared top-level uniqueness, and the
 deliberate absence of gate or measurement operand-bound validation. The local
-recovery profile reported **20/20** CTest checks. This is local evidence pending
-publication and compiler-core CI.
+recovery profile and [Compiler Core #35][1] both reported **20/20** CTest
+checks.
 
 ## Explicit non-goals
 
@@ -55,3 +55,7 @@ This increment does not provide runtime allocation, qubit ownership, aliasing,
 liveness, deallocation, borrow checking, named register operands, gate or
 measurement bound checking, OpenQASM declaration lowering, simulation,
 provider integration, hardware submission, or execution semantics.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31848161711 "SynQ Compiler Core #35"

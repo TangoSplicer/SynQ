@@ -66,9 +66,9 @@ arithmetic-looking declaration text remains opaque source. Its focused smoke
 coverage passed remotely with **19/19** CTest checks in [Compiler Core #31][6].
 
 `SYNQ-P012` is restricted to source parsed after the `qubit-declarations` Alpha
-opt-in. It has local **20/20** focused smoke evidence pending publication and
-compiler-core CI. The code validates declaration shape only; it does not yet
-validate `quantum` or `measure` operand indices against declared register sizes.
+opt-in. It has local and remote **20/20** focused smoke evidence in [Compiler
+Core #35][7]. The code validates declaration shape only; it does not yet validate
+`quantum` or `measure` operand indices against declared register sizes.
 
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
@@ -164,3 +164,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [4]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
 [5]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"
 [6]: https://github.com/TangoSplicer/SynQ/actions/runs/31847601825 "SynQ Compiler Core #31"
+[7]: https://github.com/TangoSplicer/SynQ/actions/runs/31848161711 "SynQ Compiler Core #35"
