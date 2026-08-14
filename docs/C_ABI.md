@@ -4,7 +4,7 @@
 Common Lisp, test-only Clojure/JNA, and test-only Mercury C-backend consumption
 in [Compiler Core #22][14]. This is **not** a declaration of a frozen production
 ABI, a shared library distribution, or a language-specific SDK.
-**Last reviewed:** 13 August 2026
+**Last reviewed:** 14 August 2026
 
 ## Purpose and scope
 
@@ -70,7 +70,12 @@ successful parsing of a feature-gated parameterized circuit, OpenQASM output,
 resource release, a missing-file parse error, a malformed known-gate shape that
 propagates `SYNQ-S002`, a duplicate declaration that propagates `SYNQ-S004`,
 successful bounded measurement export, and a malformed measurement that
-propagates `SYNQ-P008`. It does not use C++ headers or internal types.
+propagates `SYNQ-P008`. The current local extension also parses an opaque
+in-memory fixture containing Alpha qubit declarations, named measurement-result
+metadata, bounded control, and declaration-only callables; it then verifies that
+the legacy export service returns `SYNQ_STATUS_EXPORT_ERROR` with an owned
+diagnostic instead of silently lowering unsupported constructs. It does not use
+C++ headers or internal types.
 
 ```bash
 cd /home/ubuntu/SynQ
@@ -79,9 +84,9 @@ cmake --build /tmp/synq-c-abi --parallel 2
 ctest --test-dir /tmp/synq-c-abi --output-on-failure
 ```
 
-At the latest local review, the expanded recovery profile reported **13/13
+At the latest local review, the expanded recovery profile reported **23/23
 passing** tests, including `synq_c_abi_smoke`, `synq_clojure_jna_abi_smoke`,
-`synq_mercury_abi_smoke`, the gate-validation and feature-gate smoke tests, the
+`synq_mercury_abi_smoke`, the typed language-core smoke tests, the
 parser/exporter tests, and the two independent OpenQASM downstream validations.
 The earlier C/Rust in-memory profile passed remotely in [Compiler Core #17][11]
 for commit `65906d0`, the later Common Lisp profile passed remotely in [Compiler
@@ -89,6 +94,11 @@ Core #18][12], and the Clojure/JNA consumer passed remotely in [Compiler Core
 #19][13] for commit `cccf61b`; the Mercury C-backend consumer passed remotely in
 [Compiler Core #22][14] for commit `ef0505f`. None of these results freeze the
 ABI or test a distributed shared library.
+
+The expanded C-consumer typed-construct parser/error-path check is local evidence
+pending publication and compiler-core CI. It does not change `SYNQ_ABI_VERSION`,
+expand the public functions, or establish that every typed construct can be
+exported through `synq_export_openqasm3`.
 
 ## What this enables next—and what it does not
 

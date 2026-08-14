@@ -18,6 +18,15 @@ int main(void) {
     const char* duplicate_path = "/tmp/synq_c_abi_duplicate_smoke.synq";
     const char* measurement_path = "/tmp/synq_c_abi_measurement_smoke.synq";
     const char* in_memory_source = "quantum h q[0]\nmeasure q[0]\n";
+    const char* typed_in_memory_source =
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "#[experimental(feature = \"callable-declarations\")]\n"
+        "qubit q[1]\n"
+        "measure q[0] as observed\n"
+        "if observed then quantum h q[0]\n"
+        "fn prepare()\n"
+        "kernel ansatz()\n";
     FILE* source = fopen(path, "w");
     synq_program* program = NULL;
     char* diagnostic = NULL;
@@ -108,6 +117,30 @@ int main(void) {
         return 1;
     }
     synq_string_free(openqasm);
+    synq_program_free(program);
+
+    program = NULL;
+    diagnostic = NULL;
+    status = synq_parse_source(typed_in_memory_source, &program, &diagnostic);
+    if (!require(status == SYNQ_STATUS_OK && program != NULL && diagnostic == NULL,
+                 "C consumer parses typed Alpha declarations through the opaque ABI")) {
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    openqasm = NULL;
+    diagnostic = NULL;
+    status = synq_export_openqasm3(program, &openqasm, &diagnostic);
+    if (!require(status == SYNQ_STATUS_EXPORT_ERROR && openqasm == NULL && diagnostic != NULL,
+                 "C consumer receives an explicit export error for unsupported typed constructs")) {
+        synq_string_free(openqasm);
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    synq_string_free(diagnostic);
     synq_program_free(program);
 
     program = NULL;

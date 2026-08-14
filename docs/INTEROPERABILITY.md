@@ -1,6 +1,6 @@
 # SynQ Interoperability Boundary
 
-**Status:** The bounded OpenQASM adapter remains the verified source-export boundary. The C ABI foundation and typed measurement export both have remote compiler-core evidence. See [C ABI Foundation](./C_ABI.md).
+**Status:** The bounded OpenQASM adapter remains the verified source-export boundary. The C ABI foundation and typed measurement export both have remote compiler-core evidence. The expanded opaque C consumer proof for newly typed Alpha constructs has local evidence pending publication and compiler-core CI. See [C ABI Foundation](./C_ABI.md).
 
 > SynQ does not currently provide general-purpose source compatibility, bidirectional translation, package interoperability, or hardware-provider execution. This document defines the first deliberately narrow compatibility boundary that can be tested within the compiler recovery profile.
 
@@ -44,6 +44,16 @@ the Rust proof and non-goals are documented in [Rust C-ABI Consumer Proof](./RUS
 the Lisp proof is documented in [Common Lisp CFFI Consumer Proof](./COMMON_LISP_CFFI.md),
 and the Clojure proof boundary is documented in [Clojure JNA Consumer Proof](./CLOJURE_JNA.md).
 The Mercury proof boundary is documented in [Mercury C-Backend Consumer Proof](./MERCURY_C_ABI.md).
+
+The expanded C consumer additionally parses one opaque in-memory program using
+the typed `qubit q[n]`, named measurement-result, bounded control, and
+declaration-only callable constructs. It then confirms that the legacy C ABI
+export service returns `SYNQ_STATUS_EXPORT_ERROR` and a library-owned diagnostic
+instead of silently dropping unsupported typed constructs. This is local
+**23/23** evidence pending publication and compiler-core CI. It proves only that
+the opaque parser and explicit failure ownership path remain compatible; it does
+not make those constructs C-callable, exportable through the legacy C API, or
+executable from C.
 
 ## Promotion Rule
 
