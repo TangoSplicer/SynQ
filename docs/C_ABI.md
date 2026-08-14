@@ -2,7 +2,8 @@
 
 **Status:** Remotely validated experimental foundation for C, Rust, test-only
 Common Lisp, test-only Clojure/JNA, and test-only Mercury C-backend consumption
-in [Compiler Core #22][14]. This is **not** a declaration of a frozen production
+in [Compiler Core #22][14], with expanded typed-construct C consumer coverage in
+[Compiler Core #40][15]. This is **not** a declaration of a frozen production
 ABI, a shared library distribution, or a language-specific SDK.
 **Last reviewed:** 14 August 2026
 
@@ -95,10 +96,10 @@ Core #18][12], and the Clojure/JNA consumer passed remotely in [Compiler Core
 [Compiler Core #22][14] for commit `ef0505f`. None of these results freeze the
 ABI or test a distributed shared library.
 
-The expanded C-consumer typed-construct parser/error-path check is local evidence
-pending publication and compiler-core CI. It does not change `SYNQ_ABI_VERSION`,
-expand the public functions, or establish that every typed construct can be
-exported through `synq_export_openqasm3`.
+The expanded C-consumer typed-construct parser/error-path check passed remotely
+in [Compiler Core #40][15] with the complete **23/23** profile. It does not
+change `SYNQ_ABI_VERSION`, expand the public functions, or establish that every
+typed construct can be exported through `synq_export_openqasm3`.
 
 ## What this enables next—and what it does not
 
@@ -141,3 +142,4 @@ tests.
 [12]: https://github.com/TangoSplicer/SynQ/actions/runs/31725431911 "SynQ Compiler Core #18"
 [13]: https://github.com/TangoSplicer/SynQ/actions/runs/31726350746 "SynQ Compiler Core #19"
 [14]: https://github.com/TangoSplicer/SynQ/actions/runs/31729572407 "SynQ Compiler Core #22"
+[15]: https://github.com/TangoSplicer/SynQ/actions/runs/31849787206 "SynQ Compiler Core #40"
