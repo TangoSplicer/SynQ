@@ -76,7 +76,8 @@ Hybrid IR smoke coverage passed remotely in [Compiler Core #23][2].
 `SYNQ-R001` is not emitted by the parser and is not propagated through the C
 ABI. It identifies only the first sequential top-level name-resolution boundary;
 it does not define lexical scopes, imports, expression resolution, or a general
-symbol-table protocol.
+symbol-table protocol. Its focused smoke coverage passed remotely in [Compiler
+Core #26][3].
 
 ## Compatibility boundaries
 
@@ -120,3 +121,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31719597241 "SynQ Compiler Core #9"
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31803349469 "SynQ Compiler Core #23"
+[3]: https://github.com/TangoSplicer/SynQ/actions/runs/31803737501 "SynQ Compiler Core #26"

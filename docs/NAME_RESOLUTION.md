@@ -1,7 +1,7 @@
 # Bounded Scoped Name Resolution
 
-**Status:** Locally validated internal recovery-profile implementation; remote
-compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated internal recovery-profile implementation in
+[Compiler Core #26][1].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -43,7 +43,8 @@ its input invariant. It does not introduce a second duplicate-binding policy.
 literal with no invented binding edge, opaque expression-like `SourceText`, an
 unknown reference, a forward reference, source-order preservation, and source
 span preservation. The clean local recovery profile reported **15/15** CTest
-checks passing, including the new smoke test.
+checks passing, including the new smoke test. Compiler Core #26 then reported
+the same **15/15** CTest pass for commit `34bd685`.[1]
 
 ## Explicit non-goals
 
@@ -52,3 +53,7 @@ imports, qualified names, shadowing, assignment, mutability, expression parsing,
 type checking, generics, closures, qubit declarations or liveness, measurement
 results, `if`, `while`, runtime execution, OpenQASM lowering, a public API, or a
 stable resolved-IR serialization format.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31803737501 "SynQ Compiler Core #26"
