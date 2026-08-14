@@ -69,6 +69,15 @@ ABI. It preserves source provenance for an internal post-parse conversion
 boundary; it does not define a general HIR diagnostics protocol. Its focused
 Hybrid IR smoke coverage passed remotely in [Compiler Core #23][2].
 
+| Code | Layer | Failure condition | Default remediation |
+| --- | --- | --- |
+| `SYNQ-R001` | Internal name resolution | A declaration initializer is a whole identifier but has no earlier top-level declaration in the same Hybrid IR program. | Declare the name on an earlier top-level line or use a supported literal. |
+
+`SYNQ-R001` is not emitted by the parser and is not propagated through the C
+ABI. It identifies only the first sequential top-level name-resolution boundary;
+it does not define lexical scopes, imports, expression resolution, or a general
+symbol-table protocol.
+
 ## Compatibility boundaries
 
 | Existing caller | Increment behavior | What is deliberately unchanged |
