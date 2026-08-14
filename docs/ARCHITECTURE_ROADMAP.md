@@ -117,7 +117,7 @@ layout.
 | Classical values | SSA-like values or a clearly scoped equivalent, depending on implementation complexity. | Values carry a type; mutable effects are represented explicitly. |
 | Qubit resources | Dedicated quantum handle/type rather than an integer convention. | A quantum operation accepts only allocated/live qubits; measurement produces an explicit classical result boundary. |
 | Quantum operations | A small instruction family with gate identifier, typed parameters, ordered operands, and source span. | Backend lowering rejects unsupported gates or parameter domains; it never guesses a replacement. |
-| Control and regions | Structured blocks for branches, loops, functions, and future kernel regions. | Classical control around quantum kernels is visible before target lowering. |
+| Control and regions | Current: Alpha-gated literal-boolean `if`/`while` with one typed quantum-or-measurement body. Future: structured blocks for branches, loops, functions, and kernel regions. | The current representation makes bounded classical control visible before target lowering without defining its execution; broader regions remain planned. |
 | Provenance | Source span, feature gate, transformation name, and optional AI-suggestion identifier. | A developer can discover whether an operation came from source, a compiler rewrite, or an accepted assistant proposal. |
 
 The implementation will start with the exact constructs that have fixtures.

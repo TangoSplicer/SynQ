@@ -1,7 +1,7 @@
 # Bounded Typed Classical Control Flow
 
-**Status:** Locally validated Alpha-gated recovery-profile implementation;
-remote compiler-core evidence is pending publication of this increment.
+**Status:** Remotely validated Alpha-gated recovery-profile implementation in
+[Compiler Core #27][1], with a successful manual repeat in [#28][2].
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -52,7 +52,9 @@ forms.
 quantum/measurement body preservation, Hybrid IR lowering, name-resolution
 preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The clean local
 recovery profile reported **16/16** CTest checks passing, including this smoke
-test.
+test. Compiler Core #27 then reported the same **16/16** CTest pass for commit
+`2121c2f`; Compiler Core #28 repeated that result through the manual workflow
+entry point.[1] [2]
 
 ## Explicit non-goals
 
@@ -62,3 +64,8 @@ scope, loop execution, branch execution, termination checks, runtime values,
 measurement-result values, resource liveness, control-flow graph construction,
 optimization, OpenQASM lowering, simulation, provider submission, or hardware
 execution.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31804191932 "SynQ Compiler Core #28"

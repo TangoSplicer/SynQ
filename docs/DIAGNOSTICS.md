@@ -54,6 +54,10 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P009` | Alpha-gated classical control flow does not use its exact literal-boolean `if ... then ...` or `while ... do ...` form. | Use `if true then quantum h q[0]` or `while false do measure q[0]` after enabling the feature. |
 | `SYNQ-P010` | An Alpha-gated classical-control-flow body is not exactly one bounded quantum gate or measurement. | Use one `quantum` gate statement or one `measure q[index]` body. |
 
+`SYNQ-P009` and `SYNQ-P010` are parser diagnostics for the Alpha
+classical-control-flow profile. Their focused smoke coverage passed remotely in
+[Compiler Core #27][4].
+
 Code values are specific to parser failures. The recovery profile also has a
 small `SYNQ-S001`–`SYNQ-S004` namespace for typed known-gate shape validation
 and bounded duplicate-declaration validation; those semantic errors use the
@@ -124,3 +128,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31719597241 "SynQ Compiler Core #9"
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31803349469 "SynQ Compiler Core #23"
 [3]: https://github.com/TangoSplicer/SynQ/actions/runs/31803737501 "SynQ Compiler Core #26"
+[4]: https://github.com/TangoSplicer/SynQ/actions/runs/31804184422 "SynQ Compiler Core #27"
