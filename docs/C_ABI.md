@@ -2,7 +2,9 @@
 
 **Status:** Remotely validated experimental foundation for C, Rust, test-only
 Common Lisp, test-only Clojure/JNA, and test-only Mercury C-backend consumption,
-including the 26-check recovery profile in [Compiler Core #45][16]. The active
+including the 26-check recovery profile in [Compiler Core #45][16]. An
+experimental static native SDK path has additionally passed **27/27** checks
+locally; remote CI evidence for that increment is pending. The active
 [`Experimental ABI and Distribution Policy`](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md)
 defines the current v1 change and delivery boundaries. This is **not** a
 declaration of a frozen production ABI, a shared library distribution, or a
@@ -87,7 +89,7 @@ cmake --build /tmp/synq-c-abi --parallel 2
 ctest --test-dir /tmp/synq-c-abi --output-on-failure
 ```
 
-The current delivery-baseline recovery profile reports **26/26 passing** tests,
+The preceding delivery-baseline recovery profile reports **26/26 passing** tests,
 including `synq_c_abi_smoke`, `synq_clojure_jna_abi_smoke`,
 `synq_mercury_abi_smoke`, `synq_rust_abi_smoke`, the typed language-core and
 CLI smoke tests, parser/exporter tests, bounded evaluation/simulation checks,
@@ -118,6 +120,9 @@ interoperability**. Each later binding must be independently built and tested,
 and it may expose a smaller, safer surface than the raw C header. The policy
 requires a new ABI major and updated consumer fixtures for a public-header or
 ownership-breaking change; it does not promise ABI v1 stability across commits.
+The separately documented experimental native SDK path installs only the static
+library, header, and CMake package and has local clean-prefix evidence; it does
+not convert `synq_ffi_shared` into an installed shared library.[17]
 
 ## Deliberate non-goals
 
@@ -150,3 +155,5 @@ tests.
 [15]: https://github.com/TangoSplicer/SynQ/actions/runs/31849787206 "SynQ Compiler Core #40"
 
 [16]: https://github.com/TangoSplicer/SynQ/actions/runs/31887461976 "SynQ Compiler Core #45"
+
+[17]: ./EXPERIMENTAL_NATIVE_SDK.md "Experimental Native SDK design and local evidence"

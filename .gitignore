@@ -15,6 +15,7 @@ CMakeFiles/
 cmake_install.cmake
 Makefile
 *.cmake
+!compiler/tests/cmake/installed_sdk_conformance.cmake
 
 # Python
 __pycache__/

@@ -8,10 +8,11 @@ locally validated operations.
 ## Supported artifact
 
 The CMake recovery profile builds the versioned experimental executable
-`synqc 0.1.0-experimental`. It is the only installed program surface introduced
-by this packaging path. The package includes the CLI and its bounded-evaluation/
-simulation documentation; it does not install, freeze, or distribute a C ABI
-SDK, language-specific wrapper, quantum provider connector, or full SynQ runtime.
+`synqc 0.1.0-experimental`. Its locally validated archive also includes the
+experimental static C ABI SDK surface: `libsynq_lib.a`,
+`include/synq/synq_ffi.h`, and a `SynQ::synq_lib` CMake package. This does not
+freeze the ABI or distribute a language-specific wrapper, quantum provider
+connector, full SynQ runtime, dynamic library, signed artifact, or stable SDK.
 
 ## Build, test, install, and archive
 
@@ -45,12 +46,14 @@ implemented.
 
 ## Local delivery evidence
 
-The documented Release-profile path built the hardened compiler profile, passed
-the full local **26/26** CTest suite, installed `bin/synqc` plus the three
-recovery-profile documents into an isolated staging prefix, and generated
-`synq-recovery-cli-0.1.0-experimental-Linux.zip` through CPack. The same
-recovery compiler profile passed **26/26** checks in [Compiler Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976) for revision
-`202ebaf`; this remotely confirms the compiled CLI/test baseline, not the
-locally executed installation or CPack commands. The evidence does not
-demonstrate cross-platform archives, signing, reproducible builds, provenance
-attestation, or stable binary compatibility.
+The documented Release-profile path now passes the full local **27/27** CTest
+suite, including clean-prefix `SynQ::synq_lib` consumer conformance. It installs
+`bin/synqc`, the static library, public C header, CMake package metadata, and
+the bounded-workflow/SDK documents into an isolated staging prefix. CPack
+generates `synq-recovery-cli-0.1.0-experimental-Linux.zip` containing those
+configured artifacts while excluding the test-only shared ABI library. [Compiler
+Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976) remains
+remote evidence for the preceding 26-check compiler baseline at revision
+`202ebaf`; remote validation of the 27-check SDK increment is pending. The
+evidence does not demonstrate cross-platform archives, signing, reproducible
+builds, provenance attestation, or stable binary compatibility.

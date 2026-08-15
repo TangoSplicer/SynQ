@@ -5,6 +5,8 @@
 cmake_minimum_required(VERSION 3.18)
 project(SynQ LANGUAGES C CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -21,6 +23,7 @@ option(BUILD_EXPERIMENTAL_COMPONENTS "Build experimental debugger, network, opti
 option(BUILD_REPL "Build experimental REPL command sources" OFF)
 option(BUILD_CORE_SMOKE_TESTS "Build focused smoke tests for the compiler core profile" ON)
 option(BUILD_RECOVERY_CLI "Build the supported recovery-profile synqc executable" ON)
+option(BUILD_RECOVERY_NATIVE_SDK "Install and test the experimental static C ABI SDK path" ON)
 option(SYNQ_ENABLE_BUILD_HARDENING "Enable supported compiler warnings and ELF linker hardening for recovery targets" ON)
 option(BUILD_RECOVERY_BENCHMARKS "Build deterministic local recovery-profile benchmark utilities" OFF)
 
@@ -174,6 +177,16 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_c_abi_smoke PRIVATE synq_lib)
     set_target_properties(synq_c_abi_smoke PROPERTIES LINKER_LANGUAGE CXX)
     add_test(NAME synq_c_abi_smoke COMMAND synq_c_abi_smoke)
+
+    if(BUILD_RECOVERY_NATIVE_SDK)
+        add_test(
+            NAME synq_installed_sdk_conformance
+            COMMAND ${CMAKE_COMMAND}
+                    -DSYNQ_BUILD_DIR=${CMAKE_BINARY_DIR}
+                    -DSYNQ_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+                    -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/cmake/installed_sdk_conformance.cmake
+        )
+    endif()
 
     add_library(synq_ffi_shared SHARED tests/interop/synq_ffi_shared_anchor.cpp)
     target_include_directories(synq_ffi_shared PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
