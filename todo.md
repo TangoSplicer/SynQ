@@ -108,3 +108,9 @@
 - [x] Add Alpha-gated typed non-executing function and kernel declarations with safe parser, IR, diagnostics, and smoke-test boundaries.
 - [x] Reassess and document native/JVM interoperability contracts after the typed language-core foundations are complete.
 - [x] Perform a final roadmap validation, capability-boundary review, and factual publication record before discussing research-stage work.
+- [x] Define operational readiness criteria, measurable release gates, and a factual baseline audit for a usable SynQ language project.
+- [ ] Design and implement one coherent executable language-core slice with explicit semantic, safety, and test boundaries.
+- [ ] Restore a supported compiler CLI workflow and validate a documented end-to-end developer journey.
+- [ ] Add bounded local execution or simulation semantics only after defining resource and failure limits.
+- [ ] Strengthen interoperability, developer tooling, documentation, packaging, performance, reliability, and security evidence.
+- [ ] Publish an evidence-based operational-readiness assessment and prioritize the remaining research-stage gaps.
