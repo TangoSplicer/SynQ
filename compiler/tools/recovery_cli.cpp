@@ -17,6 +17,7 @@ namespace {
 enum class Mode {
     Validate,
     EmitOpenQasm,
+    EmitHybridOpenQasm,
     EvaluateConstants,
     Simulate,
 };
@@ -35,11 +36,13 @@ void print_help(std::ostream& output) {
            << "Usage:\n"
            << "  synqc <source.synq> --validate\n"
            << "  synqc <source.synq> --emit-openqasm [--out <file.qasm>]\n"
+           << "  synqc <source.synq> --emit-openqasm-hybrid [--out <file.qasm>]\n"
            << "  synqc <source.synq> --eval-constants [--max-declarations <n>]\n"
            << "  synqc <source.synq> --simulate [--max-qubits <n>] [--max-operations <n>]\n\n"
            << "Modes:\n"
            << "  --validate        Parse, lower, and resolve the documented bounded profile.\n"
            << "  --emit-openqasm   Emit the supported AST OpenQASM 3 source subset.\n"
+           << "  --emit-openqasm-hybrid  Emit strict Hybrid IR OpenQASM with explicit q[n].\n"
            << "  --eval-constants  Explicitly run bounded declaration-only constant evaluation.\n"
            << "  --simulate        Explicitly calculate deterministic bounded local probabilities.\n\n"
            << "This command does not submit jobs,\n"
@@ -75,6 +78,10 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EmitOpenQasm;
             selected_mode = true;
+        } else if (argument == "--emit-openqasm-hybrid") {
+            if (selected_mode) { error = "select exactly one mode"; return false; }
+            command.mode = Mode::EmitHybridOpenQasm;
+            selected_mode = true;
         } else if (argument == "--eval-constants") {
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EvaluateConstants;
@@ -107,11 +114,12 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
         }
     }
     if (!selected_mode) {
-        error = "select one of --validate, --emit-openqasm, --eval-constants, or --simulate";
+        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --eval-constants, or --simulate";
         return false;
     }
-    if (command.output_path.has_value() && command.mode != Mode::EmitOpenQasm) {
-        error = "--out is supported only with --emit-openqasm";
+    if (command.output_path.has_value() && command.mode != Mode::EmitOpenQasm &&
+        command.mode != Mode::EmitHybridOpenQasm) {
+        error = "--out is supported only with an OpenQASM export mode";
         return false;
     }
     if (command.max_declarations != 64 && command.mode != Mode::EvaluateConstants) {
@@ -207,6 +215,31 @@ int main(int argc, char** argv) {
     if (!lowered.ok()) return render_diagnostics(command.source_path, lowered.diagnostics, 4);
     const auto resolved = synq::compiler::resolve_hybrid_names(*lowered.program);
     if (!resolved.ok()) return render_diagnostics(command.source_path, resolved.diagnostics, 4);
+
+    if (command.mode == Mode::EmitHybridOpenQasm) {
+        const auto exported = synq::compiler::export_hybrid_openqasm3(*lowered.program);
+        if (!exported.ok()) {
+            for (const auto& diagnostic : exported.diagnostics) {
+                std::cerr << command.source_path << ": error[hybrid-openqasm-export]: " << diagnostic << "\n";
+            }
+            return 5;
+        }
+        if (command.output_path.has_value()) {
+            std::ofstream output(*command.output_path, std::ios::binary);
+            if (!output) {
+                std::cerr << "synqc: error: cannot write " << *command.output_path << "\n";
+                return 6;
+            }
+            output << exported.program;
+            if (!output) {
+                std::cerr << "synqc: error: failed while writing " << *command.output_path << "\n";
+                return 6;
+            }
+        } else {
+            std::cout << exported.program;
+        }
+        return 0;
+    }
 
     if (command.mode == Mode::Validate) {
         std::cout << "synqc: valid bounded recovery-profile program: " << command.source_path << "\n";

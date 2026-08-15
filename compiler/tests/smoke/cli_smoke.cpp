@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
     const auto simulation = base.string() + "_simulation.synq";
     const auto invalid = base.string() + "_invalid.synq";
     const auto qasm = base.string() + "_output.qasm";
+    const auto hybrid_qasm = base.string() + "_hybrid_output.qasm";
     const auto stdout_path = base.string() + "_stdout.txt";
     const auto stderr_path = base.string() + "_stderr.txt";
 
@@ -66,6 +67,13 @@ int main(int argc, char** argv) {
                      read_file(qasm).find("c[0] = measure q[0];") != std::string::npos,
                  "OpenQASM mode writes the supported bounded source output")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(simulation) + " --emit-openqasm-hybrid --out " + quote(hybrid_qasm) +
+                              " > " + quote(stdout_path) + " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(hybrid_qasm).find("qubit[2] q;") != std::string::npos &&
+                     read_file(hybrid_qasm).find("h q[0];") != std::string::npos &&
+                     read_file(hybrid_qasm).find("cx q[0], q[1];") != std::string::npos,
+                 "strict Hybrid OpenQASM mode preserves the explicit declaration and typed Bell lowering")) return 1;
+
     if (!require(std::system((invoke + " " + quote(constants) + " --eval-constants > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("total = Integer:9") != std::string::npos &&
@@ -89,6 +97,7 @@ int main(int argc, char** argv) {
     std::filesystem::remove(simulation);
     std::filesystem::remove(invalid);
     std::filesystem::remove(qasm);
+    std::filesystem::remove(hybrid_qasm);
     std::filesystem::remove(stdout_path);
     std::filesystem::remove(stderr_path);
     std::cout << "SynQ CLI smoke test passed\n";
