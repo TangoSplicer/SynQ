@@ -125,6 +125,12 @@ Core #26][3].
 | `SYNQ-E003` | Internal bounded evaluation | An alias or arithmetic reference has no prior evaluated binding of the required kind. | Use an earlier supported declaration. |
 | `SYNQ-E004` | Internal bounded evaluation | A manually constructed internal classification or arithmetic tree is invalid. | Use parser-produced bounded declarations and expression trees. |
 | `SYNQ-E005` | Internal bounded evaluation | Checked `int64` arithmetic overflows or has an unsupported operator. | Use an in-range one-operator Integer expression. |
+| `SYNQ-SIM000` | Internal bounded simulation | Local simulation was requested without explicit API opt-in. | Enable the documented simulation option only after reviewing its limits. |
+| `SYNQ-SIM001` | Internal bounded simulation | The program does not have one in-limit `qubit q[n]` declaration. | Use one default register inside the configured qubit limit. |
+| `SYNQ-SIM002` | Internal bounded simulation | The typed program contains a construct or measurement ordering/result form the simulator does not model. | Use only the documented register, supported gates, then unnamed trailing measurements. |
+| `SYNQ-SIM003` | Internal bounded simulation | A gate kind, shape, operand, or literal angle is unsupported by the local simulator. | Use a parser-produced supported gate with documented operands and literal angle. |
+| `SYNQ-SIM004` | Internal bounded simulation | The circuit exceeds the configured gate-operation limit. | Reduce the circuit or explicitly select a documented operation limit. |
+| `SYNQ-SIM005` | Internal bounded simulation | The final numerical state fails the normalization check. | Reduce the circuit and report the reproducible source; no result was produced. |
 
 `SYNQ-R002`, `SYNQ-T001`, and `SYNQ-T002` are internal resolver/type diagnostics.
 They are not parser diagnostics and are not propagated through the C ABI. They
@@ -152,6 +158,12 @@ are not propagated through the C ABI. Their focused smoke coverage passed
 locally and remotely with **24/24** CTest checks in [Compiler Core #41][11].
 They do not establish a general runtime, simulation, quantum execution, or
 hardware path.
+
+`SYNQ-SIM000` through `SYNQ-SIM005` are internal diagnostics for the explicit
+bounded local simulator. They are not parser diagnostics and are not propagated
+through the C ABI. Their focused smoke coverage is local **26/26** evidence
+pending publication and compiler-core CI. They do not establish device behavior,
+noise modeling, sampled measurement results, provider access, or hardware use.
 
 ## Compatibility boundaries
 

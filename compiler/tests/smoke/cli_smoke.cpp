@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
     const auto base = std::filesystem::temp_directory_path() / "synq_cli_smoke";
     const auto quantum = base.string() + "_quantum.synq";
     const auto constants = base.string() + "_constants.synq";
+    const auto simulation = base.string() + "_simulation.synq";
     const auto invalid = base.string() + "_invalid.synq";
     const auto qasm = base.string() + "_output.qasm";
     const auto stdout_path = base.string() + "_stdout.txt";
@@ -47,6 +48,10 @@ int main(int argc, char** argv) {
                             "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
                             "let seed = 5\nlet total = seed + 4\nlet ready = true\n"),
                  "writes constant-evaluation CLI fixture") ||
+        !require(write_file(simulation,
+                            "#[experimental(feature = \"qubit-declarations\")]\n"
+                            "qubit q[2]\nquantum bell_pair q[0], q[1]\nmeasure q[0]\nmeasure q[1]\n"),
+                 "writes bounded-simulation CLI fixture") ||
         !require(write_file(invalid, "quantum cx q[0]\n"), "writes invalid CLI fixture")) return 1;
 
     const std::string invoke = quote(executable);
@@ -67,6 +72,13 @@ int main(int argc, char** argv) {
                      read_file(stdout_path).find("ready = Boolean:true") != std::string::npos,
                  "experimental constant-evaluation mode prints deterministic evaluated bindings")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(simulation) + " --simulate > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("basis |00> probability = 0.5") != std::string::npos &&
+                     read_file(stdout_path).find("basis |11> probability = 0.5") != std::string::npos &&
+                     read_file(stdout_path).find("measurement q[0] probability_one = 0.5") != std::string::npos,
+                 "simulation mode prints deterministic bounded probabilities")) return 1;
+
     const int invalid_status = std::system((invoke + " " + quote(invalid) + " --validate > " + quote(stdout_path) +
                                             " 2> " + quote(stderr_path)).c_str());
     if (!require(invalid_status != 0 && read_file(stderr_path).find("SYNQ-S002") != std::string::npos,
@@ -74,6 +86,7 @@ int main(int argc, char** argv) {
 
     std::filesystem::remove(quantum);
     std::filesystem::remove(constants);
+    std::filesystem::remove(simulation);
     std::filesystem::remove(invalid);
     std::filesystem::remove(qasm);
     std::filesystem::remove(stdout_path);

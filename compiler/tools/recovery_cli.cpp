@@ -2,8 +2,10 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "compiler/bounded_evaluator.h"
+#include "compiler/bounded_simulator.h"
 #include "compiler/diagnostic.h"
 #include "compiler/hybrid_ir.h"
 #include "compiler/name_resolution.h"
@@ -16,6 +18,7 @@ enum class Mode {
     Validate,
     EmitOpenQasm,
     EvaluateConstants,
+    Simulate,
 };
 
 struct Command {
@@ -23,6 +26,8 @@ struct Command {
     std::string source_path;
     std::optional<std::string> output_path;
     std::size_t max_declarations = 64;
+    std::size_t max_qubits = 10;
+    std::size_t max_operations = 1024;
 };
 
 void print_help(std::ostream& output) {
@@ -30,12 +35,14 @@ void print_help(std::ostream& output) {
            << "Usage:\n"
            << "  synqc <source.synq> --validate\n"
            << "  synqc <source.synq> --emit-openqasm [--out <file.qasm>]\n"
-           << "  synqc <source.synq> --eval-constants [--max-declarations <n>]\n\n"
+           << "  synqc <source.synq> --eval-constants [--max-declarations <n>]\n"
+           << "  synqc <source.synq> --simulate [--max-qubits <n>] [--max-operations <n>]\n\n"
            << "Modes:\n"
            << "  --validate        Parse, lower, and resolve the documented bounded profile.\n"
            << "  --emit-openqasm   Emit the supported AST OpenQASM 3 source subset.\n"
-           << "  --eval-constants  Explicitly run bounded declaration-only constant evaluation.\n\n"
-           << "This command does not execute quantum programs, simulate circuits, submit jobs,\n"
+           << "  --eval-constants  Explicitly run bounded declaration-only constant evaluation.\n"
+           << "  --simulate        Explicitly calculate deterministic bounded local probabilities.\n\n"
+           << "This command does not submit jobs,\n"
            << "run legacy runtime components, or evaluate general SynQ source.\n";
 }
 
@@ -72,6 +79,10 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EvaluateConstants;
             selected_mode = true;
+        } else if (argument == "--simulate") {
+            if (selected_mode) { error = "select exactly one mode"; return false; }
+            command.mode = Mode::Simulate;
+            selected_mode = true;
         } else if (argument == "--out") {
             if (++index >= argc || command.output_path.has_value()) { error = "--out requires one output path"; return false; }
             command.output_path = argv[index];
@@ -80,13 +91,23 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
                 error = "--max-declarations requires a positive whole number";
                 return false;
             }
+        } else if (argument == "--max-qubits") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_qubits)) {
+                error = "--max-qubits requires a positive whole number";
+                return false;
+            }
+        } else if (argument == "--max-operations") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_operations)) {
+                error = "--max-operations requires a positive whole number";
+                return false;
+            }
         } else {
             error = "unknown argument: " + argument;
             return false;
         }
     }
     if (!selected_mode) {
-        error = "select one of --validate, --emit-openqasm, or --eval-constants";
+        error = "select one of --validate, --emit-openqasm, --eval-constants, or --simulate";
         return false;
     }
     if (command.output_path.has_value() && command.mode != Mode::EmitOpenQasm) {
@@ -95,6 +116,10 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
     }
     if (command.max_declarations != 64 && command.mode != Mode::EvaluateConstants) {
         error = "--max-declarations is supported only with --eval-constants";
+        return false;
+    }
+    if ((command.max_qubits != 10 || command.max_operations != 1024) && command.mode != Mode::Simulate) {
+        error = "--max-qubits and --max-operations are supported only with --simulate";
         return false;
     }
     return true;
@@ -122,6 +147,15 @@ void print_value(const synq::compiler::EvaluatedBinding& binding) {
             break;
     }
     std::cout << "\n";
+}
+
+std::string basis_label(std::size_t basis, std::size_t qubits) {
+    std::string label;
+    label.reserve(qubits);
+    for (std::size_t index = qubits; index > 0; --index) {
+        label.push_back((basis & (std::size_t{1} << (index - 1))) == 0 ? '0' : '1');
+    }
+    return label;
 }
 
 }  // namespace
@@ -176,6 +210,25 @@ int main(int argc, char** argv) {
 
     if (command.mode == Mode::Validate) {
         std::cout << "synqc: valid bounded recovery-profile program: " << command.source_path << "\n";
+        return 0;
+    }
+
+    if (command.mode == Mode::Simulate) {
+        synq::compiler::BoundedSimulationOptions options;
+        options.allow_experimental_local_simulation = true;
+        options.max_qubits = command.max_qubits;
+        options.max_operations = command.max_operations;
+        const auto simulation = synq::compiler::simulate_bounded_quantum(*resolved.program, options);
+        if (!simulation.ok()) return render_diagnostics(command.source_path, simulation.diagnostics, 5);
+        std::cout << "qubits = " << simulation.simulation->qubit_count << "\n";
+        for (const auto& basis : simulation.simulation->basis_probabilities) {
+            std::cout << "basis |" << basis_label(basis.basis_index, simulation.simulation->qubit_count)
+                      << "> probability = " << basis.probability << "\n";
+        }
+        for (const auto& measurement : simulation.simulation->measurements) {
+            std::cout << "measurement q[" << measurement.qubit_index << "] probability_one = "
+                      << measurement.probability_one << "\n";
+        }
         return 0;
     }
 

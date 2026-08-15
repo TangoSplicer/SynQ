@@ -22,6 +22,7 @@ historical runtime-dependent command-line source.
 | `synqc file.synq --validate` | Parses, lowers to Hybrid IR, and performs bounded name/static validation. | `0` success; `3` parse error; `4` lowering/resolution error. |
 | `synqc file.synq --emit-openqasm [--out output.qasm]` | Emits only the documented AST OpenQASM 3 source subset. | `0` success; `3` parse error; `5` unsupported export; `6` output-write failure. |
 | `synqc file.synq --eval-constants [--max-declarations n]` | Explicitly opts into declaration-only bounded constant evaluation. | `0` success; `3` parse error; `4` lowering/resolution error; `5` evaluation failure. |
+| `synqc file.synq --simulate [--max-qubits n] [--max-operations n]` | Explicitly computes bounded local basis/marginal probabilities. | `0` success; `3` parse error; `4` lowering/resolution error; `5` simulation failure. |
 | `synqc --help` | Prints usage and documented safety boundary. | `0`. |
 
 Malformed command lines return `2`. The command prints structured parser,
@@ -47,20 +48,20 @@ let ready = true
 
 ## Explicit non-goals
 
-`synqc` does not execute quantum programs, simulate circuits, submit jobs,
-connect to providers, call the disabled historical runtime, evaluate general
-classical programs, execute `if`/`while`, execute callables, install packages,
-or establish a stable production CLI contract. Its supported behavior is limited
-to the modes above and their tested boundaries.
+`synqc` does not execute quantum programs on a device, submit jobs, connect to
+providers, call the disabled historical runtime, evaluate general classical
+programs, execute `if`/`while`, execute callables, install packages, or
+establish a stable production CLI contract. `--simulate` is a small local
+probability model, not a device executor, noise model, or measurement sampler.
+Its supported behavior is limited to the modes above and their tested boundaries.
 
 ## Focused validation
 
 `synq_cli_smoke` writes temporary source fixtures and invokes the compiled CLI
 as a separate process. It verifies successful validation, exact bounded OpenQASM
-file output, deterministic constant-evaluation output, and nonzero structured
-diagnostic failure. The local recovery profile reported **25/25** CTest checks.
-The local recovery profile and [Compiler Core #42][1] both reported **25/25**
-CTest checks.
+file output, deterministic constant-evaluation/simulation output, and nonzero
+structured diagnostic failure. The local recovery profile reported **26/26**
+CTest checks. This is local evidence pending publication and compiler-core CI.
 
 ## References
 

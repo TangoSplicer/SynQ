@@ -35,7 +35,7 @@ evidence, and a maintenance model.
 | --- | --- |
 | G1 — Supported CLI | **Remotely validated.** `synqc` parses a documented file, reports structured failures, emits one supported output, returns documented exit codes, and has end-to-end tests in [Compiler Core #42](https://github.com/TangoSplicer/SynQ/actions/runs/31886580043). |
 | G2 — Executable semantic slice | A small, documented subset has deterministic local evaluation or simulation semantics, explicit resource limits, and negative/error tests. |
-| G3 — Quantum developer loop | A developer can create one verified example, validate it, inspect/export it, and run it against a local supported engine without hardware claims. |
+| G3 — Quantum developer loop | **Locally validated; remote evidence pending.** A developer can create one verified example, validate it, inspect/export it, and calculate bounded local probabilities without hardware claims. |
 | G4 — Tooling and diagnostics | Stable CLI output, source locations, reference documentation, examples, and a reproducible build/test command are maintained together. |
 | G5 — Interoperability contract | Versioning, ownership, compatibility, supported constructs, and failure behavior are documented and separately tested for each advertised consumer. |
 | G6 — Performance and reliability | Repeatable benchmark fixtures, regression thresholds, sanitizers or equivalent checks, dependency policy, and release checks produce recorded evidence. |
