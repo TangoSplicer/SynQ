@@ -1,7 +1,7 @@
 # Bounded Constant Evaluation
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated experimental semantic slice in [Compiler Core
+#41][1].
 **Last reviewed:** 15 August 2026
 
 ## Purpose
@@ -41,3 +41,14 @@ parallel execution, simulation, provider integration, and hardware submission.
 > A successful constant-evaluation result proves only deterministic evaluation
 > of the documented declaration subset. It does not mean a SynQ program has run
 > on a quantum simulator or device.
+
+## Focused validation
+
+`synq_bounded_evaluator_smoke` covers explicit opt-in, declaration limits,
+Integer/Boolean/String values, aliases, checked arithmetic, unsupported
+decimal/quantum rejection, and overflow. The local recovery profile and
+[Compiler Core #41][1] both reported **24/24** CTest checks.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31886373263 "SynQ Compiler Core #41"

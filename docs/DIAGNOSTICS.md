@@ -148,9 +148,10 @@ Core #36][8].
 
 `SYNQ-E000` through `SYNQ-E005` are internal diagnostics for the explicit,
 declaration-only bounded constant evaluator. They are not parser diagnostics and
-are not propagated through the C ABI. Their focused smoke coverage is local
-**24/24** evidence pending publication and compiler-core CI. They do not
-establish a general runtime, simulation, quantum execution, or hardware path.
+are not propagated through the C ABI. Their focused smoke coverage passed
+locally and remotely with **24/24** CTest checks in [Compiler Core #41][11].
+They do not establish a general runtime, simulation, quantum execution, or
+hardware path.
 
 ## Compatibility boundaries
 
@@ -202,3 +203,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [8]: https://github.com/TangoSplicer/SynQ/actions/runs/31848568933 "SynQ Compiler Core #36"
 [9]: https://github.com/TangoSplicer/SynQ/actions/runs/31848936812 "SynQ Compiler Core #37"
 [10]: https://github.com/TangoSplicer/SynQ/actions/runs/31849507058 "SynQ Compiler Core #39"
+[11]: https://github.com/TangoSplicer/SynQ/actions/runs/31886373263 "SynQ Compiler Core #41"
