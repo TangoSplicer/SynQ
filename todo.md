@@ -112,5 +112,5 @@
 - [x] Design and implement one coherent executable language-core slice with explicit semantic, safety, and test boundaries.
 - [x] Restore a supported compiler CLI workflow and validate a documented end-to-end developer journey.
 - [x] Add bounded local execution or simulation semantics only after defining resource and failure limits.
-- [ ] Strengthen interoperability, developer tooling, documentation, packaging, performance, reliability, and security evidence.
+- [x] Strengthen interoperability, developer tooling, documentation, packaging, performance, reliability, and security evidence.
 - [ ] Publish an evidence-based operational-readiness assessment and prioritize the remaining research-stage gaps.

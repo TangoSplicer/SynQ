@@ -2,8 +2,8 @@
 
 **Status:** Remotely validated internal source-generation extension in [Compiler
 Core #38][1]. A locally validated `synqc --emit-openqasm-hybrid` command now
-exposes the same strict contract to recovery-profile users; its CLI evidence is
-pending publication and compiler-core CI.
+exposes the same strict contract to recovery-profile users; [Compiler Core
+#44][2] validates that CLI access.
 **Last reviewed:** 14 August 2026
 
 ## Purpose
@@ -49,9 +49,11 @@ checks.
 lowers, and resolves source before calling this exporter. It preserves the
 existing explicit rejection behavior rather than falling back to the broader AST
 exporter. The CLI smoke covers an explicit `qubit q[2]` Bell-pair fixture and
-asserts the declared register size and `h`/`cx` lowering. This additional CLI
-access remains local evidence pending publication and CI.
+asserts the declared register size and `h`/`cx` lowering. The local recovery
+profile and [Compiler Core #44][2] both reported **26/26** CTest checks for this
+additional CLI access.
 
 ## References
 
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31849244490 "SynQ Compiler Core #38"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/31887104395 "SynQ Compiler Core #44"

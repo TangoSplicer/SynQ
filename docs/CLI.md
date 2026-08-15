@@ -1,8 +1,7 @@
 # SynQ Recovery-Profile CLI
 
-**Status:** Remote evidence through [Compiler Core #43][1] covers validation,
-AST OpenQASM export, constant evaluation, and bounded simulation. The strict
-Hybrid OpenQASM CLI mode has local evidence pending publication and CI.
+**Status:** Remotely validated supported recovery-profile workflow, including
+strict Hybrid OpenQASM export, in [Compiler Core #44][1].
 **Last reviewed:** 15 August 2026
 
 ## Build
@@ -69,10 +68,10 @@ explicit typed declaration fact rather than an operand-derived estimate.
 as a separate process. It verifies successful validation, exact bounded OpenQASM
 file output, deterministic constant-evaluation/simulation output, and nonzero
 structured diagnostic failure. The local recovery profile reported **26/26**
-CTest checks. It now also verifies explicit-register Hybrid OpenQASM file output
-and Bell-pair lowering. This is local evidence pending publication and
-compiler-core CI.
+CTest checks. It also verifies explicit-register Hybrid OpenQASM file output and
+Bell-pair lowering. The local recovery profile and [Compiler Core #44][1] both
+reported **26/26** CTest checks.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31886881473 "SynQ Compiler Core #43"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31887104395 "SynQ Compiler Core #44"
