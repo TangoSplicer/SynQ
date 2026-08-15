@@ -3,7 +3,7 @@
 **Status:** A staged architecture plan. Sections labelled **planned** describe
 design targets, not implemented subsystems.  
 **Author:** Manus AI  
-**Last reviewed:** 13 August 2026
+**Last reviewed:** 15 August 2026
 
 ## Scope and architectural posture
 
@@ -49,7 +49,7 @@ flowchart LR
 | `evaluate_bounded_constants` | Remotely evaluates an explicitly opted-in, declaration-only resolved subset of Integer/Boolean/String literals, aliases, and one-operator checked Integer arithmetic with a caller-set declaration limit. | It rejects quantum statements, measurements, controls, callables, decimals, opaque source, I/O, mutation, loops, calls, simulation, and hardware use. |
 | `simulate_bounded_quantum` | Remotely calculates pure-state basis and requested marginal probabilities from one explicit default register, supported gates, and unnamed trailing measurements. | It has explicit opt-in, 10-qubit/1,024-gate default limits, no sampling/collapse/noise, and rejects all controls, named results, provider access, and hardware use. |
 | `synqc` recovery CLI | Remotely exposes parser/lowering/resolution validation, bounded AST OpenQASM 3 source emission, declaration-only constant evaluation, bounded local probability simulation, and strict Hybrid export with explicit-register constraints. | It is a new supported recovery-profile executable, not the historical runtime-dependent CLI. It has no general execution, device simulation, provider, package, REPL, or stable-release contract. |
-| Core CMake profile | Builds C++17 library sources and registers focused smoke tests by default; it also offers opt-in warnings/ELF CLI hardening and an opt-in local benchmark target. | The default options keep historical optional targets off; [Compiler Core #44](https://github.com/TangoSplicer/SynQ/actions/runs/31887104395) validated the current 26-test profile, including the separate-process CLI workflow, bounded constant evaluation, declaration-only callable provenance/rejection/resolver-preservation coverage, external OpenQASM validation, and C ABI consumers. The benchmark/install/archive path has local evidence only. |
+| Core CMake profile | Builds C++17 library sources and registers focused smoke tests by default; it also offers opt-in warnings/ELF CLI hardening and an opt-in local benchmark target. | The default options keep historical optional targets off; [Compiler Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976) validated the current 26-test profile, including the versioned separate-process CLI workflow, bounded constant evaluation, bounded local simulation, declaration-only callable provenance/rejection/resolver-preservation coverage, external OpenQASM validation, and C ABI consumers. The benchmark timing, installation, and archive commands have local evidence only. |
 
 The current architecture is therefore a **language seed**: a parser, a minimal
 AST, a bounded backend, and independent validation of the emitted text. It is a

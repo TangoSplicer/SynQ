@@ -60,11 +60,13 @@ This project currently makes no verified claim of a stable release, production d
 
 ## Recovery Priorities
 
-The next practical phase is **reproducible baseline engineering**:
+The operational-readiness baseline is assessed in
+[`OPERATIONAL_READINESS_ASSESSMENT_2026-08-15.md`](./OPERATIONAL_READINESS_ASSESSMENT_2026-08-15.md).
+The next practical phase is **public-contract and semantic-core engineering**:
 
-1. Treat the completed typed-foundation sequence as a stable evidence boundary; any recursive expressions, scopes, callable bodies/calls, or execution semantics require a new design record and dedicated negative tests.
-2. Review C ABI versioning, ownership, distribution policy, and language-specific wrapper design before adding a Rust safe wrapper, crate, or packaged Lisp/Clojure/Mercury binding.
-3. Decide whether named-register operands and bounded control-flow lowering have an exact OpenQASM mapping before expanding the strict Hybrid exporter.
+1. Define experimental C ABI versioning, ownership, compatibility, installation, and deprecation policy before adding a Rust safe wrapper, crate, or packaged Lisp/Clojure/Mercury binding.
+2. Treat the completed typed-foundation sequence as a stable evidence boundary; named-register operands, control-flow lowering, callable bodies/calls, scopes, or execution semantics each require a new design record and dedicated negative tests.
+3. Implement named-register semantics only after deciding their resource, resolver, strict-export, and bounded-simulation contracts; do not infer a target mapping.
 4. Add one bounded backend feature beyond the source-only catalog only after defining its data model, route contract, and tests; do not restore historical routers wholesale.
 5. Run an end-to-end container check when a Docker-capable environment is available, and repair or remove stale optional compiler targets one subsystem at a time.
 
