@@ -1,7 +1,7 @@
 # SynQ Structured Diagnostics
 
 **Status:** Remotely validated recovery-profile implementation boundary.
-**Last reviewed:** 13 August 2026
+**Last reviewed:** 15 August 2026
 
 ## Purpose
 
@@ -119,6 +119,12 @@ Core #26][3].
 | `SYNQ-T004` | Internal arithmetic-tree validation | A manually constructed internal Integer arithmetic expression has an unsupported operator or wrong operand count. | Use the parser-produced one-operator tree with two Integer literal/identifier atoms. |
 | `SYNQ-Q001` | Internal default-register validation | `q[index]` occurs before an explicit later `qubit q[n]` declaration. | Declare the default register before operations using `q[index]`. |
 | `SYNQ-Q002` | Internal default-register validation | A `q[index]` operand is not smaller than the explicit `qubit q[n]` size. | Use an index in the declared `q[0]` through `q[n-1]` range. |
+| `SYNQ-E000` | Internal bounded evaluation | Constant evaluation was requested without the explicit API opt-in. | Enable `allow_experimental_constant_evaluation` only after reviewing the documented limits. |
+| `SYNQ-E001` | Internal bounded evaluation | The resolved program exceeds the configured declaration limit. | Reduce the declaration-only program or explicitly choose a documented limit. |
+| `SYNQ-E002` | Internal bounded evaluation | A declaration initializer or top-level node is outside the constant-evaluation subset. | Use supported declarations only; use the separate source-export workflow for quantum statements. |
+| `SYNQ-E003` | Internal bounded evaluation | An alias or arithmetic reference has no prior evaluated binding of the required kind. | Use an earlier supported declaration. |
+| `SYNQ-E004` | Internal bounded evaluation | A manually constructed internal classification or arithmetic tree is invalid. | Use parser-produced bounded declarations and expression trees. |
+| `SYNQ-E005` | Internal bounded evaluation | Checked `int64` arithmetic overflows or has an unsupported operator. | Use an in-range one-operator Integer expression. |
 
 `SYNQ-R002`, `SYNQ-T001`, and `SYNQ-T002` are internal resolver/type diagnostics.
 They are not parser diagnostics and are not propagated through the C ABI. They
@@ -139,6 +145,12 @@ without such a declaration retains prior indexed-operand behavior. They are not
 parser diagnostics and are not propagated through the C ABI. Their focused smoke
 coverage passed locally and remotely with **20/20** CTest checks in [Compiler
 Core #36][8].
+
+`SYNQ-E000` through `SYNQ-E005` are internal diagnostics for the explicit,
+declaration-only bounded constant evaluator. They are not parser diagnostics and
+are not propagated through the C ABI. Their focused smoke coverage is local
+**24/24** evidence pending publication and compiler-core CI. They do not
+establish a general runtime, simulation, quantum execution, or hardware path.
 
 ## Compatibility boundaries
 
