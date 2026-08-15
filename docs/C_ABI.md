@@ -1,11 +1,13 @@
 # SynQ C ABI Foundation
 
 **Status:** Remotely validated experimental foundation for C, Rust, test-only
-Common Lisp, test-only Clojure/JNA, and test-only Mercury C-backend consumption
-in [Compiler Core #22][14], with expanded typed-construct C consumer coverage in
-[Compiler Core #40][15]. This is **not** a declaration of a frozen production
-ABI, a shared library distribution, or a language-specific SDK.
-**Last reviewed:** 14 August 2026
+Common Lisp, test-only Clojure/JNA, and test-only Mercury C-backend consumption,
+including the 26-check recovery profile in [Compiler Core #45][16]. The active
+[`Experimental ABI and Distribution Policy`](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md)
+defines the current v1 change and delivery boundaries. This is **not** a
+declaration of a frozen production ABI, a shared library distribution, or a
+language-specific SDK.
+**Last reviewed:** 15 August 2026
 
 ## Purpose and scope
 
@@ -85,11 +87,12 @@ cmake --build /tmp/synq-c-abi --parallel 2
 ctest --test-dir /tmp/synq-c-abi --output-on-failure
 ```
 
-At the latest local review, the expanded recovery profile reported **23/23
-passing** tests, including `synq_c_abi_smoke`, `synq_clojure_jna_abi_smoke`,
-`synq_mercury_abi_smoke`, the typed language-core smoke tests, the
-parser/exporter tests, and the two independent OpenQASM downstream validations.
-The earlier C/Rust in-memory profile passed remotely in [Compiler Core #17][11]
+The current delivery-baseline recovery profile reports **26/26 passing** tests,
+including `synq_c_abi_smoke`, `synq_clojure_jna_abi_smoke`,
+`synq_mercury_abi_smoke`, `synq_rust_abi_smoke`, the typed language-core and
+CLI smoke tests, parser/exporter tests, bounded evaluation/simulation checks,
+and the two independent OpenQASM downstream validations. The complete profile
+passed remotely in [Compiler Core #45][16]. The earlier C/Rust in-memory profile passed remotely in [Compiler Core #17][11]
 for commit `65906d0`, the later Common Lisp profile passed remotely in [Compiler
 Core #18][12], and the Clojure/JNA consumer passed remotely in [Compiler Core
 #19][13] for commit `cccf61b`; the Mercury C-backend consumer passed remotely in
@@ -97,7 +100,7 @@ Core #18][12], and the Clojure/JNA consumer passed remotely in [Compiler Core
 ABI or test a distributed shared library.
 
 The expanded C-consumer typed-construct parser/error-path check passed remotely
-in [Compiler Core #40][15] with the complete **23/23** profile. It does not
+in [Compiler Core #40][15] with the then-complete **23/23** profile. It did not
 change `SYNQ_ABI_VERSION`, expand the public functions, or establish that every
 typed construct can be exported through `synq_export_openqasm3`.
 
@@ -112,7 +115,9 @@ typed construct can be exported through `synq_export_openqasm3`.
 
 The C ABI is therefore **a foundation for interoperability, not proof of full
 interoperability**. Each later binding must be independently built and tested,
-and it may expose a smaller, safer surface than the raw C header.
+and it may expose a smaller, safer surface than the raw C header. The policy
+requires a new ABI major and updated consumer fixtures for a public-header or
+ownership-breaking change; it does not promise ABI v1 stability across commits.
 
 ## Deliberate non-goals
 
@@ -143,3 +148,5 @@ tests.
 [13]: https://github.com/TangoSplicer/SynQ/actions/runs/31726350746 "SynQ Compiler Core #19"
 [14]: https://github.com/TangoSplicer/SynQ/actions/runs/31729572407 "SynQ Compiler Core #22"
 [15]: https://github.com/TangoSplicer/SynQ/actions/runs/31849787206 "SynQ Compiler Core #40"
+
+[16]: https://github.com/TangoSplicer/SynQ/actions/runs/31887461976 "SynQ Compiler Core #45"

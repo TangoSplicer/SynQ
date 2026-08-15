@@ -33,6 +33,11 @@ audit, a memory-safety proof, or cross-platform hardening certification.
 > The `0.1.0-experimental` label is a compatibility warning, not a promise of a
 > stable CLI, ABI, language specification, distribution channel, or runtime.
 
+The active [Experimental ABI and Distribution Policy](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md)
+separates this installable CLI path from the non-distributed C ABI and test-only
+shared-library artifacts. In particular, this ZIP does not install `synq_lib`,
+the public C header, or language-specific SDK packages.
+
 Every candidate must pass the documented compiler checks and be treated as an
 experimental recovery-profile artifact until versioning, compatibility policy,
 release signing, supply-chain review, and broader platform testing are separately

@@ -114,3 +114,6 @@
 - [x] Add bounded local execution or simulation semantics only after defining resource and failure limits.
 - [x] Strengthen interoperability, developer tooling, documentation, packaging, performance, reliability, and security evidence.
 - [x] Publish an evidence-based operational-readiness assessment and prioritize the remaining research-stage gaps.
+- [ ] Publish a bounded experimental C ABI and distribution policy without claiming ABI stability or packaged language SDKs.
+- [ ] Validate the published ABI/distribution policy against the opaque C header, recovery packaging path, and consumer evidence.
+- [ ] Update the public Evidence Ledger to link the verified experimental ABI/distribution policy and retain explicit support boundaries.
