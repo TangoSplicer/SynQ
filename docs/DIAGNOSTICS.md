@@ -161,9 +161,10 @@ hardware path.
 
 `SYNQ-SIM000` through `SYNQ-SIM005` are internal diagnostics for the explicit
 bounded local simulator. They are not parser diagnostics and are not propagated
-through the C ABI. Their focused smoke coverage is local **26/26** evidence
-pending publication and compiler-core CI. They do not establish device behavior,
-noise modeling, sampled measurement results, provider access, or hardware use.
+through the C ABI. Their focused smoke coverage passed locally and remotely with
+**26/26** CTest checks in [Compiler Core #43][12]. They do not establish device
+behavior, noise modeling, sampled measurement results, provider access, or
+hardware use.
 
 ## Compatibility boundaries
 
@@ -216,3 +217,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [9]: https://github.com/TangoSplicer/SynQ/actions/runs/31848936812 "SynQ Compiler Core #37"
 [10]: https://github.com/TangoSplicer/SynQ/actions/runs/31849507058 "SynQ Compiler Core #39"
 [11]: https://github.com/TangoSplicer/SynQ/actions/runs/31886373263 "SynQ Compiler Core #41"
+[12]: https://github.com/TangoSplicer/SynQ/actions/runs/31886881473 "SynQ Compiler Core #43"

@@ -1,7 +1,7 @@
 # SynQ Recovery-Profile CLI
 
-**Status:** Remotely validated supported recovery-profile workflow in [Compiler
-Core #42][1].
+**Status:** Remotely validated supported recovery-profile workflow, including
+bounded local simulation, in [Compiler Core #43][1].
 **Last reviewed:** 15 August 2026
 
 ## Build
@@ -61,8 +61,9 @@ Its supported behavior is limited to the modes above and their tested boundaries
 as a separate process. It verifies successful validation, exact bounded OpenQASM
 file output, deterministic constant-evaluation/simulation output, and nonzero
 structured diagnostic failure. The local recovery profile reported **26/26**
-CTest checks. This is local evidence pending publication and compiler-core CI.
+CTest checks. The local recovery profile and [Compiler Core #43][1] both
+reported **26/26** CTest checks.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31886580043 "SynQ Compiler Core #42"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31886881473 "SynQ Compiler Core #43"

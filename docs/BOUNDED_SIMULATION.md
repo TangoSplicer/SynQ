@@ -1,7 +1,7 @@
 # Bounded Local Quantum Simulation
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** Remotely validated experimental local simulation slice in [Compiler
+Core #43][1].
 **Last reviewed:** 15 August 2026
 
 ## Purpose
@@ -51,3 +51,10 @@ the qubit limit, and named-result rejection. The expanded separate-process CLI
 smoke verifies deterministic `synqc --simulate` output. The local recovery
 profile reported **26/26** CTest checks. This is local evidence pending
 publication and compiler-core CI.
+
+The local recovery profile and [Compiler Core #43][1] both reported **26/26**
+CTest checks.
+
+## References
+
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/31886881473 "SynQ Compiler Core #43"
