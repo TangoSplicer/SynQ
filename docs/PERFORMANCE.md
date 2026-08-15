@@ -1,7 +1,7 @@
 # Recovery-Profile Performance Evidence
 
-**Status:** Design and implementation in progress; no remote validation claim is
-made in this record.
+**Status:** The benchmark implementation is included in the remotely validated
+recovery compiler build; its timing observation remains local-only evidence.
 **Last reviewed:** 15 August 2026
 
 ## Measurement scope
@@ -40,6 +40,9 @@ comparison baseline.
 On 15 August 2026, the documented Release benchmark command completed 1,000
 bounded Bell-probability simulations in **0.000118557 seconds**, reporting
 approximately **8.43 million simulations per second** and checksum `500` in the
-current sandbox. This is one local observation for the fixed two-qubit fixture;
-it is not a benchmark result for the SynQ language as a whole and must not be
-used as a Python, Java, hardware, or provider comparison.
+current sandbox. The codebase containing the opt-in benchmark also passed
+**26/26** recovery-profile checks in [Compiler Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976) for revision `202ebaf`; the workflow does not
+run a timing threshold or establish a remote performance measurement. This is
+one local observation for the fixed two-qubit fixture; it is not a benchmark
+result for the SynQ language as a whole and must not be used as a Python, Java,
+hardware, or provider comparison.

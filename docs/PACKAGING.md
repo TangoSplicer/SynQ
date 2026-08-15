@@ -1,7 +1,8 @@
 # Recovery-Profile CLI Packaging
 
-**Status:** Locally validated experimental install/archive path; no remote
-validation claim is made in this record.
+**Status:** Experimental install/archive path with a remotely validated
+compiler build-and-test baseline. The installation and archive commands remain
+locally validated operations.
 **Last reviewed:** 15 August 2026
 
 ## Supported artifact
@@ -42,7 +43,9 @@ implemented.
 The documented Release-profile path built the hardened compiler profile, passed
 the full local **26/26** CTest suite, installed `bin/synqc` plus the three
 recovery-profile documents into an isolated staging prefix, and generated
-`synq-recovery-cli-0.1.0-experimental-Linux.zip` through CPack. This is local
-evidence pending publication and compiler-core CI. It does not demonstrate
-cross-platform archives, signing, reproducible builds, provenance attestation,
-or stable binary compatibility.
+`synq-recovery-cli-0.1.0-experimental-Linux.zip` through CPack. The same
+recovery compiler profile passed **26/26** checks in [Compiler Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976) for revision
+`202ebaf`; this remotely confirms the compiled CLI/test baseline, not the
+locally executed installation or CPack commands. The evidence does not
+demonstrate cross-platform archives, signing, reproducible builds, provenance
+attestation, or stable binary compatibility.
