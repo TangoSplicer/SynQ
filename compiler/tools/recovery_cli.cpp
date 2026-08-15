@@ -173,6 +173,10 @@ int main(int argc, char** argv) {
         print_help(std::cout);
         return 0;
     }
+    if (argc == 2 && std::string(argv[1]) == "--version") {
+        std::cout << "synqc " << SYNQ_RECOVERY_CLI_VERSION << "\n";
+        return 0;
+    }
 
     Command command;
     std::string argument_error;

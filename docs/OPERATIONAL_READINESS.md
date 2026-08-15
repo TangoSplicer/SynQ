@@ -21,13 +21,13 @@ evidence, and a maintenance model.
 
 | Area | Current evidence | Operational gap |
 | --- | --- | --- |
-| Compiler foundation | [Compiler Core #40](https://github.com/TangoSplicer/SynQ/actions/runs/31849787206) passed 23/23 recovery-profile checks. | The grammar and semantics remain intentionally narrow. |
-| Source model | Typed gates, bounded classical metadata, qubit declarations, named measurement metadata, and declaration-only callables exist behind feature gates. | No general expression evaluator, scopes, callable bodies/calls, or executable classical semantics exists. |
-| Quantum path | AST OpenQASM export and a stricter internal Hybrid IR export are tested for exact supported subsets. | Export is source generation only; it is not simulation, provider integration, or hardware execution. |
+| Compiler foundation | [Compiler Core #44](https://github.com/TangoSplicer/SynQ/actions/runs/31887104395) passed 26/26 recovery-profile checks. | The grammar and semantics remain intentionally narrow. |
+| Source model | Typed gates, bounded classical metadata/evaluation, qubit declarations, bounded simulation, named measurement metadata, and declaration-only callables exist behind exact gates/opt-ins. | No general expression evaluator, scopes, callable bodies/calls, or executable classical semantics exists. |
+| Quantum path | AST/strict Hybrid OpenQASM export and a bounded local probability simulator are tested for exact supported subsets. | Export and local simulation are not provider integration or hardware execution. |
 | Native interoperability | C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers exercise an opaque C ABI. | There are no distributed language packages, safe wrappers, or a frozen ABI policy. |
-| Command-line workflow | The historical compiler CLI remains disabled because it depends on incomplete runtime/exporter subsystems. | No supported end-to-end `synqc` developer command exists yet. |
+| Command-line workflow | `synqc` validates, exports supported OpenQASM subsets, evaluates bounded constants, and simulates bounded probabilities. | It is an experimental recovery-profile command, not a general executor, provider client, or stable CLI contract. |
 | Frontend | The frontend has 33 local unit tests and a successful production build. | It is not evidence of a compiled-language runtime or deployed backend integration. |
-| Performance | No benchmark suite or performance target exists. | No claim can be made that SynQ matches Python’s execution performance or Java’s ecosystem/runtime benefits. |
+| Performance | A local opt-in deterministic bounded-simulator benchmark and experimental install/archive path exist. | No claim can be made that SynQ matches Python’s execution performance or Java’s ecosystem/runtime benefits. |
 
 ## Acceptance gates
 
@@ -38,8 +38,8 @@ evidence, and a maintenance model.
 | G3 — Quantum developer loop | **Remotely validated.** A developer can create one verified example, validate it, inspect/export it, and calculate bounded local probabilities without hardware claims in [Compiler Core #43](https://github.com/TangoSplicer/SynQ/actions/runs/31886881473). |
 | G4 — Tooling and diagnostics | Stable CLI output, source locations, reference documentation, examples, and a reproducible build/test command are maintained together. |
 | G5 — Interoperability contract | Versioning, ownership, compatibility, supported constructs, and failure behavior are documented and separately tested for each advertised consumer. |
-| G6 — Performance and reliability | Repeatable benchmark fixtures, regression thresholds, sanitizers or equivalent checks, dependency policy, and release checks produce recorded evidence. |
-| G7 — Distribution and maintenance | Tagged release artifacts or reproducible install instructions, a support/contribution policy, security disclosure route, and a known-issues ledger exist. |
+| G6 — Performance and reliability | **Locally validated baseline; remote evidence pending.** A repeatable benchmark fixture, opt-in supported hardening flags, dependency policy, and build/test/install/package checks produce recorded evidence. Regression thresholds, sanitizers, and broader security review remain gaps. |
+| G7 — Distribution and maintenance | **Locally validated baseline; remote evidence pending.** Reproducible install instructions and an experimental ZIP artifact exist. Tags, signing, support policy, security disclosure route, and a maintained known-issues ledger remain gaps. |
 
 ## Performance and ecosystem principles
 

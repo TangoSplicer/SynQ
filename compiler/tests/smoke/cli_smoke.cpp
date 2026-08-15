@@ -56,6 +56,10 @@ int main(int argc, char** argv) {
         !require(write_file(invalid, "quantum cx q[0]\n"), "writes invalid CLI fixture")) return 1;
 
     const std::string invoke = quote(executable);
+    if (!require(std::system((invoke + " --version > " + quote(stdout_path) + " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("synqc 0.1.0-experimental") != std::string::npos,
+                 "version mode reports the documented experimental recovery CLI version")) return 1;
+
     if (!require(std::system((invoke + " " + quote(quantum) + " --validate > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("valid bounded recovery-profile") != std::string::npos,

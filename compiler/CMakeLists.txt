@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(SYNQ_RECOVERY_CLI_VERSION "0.1.0-experimental")
 
 # The historical test and Python-binding targets are incomplete. Keep the
 # default build focused on the compiler library until those targets are repaired.
@@ -20,6 +21,8 @@ option(BUILD_EXPERIMENTAL_COMPONENTS "Build experimental debugger, network, opti
 option(BUILD_REPL "Build experimental REPL command sources" OFF)
 option(BUILD_CORE_SMOKE_TESTS "Build focused smoke tests for the compiler core profile" ON)
 option(BUILD_RECOVERY_CLI "Build the supported recovery-profile synqc executable" ON)
+option(SYNQ_ENABLE_BUILD_HARDENING "Enable supported compiler warnings and ELF linker hardening for recovery targets" ON)
+option(BUILD_RECOVERY_BENCHMARKS "Build deterministic local recovery-profile benchmark utilities" OFF)
 
 file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 if(NOT BUILD_PYTHON_BINDINGS)
@@ -43,6 +46,23 @@ if(BUILD_RECOVERY_CLI)
     add_executable(synqc tools/recovery_cli.cpp)
     target_include_directories(synqc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synqc PRIVATE synq_lib)
+    target_compile_definitions(synqc PRIVATE SYNQ_RECOVERY_CLI_VERSION="${SYNQ_RECOVERY_CLI_VERSION}")
+endif()
+
+if(BUILD_RECOVERY_BENCHMARKS)
+    add_executable(synq_benchmark tools/recovery_benchmark.cpp)
+    target_include_directories(synq_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_benchmark PRIVATE synq_lib)
+endif()
+
+if(SYNQ_ENABLE_BUILD_HARDENING AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(synq_lib PRIVATE -Wall -Wextra -Wpedantic)
+    if(BUILD_RECOVERY_CLI)
+        target_compile_options(synqc PRIVATE -Wall -Wextra -Wpedantic)
+        if(UNIX AND NOT APPLE)
+            target_link_options(synqc PRIVATE -Wl,-z,relro,-z,now)
+        endif()
+    endif()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
