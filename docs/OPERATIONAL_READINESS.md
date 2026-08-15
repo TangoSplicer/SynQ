@@ -33,7 +33,7 @@ evidence, and a maintenance model.
 
 | Gate | Required evidence before the gate can be marked complete |
 | --- | --- |
-| G1 — Supported CLI | A versioned `synqc` command parses a documented file, reports structured failures, emits one supported output, returns stable exit codes, and has end-to-end tests. |
+| G1 — Supported CLI | **Locally validated; remote evidence pending.** `synqc` parses a documented file, reports structured failures, emits one supported output, returns documented exit codes, and has end-to-end tests. |
 | G2 — Executable semantic slice | A small, documented subset has deterministic local evaluation or simulation semantics, explicit resource limits, and negative/error tests. |
 | G3 — Quantum developer loop | A developer can create one verified example, validate it, inspect/export it, and run it against a local supported engine without hardware claims. |
 | G4 — Tooling and diagnostics | Stable CLI output, source locations, reference documentation, examples, and a reproducible build/test command are maintained together. |

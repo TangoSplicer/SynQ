@@ -1,0 +1,83 @@
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+namespace {
+
+bool require(bool condition, const std::string& message) {
+    if (!condition) {
+        std::cerr << "FAIL: " << message << "\n";
+        return false;
+    }
+    return true;
+}
+
+std::string quote(const std::filesystem::path& path) {
+    return "\"" + path.string() + "\"";
+}
+
+std::string read_file(const std::filesystem::path& path) {
+    std::ifstream input(path, std::ios::binary);
+    return std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+}
+
+bool write_file(const std::filesystem::path& path, const std::string& contents) {
+    std::ofstream output(path, std::ios::binary);
+    output << contents;
+    return static_cast<bool>(output);
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    if (!require(argc == 2, "CLI executable path is supplied by CTest")) return 1;
+    const std::filesystem::path executable = argv[1];
+    const auto base = std::filesystem::temp_directory_path() / "synq_cli_smoke";
+    const auto quantum = base.string() + "_quantum.synq";
+    const auto constants = base.string() + "_constants.synq";
+    const auto invalid = base.string() + "_invalid.synq";
+    const auto qasm = base.string() + "_output.qasm";
+    const auto stdout_path = base.string() + "_stdout.txt";
+    const auto stderr_path = base.string() + "_stderr.txt";
+
+    if (!require(write_file(quantum, "quantum h q[0]\nmeasure q[0]\n"), "writes quantum CLI fixture") ||
+        !require(write_file(constants,
+                            "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
+                            "let seed = 5\nlet total = seed + 4\nlet ready = true\n"),
+                 "writes constant-evaluation CLI fixture") ||
+        !require(write_file(invalid, "quantum cx q[0]\n"), "writes invalid CLI fixture")) return 1;
+
+    const std::string invoke = quote(executable);
+    if (!require(std::system((invoke + " " + quote(quantum) + " --validate > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("valid bounded recovery-profile") != std::string::npos,
+                 "validate mode reports a successful typed parse/lower/resolve workflow")) return 1;
+
+    if (!require(std::system((invoke + " " + quote(quantum) + " --emit-openqasm --out " + quote(qasm) +
+                              " > " + quote(stdout_path) + " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(qasm).find("OPENQASM 3.0;") != std::string::npos &&
+                     read_file(qasm).find("c[0] = measure q[0];") != std::string::npos,
+                 "OpenQASM mode writes the supported bounded source output")) return 1;
+
+    if (!require(std::system((invoke + " " + quote(constants) + " --eval-constants > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("total = Integer:9") != std::string::npos &&
+                     read_file(stdout_path).find("ready = Boolean:true") != std::string::npos,
+                 "experimental constant-evaluation mode prints deterministic evaluated bindings")) return 1;
+
+    const int invalid_status = std::system((invoke + " " + quote(invalid) + " --validate > " + quote(stdout_path) +
+                                            " 2> " + quote(stderr_path)).c_str());
+    if (!require(invalid_status != 0 && read_file(stderr_path).find("SYNQ-S002") != std::string::npos,
+                 "validate mode preserves structured diagnostics and nonzero failure")) return 1;
+
+    std::filesystem::remove(quantum);
+    std::filesystem::remove(constants);
+    std::filesystem::remove(invalid);
+    std::filesystem::remove(qasm);
+    std::filesystem::remove(stdout_path);
+    std::filesystem::remove(stderr_path);
+    std::cout << "SynQ CLI smoke test passed\n";
+    return 0;
+}

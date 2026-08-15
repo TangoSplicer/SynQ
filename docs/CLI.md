@@ -1,0 +1,62 @@
+# SynQ Recovery-Profile CLI
+
+**Status:** Locally validated supported recovery-profile workflow; no remote
+validation claim is made in this record.
+**Last reviewed:** 15 August 2026
+
+## Build
+
+```bash
+cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release
+cmake --build compiler/build --parallel 2
+```
+
+The supported executable is `compiler/build/synqc`. It is a new
+recovery-profile command and is deliberately separate from the disabled
+historical runtime-dependent command-line source.
+
+## Supported commands
+
+| Command | Behavior | Exit codes |
+| --- | --- | --- |
+| `synqc file.synq --validate` | Parses, lowers to Hybrid IR, and performs bounded name/static validation. | `0` success; `3` parse error; `4` lowering/resolution error. |
+| `synqc file.synq --emit-openqasm [--out output.qasm]` | Emits only the documented AST OpenQASM 3 source subset. | `0` success; `3` parse error; `5` unsupported export; `6` output-write failure. |
+| `synqc file.synq --eval-constants [--max-declarations n]` | Explicitly opts into declaration-only bounded constant evaluation. | `0` success; `3` parse error; `4` lowering/resolution error; `5` evaluation failure. |
+| `synqc --help` | Prints usage and documented safety boundary. | `0`. |
+
+Malformed command lines return `2`. The command prints structured parser,
+lowering, resolution, and evaluation diagnostics to standard error. OpenQASM
+export diagnostics are textual exporter diagnostics because that existing source
+generation service has not yet adopted the structured `Diagnostic` type.
+
+## Example
+
+```synq
+#[experimental(feature = "integer-arithmetic-expressions")]
+let seed = 5
+let total = seed + 4
+let ready = true
+```
+
+```bash
+./compiler/build/synqc constants.synq --eval-constants
+# seed = Integer:5
+# total = Integer:9
+# ready = Boolean:true
+```
+
+## Explicit non-goals
+
+`synqc` does not execute quantum programs, simulate circuits, submit jobs,
+connect to providers, call the disabled historical runtime, evaluate general
+classical programs, execute `if`/`while`, execute callables, install packages,
+or establish a stable production CLI contract. Its supported behavior is limited
+to the modes above and their tested boundaries.
+
+## Focused validation
+
+`synq_cli_smoke` writes temporary source fixtures and invokes the compiled CLI
+as a separate process. It verifies successful validation, exact bounded OpenQASM
+file output, deterministic constant-evaluation output, and nonzero structured
+diagnostic failure. The local recovery profile reported **25/25** CTest checks.
+This is local evidence pending publication and compiler-core CI.

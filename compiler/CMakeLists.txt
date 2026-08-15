@@ -19,6 +19,7 @@ option(BUILD_COMPILER_EXECUTABLE "Build the unfinished compiler command-line ent
 option(BUILD_EXPERIMENTAL_COMPONENTS "Build experimental debugger, network, optimizer, and plugin subsystems" OFF)
 option(BUILD_REPL "Build experimental REPL command sources" OFF)
 option(BUILD_CORE_SMOKE_TESTS "Build focused smoke tests for the compiler core profile" ON)
+option(BUILD_RECOVERY_CLI "Build the supported recovery-profile synqc executable" ON)
 
 file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 if(NOT BUILD_PYTHON_BINDINGS)
@@ -37,6 +38,12 @@ if(NOT BUILD_REPL)
     list(FILTER SRC_SOURCES EXCLUDE REGEX ".*/repl/.*\\.cpp$")
 endif()
 add_subdirectory(src)
+
+if(BUILD_RECOVERY_CLI)
+    add_executable(synqc tools/recovery_cli.cpp)
+    target_include_directories(synqc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synqc PRIVATE synq_lib)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
@@ -131,6 +138,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_include_directories(synq_bounded_evaluator_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_bounded_evaluator_smoke PRIVATE synq_lib)
     add_test(NAME synq_bounded_evaluator_smoke COMMAND synq_bounded_evaluator_smoke)
+
+    if(BUILD_RECOVERY_CLI)
+        add_executable(synq_cli_smoke tests/smoke/cli_smoke.cpp)
+        add_test(NAME synq_cli_smoke COMMAND synq_cli_smoke $<TARGET_FILE:synqc>)
+    endif()
 
     add_executable(synq_c_abi_smoke tests/interop/c_abi_smoke.c)
     target_include_directories(synq_c_abi_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
