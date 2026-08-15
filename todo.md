@@ -117,6 +117,6 @@
 - [x] Publish a bounded experimental C ABI and distribution policy without claiming ABI stability or packaged language SDKs.
 - [x] Validate the published ABI/distribution policy against the opaque C header, recovery packaging path, and consumer evidence.
 - [x] Update the public Evidence Ledger to link the verified experimental ABI/distribution policy and retain explicit support boundaries.
-- [ ] Design an installable experimental native C ABI SDK boundary without converting the test-only shared library into an unsupported production claim.
-- [ ] Add a clean-prefix installation and external consumer conformance test for the experimental native SDK path.
-- [ ] Publish native SDK distribution evidence and update policy, status, readiness assessment, and the Evidence Ledger with any verified limits.
+- [x] Design an installable experimental native C ABI SDK boundary without converting the test-only shared library into an unsupported production claim.
+- [x] Add a clean-prefix installation and external consumer conformance test for the experimental native SDK path.
+- [x] Publish native SDK distribution evidence and update policy, status, readiness assessment, and the Evidence Ledger with any verified limits.

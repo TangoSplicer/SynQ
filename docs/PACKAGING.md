@@ -46,14 +46,14 @@ implemented.
 
 ## Local delivery evidence
 
-The documented Release-profile path now passes the full local **27/27** CTest
-suite, including clean-prefix `SynQ::synq_lib` consumer conformance. It installs
+The documented Release-profile path passes the full local **27/27** CTest suite,
+including clean-prefix `SynQ::synq_lib` consumer conformance. It installs
 `bin/synqc`, the static library, public C header, CMake package metadata, and
 the bounded-workflow/SDK documents into an isolated staging prefix. CPack
 generates `synq-recovery-cli-0.1.0-experimental-Linux.zip` containing those
 configured artifacts while excluding the test-only shared ABI library. [Compiler
-Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976) remains
-remote evidence for the preceding 26-check compiler baseline at revision
-`202ebaf`; remote validation of the 27-check SDK increment is pending. The
-evidence does not demonstrate cross-platform archives, signing, reproducible
-builds, provenance attestation, or stable binary compatibility.
+Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207) remotely
+validated the 27-check SDK increment for revision `1de1484`; CPack archive
+inspection remains local evidence. The evidence does not demonstrate
+cross-platform archives, signing, reproducible builds, provenance attestation,
+or stable binary compatibility.

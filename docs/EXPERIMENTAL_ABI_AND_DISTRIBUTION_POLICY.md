@@ -93,7 +93,7 @@ performed locally; their operations are not remote package-release evidence.[5]
 | Artifact or route | Current policy | Reasoning and limitation |
 | --- | --- | --- |
 | `synqc` CLI and bundled documents | **Experimental local install/archive path.** | This is the configured install/ZIP delivery surface. It has no signing, provenance attestation, cross-platform support matrix, or support SLA.[2] [5] |
-| `synq_lib` static library and CMake package | **Locally validated experimental native SDK path.** | The recovery packaging configuration installs the static library, public header, and `SynQ::synq_lib` CMake package; an isolated C/C++ consumer passed locally. Remote CI evidence remains pending, and no stable SDK or platform support claim is made.[6] |
+| `synq_lib` static library and CMake package | **Remotely validated experimental native SDK path.** | The recovery packaging configuration installs the static library, public header, and `SynQ::synq_lib` CMake package; the isolated C/C++ consumer passed in [Compiler Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207). No stable SDK or platform support claim is made.[7] |
 | `synq_ffi_shared` / `libsynq_ffi.so` | **Test-only build-directory artifact.** | It exists to run Common Lisp, Clojure/JNA, and Mercury smoke consumers; it is not a distributed native library.[6] |
 | Rust, Common Lisp, Clojure, Mercury integrations | **Remotely tested consumer proofs only.** | No crate, CFFI/ASDF system, Clojure/JVM library, Mercury package, or installer is published by this policy.[4] [6] |
 | Registries and operating-system packages | **Not published.** | No crates.io, Quicklisp, Maven, Mercury, Homebrew, apt, Chocolatey, or equivalent package claim is made. |
@@ -107,11 +107,11 @@ revision, but must not treat build-directory library locations or test helper
 targets as an installation contract.[1] [6]
 
 The current recovery path now has explicit header/library installation, CMake
-package metadata, and a local clean-prefix conformance test. Before the project
-claims a supported SDK or language-specific wrapper, it still needs remote CI
-evidence, a platform support statement, artifact-version policy, compatibility
-matrix, signing/provenance policy, and clean-environment coverage beyond the
-current Linux recovery environment.[6]
+package metadata, and a remotely validated clean-prefix conformance test. Before
+the project claims a supported SDK or language-specific wrapper, it still needs a
+platform support statement, artifact-version policy, compatibility matrix,
+signing/provenance policy, and clean-environment coverage beyond the current
+Linux recovery environment.[7]
 
 ## 6. Validation and publication discipline
 
@@ -152,7 +152,7 @@ distribution or security claims.
 | --- | --- | --- |
 | Experimental ABI contract policy | **Published by this document.** | Keep it synchronized with every public-header change. |
 | ABI v1 consumer proof | **Remotely validated through focused C/Rust/Common Lisp/Clojure/Mercury tests.** | Add a conformance matrix only when actual distribution begins.[3] [4] |
-| Installed native SDK | **Locally validated experimental static C ABI path.** | Remote CI evidence, supported-platform matrix, signing/provenance, artifact version policy, and compatibility coverage. |
+| Installed native SDK | **Remotely validated experimental static C ABI path.** | Supported-platform matrix, signing/provenance, artifact version policy, and compatibility coverage. |
 | Language-specific package | **Not available.** | One maintained package per ecosystem with native ownership/error tests and a version policy. |
 | Stable ABI or release channel | **Not available.** | Compatibility commitment, migration policy, signing/provenance, release process, and broader test/platform evidence. |
 

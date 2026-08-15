@@ -1,7 +1,6 @@
 # Experimental Native SDK Design Record
 
-**Status:** Locally validated experimental native SDK path; remote CI evidence
-is pending.
+**Status:** Remotely validated experimental native SDK path.
 **Scope:** The recovery-profile C ABI only.
 **Related policy:** [`EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md`](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md)
 
@@ -79,8 +78,19 @@ the archive contains `libsynq_lib.a`, the public header, `SynQConfig.cmake`,
 test-only `synq_ffi` shared artifact.
 
 This is Linux-local evidence for the current source revision. It is not yet a
-remote CI result, signing/provenance evidence, a cross-platform package test, a
-registry release, a dynamic-library distribution, or an ABI-stability promise.
+cross-platform package test, registry release, dynamic-library distribution,
+signing/provenance evidence, or ABI-stability promise.
+
+## Remote evidence
+
+[Compiler Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207)
+completed successfully for revision `1de1484`, reporting **27/27** CTest checks
+including `synq_installed_sdk_conformance`. This confirms the recovery CI profile
+can install the experimental static library/header/CMake package into an
+isolated prefix, configure and link the separate public-header C consumer, and
+run its bounded ABI parse/export/cleanup flow. It does not validate artifact
+signing, provenance, registry publication, cross-platform portability, dynamic
+linking, or ABI compatibility across future releases.
 
 ## Acceptance criteria
 
