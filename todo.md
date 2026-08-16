@@ -125,3 +125,7 @@
 - [x] Design an installable experimental native C ABI SDK boundary without converting the test-only shared library into an unsupported production claim.
 - [x] Add a clean-prefix installation and external consumer conformance test for the experimental native SDK path.
 - [x] Publish native SDK distribution evidence and update policy, status, readiness assessment, and the Evidence Ledger with any verified limits.
+- [ ] Design a guided, non-executing CLI playground that clearly distinguishes copied commands and fixture output from online compiler execution.
+- [ ] Add a visual Bell-state walkthrough and beginner-first navigation without making simulator, hardware, or provider claims beyond the documented local CLI path.
+- [ ] Add a second independently reproducible clean-install conformance environment and record its exact supported-platform boundary.
+- [ ] Update beginner guides, project status, public Evidence Ledger, and changelog only after verified implementation and validation evidence exists.

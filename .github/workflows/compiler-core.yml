@@ -56,3 +56,43 @@ jobs:
 
       - name: Run compiler-core smoke test
         run: ctest --test-dir compiler/build --output-on-failure
+
+  clean-install-sdk-ubuntu-22:
+    name: Clean-install static SDK conformance (Ubuntu 22.04)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install minimal native SDK build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ nlohmann-json3-dev libssl-dev
+
+      - name: Configure clean native SDK producer
+        run: |
+          cmake -S compiler -B compiler/clean-sdk-build -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_CLI_TOOLS=OFF \
+            -DBUILD_COMPILER_EXECUTABLE=OFF \
+            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
+            -DBUILD_REPL=OFF \
+            -DBUILD_CORE_SMOKE_TESTS=OFF \
+            -DBUILD_RECOVERY_CLI=OFF \
+            -DBUILD_RECOVERY_NATIVE_SDK=ON
+
+      - name: Build and install static SDK into an isolated prefix
+        run: |
+          cmake --build compiler/clean-sdk-build --parallel 2
+          cmake --install compiler/clean-sdk-build --prefix "$RUNNER_TEMP/synq-sdk-prefix"
+
+      - name: Configure and build external C ABI consumer
+        run: |
+          cmake -S compiler/tests/interop/installed_sdk_consumer -B "$RUNNER_TEMP/synq-sdk-consumer" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/synq-sdk-prefix"
+          cmake --build "$RUNNER_TEMP/synq-sdk-consumer" --parallel 2
+
+      - name: Run external clean-install consumer
+        run: "$RUNNER_TEMP/synq-sdk-consumer/synq_installed_sdk_consumer"
