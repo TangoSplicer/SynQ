@@ -1,4 +1,6 @@
 #include <fstream>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -16,7 +18,7 @@ bool require(bool condition, const std::string& message) {
 }
 
 std::string write_fixture(const std::string& filename, const std::string& content) {
-    const std::string path = "/tmp/" + filename;
+    const std::string path = (std::filesystem::temp_directory_path() / filename).string();
     std::ofstream fixture(path);
     fixture << content;
     fixture.close();
@@ -73,7 +75,8 @@ bool parser_reports_structured_recovery_errors() {
 
 bool parser_reports_file_and_success_results() {
     Parser parser;
-    const auto missing = parser.parseFileWithDiagnostics("/tmp/synq_diagnostic_missing.synq");
+    const auto missing = parser.parseFileWithDiagnostics(
+        (std::filesystem::temp_directory_path() / "synq_diagnostic_missing.synq").string());
     const std::string valid_path = write_fixture(
         "synq_diagnostic_valid.synq",
         "#[experimental(feature = \"parameterized-quantum-gates\")]\n"

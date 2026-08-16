@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -20,7 +21,7 @@ bool require(bool condition, const std::string& message) {
 }
 
 std::string write_fixture(const std::string& filename, const std::string& content) {
-    const std::string path = "/tmp/" + filename;
+    const std::string path = (std::filesystem::temp_directory_path() / filename).string();
     std::ofstream fixture(path);
     fixture << content;
     fixture.close();
@@ -95,7 +96,8 @@ bool parser_rejects_invalid_fixture() {
     std::unique_ptr<ASTNode> malformed(parser.parseFile(malformed_path));
     std::unique_ptr<ASTNode> unsupported(parser.parseFile(unsupported_path));
     std::unique_ptr<ASTNode> malformed_declaration(parser.parseFile(declaration_path));
-    std::unique_ptr<ASTNode> missing(parser.parseFile("/tmp/synq_parser_missing_fixture.synq"));
+    std::unique_ptr<ASTNode> missing(parser.parseFile(
+        (std::filesystem::temp_directory_path() / "synq_parser_missing_fixture.synq").string()));
     std::remove(malformed_path.c_str());
     std::remove(unsupported_path.c_str());
     std::remove(declaration_path.c_str());

@@ -29,6 +29,14 @@ bool write_file(const std::filesystem::path& path, const std::string& contents) 
     return static_cast<bool>(output);
 }
 
+#ifdef _WIN32
+bool write_windows_launcher(const std::filesystem::path& path, const std::filesystem::path& executable) {
+    std::ofstream output(path, std::ios::binary);
+    output << "@echo off\r\n\"" << executable.string() << "\" %*\r\n";
+    return static_cast<bool>(output);
+}
+#endif
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -47,6 +55,14 @@ int main(int argc, char** argv) {
     const auto literal_if_qasm = base.string() + "_literal_if_output.qasm";
     const auto stdout_path = base.string() + "_stdout.txt";
     const auto stderr_path = base.string() + "_stderr.txt";
+
+#ifdef _WIN32
+    const auto launcher = base.string() + "_launcher.cmd";
+    if (!require(write_windows_launcher(launcher, executable), "writes a Windows CLI launcher")) return 1;
+    const std::string invoke = quote(launcher);
+#else
+    const std::string invoke = quote(executable);
+#endif
 
     if (!require(write_file(quantum, "quantum h q[0]\nmeasure q[0]\n"), "writes quantum CLI fixture") ||
         !require(write_file(constants,
@@ -70,7 +86,6 @@ int main(int argc, char** argv) {
                  "writes literal-if strict-export CLI fixture") ||
         !require(write_file(invalid, "quantum cx q[0]\n"), "writes invalid CLI fixture")) return 1;
 
-    const std::string invoke = quote(executable);
     if (!require(std::system((invoke + " --version > " + quote(stdout_path) + " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("synqc 0.1.0-experimental") != std::string::npos,
                  "version mode reports the documented experimental recovery CLI version")) return 1;
@@ -135,6 +150,9 @@ int main(int argc, char** argv) {
     std::filesystem::remove(literal_if_qasm);
     std::filesystem::remove(stdout_path);
     std::filesystem::remove(stderr_path);
+#ifdef _WIN32
+    std::filesystem::remove(launcher);
+#endif
     std::cout << "SynQ CLI smoke test passed\n";
     return 0;
 }

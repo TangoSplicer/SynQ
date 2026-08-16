@@ -13,10 +13,10 @@ static int require(int condition, const char* message) {
 }
 
 int main(void) {
-    const char* path = "/tmp/synq_c_abi_smoke.synq";
-    const char* semantic_path = "/tmp/synq_c_abi_semantic_smoke.synq";
-    const char* duplicate_path = "/tmp/synq_c_abi_duplicate_smoke.synq";
-    const char* measurement_path = "/tmp/synq_c_abi_measurement_smoke.synq";
+    const char* path = "synq_c_abi_smoke.synq";
+    const char* semantic_path = "synq_c_abi_semantic_smoke.synq";
+    const char* duplicate_path = "synq_c_abi_duplicate_smoke.synq";
+    const char* measurement_path = "synq_c_abi_measurement_smoke.synq";
     const char* in_memory_source = "quantum h q[0]\nmeasure q[0]\n";
     const char* typed_in_memory_source =
         "#[experimental(feature = \"qubit-declarations\")]\n"
@@ -145,7 +145,7 @@ int main(void) {
 
     program = NULL;
     diagnostic = NULL;
-    status = synq_parse_file("/tmp/synq_missing_c_abi_file.synq", &program, &diagnostic);
+    status = synq_parse_file("synq_missing_c_abi_file.synq", &program, &diagnostic);
     if (!require(status == SYNQ_STATUS_PARSE_ERROR, "C consumer receives a parse error for a missing file")) {
         synq_string_free(diagnostic);
         remove(path);

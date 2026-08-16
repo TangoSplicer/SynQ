@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -16,6 +17,10 @@ bool require(bool condition, const std::string& message) {
         return false;
     }
     return true;
+}
+
+std::string fixture_path(const std::string& filename) {
+    return (std::filesystem::temp_directory_path() / filename).string();
 }
 
 bool exports_supported_kernels_in_order() {
@@ -39,7 +44,7 @@ bool exports_supported_kernels_in_order() {
 }
 
 bool exports_parsed_quantum_fixture() {
-    const std::string path = "/tmp/synq_openqasm3_fixture.synq";
+    const std::string path = fixture_path("synq_openqasm3_fixture.synq");
     std::ofstream fixture(path);
     fixture << "quantum h // standard gate\n";
     fixture << "quantum y\n";
@@ -58,7 +63,7 @@ bool exports_parsed_quantum_fixture() {
 }
 
 bool exports_explicit_qubit_operands() {
-    const std::string path = "/tmp/synq_openqasm3_explicit_fixture.synq";
+    const std::string path = fixture_path("synq_openqasm3_explicit_fixture.synq");
     std::ofstream fixture(path);
     fixture << "quantum h q[3];\n";
     fixture << "quantum cx q[3], q[5];\n";
@@ -120,7 +125,7 @@ bool rejects_invalid_explicit_operands() {
 }
 
 bool exports_literal_angle_gates() {
-    const std::string path = "/tmp/synq_openqasm3_parameter_fixture.synq";
+    const std::string path = fixture_path("synq_openqasm3_parameter_fixture.synq");
     std::ofstream fixture(path);
     fixture << "#[experimental(feature = \"parameterized-quantum-gates\")]\n";
     fixture << "quantum rx(pi/2) q[0];\n";
