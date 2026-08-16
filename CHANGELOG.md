@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Tested-environment guide:** Published the verified Ubuntu-like compiler and
+  clean-install boundary without claiming a broader support matrix.
+- **Alpha named-register operands:** Added parser, Hybrid IR, resolver, range
+  diagnostics, strict-Hybrid OpenQASM lowering, CLI coverage, and explicit
+  simulator rejection. [Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553)
+  passed **27/27** checks.
+- **Strict literal-if gate lowering:** Added the exact `if true/false then
+  quantum <supported gate>` OpenQASM source-lowering subset, CLI coverage, and
+  rejection fixtures for wider control forms. [Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849)
+  passed **27/27** checks.
+- **Community and contract materials:** Added factual interoperability guidance,
+  contribution workflow, security-reporting policy, and bounded issue templates.
+
+### Changed
+- **Repository status documents:** Replaced stale compiler, CLI, security,
+  support, and release assertions with the current experimental recovery-profile
+  evidence and explicit non-claims.
+
+### Planned
+- Add a second independently validated clean-install environment before making
+  any support-matrix or cross-platform SDK claim.
+- Design the resource and bounded-execution contracts required before
+  multi-register simulation, non-literal control, or callable bodies/calls.
+
+---
+
 ## [0.1.0-experimental] - 2026-08-15
 
 ### Added
@@ -21,12 +50,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 - **CLI Versioning:** Maintained `synqc 0.1.0-experimental` as the truthful version for the bounded recovery CLI artifact.
 - **Documentation Alignment:** Replaced obsolete speculative v1.0.0 release notes with a factual experimental engineering changelog.
-
----
-
-## [Unreleased]
-
-### Planned
-- Named-register allocation and literal operand validation.
-- Guarded `if` statement lowering in strict Hybrid IR.
-- Expanded SDK clean-install coverage across target operating systems.
