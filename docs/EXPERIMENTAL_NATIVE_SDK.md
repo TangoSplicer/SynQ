@@ -3,6 +3,7 @@
 **Status:** Remotely validated experimental native SDK path.
 **Scope:** The recovery-profile C ABI only.
 **Related policy:** [`EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md`](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md)
+**Tested environment:** [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md)
 
 ## Purpose
 
