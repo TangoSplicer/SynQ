@@ -73,11 +73,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install nlohmann_json via vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonPath: ''
-          vcpkgArguments: 'nlohmann-json'
+      - name: Install nlohmann_json via vcpkg classic mode
+        run: |
+          vcpkg install nlohmann-json:x64-windows
 
       - name: Configure verified recovery profile (Windows)
         run: |
