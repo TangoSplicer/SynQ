@@ -78,6 +78,51 @@ bool exports_explicit_named_register_hybrid_subset() {
                    "Hybrid OpenQASM preserves declared register names, bounds, and measurement storage");
 }
 
+bool lowers_literal_if_gate_and_rejects_wider_control() {
+    bool literal_ok = false;
+    const auto literal_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "if true then quantum h q[0]\n", literal_ok);
+    if (!require(literal_ok, "literal-if Hybrid fixture lowers")) return false;
+    const auto literal_export = synq::compiler::export_hybrid_openqasm3(literal_if);
+    const std::string expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[1] q;\n"
+        "if (true) h q[0];\n";
+    if (!require(literal_export.ok() && literal_export.program == expected,
+                 "strict Hybrid export lowers one literal-if typed gate body")) return false;
+
+    bool identifier_ok = false;
+    const auto identifier_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "if enabled then quantum h q[0]\n", identifier_ok);
+    if (!require(identifier_ok && !synq::compiler::export_hybrid_openqasm3(identifier_if).ok(),
+                 "strict Hybrid export rejects identifier-based if conditions")) return false;
+
+    bool while_ok = false;
+    const auto while_control = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "while true do quantum h q[0]\n", while_ok);
+    if (!require(while_ok && !synq::compiler::export_hybrid_openqasm3(while_control).ok(),
+                 "strict Hybrid export rejects while-loop lowering")) return false;
+
+    bool measurement_ok = false;
+    const auto measurement_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "if false then measure q[0]\n", measurement_ok);
+    return require(measurement_ok && !synq::compiler::export_hybrid_openqasm3(measurement_if).ok(),
+                   "strict Hybrid export retains the literal-if measurement boundary");
+}
+
 bool rejects_unsupported_hybrid_boundaries() {
     bool no_declaration_ok = false;
     const auto no_declaration = lower_fixture("quantum h q[0]\n", no_declaration_ok);
@@ -110,6 +155,7 @@ bool rejects_unsupported_hybrid_boundaries() {
 int main() {
     if (!exports_explicit_typed_hybrid_subset()) return 1;
     if (!exports_explicit_named_register_hybrid_subset()) return 1;
+    if (!lowers_literal_if_gate_and_rejects_wider_control()) return 1;
     if (!rejects_unsupported_hybrid_boundaries()) return 1;
     std::cout << "SynQ Hybrid OpenQASM 3 exporter smoke test passed\n";
     return 0;

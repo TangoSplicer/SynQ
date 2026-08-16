@@ -184,7 +184,7 @@ void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
     }
 }
 
-OpenQasm3ExportResult export_named_register_hybrid_openqasm3(const HybridProgram& program) {
+OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& program) {
     OpenQasm3ExportResult result;
     std::ostringstream body;
     std::unordered_map<std::string, std::size_t> declared_qubit_counts;
@@ -263,8 +263,43 @@ OpenQasm3ExportResult export_named_register_hybrid_openqasm3(const HybridProgram
         }
 
         if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
-            add_diagnostic(result, control->span.line,
-                           "Hybrid OpenQASM 3 export does not lower bounded classical control-flow nodes");
+            if (control->kind != ClassicalControlKind::If ||
+                control->condition.kind != ClassicalConditionKind::BooleanLiteral) {
+                add_diagnostic(result, control->span.line,
+                               "Hybrid OpenQASM 3 export lowers only literal if conditions, not identifier/expression conditions or while loops");
+                continue;
+            }
+            const auto* gate = std::get_if<HybridQuantumGate>(&control->body);
+            if (gate == nullptr) {
+                add_diagnostic(result, control->span.line,
+                               "Hybrid OpenQASM 3 literal if lowering supports one typed quantum gate body only");
+                continue;
+            }
+            if (gate->qubit_register_names.size() != gate->qubit_indices.size()) {
+                add_diagnostic(result, gate->span.line,
+                               "Hybrid OpenQASM 3 export received mismatched quantum register metadata");
+                continue;
+            }
+            bool operands_valid = true;
+            for (std::size_t position = 0; position < gate->qubit_indices.size(); ++position) {
+                const auto declaration = declared_qubit_counts.find(gate->qubit_register_names[position]);
+                if (declaration == declared_qubit_counts.end() || gate->qubit_indices[position] >= declaration->second) {
+                    add_diagnostic(result, gate->span.line,
+                                   "literal if quantum operand requires an earlier declared register and an in-range index");
+                    operands_valid = false;
+                    break;
+                }
+            }
+            if (!operands_valid) continue;
+            QuantumGateNode typed_gate(gate->kind, gate->source_name, gate->literal_angle,
+                                       gate->qubit_indices, gate->span.line, gate->span,
+                                       gate->qubit_register_names);
+            std::ostringstream lowered_body;
+            std::size_t inferred_qubit_count = 0;
+            lower_quantum_gate(typed_gate, lowered_body, inferred_qubit_count, result);
+            if (!result.ok()) continue;
+            body << "if (" << (control->condition.boolean_value ? "true" : "false") << ") "
+                 << lowered_body.str();
             continue;
         }
 
@@ -361,12 +396,12 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
 }
 
 OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
-    const bool contains_named_register = std::any_of(program.nodes.begin(), program.nodes.end(),
+    const bool requires_extended_lowering = std::any_of(program.nodes.begin(), program.nodes.end(),
         [](const HybridNode& node) {
             const auto* qubits = std::get_if<HybridQubitDeclaration>(&node);
-            return qubits != nullptr && qubits->name != "q";
+            return (qubits != nullptr && qubits->name != "q") || std::holds_alternative<HybridControlFlow>(node);
         });
-    if (contains_named_register) return export_named_register_hybrid_openqasm3(program);
+    if (requires_extended_lowering) return export_extended_hybrid_openqasm3(program);
 
     OpenQasm3ExportResult result;
     std::ostringstream body;

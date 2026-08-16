@@ -39,10 +39,12 @@ int main(int argc, char** argv) {
     const auto constants = base.string() + "_constants.synq";
     const auto simulation = base.string() + "_simulation.synq";
     const auto named_registers = base.string() + "_named_registers.synq";
+    const auto literal_if = base.string() + "_literal_if.synq";
     const auto invalid = base.string() + "_invalid.synq";
     const auto qasm = base.string() + "_output.qasm";
     const auto hybrid_qasm = base.string() + "_hybrid_output.qasm";
     const auto named_hybrid_qasm = base.string() + "_named_hybrid_output.qasm";
+    const auto literal_if_qasm = base.string() + "_literal_if_output.qasm";
     const auto stdout_path = base.string() + "_stdout.txt";
     const auto stderr_path = base.string() + "_stderr.txt";
 
@@ -61,6 +63,11 @@ int main(int argc, char** argv) {
                             "qubit data[1]\nqubit ancilla[1]\n"
                             "quantum cx data[0], ancilla[0]\nmeasure data[0]\n"),
                  "writes named-register strict-export CLI fixture") ||
+        !require(write_file(literal_if,
+                            "#[experimental(feature = \"qubit-declarations\")]\n"
+                            "#[experimental(feature = \"classical-control-flow\")]\n"
+                            "qubit q[1]\nif true then quantum h q[0]\n"),
+                 "writes literal-if strict-export CLI fixture") ||
         !require(write_file(invalid, "quantum cx q[0]\n"), "writes invalid CLI fixture")) return 1;
 
     const std::string invoke = quote(executable);
@@ -93,6 +100,11 @@ int main(int argc, char** argv) {
                      read_file(named_hybrid_qasm).find("cx data[0], ancilla[0];") != std::string::npos,
                  "strict Hybrid OpenQASM mode lowers the Alpha named-register subset")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(literal_if) + " --emit-openqasm-hybrid --out " + quote(literal_if_qasm) +
+                              " > " + quote(stdout_path) + " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(literal_if_qasm).find("if (true) h q[0];") != std::string::npos,
+                 "strict Hybrid OpenQASM mode lowers the Alpha literal-if gate subset")) return 1;
+
     if (!require(std::system((invoke + " " + quote(constants) + " --eval-constants > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("total = Integer:9") != std::string::npos &&
@@ -115,10 +127,12 @@ int main(int argc, char** argv) {
     std::filesystem::remove(constants);
     std::filesystem::remove(simulation);
     std::filesystem::remove(named_registers);
+    std::filesystem::remove(literal_if);
     std::filesystem::remove(invalid);
     std::filesystem::remove(qasm);
     std::filesystem::remove(hybrid_qasm);
     std::filesystem::remove(named_hybrid_qasm);
+    std::filesystem::remove(literal_if_qasm);
     std::filesystem::remove(stdout_path);
     std::filesystem::remove(stderr_path);
     std::cout << "SynQ CLI smoke test passed\n";
