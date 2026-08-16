@@ -21,23 +21,28 @@ bool parse_integer(const std::string& text, std::int64_t& value) {
 
 bool checked_arithmetic(ClassicalIntegerArithmeticExpressionKind kind, std::int64_t left, std::int64_t right,
                         std::int64_t& result) {
-    __int128 raw = 0;
+    constexpr auto minimum = std::numeric_limits<std::int64_t>::min();
+    constexpr auto maximum = std::numeric_limits<std::int64_t>::max();
     switch (kind) {
         case ClassicalIntegerArithmeticExpressionKind::Add:
-            raw = static_cast<__int128>(left) + static_cast<__int128>(right);
-            break;
+            if ((right > 0 && left > maximum - right) || (right < 0 && left < minimum - right)) return false;
+            result = left + right;
+            return true;
         case ClassicalIntegerArithmeticExpressionKind::Subtract:
-            raw = static_cast<__int128>(left) - static_cast<__int128>(right);
-            break;
+            if ((right < 0 && left > maximum + right) || (right > 0 && left < minimum + right)) return false;
+            result = left - right;
+            return true;
         case ClassicalIntegerArithmeticExpressionKind::Multiply:
-            raw = static_cast<__int128>(left) * static_cast<__int128>(right);
-            break;
+            if (left > 0) {
+                if ((right > 0 && left > maximum / right) || (right < 0 && right < minimum / left)) return false;
+            } else if (left < 0) {
+                if ((right > 0 && left < minimum / right) || (right < 0 && left < maximum / right)) return false;
+            }
+            result = left * right;
+            return true;
         default:
             return false;
     }
-    if (raw < std::numeric_limits<std::int64_t>::min() || raw > std::numeric_limits<std::int64_t>::max()) return false;
-    result = static_cast<std::int64_t>(raw);
-    return true;
 }
 
 bool evaluate_integer_tree(const ClassicalIntegerArithmeticExpression& expression,

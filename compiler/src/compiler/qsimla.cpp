@@ -28,6 +28,10 @@
 
 namespace synq {
 
+    namespace {
+    constexpr double kPi = 3.14159265358979323846;
+    }
+
     QSimLA::QSimLA(int num_qubits) : qubits_(num_qubits) {
         size_t dim = 1ULL << num_qubits;
         state_.resize(dim, Complex(0.0, 0.0));
@@ -41,7 +45,7 @@ namespace synq {
 
     void QSimLA::apply_unitary(const std::string& gate, int target, std::optional<double> param) {
         // Basic gate emulation
-        double theta = param.value_or(M_PI / 4);
+        double theta = param.value_or(kPi / 4);
         for (size_t i = 0; i < state_.size(); ++i) {
             if (((i >> target) & 1) == 1) {
                 state_[i] *= std::polar(1.0, theta);  // Rotate phase

@@ -94,8 +94,28 @@ bool rejects_unsupported_or_overflowing_semantics() {
                      "let overflow = maximum + 1\n",
                      overflow_result),
                  "overflow fixture parses, lowers, and resolves")) return false;
-    return require(!overflow_result.ok() && has_code(overflow_result.diagnostics, "SYNQ-E005"),
-                   "Integer overflow is rejected deterministically");
+    if (!require(!overflow_result.ok() && has_code(overflow_result.diagnostics, "SYNQ-E005"),
+                 "addition overflow is rejected deterministically")) return false;
+
+    synq::compiler::BoundedEvaluationResult multiplication_overflow_result;
+    if (!require(evaluate_source(
+                     "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
+                     "let maximum = 9223372036854775807\n"
+                     "let overflow = maximum * 2\n",
+                     multiplication_overflow_result),
+                 "multiplication overflow fixture parses, lowers, and resolves")) return false;
+    if (!require(!multiplication_overflow_result.ok() && has_code(multiplication_overflow_result.diagnostics, "SYNQ-E005"),
+                 "multiplication overflow is rejected deterministically")) return false;
+
+    synq::compiler::BoundedEvaluationResult subtraction_overflow_result;
+    if (!require(evaluate_source(
+                     "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
+                     "let minimum = -9223372036854775808\n"
+                     "let overflow = minimum - 1\n",
+                     subtraction_overflow_result),
+                 "subtraction overflow fixture parses, lowers, and resolves")) return false;
+    return require(!subtraction_overflow_result.ok() && has_code(subtraction_overflow_result.diagnostics, "SYNQ-E005"),
+                   "subtraction overflow is rejected deterministically");
 }
 
 }  // namespace
