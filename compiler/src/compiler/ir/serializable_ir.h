@@ -130,7 +130,9 @@ protected:
     void deserialize_metadata(const json& data) {
         if (data.contains("file_path")) file_path = data["file_path"];
         if (data.contains("file_hash")) file_hash = data["file_hash"];
-        if (data.contains("dependencies")) dependencies = data["dependencies"];
+        if (data.contains("dependencies")) {
+            dependencies = data["dependencies"].get<std::vector<std::string>>();
+        }
         if (data.contains("timestamp")) timestamp = data["timestamp"];
     }
 };
