@@ -85,16 +85,16 @@ jobs:
         run: cmake --build compiler/build --config Release --parallel 2
 
       - name: Run compiler-core smoke test (Windows)
-        run: ctest --test-dir compiler/build --config Release --output-on-failure
+        run: ctest --test-dir compiler/build -C Release --output-on-failure
 
       - name: Archive Windows build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: synq-compiler-windows-artifact
           path: |
-            compiler/build/Release/synq_lib.lib
+            compiler/build/src/Release/synq_lib.lib
             compiler/build/Release/synqc.exe
-            compiler/build/Release/synq_ffi.dll
+          if-no-files-found: error
 
   clean-install-sdk-ubuntu-22:
     name: Clean-install static SDK conformance (Ubuntu 22.04)
