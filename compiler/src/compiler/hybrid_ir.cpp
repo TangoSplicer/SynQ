@@ -85,6 +85,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 gate->source_name,
                 gate->literal_angle,
                 gate->qubit_indices,
+                gate->qubit_register_names,
                 gate->span,
             });
             continue;
@@ -93,6 +94,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
         if (const auto* measurement = dynamic_cast<const MeasurementNode*>(statement)) {
             lowered.nodes.emplace_back(HybridMeasurement{
                 measurement->qubit_index,
+                measurement->qubit_register_name,
                 measurement->result_name,
                 measurement->span,
             });
@@ -104,7 +106,8 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 lowered.nodes.emplace_back(HybridControlFlow{
                     control->kind,
                     control->condition,
-                    HybridQuantumGate{gate->kind, gate->source_name, gate->literal_angle, gate->qubit_indices, gate->span},
+                    HybridQuantumGate{gate->kind, gate->source_name, gate->literal_angle, gate->qubit_indices,
+                                      gate->qubit_register_names, gate->span},
                     control->span,
                 });
                 continue;
@@ -113,7 +116,8 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 lowered.nodes.emplace_back(HybridControlFlow{
                     control->kind,
                     control->condition,
-                    HybridMeasurement{measurement->qubit_index, measurement->result_name, measurement->span},
+                    HybridMeasurement{measurement->qubit_index, measurement->qubit_register_name,
+                                      measurement->result_name, measurement->span},
                     control->span,
                 });
                 continue;

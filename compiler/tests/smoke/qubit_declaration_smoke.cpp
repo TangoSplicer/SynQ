@@ -124,12 +124,63 @@ bool validates_default_register_operand_order_and_bounds() {
                    "legacy operands retain prior behavior when no explicit default register exists");
 }
 
+bool validates_named_register_operands() {
+    Parser parser;
+    const auto gated = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "qubit data[2]\n"
+        "quantum h data[0]\n");
+    if (!require(!gated.ok() && has_code(gated.diagnostics, "SYNQ-P007"),
+                 "named register operands require their own Alpha opt-in")) return false;
+
+    const auto parsed = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"named-qubit-register-operands\")]\n"
+        "qubit data[2]\n"
+        "qubit ancilla[1]\n"
+        "quantum cx data[1], ancilla[0]\n"
+        "measure data[0]\n");
+    if (!require(parsed.ok(), "gated named-register gate and measurement syntax parses")) return false;
+    const auto* gate = dynamic_cast<const QuantumGateNode*>(parsed.program->statements.at(2));
+    const auto* measurement = dynamic_cast<const MeasurementNode*>(parsed.program->statements.at(3));
+    if (!require(gate != nullptr && gate->qubit_register_names.size() == 2 &&
+                     gate->qubit_register_names[0] == "data" && gate->qubit_register_names[1] == "ancilla" &&
+                     measurement != nullptr && measurement->qubit_register_name == "data",
+                 "typed nodes retain named-register provenance")) return false;
+    const auto lowered = synq::compiler::lower_to_hybrid_ir(*parsed.program);
+    const auto resolved = synq::compiler::resolve_hybrid_names(*lowered.program);
+    if (!require(lowered.ok() && resolved.ok(), "declared in-range named operands lower and resolve")) return false;
+
+    const auto forward = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"named-qubit-register-operands\")]\n"
+        "quantum h data[0]\n"
+        "qubit data[1]\n");
+    if (!require(forward.ok(), "forward named-register source remains a successful parse")) return false;
+    const auto forward_hir = synq::compiler::lower_to_hybrid_ir(*forward.program);
+    const auto forward_resolved = synq::compiler::resolve_hybrid_names(*forward_hir.program);
+    if (!require(!forward_resolved.ok() && has_code(forward_resolved.diagnostics, "SYNQ-Q001"),
+                 "named-register operand before declaration reports SYNQ-Q001")) return false;
+
+    const auto out_of_range = parser.parseSourceWithDiagnostics(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"named-qubit-register-operands\")]\n"
+        "qubit data[1]\n"
+        "measure data[1]\n");
+    if (!require(out_of_range.ok(), "out-of-range named measurement remains a successful parse")) return false;
+    const auto out_of_range_hir = synq::compiler::lower_to_hybrid_ir(*out_of_range.program);
+    const auto out_of_range_resolved = synq::compiler::resolve_hybrid_names(*out_of_range_hir.program);
+    return require(!out_of_range_resolved.ok() && has_code(out_of_range_resolved.diagnostics, "SYNQ-Q002"),
+                   "named-register range failure reports SYNQ-Q002");
+}
+
 }  // namespace
 
 int main() {
     if (!parses_lowers_and_resolves_qubit_declarations()) return 1;
     if (!enforces_gate_grammar_and_shared_top_level_names()) return 1;
     if (!validates_default_register_operand_order_and_bounds()) return 1;
+    if (!validates_named_register_operands()) return 1;
     std::cout << "SynQ bounded qubit declaration smoke test passed\n";
     return 0;
 }

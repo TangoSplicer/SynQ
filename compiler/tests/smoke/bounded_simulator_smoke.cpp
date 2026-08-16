@@ -89,8 +89,19 @@ bool enforces_opt_in_and_resource_or_semantic_boundaries() {
                      "#[experimental(feature = \"qubit-declarations\")]\n"
                      "qubit q[1]\nmeasure q[0] as observed\n", named_measurement),
                  "named-measurement fixture parses, lowers, and resolves")) return false;
-    return require(!named_measurement.ok() && has_code(named_measurement.diagnostics, "SYNQ-SIM002"),
-                   "simulator rejects sampling/binding semantics it does not implement");
+    if (!require(!named_measurement.ok() && has_code(named_measurement.diagnostics, "SYNQ-SIM002"),
+                   "simulator rejects sampling/binding semantics it does not implement")) return false;
+
+    synq::compiler::BoundedSimulationResult named_register;
+    if (!require(simulate_source(
+                     "#[experimental(feature = \"qubit-declarations\")]\n"
+                     "#[experimental(feature = \"named-qubit-register-operands\")]\n"
+                     "qubit data[1]\n"
+                     "quantum h data[0]\n"
+                     "measure data[0]\n", named_register),
+                 "named-register simulation fixture parses, lowers, and resolves")) return false;
+    return require(!named_register.ok() && has_code(named_register.diagnostics, "SYNQ-SIM001"),
+                   "bounded simulator retains an explicit default-register-only boundary");
 }
 
 }  // namespace

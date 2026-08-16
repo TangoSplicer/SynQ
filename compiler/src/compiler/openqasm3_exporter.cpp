@@ -5,6 +5,7 @@
 #include <limits>
 #include <memory>
 #include <sstream>
+#include <unordered_map>
 
 namespace synq::compiler {
 namespace {
@@ -36,8 +37,9 @@ bool parse_operands(const std::vector<std::string>& arguments, std::vector<std::
     return true;
 }
 
-void write_single_qubit_gate(std::ostringstream& body, const std::string& gate, std::size_t qubit) {
-    body << gate << " q[" << qubit << "];\n";
+void write_single_qubit_gate(std::ostringstream& body, const std::string& gate,
+                             const std::string& register_name, std::size_t qubit) {
+    body << gate << " " << register_name << "[" << qubit << "];\n";
 }
 
 bool is_decimal_parameter(const std::string& value) {
@@ -77,8 +79,9 @@ bool split_parameterized_kernel(const std::string& kernel, std::string& gate, st
 }
 
 void write_parameterized_single_qubit_gate(
-    std::ostringstream& body, const std::string& gate, const std::string& parameter, std::size_t qubit) {
-    body << gate << "(" << parameter << ") q[" << qubit << "];\n";
+    std::ostringstream& body, const std::string& gate, const std::string& parameter,
+    const std::string& register_name, std::size_t qubit) {
+    body << gate << "(" << parameter << ") " << register_name << "[" << qubit << "];\n";
 }
 
 QuantumGateKind quantum_gate_kind(const std::string& source_name) {
@@ -113,6 +116,10 @@ std::unique_ptr<QuantumGateNode> typed_legacy_instruction(const InstructionNode&
 
 void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
                         std::size_t& qubit_count, OpenQasm3ExportResult& result) {
+    const auto register_name = [&gate](std::size_t position) -> const std::string& {
+        static const std::string default_register = "q";
+        return position < gate.qubit_register_names.size() ? gate.qubit_register_names[position] : default_register;
+    };
     if (gate.kind == QuantumGateKind::H || gate.kind == QuantumGateKind::X ||
         gate.kind == QuantumGateKind::Y || gate.kind == QuantumGateKind::Z) {
         if (gate.literal_angle.has_value()) {
@@ -125,7 +132,7 @@ void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
             return;
         }
         const std::size_t qubit = gate.qubit_indices.empty() ? 0 : gate.qubit_indices.front();
-        write_single_qubit_gate(body, gate.source_name, qubit);
+        write_single_qubit_gate(body, gate.source_name, register_name(0), qubit);
         qubit_count = std::max(qubit_count, qubit + 1);
         return;
     }
@@ -135,7 +142,8 @@ void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
             add_diagnostic(result, gate.line, "kernel `cx` requires exactly two explicit qubit operands");
             return;
         }
-        body << "cx q[" << gate.qubit_indices[0] << "], q[" << gate.qubit_indices[1] << "];\n";
+        body << "cx " << register_name(0) << "[" << gate.qubit_indices[0] << "], "
+             << register_name(1) << "[" << gate.qubit_indices[1] << "];\n";
         qubit_count = std::max(qubit_count, std::max(gate.qubit_indices[0], gate.qubit_indices[1]) + 1);
         return;
     }
@@ -147,8 +155,9 @@ void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
         }
         const std::size_t first = gate.qubit_indices.empty() ? 0 : gate.qubit_indices[0];
         const std::size_t second = gate.qubit_indices.empty() ? 1 : gate.qubit_indices[1];
-        write_single_qubit_gate(body, "h", first);
-        body << "cx q[" << first << "], q[" << second << "];\n";
+        write_single_qubit_gate(body, "h", register_name(0), first);
+        body << "cx " << register_name(0) << "[" << first << "], "
+             << register_name(gate.qubit_indices.empty() ? 0 : 1) << "[" << second << "];\n";
         qubit_count = std::max(qubit_count, std::max(first, second) + 1);
         return;
     }
@@ -160,7 +169,8 @@ void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
                            "parameterized gate `" + gate.source_name + "` requires exactly one explicit qubit operand");
             return;
         }
-        write_parameterized_single_qubit_gate(body, gate.source_name, *gate.literal_angle, gate.qubit_indices.front());
+        write_parameterized_single_qubit_gate(body, gate.source_name, *gate.literal_angle,
+                                              register_name(0), gate.qubit_indices.front());
         qubit_count = std::max(qubit_count, gate.qubit_indices.front() + 1);
         return;
     }
@@ -172,6 +182,115 @@ void lower_quantum_gate(const QuantumGateNode& gate, std::ostringstream& body,
         add_diagnostic(result, gate.line,
                        "unsupported quantum kernel `" + gate.source_name + "` for the OpenQASM 3 recovery exporter");
     }
+}
+
+OpenQasm3ExportResult export_named_register_hybrid_openqasm3(const HybridProgram& program) {
+    OpenQasm3ExportResult result;
+    std::ostringstream body;
+    std::unordered_map<std::string, std::size_t> declared_qubit_counts;
+    std::vector<std::string> declaration_order;
+    std::unordered_map<std::string, bool> measured_registers;
+    std::vector<std::string> measurement_order;
+
+    for (const HybridNode& node : program.nodes) {
+        if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
+            if (declared_qubit_counts.find(qubits->name) != declared_qubit_counts.end()) {
+                add_diagnostic(result, qubits->span.line,
+                               "Hybrid OpenQASM 3 export accepts each qubit register declaration only once");
+                continue;
+            }
+            declared_qubit_counts.emplace(qubits->name, qubits->qubit_count);
+            declaration_order.push_back(qubits->name);
+            continue;
+        }
+
+        if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
+            if (gate->qubit_register_names.size() != gate->qubit_indices.size()) {
+                add_diagnostic(result, gate->span.line,
+                               "Hybrid OpenQASM 3 export received mismatched quantum register metadata");
+                continue;
+            }
+            bool operands_valid = true;
+            for (std::size_t position = 0; position < gate->qubit_indices.size(); ++position) {
+                const auto declaration = declared_qubit_counts.find(gate->qubit_register_names[position]);
+                if (declaration == declared_qubit_counts.end()) {
+                    add_diagnostic(result, gate->span.line,
+                                   "Hybrid OpenQASM 3 export requires each declared qubit register before use");
+                    operands_valid = false;
+                    break;
+                }
+                if (gate->qubit_indices[position] >= declaration->second) {
+                    add_diagnostic(result, gate->span.line,
+                                   "quantum operand is outside its explicit qubit declaration range");
+                    operands_valid = false;
+                    break;
+                }
+            }
+            if (!operands_valid) continue;
+            QuantumGateNode typed_gate(gate->kind, gate->source_name, gate->literal_angle,
+                                       gate->qubit_indices, gate->span.line, gate->span,
+                                       gate->qubit_register_names);
+            std::size_t inferred_qubit_count = 0;
+            lower_quantum_gate(typed_gate, body, inferred_qubit_count, result);
+            continue;
+        }
+
+        if (const auto* measurement = std::get_if<HybridMeasurement>(&node)) {
+            const auto declaration = declared_qubit_counts.find(measurement->qubit_register_name);
+            if (declaration == declared_qubit_counts.end()) {
+                add_diagnostic(result, measurement->span.line,
+                               "Hybrid OpenQASM 3 export requires each declared qubit register before measurement");
+                continue;
+            }
+            if (measurement->result_name.has_value()) {
+                add_diagnostic(result, measurement->span.line,
+                               "Hybrid OpenQASM 3 export does not lower named SynQ measurement-result declarations");
+                continue;
+            }
+            if (measurement->qubit_index >= declaration->second) {
+                add_diagnostic(result, measurement->span.line,
+                               "measurement operand is outside its explicit qubit declaration range");
+                continue;
+            }
+            body << "c_" << measurement->qubit_register_name << "[" << measurement->qubit_index
+                 << "] = measure " << measurement->qubit_register_name << "["
+                 << measurement->qubit_index << "];\n";
+            if (!measured_registers[measurement->qubit_register_name]) {
+                measured_registers[measurement->qubit_register_name] = true;
+                measurement_order.push_back(measurement->qubit_register_name);
+            }
+            continue;
+        }
+
+        if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
+            add_diagnostic(result, control->span.line,
+                           "Hybrid OpenQASM 3 export does not lower bounded classical control-flow nodes");
+            continue;
+        }
+
+        const auto* declaration = std::get_if<HybridDeclaration>(&node);
+        add_diagnostic(result, declaration == nullptr ? 0 : declaration->span.line,
+                       "Hybrid OpenQASM 3 export supports only qubit declarations, typed quantum gates, and unnamed measurements");
+    }
+
+    if (!result.ok()) return result;
+    if (declaration_order.empty()) {
+        add_diagnostic(result, 0, "Hybrid OpenQASM 3 export requires at least one explicit qubit declaration");
+        return result;
+    }
+
+    std::ostringstream output;
+    output << "OPENQASM 3.0;\n";
+    output << "include \"stdgates.inc\";\n";
+    for (const std::string& name : declaration_order) {
+        output << "qubit[" << declared_qubit_counts.at(name) << "] " << name << ";\n";
+    }
+    for (const std::string& name : measurement_order) {
+        output << "bit[" << declared_qubit_counts.at(name) << "] c_" << name << ";\n";
+    }
+    output << body.str();
+    result.program = output.str();
+    return result;
 }
 
 }  // namespace
@@ -242,6 +361,13 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program) {
 }
 
 OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
+    const bool contains_named_register = std::any_of(program.nodes.begin(), program.nodes.end(),
+        [](const HybridNode& node) {
+            const auto* qubits = std::get_if<HybridQubitDeclaration>(&node);
+            return qubits != nullptr && qubits->name != "q";
+        });
+    if (contains_named_register) return export_named_register_hybrid_openqasm3(program);
+
     OpenQasm3ExportResult result;
     std::ostringstream body;
     std::optional<std::size_t> declared_qubit_count;

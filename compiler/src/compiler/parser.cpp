@@ -59,8 +59,11 @@ bool is_identifier(const std::string& value) {
 }
 
 bool is_qubit_operand(const std::string& value) {
-    return value.size() > 3 && value.rfind("q[", 0) == 0 && value.back() == ']' &&
-           is_non_negative_integer(value.substr(2, value.size() - 3));
+    const std::size_t open = value.find('[');
+    return open != std::string::npos && open > 0 && value.back() == ']' &&
+           value.find('[', open + 1) == std::string::npos &&
+           is_identifier(value.substr(0, open)) &&
+           is_non_negative_integer(value.substr(open + 1, value.size() - open - 2));
 }
 
 bool is_decimal_parameter(const std::string& value) {
@@ -154,28 +157,31 @@ bool parse_quantum_arguments(const std::string& source, std::vector<std::string>
     return false;
 }
 
-bool parse_qubit_index(const std::string& operand, std::size_t& index) {
+bool parse_qubit_operand(const std::string& operand, std::string& register_name, std::size_t& index) {
     if (!is_qubit_operand(operand)) return false;
+    const std::size_t open = operand.find('[');
+    register_name = operand.substr(0, open);
     index = 0;
-    for (std::size_t position = 2; position + 1 < operand.size(); ++position) {
+    for (std::size_t position = open + 1; position + 1 < operand.size(); ++position) {
         index = index * 10 + static_cast<std::size_t>(operand[position] - '0');
     }
     return true;
 }
 
 bool parse_measurement_arguments(const std::string& source,
+                                 std::string& register_name,
                                  std::size_t& qubit_index,
                                  std::optional<std::string>& result_name) {
     const std::string separator = " as ";
     const std::size_t boundary = source.find(separator);
     if (boundary == std::string::npos) {
         result_name = std::nullopt;
-        return parse_qubit_index(source, qubit_index);
+        return parse_qubit_operand(source, register_name, qubit_index);
     }
     if (source.find(separator, boundary + separator.size()) != std::string::npos) return false;
     const std::string operand = trim(source.substr(0, boundary));
     const std::string name = trim(source.substr(boundary + separator.size()));
-    if (!parse_qubit_index(operand, qubit_index) || !is_identifier(name)) return false;
+    if (!parse_qubit_operand(operand, register_name, qubit_index) || !is_identifier(name)) return false;
     result_name = name;
     return true;
 }
@@ -229,14 +235,22 @@ QuantumGateNode* make_quantum_gate_node(const std::vector<std::string>& argument
         : std::nullopt;
 
     std::vector<std::size_t> operands;
+    std::vector<std::string> register_names;
     operands.reserve(arguments.size() - 1);
     for (std::size_t position = 1; position < arguments.size(); ++position) {
         std::size_t index = 0;
-        if (!parse_qubit_index(arguments[position], index)) return nullptr;
+        std::string register_name;
+        if (!parse_qubit_operand(arguments[position], register_name, index)) return nullptr;
         operands.push_back(index);
+        register_names.push_back(std::move(register_name));
     }
     return new QuantumGateNode(quantum_gate_kind(source_name), source_name, literal_angle,
-                               std::move(operands), line_number, span);
+                               std::move(operands), line_number, span, std::move(register_names));
+}
+
+bool uses_named_register_operand(const QuantumGateNode& gate) {
+    return std::any_of(gate.qubit_register_names.begin(), gate.qubit_register_names.end(),
+                       [](const std::string& name) { return name != "q"; });
 }
 
 bool parse_boolean_expression_atom(const std::string& source,
@@ -346,18 +360,32 @@ ASTNode* make_control_body_node(const std::string& operation, const std::string&
             delete gate;
             return nullptr;
         }
+        if (uses_named_register_operand(*gate) && !active_features.is_enabled("named-qubit-register-operands")) {
+            error = {"SYNQ-P007", synq::compiler::DiagnosticSeverity::Error, span,
+                     "named qubit register operands require an alpha feature opt-in",
+                     "add #[experimental(feature = \"named-qubit-register-operands\")] before the gated construct"};
+            delete gate;
+            return nullptr;
+        }
         return gate;
     }
 
     if (operation == "measure") {
+        std::string register_name;
         std::size_t qubit_index = 0;
-        if (!parse_qubit_index(argument, qubit_index)) {
+        if (!parse_qubit_operand(argument, register_name, qubit_index)) {
             error = {"SYNQ-P008", synq::compiler::DiagnosticSeverity::Error, span,
                      "measurement requires exactly one explicit qubit operand",
                      "use measure q[index], for example measure q[0]"};
             return nullptr;
         }
-        return new MeasurementNode(qubit_index, line_number, span);
+        if (register_name != "q" && !active_features.is_enabled("named-qubit-register-operands")) {
+            error = {"SYNQ-P007", synq::compiler::DiagnosticSeverity::Error, span,
+                     "named qubit register operands require an alpha feature opt-in",
+                     "add #[experimental(feature = \"named-qubit-register-operands\")] before the gated construct"};
+            return nullptr;
+        }
+        return new MeasurementNode(qubit_index, line_number, span, std::nullopt, std::move(register_name));
     }
 
     error = {"SYNQ-P010", synq::compiler::DiagnosticSeverity::Error, span,
@@ -568,11 +596,18 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                 return fail_parse("SYNQ-P007", span, "parameterized quantum gates require an alpha feature opt-in",
                                   "add #[experimental(feature = \"parameterized-quantum-gates\")] before the gated construct");
             }
+            if (uses_named_register_operand(*gate) &&
+                !active_features.is_enabled("named-qubit-register-operands")) {
+                delete gate;
+                return fail_parse("SYNQ-P007", span, "named qubit register operands require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"named-qubit-register-operands\")] before the gated construct");
+            }
             root->statements.push_back(gate);
         } else if (operation == "measure") {
+            std::string register_name;
             std::size_t qubit_index = 0;
             std::optional<std::string> result_name;
-            if (!parse_measurement_arguments(argument, qubit_index, result_name)) {
+            if (!parse_measurement_arguments(argument, register_name, qubit_index, result_name)) {
                 return fail_parse("SYNQ-P008", span,
                                   "measurement requires one explicit qubit operand and an optional result identifier",
                                   "use measure q[index] or measure q[index] as <identifier>, for example measure q[0] as observed");
@@ -586,7 +621,12 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                       "rename the measurement result or reuse the existing binding according to future language semantics");
                 }
             }
-            root->statements.push_back(new MeasurementNode(qubit_index, line_number, span, std::move(result_name)));
+            if (register_name != "q" && !active_features.is_enabled("named-qubit-register-operands")) {
+                return fail_parse("SYNQ-P007", span, "named qubit register operands require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"named-qubit-register-operands\")] before the gated construct");
+            }
+            root->statements.push_back(new MeasurementNode(qubit_index, line_number, span,
+                                                           std::move(result_name), std::move(register_name)));
         } else {
             root->statements.push_back(new InstructionNode(operation, {argument}, line_number, span));
         }

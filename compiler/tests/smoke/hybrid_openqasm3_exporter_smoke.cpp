@@ -48,6 +48,36 @@ bool exports_explicit_typed_hybrid_subset() {
            require(exported.program == expected, "Hybrid OpenQASM output respects the explicit q declaration size");
 }
 
+bool exports_explicit_named_register_hybrid_subset() {
+    bool lowered_ok = false;
+    const auto program = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"named-qubit-register-operands\")]\n"
+        "qubit data[2]\n"
+        "qubit ancilla[1]\n"
+        "quantum h data[0]\n"
+        "quantum cx data[0], ancilla[0]\n"
+        "measure data[1]\n"
+        "measure ancilla[0]\n", lowered_ok);
+    if (!require(lowered_ok, "typed named-register Hybrid fixture lowers")) return false;
+
+    const auto exported = synq::compiler::export_hybrid_openqasm3(program);
+    const std::string expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[2] data;\n"
+        "qubit[1] ancilla;\n"
+        "bit[2] c_data;\n"
+        "bit[1] c_ancilla;\n"
+        "h data[0];\n"
+        "cx data[0], ancilla[0];\n"
+        "c_data[1] = measure data[1];\n"
+        "c_ancilla[0] = measure ancilla[0];\n";
+    return require(exported.ok(), "explicit named-register Hybrid subset exports") &&
+           require(exported.program == expected,
+                   "Hybrid OpenQASM preserves declared register names, bounds, and measurement storage");
+}
+
 bool rejects_unsupported_hybrid_boundaries() {
     bool no_declaration_ok = false;
     const auto no_declaration = lower_fixture("quantum h q[0]\n", no_declaration_ok);
@@ -79,6 +109,7 @@ bool rejects_unsupported_hybrid_boundaries() {
 
 int main() {
     if (!exports_explicit_typed_hybrid_subset()) return 1;
+    if (!exports_explicit_named_register_hybrid_subset()) return 1;
     if (!rejects_unsupported_hybrid_boundaries()) return 1;
     std::cout << "SynQ Hybrid OpenQASM 3 exporter smoke test passed\n";
     return 0;

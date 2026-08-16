@@ -40,11 +40,13 @@ struct HybridQuantumGate {
     std::string source_name;
     std::optional<std::string> literal_angle;
     std::vector<std::size_t> qubit_indices;
+    std::vector<std::string> qubit_register_names;
     SourceSpan span;
 };
 
 struct HybridMeasurement {
     std::size_t qubit_index = 0;
+    std::string qubit_register_name = "q";
     std::optional<std::string> result_name;
     SourceSpan span;
 };

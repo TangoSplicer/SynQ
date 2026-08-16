@@ -98,6 +98,7 @@ public:
     std::string source_name;
     std::optional<std::string> literal_angle;
     std::vector<std::size_t> qubit_indices;
+    std::vector<std::string> qubit_register_names;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -114,19 +115,27 @@ public:
                     std::optional<std::string> angle,
                     std::vector<std::size_t> operands,
                     std::size_t line_number,
-                    synq::compiler::SourceSpan source_span)
+                    synq::compiler::SourceSpan source_span,
+                    std::vector<std::string> register_names = {})
         : kind(gate_kind),
           source_name(std::move(original_name)),
           literal_angle(std::move(angle)),
           qubit_indices(std::move(operands)),
+          qubit_register_names(std::move(register_names)),
           line(line_number),
-          span(source_span) {}
+          span(source_span) {
+        if (qubit_register_names.empty()) {
+            qubit_register_names.assign(qubit_indices.size(), "q");
+        }
+    }
 
     std::string toString() override {
         std::string text = "quantum " + source_name;
         if (literal_angle.has_value()) text += "(" + *literal_angle + ")";
         for (std::size_t index = 0; index < qubit_indices.size(); ++index) {
-            text += index == 0 ? " q[" : ", q[";
+            const std::string& register_name = index < qubit_register_names.size()
+                ? qubit_register_names[index] : std::string("q");
+            text += index == 0 ? " " + register_name + "[" : ", " + register_name + "[";
             text += std::to_string(qubit_indices[index]) + "]";
         }
         return text;
@@ -139,6 +148,7 @@ public:
 class MeasurementNode : public ASTNode {
 public:
     std::size_t qubit_index = 0;
+    std::string qubit_register_name = "q";
     std::optional<std::string> result_name;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
@@ -152,11 +162,13 @@ public:
 
     MeasurementNode(std::size_t index, std::size_t line_number,
                     synq::compiler::SourceSpan source_span,
-                    std::optional<std::string> declared_result)
-        : qubit_index(index), result_name(std::move(declared_result)), line(line_number), span(source_span) {}
+                    std::optional<std::string> declared_result,
+                    std::string source_register = "q")
+        : qubit_index(index), qubit_register_name(std::move(source_register)),
+          result_name(std::move(declared_result)), line(line_number), span(source_span) {}
 
     std::string toString() override {
-        return "measure q[" + std::to_string(qubit_index) + "]" +
+        return "measure " + qubit_register_name + "[" + std::to_string(qubit_index) + "]" +
                (result_name.has_value() ? " as " + *result_name : "");
     }
 };

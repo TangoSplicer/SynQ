@@ -91,6 +91,12 @@ FeatureRegistry make_default_feature_registry() {
         "synq#bounded-qubit-declarations",
     });
     registry.register_feature({
+        "named-qubit-register-operands",
+        FeatureStage::Alpha,
+        "Enables one declared non-default register name plus one literal index in bounded quantum and measurement operands.",
+        "synq#bounded-named-register-operands",
+    });
+    registry.register_feature({
         "callable-declarations",
         FeatureStage::Alpha,
         "Enables declaration-only fn name() and kernel name() metadata without parameters, bodies, calls, or execution.",
