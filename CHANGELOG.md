@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Separate Windows and Linux CI artifacts:** Added independent Linux and
+  Windows build/smoke jobs with separately named artifacts. [Compiler Core
+  multi-platform run #31976468444](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444)
+  passed the Linux 27-test recovery profile, the Windows MSVC 20-test
+  platform-neutral profile, and the distinct Ubuntu 22.04 static-SDK consumer
+  job.
 - **Second clean-install environment:** Added a fixed Ubuntu 22.04 producer,
   install, discovery, external-consumer, and execution job. Together with the
   existing `ubuntu-latest` recovery profile, it passed in [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719).
@@ -30,6 +36,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   contribution workflow, security-reporting policy, and bounded issue templates.
 
 ### Changed
+- **MSVC portability and smoke fixtures:** Replaced GNU-only checked-arithmetic
+  and `M_PI` assumptions, separated optional Ubuntu toolchain fixtures from the
+  Windows profile, and made parser, diagnostics, exporter, C ABI, and CLI smoke
+  fixtures portable across the validated CI runners. The Windows job is not an
+  SDK or language-wrapper compatibility claim.
 - **Older JSON compatibility:** Replaced an implicit JSON-to-vector assignment
   with an explicit typed conversion so the static SDK producer builds under the
   older nlohmann-json package in the fixed Ubuntu 22.04 job.

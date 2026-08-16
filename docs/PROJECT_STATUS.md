@@ -10,23 +10,24 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719)
-passed **27/27** recovery-profile CTest checks for revision `addad26`. Its
-separate fixed Ubuntu 22.04 job also builds, installs, discovers, compiles, and
-runs the experimental static SDK consumer from a clean prefix. The exact
-tested-environment boundary is recorded in
+ [Compiler Core multi-platform run #31976468444](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444)
+passed all three independent jobs for revision `40ee355`: the Linux recovery
+profile passed **27/27** CTest checks, the Windows MSVC platform-neutral profile
+passed **20/20** CTest checks, and the fixed Ubuntu 22.04 job built, installed,
+discovered, compiled, and ran the experimental static SDK consumer from a clean
+prefix. The exact tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated recovery profile.** | Builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and focused CTest consumers. Optional historical targets remain outside this claim. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 27 CTests. A separate Windows MSVC profile builds `synq_lib.lib` and `synqc.exe` and passes 20 platform-neutral CTests. Optional historical targets remain outside both claims. |
 | `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded constant evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
 | Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, and declaration-only callables. No scopes, assignments, general expressions, callable bodies/calls, or runtime semantics exist. |
 | Named registers | **Remotely validated Alpha subset in [Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553).** | Earlier declared `name[index]` operands resolve and strict-Hybrid export supports declared registers. The bounded simulator rejects the named-register form. |
 | Literal-if export | **Remotely validated strict source-lowering subset in [Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849).** | One literal `if` with one supported typed gate body lowers to OpenQASM 3. Identifier/expression conditions, `while`, measurement bodies, and execution remain rejected. |
 | Local simulation | **Remotely validated bounded probability model.** | One default register, limited gates, opt-in limits, and deterministic probability output only. No samples, collapse, noise, control execution, provider, or hardware behavior. |
-| C ABI and static SDK | **Remotely validated experimental path.** | Opaque C ABI consumer proofs and a clean-prefix installed static library/header/CMake package consumer passed in the recovery profile and a distinct fixed Ubuntu 22.04 job in [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719). No frozen ABI, shared-library delivery, package registry, or cross-platform SDK is claimed. |
-| Interoperability proofs | **Remotely exercised.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. They are not released wrappers or language packages. |
+| C ABI and static SDK | **Remotely validated experimental Ubuntu path; Windows C ABI smoke also validated.** | The Ubuntu recovery profile and fixed Ubuntu 22.04 job prove the clean-prefix static library/header/CMake package consumer. The Windows MSVC profile exercises the in-tree C ABI smoke only. No Windows clean-install SDK, frozen ABI, shared-library delivery, registry, or cross-platform SDK is claimed. |
+| Interoperability proofs | **Remotely exercised on the Ubuntu full profile.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. The Windows profile intentionally excludes those toolchain-specific fixtures. They are not released wrappers or language packages. |
 | Governance and maintenance | **Factual baseline published.** | `CHANGELOG.md`, contribution guidance, a security-reporting route, issue templates, support-environment guide, and ABI/distribution policy exist. They do not promise review times, support SLA, signing, or package availability. |
 
 ## Explicit non-claims
@@ -44,7 +45,9 @@ states a reproducible, current validation path.
 ## Ordered remaining work
 
 1. Extend the tested-platform matrix only with actual clean-install evidence; the
-   current evidence covers two Ubuntu-based CI environments, not another OS.
+   current evidence includes a Windows MSVC compiler/CLI/C-ABI smoke profile, but
+   static SDK installation and language-interoperability conformance remain
+   Ubuntu-only.
 2. Decide a separate resource and simulation contract before attempting
    multi-register simulation or allocation semantics.
 3. Design non-literal conditions, loops, branch blocks, and measurement bodies

@@ -7,15 +7,17 @@ it is not a cross-platform support promise.
 ## Verified environment boundary
 
 The recovery compiler profile is continuously exercised by the
-[`Compiler Core` workflow](../.github/workflows/compiler-core.yml) on GitHub's
-`ubuntu-latest` runner. The most recent full-profile evidence is [Compiler Core
-#50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719), which
-completed successfully with **27/27** CTest checks for revision `addad26`.
+[`Compiler Core` workflow](../.github/workflows/compiler-core.yml). The latest
+remote evidence is [Compiler Core multi-platform run
+#31976468444](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444)
+for revision `40ee355`. Its Linux job passed the full **27/27** recovery-profile
+CTest suite, while its distinct Windows MSVC job passed a **20-test**
+platform-neutral compiler/CLI/C-ABI smoke profile.
 
 The same workflow now includes a distinct `ubuntu-22.04` job that installs a
 minimal static SDK into a fresh temporary prefix and builds/runs the external C
 header consumer through `CMAKE_PREFIX_PATH`. That second job also passed in
-[Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719).
+[the same multi-platform run](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444).
 
 The local confirmation made on 16 August 2026 used the following Ubuntu 24.04
 environment. It rebuilt the same recovery profile and independently passed the
@@ -24,18 +26,21 @@ evidence, not minimum-version guarantees.
 
 | Component | Local confirmation | CI installation/source |
 | --- | --- | --- |
-| Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` recovery profile and fixed `ubuntu-22.04` static-SDK conformance job |
+| Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` full recovery profile, `windows-latest` MSVC platform-neutral smoke profile, and fixed `ubuntu-22.04` static-SDK conformance job |
 | CMake | 3.28.3 | `apt` `cmake`; project requires CMake 3.18 or later |
-| C++ compiler | GCC 13.3.0 | `apt` `g++`; project requires C++17 support |
+| C++ compiler | GCC 13.3.0 | `apt` `g++` on Ubuntu; MSVC via `windows-latest`; project requires C++17 support |
 | OpenSSL | 3.0.13 | `apt` `libssl-dev` |
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
 
-> **Support boundary:** The recovery profile has remote evidence on
-> `ubuntu-latest`; the experimental static SDK clean-install path has an
-> additional fixed Ubuntu 22.04 result. macOS, Windows, other Linux
-> distributions, alternate compilers, ARM hosts, dynamic linking, package
-> registries, and ABI compatibility across future revisions remain unvalidated.
+> **Support boundary:** `windows-latest` now has remote MSVC evidence for a
+> 20-test platform-neutral compiler/CLI/C-ABI smoke profile. The full 27-test
+> suite, the Rust/Common Lisp/Clojure/Mercury fixtures, OpenQASM Python reference
+> checks, and clean-install static SDK conformance remain Ubuntu-only evidence.
+> No Windows SDK installation, language-wrapper, shared-library, package, or ABI
+> compatibility claim follows from the Windows smoke result. macOS, other Linux
+> distributions, ARM hosts, dynamic linking, package registries, and future ABI
+> compatibility remain unvalidated.
 
 ## Reproduce the supported recovery profile
 
@@ -68,6 +73,31 @@ ctest --test-dir compiler/build --output-on-failure
 The Mercury fixture requires its cached/toolchain setup path used in the CI
 workflow. Follow `compiler/tests/interop/setup_mercury_toolchain.sh` rather than
 assuming a distribution package provides an equivalent compiler.
+
+## Reproduce the Windows MSVC smoke profile
+
+The Windows job is deliberately separate from the Ubuntu full-profile and SDK
+jobs. It installs `nlohmann-json` and OpenSSL with vcpkg, builds the recovery
+compiler with MSVC, and runs the platform-neutral 20-test profile. It does not
+attempt the Ubuntu-only interoperability, Python-reference, or clean-install SDK
+checks.
+
+```powershell
+vcpkg install nlohmann-json:x64-windows openssl:x64-windows
+
+cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release `
+  "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+  -DVCPKG_TARGET_TRIPLET=x64-windows `
+  -DBUILD_TESTS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_CLI_TOOLS=OFF `
+  -DBUILD_COMPILER_EXECUTABLE=OFF -DBUILD_EXPERIMENTAL_COMPONENTS=OFF `
+  -DBUILD_REPL=OFF -DBUILD_CORE_SMOKE_TESTS=ON `
+  -DBUILD_RECOVERY_NATIVE_SDK=OFF `
+  -DBUILD_RECOVERY_INTEROP_SMOKE_TESTS=OFF `
+  -DBUILD_OPENQASM_REFERENCE_CHECKS=OFF
+
+cmake --build compiler/build --config Release --parallel 2
+ctest --test-dir compiler/build -C Release --output-on-failure
+```
 
 ## Experimental native SDK clean-install check
 

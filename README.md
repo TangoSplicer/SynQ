@@ -9,8 +9,10 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-#48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849), which passed
-**27/27** recovery-profile CTest checks for revision `8f0de7e`. The tested
+multi-platform run #31976468444](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444),
+which passed all three independently scoped jobs for revision `40ee355`: **27/27**
+Linux recovery-profile CTests, **20/20** Windows MSVC platform-neutral CTests,
+and an Ubuntu 22.04 clean-install static-SDK consumer check. The tested
 environment and exact clean-install boundaries are documented in
 [`docs/TESTED_ENVIRONMENTS.md`](docs/TESTED_ENVIRONMENTS.md).
 
@@ -21,7 +23,7 @@ environment and exact clean-install boundaries are documented in
 | Named registers | Alpha `name[index]` operands resolve against earlier declared registers and lower through strict Hybrid OpenQASM. | No resource lifetime, flattening, or multi-register simulation. |
 | Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if` with one supported typed gate body. | No identifier/expression condition lowering, loops, measurement body, branch execution, or classical runtime. |
 | Local simulation | Opt-in pure-state probability calculation for one default register and a limited gate set. | No samples/collapse, noise, controls, providers, or hardware execution. |
-| Native interoperability | C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers exercise the opaque C ABI; a static CMake SDK clean-install consumer is tested. | No safe wrappers, registry packages, shared-library distribution, frozen ABI, or cross-platform support guarantee. |
+| Native interoperability | The Ubuntu full profile exercises C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers; the separate Windows MSVC profile exercises platform-neutral compiler, CLI, and C-ABI smoke coverage. | No Windows SDK clean-install proof, safe wrappers, registry packages, shared-library distribution, frozen ABI, or cross-platform SDK guarantee. |
 
 ## Quick start: verified compiler path
 

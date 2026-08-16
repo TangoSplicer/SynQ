@@ -139,4 +139,4 @@
 - [x] Add a syntax-focused bounded Bell-state source preview to the separate Evidence Ledger.
 - [x] Add a live GitHub Actions build-status link to the separate Evidence Ledger.
 - [x] Add an accessible FAQ dialog explaining experimental ABI and feature-gating boundaries in the separate Evidence Ledger.
-- [ ] Remotely validate the platform-neutral Windows MSVC smoke profile before making any Windows support claim.
+- [x] Remotely validate the platform-neutral Windows MSVC smoke profile before making any Windows support claim.
