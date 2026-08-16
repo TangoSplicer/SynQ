@@ -129,3 +129,14 @@
 - [x] Add a visual Bell-state walkthrough and beginner-first navigation without making simulator, hardware, or provider claims beyond the documented local CLI path.
 - [x] Add a second independently reproducible clean-install conformance environment and record its exact supported-platform boundary.
 - [x] Update beginner guides, project status, public Evidence Ledger, and changelog only after verified implementation and validation evidence exists.
+
+- [x] Add an accessible loading animation or skeleton state to the public Evidence Ledger and validate its responsive behavior.
+
+- [x] Add an accessible compact mobile navigation menu to the separate Evidence Ledger preview and validate its responsive behavior.
+
+- [x] Add and validate a mobile-only “Jump to first lesson” shortcut in the separate Evidence Ledger preview.
+
+- [x] Add a syntax-focused bounded Bell-state source preview to the separate Evidence Ledger.
+- [x] Add a live GitHub Actions build-status link to the separate Evidence Ledger.
+- [x] Add an accessible FAQ dialog explaining experimental ABI and feature-gating boundaries in the separate Evidence Ledger.
+- [ ] Remotely validate the platform-neutral Windows MSVC smoke profile before making any Windows support claim.

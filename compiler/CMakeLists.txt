@@ -22,6 +22,8 @@ option(BUILD_COMPILER_EXECUTABLE "Build the unfinished compiler command-line ent
 option(BUILD_EXPERIMENTAL_COMPONENTS "Build experimental debugger, network, optimizer, and plugin subsystems" OFF)
 option(BUILD_REPL "Build experimental REPL command sources" OFF)
 option(BUILD_CORE_SMOKE_TESTS "Build focused smoke tests for the compiler core profile" ON)
+option(BUILD_RECOVERY_INTEROP_SMOKE_TESTS "Build optional cross-language interoperability smoke fixtures" ON)
+option(BUILD_OPENQASM_REFERENCE_CHECKS "Run optional Python OpenQASM parser and importer reference checks" ON)
 option(BUILD_RECOVERY_CLI "Build the supported recovery-profile synqc executable" ON)
 option(BUILD_RECOVERY_NATIVE_SDK "Install and test the experimental static C ABI SDK path" ON)
 option(SYNQ_ENABLE_BUILD_HARDENING "Enable supported compiler warnings and ELF linker hardening for recovery targets" ON)
@@ -188,66 +190,68 @@ if(BUILD_CORE_SMOKE_TESTS)
         )
     endif()
 
-    add_library(synq_ffi_shared SHARED tests/interop/synq_ffi_shared_anchor.cpp)
-    target_include_directories(synq_ffi_shared PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(synq_ffi_shared PRIVATE synq_lib)
-    set_target_properties(synq_ffi_shared PROPERTIES OUTPUT_NAME synq_ffi)
+    if(BUILD_RECOVERY_INTEROP_SMOKE_TESTS)
+        add_library(synq_ffi_shared SHARED tests/interop/synq_ffi_shared_anchor.cpp)
+        target_include_directories(synq_ffi_shared PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_link_libraries(synq_ffi_shared PRIVATE synq_lib)
+        set_target_properties(synq_ffi_shared PROPERTIES OUTPUT_NAME synq_ffi)
 
-    find_program(SYNQ_SBCL_EXECUTABLE sbcl REQUIRED)
-    add_test(
-        NAME synq_common_lisp_abi_smoke
-        COMMAND ${SYNQ_SBCL_EXECUTABLE} --noinform --script
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/common_lisp_abi_smoke.lisp
-                $<TARGET_FILE:synq_ffi_shared>
-    )
+        find_program(SYNQ_SBCL_EXECUTABLE sbcl REQUIRED)
+        add_test(
+            NAME synq_common_lisp_abi_smoke
+            COMMAND ${SYNQ_SBCL_EXECUTABLE} --noinform --script
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/common_lisp_abi_smoke.lisp
+                    $<TARGET_FILE:synq_ffi_shared>
+        )
 
-    find_program(SYNQ_CLOJURE_EXECUTABLE clojure REQUIRED)
-    find_file(SYNQ_JNA_JAR NAMES jna.jar PATHS /usr/share/java REQUIRED)
-    add_test(
-        NAME synq_clojure_jna_abi_smoke
-        COMMAND ${SYNQ_CLOJURE_EXECUTABLE} -cp ${SYNQ_JNA_JAR}
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/clojure_jna_abi_smoke.clj
-                $<TARGET_FILE:synq_ffi_shared>
-    )
+        find_program(SYNQ_CLOJURE_EXECUTABLE clojure REQUIRED)
+        find_file(SYNQ_JNA_JAR NAMES jna.jar PATHS /usr/share/java REQUIRED)
+        add_test(
+            NAME synq_clojure_jna_abi_smoke
+            COMMAND ${SYNQ_CLOJURE_EXECUTABLE} -cp ${SYNQ_JNA_JAR}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/clojure_jna_abi_smoke.clj
+                    $<TARGET_FILE:synq_ffi_shared>
+        )
 
-    find_program(SYNQ_MMC_EXECUTABLE mmc REQUIRED)
-    get_filename_component(SYNQ_MMC_DIRECTORY ${SYNQ_MMC_EXECUTABLE} DIRECTORY)
-    set(SYNQ_MERCURY_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/mercury_abi_smoke)
-    set(SYNQ_MERCURY_ABI_SMOKE_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/mercury_abi_smoke.m)
-    add_custom_command(
-        OUTPUT ${SYNQ_MERCURY_ABI_SMOKE}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/mercury_abi_smoke.m
-                ${SYNQ_MERCURY_ABI_SMOKE_SOURCE}
-        COMMAND ${CMAKE_COMMAND} -E env "PATH=${SYNQ_MMC_DIRECTORY}:$ENV{PATH}"
-                ${SYNQ_MMC_EXECUTABLE} --make --grade asm_fast.gc
-                --c-include-directory ${CMAKE_CURRENT_SOURCE_DIR}/include
-                --link-object $<TARGET_FILE:synq_ffi_shared>
-                --ld-flag=-Wl,-rpath,$<TARGET_FILE_DIR:synq_ffi_shared>
-                mercury_abi_smoke
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS synq_ffi_shared ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/mercury_abi_smoke.m
-        VERBATIM
-    )
-    add_custom_target(synq_mercury_abi_smoke_target ALL DEPENDS ${SYNQ_MERCURY_ABI_SMOKE})
-    add_test(NAME synq_mercury_abi_smoke COMMAND ${SYNQ_MERCURY_ABI_SMOKE})
+        find_program(SYNQ_MMC_EXECUTABLE mmc REQUIRED)
+        get_filename_component(SYNQ_MMC_DIRECTORY ${SYNQ_MMC_EXECUTABLE} DIRECTORY)
+        set(SYNQ_MERCURY_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/mercury_abi_smoke)
+        set(SYNQ_MERCURY_ABI_SMOKE_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/mercury_abi_smoke.m)
+        add_custom_command(
+            OUTPUT ${SYNQ_MERCURY_ABI_SMOKE}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/mercury_abi_smoke.m
+                    ${SYNQ_MERCURY_ABI_SMOKE_SOURCE}
+            COMMAND ${CMAKE_COMMAND} -E env "PATH=${SYNQ_MMC_DIRECTORY}:$ENV{PATH}"
+                    ${SYNQ_MMC_EXECUTABLE} --make --grade asm_fast.gc
+                    --c-include-directory ${CMAKE_CURRENT_SOURCE_DIR}/include
+                    --link-object $<TARGET_FILE:synq_ffi_shared>
+                    --ld-flag=-Wl,-rpath,$<TARGET_FILE_DIR:synq_ffi_shared>
+                    mercury_abi_smoke
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            DEPENDS synq_ffi_shared ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/mercury_abi_smoke.m
+            VERBATIM
+        )
+        add_custom_target(synq_mercury_abi_smoke_target ALL DEPENDS ${SYNQ_MERCURY_ABI_SMOKE})
+        add_test(NAME synq_mercury_abi_smoke COMMAND ${SYNQ_MERCURY_ABI_SMOKE})
 
-    find_program(SYNQ_RUSTC_EXECUTABLE rustc REQUIRED)
-    set(SYNQ_RUST_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_abi_smoke)
-    add_custom_command(
-        OUTPUT ${SYNQ_RUST_ABI_SMOKE}
-        COMMAND ${SYNQ_RUSTC_EXECUTABLE} --edition=2021 ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/rust_abi_smoke.rs
-                -L native=$<TARGET_FILE_DIR:synq_lib>
-                -l static=synq_lib
-                -l dylib=stdc++
-                -l dylib=crypto
-                -l dylib=pthread
-                -o ${SYNQ_RUST_ABI_SMOKE}
-        DEPENDS synq_lib ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/rust_abi_smoke.rs
-        VERBATIM
-    )
-    add_custom_target(synq_rust_abi_smoke_target ALL DEPENDS ${SYNQ_RUST_ABI_SMOKE})
-    add_test(NAME synq_rust_abi_smoke COMMAND ${SYNQ_RUST_ABI_SMOKE})
+        find_program(SYNQ_RUSTC_EXECUTABLE rustc REQUIRED)
+        set(SYNQ_RUST_ABI_SMOKE ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_abi_smoke)
+        add_custom_command(
+            OUTPUT ${SYNQ_RUST_ABI_SMOKE}
+            COMMAND ${SYNQ_RUSTC_EXECUTABLE} --edition=2021 ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/rust_abi_smoke.rs
+                    -L native=$<TARGET_FILE_DIR:synq_lib>
+                    -l static=synq_lib
+                    -l dylib=stdc++
+                    -l dylib=crypto
+                    -l dylib=pthread
+                    -o ${SYNQ_RUST_ABI_SMOKE}
+            DEPENDS synq_lib ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/rust_abi_smoke.rs
+            VERBATIM
+        )
+        add_custom_target(synq_rust_abi_smoke_target ALL DEPENDS ${SYNQ_RUST_ABI_SMOKE})
+        add_test(NAME synq_rust_abi_smoke COMMAND ${SYNQ_RUST_ABI_SMOKE})
+    endif()
 
     add_executable(synq_openqasm3_exporter_smoke tests/smoke/openqasm3_exporter_smoke.cpp)
     target_include_directories(synq_openqasm3_exporter_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -255,18 +259,20 @@ if(BUILD_CORE_SMOKE_TESTS)
     set(SYNQ_OPENQASM3_REFERENCE_FIXTURE ${CMAKE_CURRENT_BINARY_DIR}/synq_openqasm3_reference.qasm)
     add_test(NAME synq_openqasm3_exporter_smoke COMMAND synq_openqasm3_exporter_smoke ${SYNQ_OPENQASM3_REFERENCE_FIXTURE})
 
-    find_package(Python3 COMPONENTS Interpreter REQUIRED)
-    add_test(
-        NAME synq_openqasm3_reference_parse
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
-    )
-    set_tests_properties(synq_openqasm3_reference_parse PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
+    if(BUILD_OPENQASM_REFERENCE_CHECKS)
+        find_package(Python3 COMPONENTS Interpreter REQUIRED)
+        add_test(
+            NAME synq_openqasm3_reference_parse
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
+        )
+        set_tests_properties(synq_openqasm3_reference_parse PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
 
-    add_test(
-        NAME synq_openqasm3_qiskit_import
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_qiskit_qasm3_import.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
-    )
-    set_tests_properties(synq_openqasm3_qiskit_import PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
+        add_test(
+            NAME synq_openqasm3_qiskit_import
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_qiskit_qasm3_import.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
+        )
+        set_tests_properties(synq_openqasm3_qiskit_import PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
+    endif()
 endif()
 
 # Global includes
