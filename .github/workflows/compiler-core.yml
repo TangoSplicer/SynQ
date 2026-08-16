@@ -73,21 +73,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install nlohmann_json via vcpkg classic mode
+      - name: Install native Windows dependencies via vcpkg classic mode
         run: |
-          vcpkg install nlohmann-json:x64-windows
+          vcpkg install nlohmann-json:x64-windows openssl:x64-windows
 
       - name: Configure verified recovery profile (Windows)
-        run: |
-          cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
-            -DBUILD_TESTS=OFF \
-            -DBUILD_PYTHON_BINDINGS=OFF \
-            -DBUILD_CLI_TOOLS=OFF \
-            -DBUILD_COMPILER_EXECUTABLE=OFF \
-            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
-            -DBUILD_REPL=OFF \
-            -DBUILD_CORE_SMOKE_TESTS=ON
+        shell: pwsh
+        run: cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows -DBUILD_TESTS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_CLI_TOOLS=OFF -DBUILD_COMPILER_EXECUTABLE=OFF -DBUILD_EXPERIMENTAL_COMPONENTS=OFF -DBUILD_REPL=OFF -DBUILD_CORE_SMOKE_TESTS=ON
 
       - name: Build compiler core (Windows)
         run: cmake --build compiler/build --config Release --parallel 2
