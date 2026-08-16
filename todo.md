@@ -117,15 +117,15 @@
 - [x] Publish a bounded experimental C ABI and distribution policy without claiming ABI stability or packaged language SDKs.
 - [x] Validate the published ABI/distribution policy against the opaque C header, recovery packaging path, and consumer evidence.
 - [x] Update the public Evidence Ledger to link the verified experimental ABI/distribution policy and retain explicit support boundaries.
-- [ ] Publish tested-environment guidance and clean-install boundaries for the experimental static native SDK path.
+- [x] Publish tested-environment guidance and clean-install boundaries for the experimental static native SDK path.
 - [x] Design and implement bounded named-register declarations, operand resolution, range diagnostics, and strict OpenQASM mapping.
 - [x] Design and implement bounded strict-Hybrid `if` lowering with positive and negative semantic/export tests.
 - [ ] Update raw-ABI interoperability contracts and contributor materials without claiming safe wrappers or registry packages.
-- [ ] Update project status, readiness evidence, changelog, and the public Evidence Ledger after verified language increments.
+- [x] Update project status, readiness evidence, changelog, and the public Evidence Ledger after verified language increments.
 - [x] Design an installable experimental native C ABI SDK boundary without converting the test-only shared library into an unsupported production claim.
 - [x] Add a clean-prefix installation and external consumer conformance test for the experimental native SDK path.
 - [x] Publish native SDK distribution evidence and update policy, status, readiness assessment, and the Evidence Ledger with any verified limits.
-- [ ] Design a guided, non-executing CLI playground that clearly distinguishes copied commands and fixture output from online compiler execution.
-- [ ] Add a visual Bell-state walkthrough and beginner-first navigation without making simulator, hardware, or provider claims beyond the documented local CLI path.
-- [ ] Add a second independently reproducible clean-install conformance environment and record its exact supported-platform boundary.
-- [ ] Update beginner guides, project status, public Evidence Ledger, and changelog only after verified implementation and validation evidence exists.
+- [x] Design a guided, non-executing CLI playground that clearly distinguishes copied commands and fixture output from online compiler execution.
+- [x] Add a visual Bell-state walkthrough and beginner-first navigation without making simulator, hardware, or provider claims beyond the documented local CLI path.
+- [x] Add a second independently reproducible clean-install conformance environment and record its exact supported-platform boundary.
+- [x] Update beginner guides, project status, public Evidence Ledger, and changelog only after verified implementation and validation evidence exists.
