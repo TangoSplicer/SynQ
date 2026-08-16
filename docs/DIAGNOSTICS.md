@@ -1,7 +1,7 @@
 # SynQ Structured Diagnostics
 
 **Status:** Remotely validated recovery-profile implementation boundary.
-**Last reviewed:** 15 August 2026
+**Last reviewed:** 16 August 2026
 
 ## Purpose
 
@@ -47,7 +47,7 @@ recovery-profile parser and covered by a focused smoke test.
 | `SYNQ-P002` | A `let` declaration has no valid identifier or value. | Use `let <identifier> = <value>`. |
 | `SYNQ-P003` | The line does not start with a supported recovery-profile instruction or a required argument is absent. | Use `let`, `print`, `delay`, `quantum`, `measure`, or `ai` with the documented argument form. |
 | `SYNQ-P004` | `delay` does not use a non-negative integer number of milliseconds. | Use a non-negative whole number, such as `delay 0`. |
-| `SYNQ-P005` | Quantum operands or parameter syntax do not match the bounded grammar. | Use explicit `q[index]` operands and the documented literal-angle form. |
+| `SYNQ-P005` | Quantum operands or parameter syntax do not match the bounded grammar. | Use an explicit `<register>[index]` operand and the documented literal-angle form. |
 | `SYNQ-P006` | An experimental annotation is malformed or names an unknown feature. | Use a registered exact annotation such as `#[experimental(feature = "parameterized-quantum-gates")]`. |
 | `SYNQ-P007` | A gated construct is used without its required alpha opt-in. | Add the documented file-scoped feature annotation or use an ungated construct. |
 | `SYNQ-P008` | A measurement does not use one explicit non-negative qubit operand with an optional valid result identifier. | Use `measure q[index]` or `measure q[index] as <identifier>`, for example `measure q[0] as observed`. |
@@ -117,8 +117,9 @@ Core #26][3].
 | `SYNQ-R003` | Internal name resolution | An opted-in Integer arithmetic identifier atom has no earlier top-level declaration. | Declare the name on an earlier line with static type `Integer`, or use an Integer literal. |
 | `SYNQ-T003` | Internal static-type validation | An opted-in Integer arithmetic identifier atom resolves to a non-Integer declaration. | Use an Integer declaration/reference or an Integer literal atom. |
 | `SYNQ-T004` | Internal arithmetic-tree validation | A manually constructed internal Integer arithmetic expression has an unsupported operator or wrong operand count. | Use the parser-produced one-operator tree with two Integer literal/identifier atoms. |
-| `SYNQ-Q001` | Internal default-register validation | `q[index]` occurs before an explicit later `qubit q[n]` declaration. | Declare the default register before operations using `q[index]`. |
-| `SYNQ-Q002` | Internal default-register validation | A `q[index]` operand is not smaller than the explicit `qubit q[n]` size. | Use an index in the declared `q[0]` through `q[n-1]` range. |
+| `SYNQ-Q001` | Internal qubit-register validation | A named register operand occurs before its matching declaration; `q[index]` retains this check only when an explicit `qubit q[n]` declaration exists. | Declare the referenced register before its first operation. |
+| `SYNQ-Q002` | Internal qubit-register validation | A declared-register operand index is not smaller than that register’s explicit size. | Use an index in the declared `<register>[0]` through `<register>[n-1]` range. |
+| `SYNQ-Q003` | Internal qubit-register validation | Manually constructed Hybrid gate metadata has a different register-name and index count. | Use parser-produced bounded quantum operands. |
 | `SYNQ-E000` | Internal bounded evaluation | Constant evaluation was requested without the explicit API opt-in. | Enable `allow_experimental_constant_evaluation` only after reviewing the documented limits. |
 | `SYNQ-E001` | Internal bounded evaluation | The resolved program exceeds the configured declaration limit. | Reduce the declaration-only program or explicitly choose a documented limit. |
 | `SYNQ-E002` | Internal bounded evaluation | A declaration initializer or top-level node is outside the constant-evaluation subset. | Use supported declarations only; use the separate source-export workflow for quantum statements. |
@@ -144,13 +145,14 @@ are not propagated through the C ABI. Their focused smoke coverage is local
 and remote **19/19** evidence in [Compiler Core #31][6]; they do not establish
 arithmetic evaluation or a general expression/type system.
 
-`SYNQ-Q001` and `SYNQ-Q002` are internal resolver diagnostics for the local
-default-register reference-validation extension. They apply only when a typed
-`qubit q[n]` declaration exists anywhere in the Hybrid IR program; a program
-without such a declaration retains prior indexed-operand behavior. They are not
-parser diagnostics and are not propagated through the C ABI. Their focused smoke
-coverage passed locally and remotely with **20/20** CTest checks in [Compiler
-Core #36][8].
+`SYNQ-Q001` through `SYNQ-Q003` are internal resolver diagnostics for bounded
+qubit-register references. The Alpha-gated `name[index]` form must resolve to an
+earlier declaration and lie within that declaration’s literal range. The legacy
+default form retains prior behavior without any explicit `qubit q[n]`
+declaration. These diagnostics are not parser diagnostics and are not propagated
+through the C ABI. Named-register parser, resolver, strict-export, CLI, and
+simulator-boundary coverage passed remotely with **27/27** CTest checks in
+[Compiler Core #47][13].
 
 `SYNQ-E000` through `SYNQ-E005` are internal diagnostics for the explicit,
 declaration-only bounded constant evaluator. They are not parser diagnostics and
@@ -218,3 +220,4 @@ checks. The same compiler profile passed in [Compiler Core #9][1] for commit
 [10]: https://github.com/TangoSplicer/SynQ/actions/runs/31849507058 "SynQ Compiler Core #39"
 [11]: https://github.com/TangoSplicer/SynQ/actions/runs/31886373263 "SynQ Compiler Core #41"
 [12]: https://github.com/TangoSplicer/SynQ/actions/runs/31886881473 "SynQ Compiler Core #43"
+[13]: https://github.com/TangoSplicer/SynQ/actions/runs/31951911553 "SynQ Compiler Core #47"

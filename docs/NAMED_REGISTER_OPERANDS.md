@@ -1,8 +1,9 @@
 # Named Register Operands
 
-**Status:** Design record for an Alpha-gated bounded language increment. This
-document describes the intended contract; no behavior is claimed until parser,
-resolver, exporter, tests, and remote CI evidence are added.
+**Status:** Remotely validated Alpha-gated bounded language increment in
+[Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553).
+This document describes the implemented recovery-profile contract and its
+remaining boundaries.
 
 ## Purpose and syntax
 
@@ -62,3 +63,14 @@ separate increments.
 No claim is made that this profile defines quantum resource lifetime, execution
 placement, multi-register simulation, hardware mapping, a stable language
 syntax, or a general type system.
+
+## Evidence
+
+Revision `3a87e63` passed **27/27** recovery-profile CTest checks in [Compiler
+Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553). The
+focused coverage includes Alpha-gate rejection, typed AST/Hybrid provenance,
+resolver declaration-order and range failures, cross-register strict Hybrid
+OpenQASM emission, a separate-process `synqc --emit-openqasm-hybrid` path, and
+an explicit bounded-simulator rejection fixture. The evidence does not validate
+named-register hardware execution, provider integration, or multi-register
+simulation.

@@ -2,7 +2,7 @@
 
 **Status:** Planning and acceptance record. This document does not declare SynQ
 operationally ready.
-**Last reviewed:** 15 August 2026
+**Last reviewed:** 16 August 2026
 
 ## Purpose
 
@@ -21,8 +21,8 @@ evidence, and a maintenance model.
 
 | Area | Current evidence | Operational gap |
 | --- | --- | --- |
-| Compiler foundation | [Compiler Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207) passed 27/27 recovery-profile checks for revision `1de1484`, including installed-SDK conformance. | The grammar and semantics remain intentionally narrow. |
-| Source model | Typed gates, bounded classical metadata/evaluation, qubit declarations, bounded simulation, named measurement metadata, and declaration-only callables exist behind exact gates/opt-ins. | No general expression evaluator, scopes, callable bodies/calls, or executable classical semantics exists. |
+| Compiler foundation | [Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553) passed 27/27 recovery-profile checks for revision `3a87e63`, including installed-SDK conformance and Alpha named-register coverage. | The grammar and semantics remain intentionally narrow. |
+| Source model | Typed gates, bounded classical metadata/evaluation, qubit declarations with Alpha named operands, bounded simulation, named measurement metadata, and declaration-only callables exist behind exact gates/opt-ins. | No general expression evaluator, scopes, callable bodies/calls, or executable classical semantics exists. |
 | Quantum path | AST/strict Hybrid OpenQASM export and a bounded local probability simulator are tested for exact supported subsets. | Export and local simulation are not provider integration or hardware execution. |
 | Native interoperability | C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers exercise an opaque C ABI. | There are no distributed language packages, safe wrappers, or a frozen ABI policy. |
 | Command-line workflow | `synqc` validates, exports supported OpenQASM subsets, evaluates bounded constants, and simulates bounded probabilities. | It is an experimental recovery-profile command, not a general executor, provider client, or stable CLI contract. |

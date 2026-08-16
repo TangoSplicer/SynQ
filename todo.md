@@ -118,7 +118,7 @@
 - [x] Validate the published ABI/distribution policy against the opaque C header, recovery packaging path, and consumer evidence.
 - [x] Update the public Evidence Ledger to link the verified experimental ABI/distribution policy and retain explicit support boundaries.
 - [ ] Publish tested-environment guidance and clean-install boundaries for the experimental static native SDK path.
-- [ ] Design and implement bounded named-register declarations, operand resolution, range diagnostics, and strict OpenQASM mapping.
+- [x] Design and implement bounded named-register declarations, operand resolution, range diagnostics, and strict OpenQASM mapping.
 - [ ] Design and implement bounded strict-Hybrid `if` lowering with positive and negative semantic/export tests.
 - [ ] Update raw-ABI interoperability contracts and contributor materials without claiming safe wrappers or registry packages.
 - [ ] Update project status, readiness evidence, changelog, and the public Evidence Ledger after verified language increments.
