@@ -3,8 +3,9 @@
 **Status:** The earlier literal-condition Alpha profile passed remotely in
 [Compiler Core #27][1], with a successful manual repeat in [#28][2]; the
 Boolean identifier-reference extension passed remotely in [Compiler Core #29][3],
-and the bounded Boolean-operator extension passed remotely in [#30][4].
-**Last reviewed:** 14 August 2026
+and the bounded Boolean-operator extension passed remotely in [#30][4]. A
+strict literal-if gate source-lowering subset passed remotely in [#48][5].
+**Last reviewed:** 16 August 2026
 
 ## Purpose
 
@@ -16,7 +17,8 @@ requires an explicit file-scoped opt-in.
 
 > **Design rule:** control syntax must be visible in the typed AST and Hybrid
 > IR, but it must not imply loop execution, branch execution, a classical
-> runtime, result handling, or backend lowering.
+> runtime, or result handling. The strict Hybrid exporter has one separately
+> documented literal-if gate source-lowering exception.
 
 ## Alpha-gated source profile
 
@@ -30,7 +32,7 @@ if ready then quantum x q[0]
 
 | Form | Typed representation | Explicit boundary |
 | --- | --- | --- |
-| `if true then quantum h q[0]` | `ClassicalControlNode { If, true, QuantumGateNode }`, then `HybridControlFlow` with a typed gate body. | No expression condition, `else`, block, declaration, assignment, result value, execution, or lowering semantics. |
+| `if true then quantum h q[0]` | `ClassicalControlNode { If, true, QuantumGateNode }`, then `HybridControlFlow` with a typed gate body. | Strict Hybrid OpenQASM may emit `if (true) h q[0];`; no expression condition, `else`, block, result value, or execution semantics are defined. |
 | `while false do measure q[0]` | `ClassicalControlNode { While, false, MeasurementNode }`, then `HybridControlFlow` with a typed measurement body. | No iteration, termination analysis, measurement-dependent condition, returned bit, or runtime effect. |
 | `if ready then quantum x q[0]` | `ClassicalCondition { IdentifierReference, "ready" }`, then a `ResolvedHybridControlFlow` only after the earlier binding resolves to static type `Boolean`. | No general expression, value lookup, coercion, truthiness, runtime read, or execution semantics. |
 | `if not ready then quantum h q[0]` or `while ready and enabled do measure q[0]` | `ClassicalCondition { BooleanExpression, ... }` holding exactly one `Not` or one `And`/`Or` tree over literal or identifier leaves. | No parentheses, nesting, precedence, short-circuit behavior, value computation, or branch/loop execution semantics. |
@@ -48,10 +50,11 @@ earlier top-level declaration of static type `Boolean`, preserving ordered leaf
 binding indices in `ResolvedHybridControlFlow`. It does not resolve inside
 control bodies because those bodies expose no classical variable references.
 
-The current OpenQASM source exporter remains a typed-AST source-export subset
-and does not claim lowering of control nodes. This increment does not modify it
-or claim that OpenQASM, a simulator, a provider, or hardware can execute these
-forms.
+The direct AST OpenQASM source exporter remains a typed-AST subset and does not
+lower control nodes. The strict Hybrid exporter now lowers one literal `if` with
+one supported typed gate body only; it rejects identifier/expression conditions,
+`while`, and measurement bodies. This does not claim that SynQ, a simulator, a
+provider, or hardware executes these forms.
 
 ## Focused validation
 
@@ -61,7 +64,9 @@ quantum/measurement body preservation, Hybrid IR lowering, name-resolution
 preservation, and `SYNQ-P009`/`SYNQ-P010` rejection paths. The separate
 expression smoke covers Boolean identifier conditions and `SYNQ-R002`/`SYNQ-T001`.
 The separate Boolean-expression smoke covers `not`, `and`, `or`, and `SYNQ-T002`.
-The expanded **18/18** profile passed remotely in [Compiler Core #30][4].
+The expanded **18/18** profile passed remotely in [Compiler Core #30][4]. Exact
+literal-if source lowering and its bounded rejections passed remotely in
+[Compiler Core #48][5] with **27/27** checks.
 
 ## Explicit non-goals
 
@@ -70,7 +75,7 @@ conditions beyond whole resolved identifiers, assignment, mutable variables,
 `else`, blocks, nesting, function scope, loop execution, branch execution,
 termination checks, runtime values,
 measurement-result values, resource liveness, control-flow graph construction,
-optimization, OpenQASM lowering, simulation, provider submission, or hardware
+optimization, general OpenQASM lowering, simulation, provider submission, or hardware
 execution.
 
 ## References
@@ -79,3 +84,4 @@ execution.
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31804191932 "SynQ Compiler Core #28"
 [3]: https://github.com/TangoSplicer/SynQ/actions/runs/31837377648 "SynQ Compiler Core #29"
 [4]: https://github.com/TangoSplicer/SynQ/actions/runs/31842571512 "SynQ Compiler Core #30"
+[5]: https://github.com/TangoSplicer/SynQ/actions/runs/31952214849 "SynQ Compiler Core #48"

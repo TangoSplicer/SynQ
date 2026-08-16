@@ -1,7 +1,8 @@
 # Strict Literal `if` Lowering
 
-**Status:** Design record for the next Alpha control-flow increment. This is not
-evidence that control-flow export or execution is currently available.
+**Status:** Remotely validated strict-export increment in [Compiler Core
+#48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849). This is
+source lowering evidence, not runtime control-flow execution evidence.
 
 ## Narrow target
 
@@ -50,3 +51,12 @@ dependent branching, loops, scope, branch blocks, multi-statement regions,
 callable bodies, general expression evaluation, optimization, provider access,
 or hardware execution. Any of those additions require a separate design record,
 negative tests, and new remote validation evidence.
+
+## Evidence
+
+Revision `8f0de7e` passed **27/27** recovery-profile CTest checks in [Compiler
+Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849). The
+coverage asserts exact literal-if OpenQASM text, separate-process CLI output,
+and strict rejection of identifier conditions, `while`, and measurement bodies.
+No external-provider, hardware, general-classical, or local-simulator control
+claim follows from this source-generation evidence.
