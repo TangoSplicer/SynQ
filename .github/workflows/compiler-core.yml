@@ -16,8 +16,8 @@ permissions:
   contents: read
 
 jobs:
-  build-and-smoke-test:
-    name: Build compiler core and run smoke test
+  build-and-smoke-test-linux:
+    name: Linux Compiler Core & Smoke Test (Ubuntu)
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -56,6 +56,60 @@ jobs:
 
       - name: Run compiler-core smoke test
         run: ctest --test-dir compiler/build --output-on-failure
+
+      - name: Archive Linux build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: synq-compiler-linux-artifact
+          path: |
+            compiler/build/libsynq_lib.a
+            compiler/build/synqc*
+            compiler/build/libsynq_ffi*
+
+  build-and-smoke-test-windows:
+    name: Windows Compiler Core & Smoke Test (MSVC)
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v4
+        with:
+          cmake-version: '3.28.x'
+
+      - name: Install nlohmann_json via vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonPath: ''
+          vcpkgArguments: 'nlohmann-json'
+
+      - name: Configure verified recovery profile (Windows)
+        run: |
+          cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_CLI_TOOLS=OFF \
+            -DBUILD_COMPILER_EXECUTABLE=OFF \
+            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
+            -DBUILD_REPL=OFF \
+            -DBUILD_CORE_SMOKE_TESTS=ON
+
+      - name: Build compiler core (Windows)
+        run: cmake --build compiler/build --config Release --parallel 2
+
+      - name: Run compiler-core smoke test (Windows)
+        run: ctest --test-dir compiler/build --config Release --output-on-failure
+
+      - name: Archive Windows build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: synq-compiler-windows-artifact
+          path: |
+            compiler/build/Release/synq_lib.lib
+            compiler/build/Release/synqc.exe
+            compiler/build/Release/synq_ffi.dll
 
   clean-install-sdk-ubuntu-22:
     name: Clean-install static SDK conformance (Ubuntu 22.04)
