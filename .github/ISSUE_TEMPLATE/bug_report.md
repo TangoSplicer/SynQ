@@ -1,54 +1,22 @@
 ---
-name: Bug Report
-about: Report a bug or issue with SynQ
-title: '[BUG] '
-labels: 'bug'
-assignees: ''
-
+name: Reproducible defect
+about: Report a verified compiler, SDK, documentation, or prototype defect
+title: "bug: "
+labels: bug
 ---
 
-## Describe the Bug
+## Summary
 
-A clear and concise description of what the bug is.
+Describe the observed behavior without including credentials or sensitive data.
 
-## Steps to Reproduce
+## Reproduction
 
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Run '...'
-3. See error
+Provide the smallest source fixture or command sequence, operating-system and
+toolchain version, expected result, actual result, and first failing diagnostic
+or test output.
 
-## Expected Behavior
+## Boundary check
 
-A clear and concise description of what you expected to happen.
-
-## Actual Behavior
-
-What actually happened instead.
-
-## Environment
-
-- **OS:** (e.g., Ubuntu 20.04, macOS 12, Windows 11)
-- **SynQ Version:** (e.g., 1.0.0)
-- **Compiler:** (e.g., GCC 9.3, Clang 12)
-- **Python Version:** (e.g., 3.8, 3.9, 3.10)
-
-## Code Example
-
-```synq
-// Minimal code to reproduce the issue
-```
-
-## Error Message
-
-```
-Paste the full error message here
-```
-
-## Additional Context
-
-Add any other context about the problem here.
-
-## Possible Solution
-
-If you have a possible solution, describe it here.
+- [ ] I checked the current documentation and the behavior is claimed as supported or is a documentation inconsistency.
+- [ ] I did not include credentials, private keys, or exploit details.
+- [ ] This is not a vulnerability report; I will use `SECURITY.md` for that route.
