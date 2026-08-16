@@ -10,10 +10,11 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
-[Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849)
-passed **27/27** recovery-profile CTest checks for revision `8f0de7e`. It
-independently validates the current C++17 recovery build on its GitHub Actions
-Ubuntu runner; the exact tested-environment boundary is recorded in
+ [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719)
+passed **27/27** recovery-profile CTest checks for revision `addad26`. Its
+separate fixed Ubuntu 22.04 job also builds, installs, discovers, compiles, and
+runs the experimental static SDK consumer from a clean prefix. The exact
+tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
@@ -24,7 +25,7 @@ Ubuntu runner; the exact tested-environment boundary is recorded in
 | Named registers | **Remotely validated Alpha subset in [Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553).** | Earlier declared `name[index]` operands resolve and strict-Hybrid export supports declared registers. The bounded simulator rejects the named-register form. |
 | Literal-if export | **Remotely validated strict source-lowering subset in [Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849).** | One literal `if` with one supported typed gate body lowers to OpenQASM 3. Identifier/expression conditions, `while`, measurement bodies, and execution remain rejected. |
 | Local simulation | **Remotely validated bounded probability model.** | One default register, limited gates, opt-in limits, and deterministic probability output only. No samples, collapse, noise, control execution, provider, or hardware behavior. |
-| C ABI and static SDK | **Remotely validated experimental path.** | Opaque C ABI consumer proofs and a clean-prefix installed static library/header/CMake package consumer passed in [Compiler Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207). No frozen ABI, shared-library delivery, package registry, or cross-platform SDK is claimed. |
+| C ABI and static SDK | **Remotely validated experimental path.** | Opaque C ABI consumer proofs and a clean-prefix installed static library/header/CMake package consumer passed in the recovery profile and a distinct fixed Ubuntu 22.04 job in [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719). No frozen ABI, shared-library delivery, package registry, or cross-platform SDK is claimed. |
 | Interoperability proofs | **Remotely exercised.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. They are not released wrappers or language packages. |
 | Governance and maintenance | **Factual baseline published.** | `CHANGELOG.md`, contribution guidance, a security-reporting route, issue templates, support-environment guide, and ABI/distribution policy exist. They do not promise review times, support SLA, signing, or package availability. |
 
@@ -42,7 +43,8 @@ states a reproducible, current validation path.
 
 ## Ordered remaining work
 
-1. Extend the tested-platform matrix only with actual clean-install evidence.
+1. Extend the tested-platform matrix only with actual clean-install evidence; the
+   current evidence covers two Ubuntu-based CI environments, not another OS.
 2. Decide a separate resource and simulation contract before attempting
    multi-register simulation or allocation semantics.
 3. Design non-literal conditions, loops, branch blocks, and measurement bodies

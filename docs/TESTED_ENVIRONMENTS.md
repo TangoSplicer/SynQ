@@ -8,9 +8,14 @@ it is not a cross-platform support promise.
 
 The recovery compiler profile is continuously exercised by the
 [`Compiler Core` workflow](../.github/workflows/compiler-core.yml) on GitHub's
-`ubuntu-latest` runner. Its most recent relevant evidence is [Compiler Core
-#46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207), which
-completed successfully with **27/27** CTest checks for revision `1de1484`.
+`ubuntu-latest` runner. The most recent full-profile evidence is [Compiler Core
+#50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719), which
+completed successfully with **27/27** CTest checks for revision `addad26`.
+
+The same workflow now includes a distinct `ubuntu-22.04` job that installs a
+minimal static SDK into a fresh temporary prefix and builds/runs the external C
+header consumer through `CMAKE_PREFIX_PATH`. That second job also passed in
+[Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719).
 
 The local confirmation made on 16 August 2026 used the following Ubuntu 24.04
 environment. It rebuilt the same recovery profile and independently passed the
@@ -19,17 +24,18 @@ evidence, not minimum-version guarantees.
 
 | Component | Local confirmation | CI installation/source |
 | --- | --- | --- |
-| Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` runner |
+| Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` recovery profile and fixed `ubuntu-22.04` static-SDK conformance job |
 | CMake | 3.28.3 | `apt` `cmake`; project requires CMake 3.18 or later |
 | C++ compiler | GCC 13.3.0 | `apt` `g++`; project requires C++17 support |
 | OpenSSL | 3.0.13 | `apt` `libssl-dev` |
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
 
-> **Support boundary:** Only the Ubuntu recovery profile has a remote CTest
-> result. macOS, Windows, other Linux distributions, alternate compilers, ARM
-> hosts, dynamic linking, package registries, and ABI compatibility across
-> future revisions remain unvalidated.
+> **Support boundary:** The recovery profile has remote evidence on
+> `ubuntu-latest`; the experimental static SDK clean-install path has an
+> additional fixed Ubuntu 22.04 result. macOS, Windows, other Linux
+> distributions, alternate compilers, ARM hosts, dynamic linking, package
+> registries, and ABI compatibility across future revisions remain unvalidated.
 
 ## Reproduce the supported recovery profile
 
@@ -86,6 +92,11 @@ The installed path is an **experimental static-library integration mechanism**.
 It does not supply a stable shared library, binary compatibility commitment,
 language wrapper, registry package, cryptographic signature, provenance
 attestation, or operating-system support guarantee.
+
+The fixed Ubuntu 22.04 job is described in
+[`SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](./SECOND_CLEAN_INSTALL_ENVIRONMENT.md).
+It validates the same static path in a separate environment; it does not broaden
+the support boundary beyond two Ubuntu-based CI environments.
 
 ## Reporting an environment problem
 

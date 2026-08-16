@@ -1,8 +1,9 @@
 # Second Clean-Install Environment Conformance
 
-**Status:** Fixed-environment conformance job published for validation. The
-Ubuntu 22.04 result is not a supported-platform claim until its GitHub Actions
-job completes successfully.
+**Status:** Remotely validated fixed-environment conformance job in [Compiler
+Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719) for
+revision `addad26`. This is a second Ubuntu evidence point, not a cross-platform
+support claim.
 
 ## Purpose
 
@@ -32,6 +33,9 @@ language support.
 
 The job command sequence was run locally in a newly created producer build,
 temporary install prefix, and separate external-consumer build directory before
-publication. This proves the command sequence under the local Ubuntu 24.04
-review environment only. The eventual Ubuntu 22.04 Actions result is required
-before this record can add that platform to the tested-environment table.
+publication. [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719)
+then completed both its established 27-check recovery profile and the separate
+Ubuntu 22.04 static-SDK producer/install/external-consumer job successfully.
+This adds Ubuntu 22.04 static-SDK conformance evidence only; it does not validate
+macOS, Windows, other Linux distributions, alternate compilers, dynamic linking,
+registry delivery, signing, or ABI stability.

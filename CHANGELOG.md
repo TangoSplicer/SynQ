@@ -9,6 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Second clean-install environment:** Added a fixed Ubuntu 22.04 producer,
+  install, discovery, external-consumer, and execution job. Together with the
+  existing `ubuntu-latest` recovery profile, it passed in [Compiler Core #50](https://github.com/TangoSplicer/SynQ/actions/runs/31956231719).
+- **Beginner experience:** Added a beginner tutorial, non-executing guided CLI
+  walkthrough contract, and visual Bell-state lesson design record.
+- **Competitive review:** Added a cited, evidence-bound comparison of SynQ’s
+  current kernel against relevant quantum-programming ecosystems.
 - **Tested-environment guide:** Published the verified Ubuntu-like compiler and
   clean-install boundary without claiming a broader support matrix.
 - **Alpha named-register operands:** Added parser, Hybrid IR, resolver, range
@@ -23,13 +30,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   contribution workflow, security-reporting policy, and bounded issue templates.
 
 ### Changed
+- **Older JSON compatibility:** Replaced an implicit JSON-to-vector assignment
+  with an explicit typed conversion so the static SDK producer builds under the
+  older nlohmann-json package in the fixed Ubuntu 22.04 job.
 - **Repository status documents:** Replaced stale compiler, CLI, security,
   support, and release assertions with the current experimental recovery-profile
   evidence and explicit non-claims.
 
 ### Planned
-- Add a second independently validated clean-install environment before making
-  any support-matrix or cross-platform SDK claim.
+- Add non-Ubuntu or alternate-toolchain clean-install evidence before making any
+  cross-platform SDK claim.
 - Design the resource and bounded-execution contracts required before
   multi-register simulation, non-literal control, or callable bodies/calls.
 
