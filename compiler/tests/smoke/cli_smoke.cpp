@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 #ifdef _WIN32
     const auto launcher = base.string() + "_launcher.cmd";
     if (!require(write_windows_launcher(launcher, executable), "writes a Windows CLI launcher")) return 1;
-    const std::string invoke = quote(launcher);
+    const std::string invoke = "call " + quote(launcher);
 #else
     const std::string invoke = quote(executable);
 #endif
