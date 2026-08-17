@@ -1,7 +1,8 @@
 # Named Register Operands
 
-**Status:** Remotely validated Alpha-gated bounded language increment in
-[Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553).
+**Status:** Remotely validated Alpha-gated bounded language increment, including
+bounded multi-register local simulation, in [Compiler Core platform-matrix
+#32065348941](https://github.com/TangoSplicer/SynQ/actions/runs/32065348941).
 This document describes the implemented recovery-profile contract and its
 remaining boundaries.
 
@@ -36,7 +37,7 @@ runtime, scopes, deallocation, or provider semantics.
 | Literal bounds | Resolver | Each `name[index]` must satisfy `index < declared size`. |
 | Duplicate declarations | Existing parser rule | A qubit register shares the existing top-level namespace and cannot be redeclared. |
 | Strict export | Hybrid OpenQASM 3 exporter | Each declared register is emitted as `qubit[n] name;`; only supported gates and unnamed measurements are lowered. |
-| Local simulation | Bounded simulator | The current simulator remains default-register-only and rejects named-register programs rather than inventing a flattening model. |
+| Local simulation | Bounded simulator | Explicit declared registers receive deterministic declaration-order physical offsets in the bounded state vector; source register names and indices remain visible in results. |
 
 The default operand form `q[index]` preserves its existing behavior. If an
 explicit `qubit q[n]` declaration appears, it remains subject to declaration
@@ -57,20 +58,22 @@ The strict Hybrid exporter may lower multiple declared registers directly becaus
 OpenQASM 3 accepts named qubit declarations. Unnamed measurements are emitted
 into deterministic per-register classical declarations, while named SynQ
 measurement results remain outside the exporter boundary. Conditional nodes,
-callable bodies, arbitrary classical expressions, and simulator support remain
-separate increments.
+callable bodies, arbitrary classical expressions, and general runtime execution
+remain separate increments.
 
-No claim is made that this profile defines quantum resource lifetime, execution
-placement, multi-register simulation, hardware mapping, a stable language
-syntax, or a general type system.
+No claim is made that this profile defines quantum resource lifetime beyond one
+simulation input, execution placement, deallocation, aliasing, dynamic resource
+allocation, hardware mapping, a stable language syntax, or a general type system.
 
 ## Evidence
 
-Revision `3a87e63` passed **27/27** recovery-profile CTest checks in [Compiler
-Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553). The
-focused coverage includes Alpha-gate rejection, typed AST/Hybrid provenance,
-resolver declaration-order and range failures, cross-register strict Hybrid
-OpenQASM emission, a separate-process `synqc --emit-openqasm-hybrid` path, and
-an explicit bounded-simulator rejection fixture. The evidence does not validate
-named-register hardware execution, provider integration, or multi-register
-simulation.
+Revision `23999f4` passed the five independent jobs in [Compiler Core platform
+matrix #32065348941](https://github.com/TangoSplicer/SynQ/actions/runs/32065348941):
+**28/28** Linux CTests and **21/21** platform-neutral CTests on Windows and
+macOS, plus Ubuntu and Windows static-SDK consumer jobs. Focused coverage includes
+Alpha-gate rejection, typed AST/Hybrid provenance, resolver declaration-order and
+range failures, cross-register strict Hybrid OpenQASM emission, cross-register
+Bell simulation with source-register provenance, combined-limit refusal, and
+separate-process `synqc --simulate` output. The evidence does not validate
+named-register hardware execution, provider integration, noise, sampling, or
+device mapping.

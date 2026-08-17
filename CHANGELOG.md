@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Bounded multi-register simulation:** Added deterministic declaration-order
+  physical allocation for explicit named registers, cross-register supported
+  gates, source-register measurement provenance, combined qubit-limit rejection,
+  and `synqc --simulate` register-offset output. [Compiler Core platform-matrix
+  run #32065348941](https://github.com/TangoSplicer/SynQ/actions/runs/32065348941)
+  passed all five jobs.
 - **Inspectable Alpha semantic environment:** Added read-only resolved
   top-level binding metadata, deterministic `synqc --inspect-semantics` output,
   an explicit semantic-kernel contract, and focused resolver/CLI fixtures.

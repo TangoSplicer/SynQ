@@ -21,9 +21,9 @@ environment and exact clean-install boundaries are documented in
 | --- | --- | --- |
 | Compiler and CLI | C++17 recovery build produces `libsynq_lib.a` and `synqc 0.1.0-experimental`. | No general executor, REPL, package manager, or stable CLI contract. |
 | Source profile | Typed gates, bounded declarations, Alpha Boolean/integer forms, qubit declarations, named measurement metadata, and declaration-only callables. | No scopes, blocks, callable bodies/calls, general expressions, or runtime semantics. |
-| Named registers | Alpha `name[index]` operands resolve against earlier declared registers and lower through strict Hybrid OpenQASM. | No resource lifetime, flattening, or multi-register simulation. |
+| Named registers | Alpha `name[index]` operands resolve against earlier declared registers, lower through strict Hybrid OpenQASM, and participate in bounded declaration-order local simulation. | No resource lifetime, deallocation, aliasing, dynamic allocation, or hardware mapping. |
 | Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if` with one supported typed gate body. | No identifier/expression condition lowering, loops, measurement body, branch execution, or classical runtime. |
-| Local simulation | Opt-in pure-state probability calculation for one default register and a limited gate set. | No samples/collapse, noise, controls, providers, or hardware execution. |
+| Local simulation | Opt-in pure-state probability calculation for explicit declared default or named registers and a limited gate set. | No samples/collapse, noise, control execution, providers, hardware execution, or general resource lifecycle. |
 | Semantic inspection | `synqc --inspect-semantics` renders resolved top-level classical binding metadata. | No runtime values, nested scopes, general type system, or execution behavior. |
 | Native interoperability | The Ubuntu full profile exercises C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers; Windows and macOS run independent platform-neutral compiler/CLI/C-ABI smoke coverage. Ubuntu 22.04 and Windows MSVC also prove static SDK clean-install consumers. | No macOS SDK clean-install proof, safe wrappers, registry packages, shared-library distribution, frozen ABI, or general cross-platform SDK guarantee. |
 
@@ -80,6 +80,7 @@ accepted/rejected control forms.
 | [`docs/COMPETITIVE_LANDSCAPE_AND_DIFFERENTIATION.md`](docs/COMPETITIVE_LANDSCAPE_AND_DIFFERENTIATION.md) | Competition review and constrained differentiation strategy. |
 | [`docs/COMPETITIVE_LEVERAGE_REVIEW_2026-08-17.md`](docs/COMPETITIVE_LEVERAGE_REVIEW_2026-08-17.md) | Evidence-backed three-leverage competitive direction. |
 | [`docs/ALPHA_SEMANTIC_KERNEL.md`](docs/ALPHA_SEMANTIC_KERNEL.md) | Bounded top-level semantic environment and inspection contract. |
+| [`docs/MULTI_REGISTER_SIMULATION.md`](docs/MULTI_REGISTER_SIMULATION.md) | Bounded named-register allocation and local-probability simulation contract. |
 | [`docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md`](docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md) | Prioritized language-core improvement assessment, grounded in current code and evidence. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Safe contribution workflow. |
 | [`SECURITY.md`](SECURITY.md) | Responsible vulnerability-reporting route. |

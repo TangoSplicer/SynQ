@@ -25,7 +25,7 @@ historical runtime-dependent command-line source.
 | `synqc file.synq --emit-openqasm-hybrid [--out output.qasm]` | Emits the strict typed Hybrid OpenQASM subset: declared registers, supported gates, unnamed measurements, and one Alpha literal-if gate body. | `0` success; `3` parse error; `4` lowering/resolution error; `5` unsupported export; `6` output-write failure. |
 | `synqc file.synq --inspect-semantics` | Renders resolved top-level classical binding names, kinds, static types, source lines, and earlier-binding dependencies without evaluation. | `0` success; `3` parse error; `4` lowering/resolution error. |
 | `synqc file.synq --eval-constants [--max-declarations n]` | Explicitly opts into declaration-only bounded constant evaluation. | `0` success; `3` parse error; `4` lowering/resolution error; `5` evaluation failure. |
-| `synqc file.synq --simulate [--max-qubits n] [--max-operations n]` | Explicitly computes bounded local basis/marginal probabilities. | `0` success; `3` parse error; `4` lowering/resolution error; `5` simulation failure. |
+| `synqc file.synq --simulate [--max-qubits n] [--max-operations n]` | Explicitly computes bounded local basis/marginal probabilities for explicit declared registers, reporting source-register offsets and measurement provenance. | `0` success; `3` parse error; `4` lowering/resolution error; `5` simulation failure. |
 | `synqc --help` | Prints usage and documented safety boundary. | `0`. |
 
 Malformed command lines return `2`. The command prints structured parser,
@@ -77,7 +77,10 @@ providers, call the disabled historical runtime, evaluate general classical
 programs, execute `if`/`while`, execute callables, install packages, or
 establish a stable production CLI contract. `--simulate` is a small local
 probability model, not a device executor, noise model, or measurement sampler.
-Its supported behavior is limited to the modes above and their tested boundaries.
+It maps explicit named registers into one bounded declaration-order state vector
+only; it does not model resource lifetime, deallocation, aliasing, dynamic
+allocation, or device placement. Its supported behavior is limited to the modes
+above and their tested boundaries.
 
 The strict Hybrid mode rejects source structures the AST exporter may otherwise
 infer around: missing declarations, declaration-only classical/callable nodes,
