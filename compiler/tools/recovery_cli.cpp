@@ -18,6 +18,7 @@ enum class Mode {
     Validate,
     EmitOpenQasm,
     EmitHybridOpenQasm,
+    InspectSemantics,
     EvaluateConstants,
     Simulate,
 };
@@ -37,12 +38,14 @@ void print_help(std::ostream& output) {
            << "  synqc <source.synq> --validate\n"
            << "  synqc <source.synq> --emit-openqasm [--out <file.qasm>]\n"
            << "  synqc <source.synq> --emit-openqasm-hybrid [--out <file.qasm>]\n"
+           << "  synqc <source.synq> --inspect-semantics\n"
            << "  synqc <source.synq> --eval-constants [--max-declarations <n>]\n"
            << "  synqc <source.synq> --simulate [--max-qubits <n>] [--max-operations <n>]\n\n"
            << "Modes:\n"
            << "  --validate        Parse, lower, and resolve the documented bounded profile.\n"
            << "  --emit-openqasm   Emit the supported AST OpenQASM 3 source subset.\n"
            << "  --emit-openqasm-hybrid  Emit strict Hybrid IR OpenQASM with explicit q[n].\n"
+           << "  --inspect-semantics  Render resolved top-level binding metadata without evaluation.\n"
            << "  --eval-constants  Explicitly run bounded declaration-only constant evaluation.\n"
            << "  --simulate        Explicitly calculate deterministic bounded local probabilities.\n\n"
            << "This command does not submit jobs,\n"
@@ -82,6 +85,10 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EmitHybridOpenQasm;
             selected_mode = true;
+        } else if (argument == "--inspect-semantics") {
+            if (selected_mode) { error = "select exactly one mode"; return false; }
+            command.mode = Mode::InspectSemantics;
+            selected_mode = true;
         } else if (argument == "--eval-constants") {
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EvaluateConstants;
@@ -114,7 +121,7 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
         }
     }
     if (!selected_mode) {
-        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --eval-constants, or --simulate";
+        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --inspect-semantics, --eval-constants, or --simulate";
         return false;
     }
     if (command.output_path.has_value() && command.mode != Mode::EmitOpenQasm &&
@@ -247,6 +254,11 @@ int main(int argc, char** argv) {
 
     if (command.mode == Mode::Validate) {
         std::cout << "synqc: valid bounded recovery-profile program: " << command.source_path << "\n";
+        return 0;
+    }
+
+    if (command.mode == Mode::InspectSemantics) {
+        std::cout << synq::compiler::render_semantic_environment(*resolved.program);
         return 0;
     }
 

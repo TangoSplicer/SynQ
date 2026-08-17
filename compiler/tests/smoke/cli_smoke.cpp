@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
     const auto base = std::filesystem::temp_directory_path() / "synq_cli_smoke";
     const auto quantum = base.string() + "_quantum.synq";
     const auto constants = base.string() + "_constants.synq";
+    const auto semantics = base.string() + "_semantics.synq";
     const auto simulation = base.string() + "_simulation.synq";
     const auto named_registers = base.string() + "_named_registers.synq";
     const auto literal_if = base.string() + "_literal_if.synq";
@@ -69,6 +70,9 @@ int main(int argc, char** argv) {
                             "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
                             "let seed = 5\nlet total = seed + 4\nlet ready = true\n"),
                  "writes constant-evaluation CLI fixture") ||
+        !require(write_file(semantics,
+                            "let seed = 5\nlet selected = seed\nmeasure q[0] as observed\n"),
+                 "writes semantic-inspection CLI fixture") ||
         !require(write_file(simulation,
                             "#[experimental(feature = \"qubit-declarations\")]\n"
                             "qubit q[2]\nquantum bell_pair q[0], q[1]\nmeasure q[0]\nmeasure q[1]\n"),
@@ -126,6 +130,12 @@ int main(int argc, char** argv) {
                      read_file(stdout_path).find("ready = Boolean:true") != std::string::npos,
                  "experimental constant-evaluation mode prints deterministic evaluated bindings")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(semantics) + " --inspect-semantics > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("binding selected | Value | Integer | line 2 | depends-on seed") != std::string::npos &&
+                     read_file(stdout_path).find("binding observed | MeasurementResult | Boolean | line 3") != std::string::npos,
+                 "semantic inspection mode prints resolved binding metadata without evaluation")) return 1;
+
     if (!require(std::system((invoke + " " + quote(simulation) + " --simulate > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("basis |00> probability = 0.5") != std::string::npos &&
@@ -140,6 +150,7 @@ int main(int argc, char** argv) {
 
     std::filesystem::remove(quantum);
     std::filesystem::remove(constants);
+    std::filesystem::remove(semantics);
     std::filesystem::remove(simulation);
     std::filesystem::remove(named_registers);
     std::filesystem::remove(literal_if);

@@ -14,6 +14,24 @@
 
 namespace synq::compiler {
 
+enum class SemanticBindingKind {
+    Value,
+    MeasurementResult,
+};
+
+const char* semantic_binding_kind_name(SemanticBindingKind kind);
+
+// A read-only record of one resolved top-level classical binding. It describes
+// identity and static type only; it does not contain a runtime value or effect.
+struct SemanticBinding {
+    std::string name;
+    SemanticBindingKind kind = SemanticBindingKind::Value;
+    ClassicalStaticType static_type = ClassicalStaticType::Unknown;
+    std::size_t node_index = 0;
+    SourceSpan span;
+    std::vector<std::string> dependency_names;
+};
+
 struct ResolvedHybridDeclaration {
     HybridDeclaration declaration;
     // Index of the earlier HybridProgram declaration referenced by a whole
@@ -36,6 +54,7 @@ using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQubitDe
 
 struct ResolvedHybridProgram {
     std::vector<ResolvedHybridNode> nodes;
+    std::vector<SemanticBinding> semantic_bindings;
 };
 
 struct NameResolutionResult {
@@ -49,6 +68,10 @@ struct NameResolutionResult {
 // HybridProgram scope. It does not evaluate expressions, inspect strings,
 // create nested scopes, or assign types.
 NameResolutionResult resolve_hybrid_names(const HybridProgram& program);
+
+// Renders the resolved top-level semantic environment for inspection. The output
+// intentionally reports static types and dependency names, not evaluated values.
+std::string render_semantic_environment(const ResolvedHybridProgram& program);
 
 }  // namespace synq::compiler
 

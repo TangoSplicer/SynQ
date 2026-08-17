@@ -2,6 +2,7 @@
 #include "name_resolution.h"
 
 #include <cctype>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -14,6 +15,14 @@ bool NameResolutionResult::ok() const {
         if (diagnostic.severity == DiagnosticSeverity::Error) return false;
     }
     return true;
+}
+
+const char* semantic_binding_kind_name(SemanticBindingKind kind) {
+    switch (kind) {
+        case SemanticBindingKind::Value: return "Value";
+        case SemanticBindingKind::MeasurementResult: return "MeasurementResult";
+    }
+    return "Value";
 }
 
 namespace {
@@ -107,6 +116,8 @@ Diagnostic invalid_integer_arithmetic_diagnostic(const ClassicalIntegerArithmeti
 struct BindingInfo {
     std::size_t index = 0;
     ClassicalStaticType static_type = ClassicalStaticType::Unknown;
+    std::string name;
+    SemanticBindingKind kind = SemanticBindingKind::Value;
 };
 
 bool resolve_boolean_expression(const ClassicalBooleanExpression& expression,
@@ -145,6 +156,7 @@ bool resolve_boolean_expression(const ClassicalBooleanExpression& expression,
 bool resolve_integer_arithmetic_expression(const ClassicalIntegerArithmeticExpression& expression,
                                            const std::unordered_map<std::string, BindingInfo>& bindings,
                                            std::vector<std::size_t>& binding_indices,
+                                           std::vector<std::string>& binding_names,
                                            Diagnostic& error) {
     if (expression.kind == ClassicalIntegerArithmeticExpressionKind::IntegerLiteral) return true;
     if (expression.kind == ClassicalIntegerArithmeticExpressionKind::IdentifierReference) {
@@ -158,6 +170,7 @@ bool resolve_integer_arithmetic_expression(const ClassicalIntegerArithmeticExpre
             return false;
         }
         binding_indices.push_back(binding->second.index);
+        binding_names.push_back(binding->second.name);
         return true;
     }
     if ((expression.kind != ClassicalIntegerArithmeticExpressionKind::Add &&
@@ -168,7 +181,7 @@ bool resolve_integer_arithmetic_expression(const ClassicalIntegerArithmeticExpre
         return false;
     }
     for (const ClassicalIntegerArithmeticExpression& operand : expression.operands) {
-        if (!resolve_integer_arithmetic_expression(operand, bindings, binding_indices, error)) return false;
+        if (!resolve_integer_arithmetic_expression(operand, bindings, binding_indices, binding_names, error)) return false;
     }
     return true;
 }
@@ -256,6 +269,7 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         if (const auto* declaration = std::get_if<HybridDeclaration>(&node)) {
             std::optional<std::size_t> initializer_binding_index;
             std::vector<std::size_t> initializer_binding_indices;
+            std::vector<std::string> initializer_binding_names;
             ClassicalStaticType initializer_static_type = declaration->initializer.static_type;
             if (declaration->initializer.kind == ClassicalExpressionKind::IdentifierReference &&
                 is_identifier(declaration->source_value)) {
@@ -267,12 +281,14 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                 }
                 initializer_binding_index = binding->second.index;
                 initializer_static_type = binding->second.static_type;
+                initializer_binding_names.push_back(binding->second.name);
             }
             if (declaration->initializer.kind == ClassicalExpressionKind::IntegerArithmeticExpression) {
                 Diagnostic arithmetic_error;
                 if (!declaration->initializer.integer_arithmetic.has_value() ||
                     !resolve_integer_arithmetic_expression(*declaration->initializer.integer_arithmetic, bindings,
-                                                           initializer_binding_indices, arithmetic_error)) {
+                                                           initializer_binding_indices, initializer_binding_names,
+                                                           arithmetic_error)) {
                     NameResolutionResult result;
                     result.diagnostics.push_back(std::move(arithmetic_error));
                     return result;
@@ -283,7 +299,11 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             resolved.nodes.emplace_back(ResolvedHybridDeclaration{*declaration, initializer_binding_index,
                                                                    initializer_static_type,
                                                                    std::move(initializer_binding_indices)});
-            bindings.emplace(declaration->name, BindingInfo{node_index, initializer_static_type});
+            resolved.semantic_bindings.push_back({declaration->name, SemanticBindingKind::Value,
+                                                  initializer_static_type, node_index, declaration->span,
+                                                  std::move(initializer_binding_names)});
+            bindings.emplace(declaration->name, BindingInfo{node_index, initializer_static_type,
+                                                            declaration->name, SemanticBindingKind::Value});
             continue;
         }
 
@@ -353,13 +373,40 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
         resolved.nodes.emplace_back(measurement);
         if (measurement.result_name.has_value()) {
-            bindings.emplace(*measurement.result_name, BindingInfo{node_index, ClassicalStaticType::Boolean});
+            resolved.semantic_bindings.push_back({*measurement.result_name, SemanticBindingKind::MeasurementResult,
+                                                  ClassicalStaticType::Boolean, node_index, measurement.span, {}});
+            bindings.emplace(*measurement.result_name, BindingInfo{node_index, ClassicalStaticType::Boolean,
+                                                                    *measurement.result_name,
+                                                                    SemanticBindingKind::MeasurementResult});
         }
     }
 
     NameResolutionResult result;
     result.program = std::move(resolved);
     return result;
+}
+
+std::string render_semantic_environment(const ResolvedHybridProgram& program) {
+    std::ostringstream output;
+    output << "semantic environment: top-level immutable bindings\n";
+    if (program.semantic_bindings.empty()) {
+        output << "(no classical bindings)\n";
+        return output.str();
+    }
+    for (const SemanticBinding& binding : program.semantic_bindings) {
+        output << "binding " << binding.name << " | " << semantic_binding_kind_name(binding.kind)
+               << " | " << classical_static_type_name(binding.static_type)
+               << " | line " << binding.span.line;
+        if (!binding.dependency_names.empty()) {
+            output << " | depends-on ";
+            for (std::size_t index = 0; index < binding.dependency_names.size(); ++index) {
+                if (index != 0) output << ", ";
+                output << binding.dependency_names[index];
+            }
+        }
+        output << "\n";
+    }
+    return output.str();
 }
 
 }  // namespace synq::compiler
