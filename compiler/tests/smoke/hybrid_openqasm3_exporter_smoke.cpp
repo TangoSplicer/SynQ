@@ -112,6 +112,33 @@ bool lowers_bounded_if_gates_and_rejects_wider_control() {
     if (!require(identifier_ok && identifier_export.ok() && identifier_export.program == identifier_expected,
                  "strict Hybrid export lowers one earlier Boolean-literal declaration identifier if condition")) return false;
 
+    bool negated_identifier_ok = false;
+    const auto negated_identifier_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "let enabled = false\n"
+        "qubit q[1]\n"
+        "if not enabled then quantum h q[0]\n", negated_identifier_ok);
+    const auto negated_identifier_export = synq::compiler::export_hybrid_openqasm3(negated_identifier_if);
+    const std::string negated_identifier_expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[1] q;\n"
+        "bool synq_bool_enabled = false;\n"
+        "if (!synq_bool_enabled) h q[0];\n";
+    if (!require(negated_identifier_ok && negated_identifier_export.ok() &&
+                 negated_identifier_export.program == negated_identifier_expected,
+                 "strict Hybrid export lowers not over one earlier Boolean-literal declaration identifier")) return false;
+
+    bool negated_literal_ok = false;
+    const auto negated_literal_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "if not true then quantum h q[0]\n", negated_literal_ok);
+    if (!require(negated_literal_ok && !synq::compiler::export_hybrid_openqasm3(negated_literal_if).ok(),
+                 "strict Hybrid export rejects negated Boolean literals")) return false;
+
     bool alias_ok = false;
     const auto alias_if = lower_fixture(
         "#[experimental(feature = \"qubit-declarations\")]\n"
@@ -122,6 +149,17 @@ bool lowers_bounded_if_gates_and_rejects_wider_control() {
         "if enabled then quantum h q[0]\n", alias_ok);
     if (!require(alias_ok && !synq::compiler::export_hybrid_openqasm3(alias_if).ok(),
                  "strict Hybrid export rejects identifier conditions backed by declaration aliases")) return false;
+
+    bool negated_alias_ok = false;
+    const auto negated_alias_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "let ready = true\n"
+        "let enabled = ready\n"
+        "qubit q[1]\n"
+        "if not enabled then quantum h q[0]\n", negated_alias_ok);
+    if (!require(negated_alias_ok && !synq::compiler::export_hybrid_openqasm3(negated_alias_if).ok(),
+                 "strict Hybrid export rejects negated identifier conditions backed by declaration aliases")) return false;
 
     bool expression_ok = false;
     const auto expression_if = lower_fixture(

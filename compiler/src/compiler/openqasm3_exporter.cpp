@@ -299,15 +299,28 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
                     continue;
                 }
                 lowered_condition = storage->second;
+            } else if (control->condition.kind == ClassicalConditionKind::BooleanExpression &&
+                       control->condition.expression.kind == ClassicalBooleanExpressionKind::Not &&
+                       control->condition.expression.operands.size() == 1 &&
+                       control->condition.expression.operands.front().kind ==
+                           ClassicalBooleanExpressionKind::IdentifierReference) {
+                const auto storage = declared_boolean_storage.find(
+                    control->condition.expression.operands.front().source_text);
+                if (storage == declared_boolean_storage.end()) {
+                    add_diagnostic(result, control->span.line,
+                                   "Hybrid OpenQASM 3 negated identifier-if lowering requires an earlier top-level Boolean literal declaration; aliases, measurement results, non-Boolean values, and forward bindings are not supported");
+                    continue;
+                }
+                lowered_condition = "!" + storage->second;
             } else {
                 add_diagnostic(result, control->span.line,
-                               "Hybrid OpenQASM 3 export lowers only literal or one earlier Boolean-declaration identifier if conditions; Boolean expressions are not supported");
+                               "Hybrid OpenQASM 3 export lowers only literal, one earlier Boolean-declaration identifier, or not <earlier Boolean-declaration identifier> if conditions; Boolean expressions are otherwise not supported");
                 continue;
             }
             const auto* gate = std::get_if<HybridQuantumGate>(&control->body);
             if (gate == nullptr) {
                 add_diagnostic(result, control->span.line,
-                               "Hybrid OpenQASM 3 literal if lowering supports one typed quantum gate body only");
+                               "Hybrid OpenQASM 3 if lowering supports one typed quantum gate body only");
                 continue;
             }
             if (gate->qubit_register_names.size() != gate->qubit_indices.size()) {
