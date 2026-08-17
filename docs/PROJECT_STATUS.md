@@ -10,19 +10,20 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core platform-matrix run #32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062)
-passed all five independent jobs for revision `fb1d2b4`: the Linux recovery
-profile passed **27/27** CTest checks; Windows MSVC and macOS Clang each passed
-**20/20** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
+ [Compiler Core platform-matrix run #32063787617](https://github.com/TangoSplicer/SynQ/actions/runs/32063787617)
+passed all five independent jobs for revision `7154e10`: the Linux recovery
+profile passed **28/28** CTest checks; Windows MSVC and macOS Clang each passed
+**21/21** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
 built, installed, discovered, compiled, and ran the experimental static SDK
 consumer from a clean prefix. The exact tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 27 CTests. Separate Windows MSVC and macOS Clang profiles each pass 20 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 28 CTests. Separate Windows MSVC and macOS Clang profiles each pass 21 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
 | `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded constant evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
 | Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, and declaration-only callables. No scopes, assignments, general expressions, callable bodies/calls, or runtime semantics exist. |
+| Alpha semantic environment | **Remotely validated read-only inspection subset.** | `synqc --inspect-semantics` renders resolved top-level classical binding metadata: kind, static type, source line, and earlier-binding dependencies. It does not evaluate general source, produce runtime values, sample measurements, or introduce nested scopes. |
 | Named registers | **Remotely validated Alpha subset in [Compiler Core #47](https://github.com/TangoSplicer/SynQ/actions/runs/31951911553).** | Earlier declared `name[index]` operands resolve and strict-Hybrid export supports declared registers. The bounded simulator rejects the named-register form. |
 | Literal-if export | **Remotely validated strict source-lowering subset in [Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849).** | One literal `if` with one supported typed gate body lowers to OpenQASM 3. Identifier/expression conditions, `while`, measurement bodies, and execution remain rejected. |
 | Local simulation | **Remotely validated bounded probability model.** | One default register, limited gates, opt-in limits, and deterministic probability output only. No samples, collapse, noise, control execution, provider, or hardware behavior. |

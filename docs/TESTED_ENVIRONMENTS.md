@@ -9,9 +9,9 @@ it is not a cross-platform support promise.
 The recovery compiler profile is continuously exercised by the
 [`Compiler Core` workflow](../.github/workflows/compiler-core.yml). The latest
 remote evidence is [Compiler Core platform-matrix run
-#32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062)
-for revision `fb1d2b4`. Its Linux job passed the full **27/27** recovery-profile
-CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **20-test**
+#32063787617](https://github.com/TangoSplicer/SynQ/actions/runs/32063787617)
+for revision `7154e10`. Its Linux job passed the full **28/28** recovery-profile
+CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **21-test**
 platform-neutral compiler/CLI/C-ABI smoke profile.
 
 The same workflow now includes distinct Ubuntu 22.04 and Windows MSVC
@@ -34,10 +34,10 @@ evidence, not minimum-version guarantees.
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
 
-> **Support boundary:** `windows-latest` has remote MSVC evidence for a 20-test
+> **Support boundary:** `windows-latest` has remote MSVC evidence for a 21-test
 > platform-neutral compiler/CLI/C-ABI smoke profile **and** an experimental
 > static-SDK clean-install external-consumer check. `macos-latest` has a separate
-> 20-test Clang platform-neutral smoke profile only. The full 27-test suite, the
+> 21-test Clang platform-neutral smoke profile only. The full 28-test suite, the
 > Rust/Common Lisp/Clojure/Mercury fixtures, and OpenQASM Python reference checks
 > remain Ubuntu-only evidence. These CI results do not establish a stable ABI,
 > shared-library delivery, registry package, broad package support, dynamic

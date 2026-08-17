@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Inspectable Alpha semantic environment:** Added read-only resolved
+  top-level binding metadata, deterministic `synqc --inspect-semantics` output,
+  an explicit semantic-kernel contract, and focused resolver/CLI fixtures.
+  [Compiler Core platform-matrix run #32063787617](https://github.com/TangoSplicer/SynQ/actions/runs/32063787617)
+  passed 28 Linux CTests and 21 Windows/macOS platform-neutral CTests.
 - **Expanded platform evidence:** [Compiler Core platform-matrix run #32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062)
   passed independent Linux 27-test, Windows MSVC 20-test, macOS Clang 20-test,
   Ubuntu 22.04 static-SDK consumer, and Windows MSVC static-SDK consumer jobs.

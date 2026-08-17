@@ -147,7 +147,7 @@
 - [x] Publish a prioritized, evidence-based language-wide improvement assessment with explicit current gaps and dependency order.
 
 - [ ] Re-audit operational-readiness gaps and competitive differentiation before selecting bounded implementation increments.
-- [ ] Publish and implement a bounded semantic-kernel contract with focused local and remote evidence.
+- [x] Publish and implement a bounded semantic-kernel contract with focused local and remote evidence.
 - [ ] Publish and implement named-register resource and multi-register simulation semantics with focused local and remote evidence.
 - [ ] Publish and implement one safe, maintainable interoperability or delivery leverage point with focused local and remote evidence.
 - [ ] Run comprehensive local and remote verification and align all public readiness records after each accepted increment.
