@@ -84,14 +84,20 @@ signing/provenance evidence, or ABI-stability promise.
 
 ## Remote evidence
 
-[Compiler Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207)
-completed successfully for revision `1de1484`, reporting **27/27** CTest checks
-including `synq_installed_sdk_conformance`. This confirms the recovery CI profile
-can install the experimental static library/header/CMake package into an
+[Compiler Core platform-matrix run #32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062)
+completed successfully for revision `fb1d2b4`. Its Ubuntu 22.04 and Windows MSVC
+jobs each install the experimental static library/header/CMake package into an
 isolated prefix, configure and link the separate public-header C consumer, and
-run its bounded ABI parse/export/cleanup flow. It does not validate artifact
-signing, provenance, registry publication, cross-platform portability, dynamic
-linking, or ABI compatibility across future releases.
+run its bounded ABI parse/export/cleanup flow. The Windows implementation uses
+the vcpkg toolchain and multi-configuration `Release` consumer path; the same
+conformance script remains exercised by the Ubuntu recovery profile. The macOS
+job in that run is a compiler/CLI/C-ABI smoke profile only, not a clean-install
+SDK check.
+
+This confirms a narrow experimental static integration path on two operating
+system families. It does not validate artifact signing, provenance, registry
+publication, shared or dynamic linking, macOS SDK installation, safe wrappers,
+or ABI compatibility across future releases.
 
 ## Acceptance criteria
 
@@ -103,5 +109,5 @@ after all conditions below are satisfied:
 | No source/build leakage | The isolated consumer configures and builds through only the installed CMake package and public header. |
 | Runtime ABI exercise | The isolated executable uses v1 identity, parses a supported in-memory fixture, exports OpenQASM, and releases all returned resources. |
 | Existing safety boundary retained | The regular C/Rust/Common Lisp/Clojure/Mercury smoke tests and the full recovery profile continue to pass. |
-| Package scope remains truthful | Install/archive records state that the SDK is experimental, static-library based, Linux-tested only, and neither signed nor registry-distributed. |
+| Package scope remains truthful | Install/archive records state that the SDK is experimental, static-library based, clean-install tested on Ubuntu and Windows only, and neither signed nor registry-distributed. |
 | Evidence publication | Local command output and a successful Compiler Core run are recorded separately. |

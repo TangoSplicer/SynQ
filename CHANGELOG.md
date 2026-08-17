@@ -9,6 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Expanded platform evidence:** [Compiler Core platform-matrix run #32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062)
+  passed independent Linux 27-test, Windows MSVC 20-test, macOS Clang 20-test,
+  Ubuntu 22.04 static-SDK consumer, and Windows MSVC static-SDK consumer jobs.
+  Each artifact/job remains separately scoped; macOS SDK conformance is not
+  claimed.
+- **Language-wide improvement assessment:** Added a prioritized semantic,
+  resource, control-flow, callable, interoperability, and release-contract
+  assessment with explicit dependency order and current non-claims.
 - **Separate Windows and Linux CI artifacts:** Added independent Linux and
   Windows build/smoke jobs with separately named artifacts. [Compiler Core
   multi-platform run #31976468444](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444)
@@ -36,6 +44,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   contribution workflow, security-reporting policy, and bounded issue templates.
 
 ### Changed
+- **Portable SDK conformance harness:** Made the isolated SDK producer/consumer
+  script configuration-aware so it can select a multi-configuration build,
+  executable suffix, and vcpkg toolchain for the verified Windows MSVC path.
 - **MSVC portability and smoke fixtures:** Replaced GNU-only checked-arithmetic
   and `M_PI` assumptions, separated optional Ubuntu toolchain fixtures from the
   Windows profile, and made parser, diagnostics, exporter, C ABI, and CLI smoke
@@ -49,8 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   evidence and explicit non-claims.
 
 ### Planned
-- Add non-Ubuntu or alternate-toolchain clean-install evidence before making any
-  cross-platform SDK claim.
+- Add macOS clean-install static-SDK evidence before making any macOS SDK or
+  general cross-platform package claim.
 - Design the resource and bounded-execution contracts required before
   multi-register simulation, non-literal control, or callable bodies/calls.
 

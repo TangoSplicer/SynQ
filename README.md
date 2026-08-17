@@ -9,10 +9,11 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-multi-platform run #31976468444](https://github.com/TangoSplicer/SynQ/actions/runs/31976468444),
-which passed all three independently scoped jobs for revision `40ee355`: **27/27**
-Linux recovery-profile CTests, **20/20** Windows MSVC platform-neutral CTests,
-and an Ubuntu 22.04 clean-install static-SDK consumer check. The tested
+platform-matrix run #32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062),
+which passed all five independently scoped jobs for revision `fb1d2b4`: **27/27**
+Linux recovery-profile CTests, **20/20** Windows MSVC and macOS Clang
+platform-neutral CTests, and Ubuntu 22.04 plus Windows MSVC clean-install
+static-SDK consumer checks. The tested
 environment and exact clean-install boundaries are documented in
 [`docs/TESTED_ENVIRONMENTS.md`](docs/TESTED_ENVIRONMENTS.md).
 
@@ -23,7 +24,7 @@ environment and exact clean-install boundaries are documented in
 | Named registers | Alpha `name[index]` operands resolve against earlier declared registers and lower through strict Hybrid OpenQASM. | No resource lifetime, flattening, or multi-register simulation. |
 | Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if` with one supported typed gate body. | No identifier/expression condition lowering, loops, measurement body, branch execution, or classical runtime. |
 | Local simulation | Opt-in pure-state probability calculation for one default register and a limited gate set. | No samples/collapse, noise, controls, providers, or hardware execution. |
-| Native interoperability | The Ubuntu full profile exercises C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers; the separate Windows MSVC profile exercises platform-neutral compiler, CLI, and C-ABI smoke coverage. | No Windows SDK clean-install proof, safe wrappers, registry packages, shared-library distribution, frozen ABI, or cross-platform SDK guarantee. |
+| Native interoperability | The Ubuntu full profile exercises C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers; Windows and macOS run independent platform-neutral compiler/CLI/C-ABI smoke coverage. Ubuntu 22.04 and Windows MSVC also prove static SDK clean-install consumers. | No macOS SDK clean-install proof, safe wrappers, registry packages, shared-library distribution, frozen ABI, or general cross-platform SDK guarantee. |
 
 ## Quick start: verified compiler path
 
@@ -76,6 +77,7 @@ accepted/rejected control forms.
 | [`docs/BEGINNER_TUTORIAL.md`](docs/BEGINNER_TUTORIAL.md) | First build, validation, export, and local-probability walkthrough. |
 | [`docs/BEGINNER_EXPERIENCE.md`](docs/BEGINNER_EXPERIENCE.md) | Guided-playground and visual-lesson non-execution contract. |
 | [`docs/COMPETITIVE_LANDSCAPE_AND_DIFFERENTIATION.md`](docs/COMPETITIVE_LANDSCAPE_AND_DIFFERENTIATION.md) | Competition review and constrained differentiation strategy. |
+| [`docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md`](docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md) | Prioritized language-core improvement assessment, grounded in current code and evidence. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Safe contribution workflow. |
 | [`SECURITY.md`](SECURITY.md) | Responsible vulnerability-reporting route. |
 

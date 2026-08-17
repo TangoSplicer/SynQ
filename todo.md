@@ -140,3 +140,8 @@
 - [x] Add a live GitHub Actions build-status link to the separate Evidence Ledger.
 - [x] Add an accessible FAQ dialog explaining experimental ABI and feature-gating boundaries in the separate Evidence Ledger.
 - [x] Remotely validate the platform-neutral Windows MSVC smoke profile before making any Windows support claim.
+
+- [x] Add and remotely validate an independent Windows clean-install static SDK producer and external-consumer conformance path.
+- [x] Add and remotely validate a separate macOS platform-neutral compiler, CLI, and C ABI smoke profile.
+- [x] Add a factual verification-history view to the separate Evidence Ledger.
+- [x] Publish a prioritized, evidence-based language-wide improvement assessment with explicit current gaps and dependency order.
