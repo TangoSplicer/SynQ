@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "diagnostic.h"
@@ -18,12 +19,21 @@ struct BasisProbability {
 };
 
 struct MeasurementProbability {
+    std::string register_name = "q";
+    std::size_t register_index = 0;
     std::size_t qubit_index = 0;
     double probability_one = 0.0;
 };
 
+struct SimulatedRegister {
+    std::string name;
+    std::size_t qubit_count = 0;
+    std::size_t physical_offset = 0;
+};
+
 struct BoundedSimulation {
     std::size_t qubit_count = 0;
+    std::vector<SimulatedRegister> registers;
     std::vector<BasisProbability> basis_probabilities;
     std::vector<MeasurementProbability> measurements;
 };
@@ -41,10 +51,13 @@ struct BoundedSimulationResult {
     bool ok() const;
 };
 
-// Simulates a pure state prepared from |0...0> by an explicit `qubit q[n]`
-// declaration, supported gates, and optional trailing unnamed measurements.
-// Measurements report marginal probabilities and do not sample or collapse the
-// state. Every other typed node is rejected rather than ignored.
+// Simulates a pure state prepared from |0...0> by one or more explicit
+// `qubit name[n]` declarations. Registers retain their source identity in the
+// result and are flattened internally in declaration order for the bounded state
+// vector. Supported gates and optional trailing unnamed measurements are then
+// applied to the mapped physical indices. Measurements report marginal
+// probabilities and do not sample or collapse the state. Every other typed node
+// is rejected rather than ignored.
 BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& program,
                                                   const BoundedSimulationOptions& options);
 

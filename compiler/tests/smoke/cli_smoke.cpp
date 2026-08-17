@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
     const auto constants = base.string() + "_constants.synq";
     const auto semantics = base.string() + "_semantics.synq";
     const auto simulation = base.string() + "_simulation.synq";
+    const auto multi_register_simulation = base.string() + "_multi_register_simulation.synq";
     const auto named_registers = base.string() + "_named_registers.synq";
     const auto literal_if = base.string() + "_literal_if.synq";
     const auto invalid = base.string() + "_invalid.synq";
@@ -77,6 +78,13 @@ int main(int argc, char** argv) {
                             "#[experimental(feature = \"qubit-declarations\")]\n"
                             "qubit q[2]\nquantum bell_pair q[0], q[1]\nmeasure q[0]\nmeasure q[1]\n"),
                  "writes bounded-simulation CLI fixture") ||
+        !require(write_file(multi_register_simulation,
+                            "#[experimental(feature = \"qubit-declarations\")]\n"
+                            "#[experimental(feature = \"named-qubit-register-operands\")]\n"
+                            "qubit data[1]\nqubit ancilla[1]\n"
+                            "quantum bell_pair data[0], ancilla[0]\n"
+                            "measure data[0]\nmeasure ancilla[0]\n"),
+                 "writes multi-register simulation CLI fixture") ||
         !require(write_file(named_registers,
                             "#[experimental(feature = \"qubit-declarations\")]\n"
                             "#[experimental(feature = \"named-qubit-register-operands\")]\n"
@@ -143,6 +151,14 @@ int main(int argc, char** argv) {
                      read_file(stdout_path).find("measurement q[0] probability_one = 0.5") != std::string::npos,
                  "simulation mode prints deterministic bounded probabilities")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(multi_register_simulation) + " --simulate > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("register data[1] physical_offset = 0") != std::string::npos &&
+                     read_file(stdout_path).find("register ancilla[1] physical_offset = 1") != std::string::npos &&
+                     read_file(stdout_path).find("measurement data[0] probability_one = 0.5") != std::string::npos &&
+                     read_file(stdout_path).find("measurement ancilla[0] probability_one = 0.5") != std::string::npos,
+                 "simulation mode reports source register identity and deterministic cross-register probabilities")) return 1;
+
     const int invalid_status = std::system((invoke + " " + quote(invalid) + " --validate > " + quote(stdout_path) +
                                             " 2> " + quote(stderr_path)).c_str());
     if (!require(invalid_status != 0 && read_file(stderr_path).find("SYNQ-S002") != std::string::npos,
@@ -152,6 +168,7 @@ int main(int argc, char** argv) {
     std::filesystem::remove(constants);
     std::filesystem::remove(semantics);
     std::filesystem::remove(simulation);
+    std::filesystem::remove(multi_register_simulation);
     std::filesystem::remove(named_registers);
     std::filesystem::remove(literal_if);
     std::filesystem::remove(invalid);

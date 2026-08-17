@@ -92,16 +92,41 @@ bool enforces_opt_in_and_resource_or_semantic_boundaries() {
     if (!require(!named_measurement.ok() && has_code(named_measurement.diagnostics, "SYNQ-SIM002"),
                    "simulator rejects sampling/binding semantics it does not implement")) return false;
 
-    synq::compiler::BoundedSimulationResult named_register;
+    synq::compiler::BoundedSimulationResult named_registers;
     if (!require(simulate_source(
                      "#[experimental(feature = \"qubit-declarations\")]\n"
                      "#[experimental(feature = \"named-qubit-register-operands\")]\n"
                      "qubit data[1]\n"
-                     "quantum h data[0]\n"
-                     "measure data[0]\n", named_register),
-                 "named-register simulation fixture parses, lowers, and resolves")) return false;
-    return require(!named_register.ok() && has_code(named_register.diagnostics, "SYNQ-SIM001"),
-                   "bounded simulator retains an explicit default-register-only boundary");
+                     "qubit ancilla[1]\n"
+                     "quantum bell_pair data[0], ancilla[0]\n"
+                     "measure data[0]\nmeasure ancilla[0]\n", named_registers),
+                 "multi-register fixture parses, lowers, and resolves")) return false;
+    if (!require(named_registers.ok() && named_registers.simulation->qubit_count == 2 &&
+                     named_registers.simulation->registers.size() == 2 &&
+                     named_registers.simulation->registers[0].name == "data" &&
+                     named_registers.simulation->registers[0].physical_offset == 0 &&
+                     named_registers.simulation->registers[1].name == "ancilla" &&
+                     named_registers.simulation->registers[1].physical_offset == 1 &&
+                     named_registers.simulation->basis_probabilities.size() == 2 &&
+                     named_registers.simulation->basis_probabilities[1].basis_index == 3 &&
+                     named_registers.simulation->measurements.size() == 2 &&
+                     named_registers.simulation->measurements[0].register_name == "data" &&
+                     named_registers.simulation->measurements[0].register_index == 0 &&
+                     named_registers.simulation->measurements[0].qubit_index == 0 &&
+                     named_registers.simulation->measurements[1].register_name == "ancilla" &&
+                     named_registers.simulation->measurements[1].register_index == 0 &&
+                     named_registers.simulation->measurements[1].qubit_index == 1 &&
+                     near(named_registers.simulation->measurements[0].probability_one, 0.5) &&
+                     near(named_registers.simulation->measurements[1].probability_one, 0.5),
+                 "multi-register simulation preserves source identity and declaration-order physical allocation")) return false;
+
+    synq::compiler::BoundedSimulationResult combined_limit;
+    if (!require(simulate_source(
+                     "#[experimental(feature = \"qubit-declarations\")]\n"
+                     "qubit q[6]\nqubit ancilla[5]\n", combined_limit),
+                 "combined-register resource-limit fixture parses, lowers, and resolves")) return false;
+    return require(!combined_limit.ok() && has_code(combined_limit.diagnostics, "SYNQ-SIM001"),
+                   "multi-register simulation enforces the combined configured qubit limit");
 }
 
 }  // namespace

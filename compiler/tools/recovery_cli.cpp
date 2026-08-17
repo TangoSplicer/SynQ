@@ -270,12 +270,17 @@ int main(int argc, char** argv) {
         const auto simulation = synq::compiler::simulate_bounded_quantum(*resolved.program, options);
         if (!simulation.ok()) return render_diagnostics(command.source_path, simulation.diagnostics, 5);
         std::cout << "qubits = " << simulation.simulation->qubit_count << "\n";
+        for (const auto& register_info : simulation.simulation->registers) {
+            std::cout << "register " << register_info.name << "[" << register_info.qubit_count
+                      << "] physical_offset = " << register_info.physical_offset << "\n";
+        }
         for (const auto& basis : simulation.simulation->basis_probabilities) {
             std::cout << "basis |" << basis_label(basis.basis_index, simulation.simulation->qubit_count)
                       << "> probability = " << basis.probability << "\n";
         }
         for (const auto& measurement : simulation.simulation->measurements) {
-            std::cout << "measurement q[" << measurement.qubit_index << "] probability_one = "
+            std::cout << "measurement " << measurement.register_name << "[" << measurement.register_index
+                      << "] probability_one = "
                       << measurement.probability_one << "\n";
         }
         return 0;

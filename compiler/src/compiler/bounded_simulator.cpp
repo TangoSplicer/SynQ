@@ -4,6 +4,7 @@
 #include <complex>
 #include <limits>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -13,6 +14,11 @@ namespace {
 using Complex = std::complex<double>;
 constexpr double kPi = 3.141592653589793238462643383279502884;
 constexpr double kProbabilityEpsilon = 1e-12;
+
+struct RegisterAllocation {
+    std::size_t physical_offset = 0;
+    std::size_t qubit_count = 0;
+};
 
 Diagnostic error(const std::string& code, const SourceSpan& span, std::string message, std::string help) {
     return Diagnostic{code, DiagnosticSeverity::Error, span, std::move(message), std::move(help)};
@@ -181,19 +187,30 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
         return result;
     }
 
-    std::optional<std::size_t> qubit_count;
+    std::size_t qubit_count = 0;
+    std::vector<SimulatedRegister> registers;
+    std::unordered_map<std::string, RegisterAllocation> allocations;
     std::vector<HybridQuantumGate> gates;
     std::vector<HybridMeasurement> measurements;
     bool measurements_started = false;
     for (const auto& node : program.nodes) {
         if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
-            if (qubits->name != "q" || qubit_count.has_value()) {
+            if (allocations.find(qubits->name) != allocations.end()) {
                 result.diagnostics.push_back(error("SYNQ-SIM001", qubits->span,
-                                                   "simulator requires exactly one explicit default declaration `qubit q[n]`",
-                                                   "use one supported default register declaration before quantum gates"));
+                                                   "simulator received a duplicate explicit qubit register declaration",
+                                                   "use unique parser-produced qubit register declarations"));
                 return result;
             }
-            qubit_count = qubits->qubit_count;
+            if (qubits->qubit_count == 0 || qubits->qubit_count > options.max_qubits ||
+                qubit_count > options.max_qubits - qubits->qubit_count) {
+                result.diagnostics.push_back(error("SYNQ-SIM001", qubits->span,
+                                                   "simulator register declarations exceed the configured qubit limit",
+                                                   "declare a positive combined register size no larger than max_qubits"));
+                return result;
+            }
+            allocations.emplace(qubits->name, RegisterAllocation{qubit_count, qubits->qubit_count});
+            registers.push_back({qubits->name, qubits->qubit_count, qubit_count});
+            qubit_count += qubits->qubit_count;
             continue;
         }
         if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
@@ -203,7 +220,25 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
                                                    "move measurements to the end of the bounded simulation program"));
                 return result;
             }
-            gates.push_back(*gate);
+            if (gate->qubit_register_names.size() != gate->qubit_indices.size()) {
+                result.diagnostics.push_back(error("SYNQ-SIM003", gate->span,
+                                                   "simulator received mismatched quantum operand metadata",
+                                                   "use a parser-produced supported gate with declared register operands"));
+                return result;
+            }
+            HybridQuantumGate rebased = *gate;
+            for (std::size_t position = 0; position < rebased.qubit_indices.size(); ++position) {
+                const auto allocation = allocations.find(rebased.qubit_register_names[position]);
+                if (allocation == allocations.end() ||
+                    rebased.qubit_indices[position] >= allocation->second.qubit_count) {
+                    result.diagnostics.push_back(error("SYNQ-SIM001", gate->span,
+                                                       "simulator cannot map a gate operand to an explicit qubit register",
+                                                       "declare the referenced register before simulation and use an in-range index"));
+                    return result;
+                }
+                rebased.qubit_indices[position] = allocation->second.physical_offset + rebased.qubit_indices[position];
+            }
+            gates.push_back(std::move(rebased));
             continue;
         }
         if (const auto* measurement = std::get_if<HybridMeasurement>(&node)) {
@@ -214,7 +249,16 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
                 return result;
             }
             measurements_started = true;
-            measurements.push_back(*measurement);
+            const auto allocation = allocations.find(measurement->qubit_register_name);
+            if (allocation == allocations.end() || measurement->qubit_index >= allocation->second.qubit_count) {
+                result.diagnostics.push_back(error("SYNQ-SIM001", measurement->span,
+                                                   "simulator cannot map a measurement operand to an explicit qubit register",
+                                                   "declare the referenced register before simulation and use an in-range index"));
+                return result;
+            }
+            HybridMeasurement rebased = *measurement;
+            rebased.qubit_index = allocation->second.physical_offset + measurement->qubit_index;
+            measurements.push_back(std::move(rebased));
             continue;
         }
         result.diagnostics.push_back(error("SYNQ-SIM002", {},
@@ -223,10 +267,10 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
         return result;
     }
 
-    if (!qubit_count.has_value() || *qubit_count == 0 || *qubit_count > options.max_qubits) {
+    if (registers.empty() || qubit_count == 0 || qubit_count > options.max_qubits) {
         result.diagnostics.push_back(error("SYNQ-SIM001", {},
-                                           "simulator requires `qubit q[n]` with a size inside the configured qubit limit",
-                                           "declare 1 through max_qubits default-register qubits before simulation"));
+                                           "simulator requires explicit qubit register declarations inside the configured qubit limit",
+                                           "declare one or more `qubit name[n]` registers totaling 1 through max_qubits qubits before simulation"));
         return result;
     }
     if (gates.size() > options.max_operations) {
@@ -235,7 +279,7 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
         return result;
     }
 
-    std::vector<Complex> state(std::size_t{1} << *qubit_count, Complex{0.0, 0.0});
+    std::vector<Complex> state(std::size_t{1} << qubit_count, Complex{0.0, 0.0});
     state.front() = Complex{1.0, 0.0};
     for (const auto& gate : gates) {
         Diagnostic diagnostic;
@@ -254,13 +298,17 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
     }
 
     BoundedSimulation simulation;
-    simulation.qubit_count = *qubit_count;
+    simulation.qubit_count = qubit_count;
+    simulation.registers = registers;
     for (std::size_t basis = 0; basis < state.size(); ++basis) {
         const double probability = std::norm(state[basis]);
         if (probability > kProbabilityEpsilon) simulation.basis_probabilities.push_back({basis, probability});
     }
     for (const auto& measurement : measurements) {
-        simulation.measurements.push_back({measurement.qubit_index, probability_one(state, measurement.qubit_index)});
+        const auto allocation = allocations.find(measurement.qubit_register_name);
+        const std::size_t source_index = measurement.qubit_index - allocation->second.physical_offset;
+        simulation.measurements.push_back({measurement.qubit_register_name, source_index, measurement.qubit_index,
+                                           probability_one(state, measurement.qubit_index)});
     }
     result.simulation = std::move(simulation);
     return result;
