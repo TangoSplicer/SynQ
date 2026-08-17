@@ -1,6 +1,6 @@
 # SynQ Project Status
 
-**Review date:** 16 August 2026
+**Review date:** 17 August 2026
 **Status:** Experimental recovery-profile evidence ledger. This document does
 not declare SynQ feature-complete, production-ready, or fully operational.
 
@@ -10,17 +10,17 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core platform-matrix run #32065348941](https://github.com/TangoSplicer/SynQ/actions/runs/32065348941)
-passed all five independent jobs for revision `23999f4`: the Linux recovery
-profile passed **28/28** CTest checks; Windows MSVC and macOS Clang each passed
-**21/21** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
+ [Compiler Core platform-matrix run #32067123839](https://github.com/TangoSplicer/SynQ/actions/runs/32067123839)
+passed all five independent jobs for revision `881936f`: the Linux recovery
+profile passed **29/29** CTest checks; Windows MSVC and macOS Clang each passed
+**22/22** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
 built, installed, discovered, compiled, and ran the experimental static SDK
 consumer from a clean prefix. The exact tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 28 CTests. Separate Windows MSVC and macOS Clang profiles each pass 21 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 29 CTests. Separate Windows MSVC and macOS Clang profiles each pass 22 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
 | `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded constant evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
 | Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, and declaration-only callables. No scopes, assignments, general expressions, callable bodies/calls, or runtime semantics exist. |
 | Alpha semantic environment | **Remotely validated read-only inspection subset.** | `synqc --inspect-semantics` renders resolved top-level classical binding metadata: kind, static type, source line, and earlier-binding dependencies. It does not evaluate general source, produce runtime values, sample measurements, or introduce nested scopes. |
@@ -29,6 +29,7 @@ consumer from a clean prefix. The exact tested-environment boundary is recorded 
 | Local simulation | **Remotely validated bounded probability model.** | One or more explicit declared registers, limited gates, opt-in combined resource limits, and deterministic probability output with source-register provenance. No samples, collapse, noise, control execution, provider, hardware, lifetime, or dynamic allocation behavior. |
 | C ABI and static SDK | **Remotely validated experimental static path on Ubuntu and Windows.** | Ubuntu 22.04 and Windows MSVC clean-install jobs each prove static library/header/CMake package discovery and the external C consumer. The macOS job is smoke-only. No frozen ABI, shared-library delivery, registry, macOS SDK, or general cross-platform SDK claim is made. |
 | Interoperability proofs | **Remotely exercised on the Ubuntu full profile.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. The Windows profile intentionally excludes those toolchain-specific fixtures. They are not released wrappers or language packages. |
+| Alpha Rust wrapper | **Remotely exercised source-only adapter on the Ubuntu full profile.** | The dependency-free `synq-alpha` Cargo package owns the opaque program handle through RAII and exposes parse, OpenQASM 3 export, and ABI-identifier helpers. Three Cargo conformance tests pass through CMake against the test/build C ABI shared library. It is not published to a registry, bundled as a shared-library distribution, or a stable Rust API. |
 | Governance and maintenance | **Factual baseline published.** | `CHANGELOG.md`, contribution guidance, a security-reporting route, issue templates, support-environment guide, and ABI/distribution policy exist. They do not promise review times, support SLA, signing, or package availability. |
 
 ## Explicit non-claims
@@ -45,15 +46,15 @@ states a reproducible, current validation path.
 
 ## Ordered remaining work
 
-1. Define a coherent typed semantic kernel—values, scopes, binding rules,
-   effects, and IR invariants—before broadening syntax or backend claims.
-2. Decide a separate resource and simulation contract before attempting
-   multi-register simulation or allocation semantics.
-3. Design non-literal conditions, loops, branch blocks, and measurement bodies
-   only with target-side classical storage and execution semantics.
-4. Design callable bodies/calls, scopes, and bounded execution separately.
-5. Add any language-specific wrapper only after package, ownership, compatibility,
-   environment, and conformance commitments are explicit.
+1. Define target-side classical storage, write, lifetime, and execution semantics
+   before accepting non-literal conditions, loops, branch blocks, or measurement
+   bodies.
+2. Design callable bodies/calls, scopes, resource effects, and bounded execution
+   separately, after the control-flow contract is testable.
+3. Add a macOS clean-install static-SDK conformance job before making any macOS
+   SDK or general cross-platform packaging claim.
+4. Expand language-specific wrappers or package delivery only after ownership,
+   compatibility, environment, and conformance commitments are explicit.
 
 ## Related records
 

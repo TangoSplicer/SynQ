@@ -9,6 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Source-only Alpha Rust wrapper:** Added the dependency-free `synq-alpha`
+  Cargo package over the opaque C ABI, with RAII ownership, source parsing,
+  OpenQASM 3 export, ABI identity access, and three Cargo conformance tests.
+  [Compiler Core platform-matrix run #32067123839](https://github.com/TangoSplicer/SynQ/actions/runs/32067123839)
+  passed all five jobs, including the 29-test Ubuntu full profile that executes
+  the wrapper tests. This does not publish a registry package, distribute a
+  shared library, or stabilize a Rust API.
 - **Bounded multi-register simulation:** Added deterministic declaration-order
   physical allocation for explicit named registers, cross-register supported
   gates, source-register measurement provenance, combined qubit-limit rejection,
@@ -73,8 +80,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Planned
 - Add macOS clean-install static-SDK evidence before making any macOS SDK or
   general cross-platform package claim.
-- Design the resource and bounded-execution contracts required before
-  multi-register simulation, non-literal control, or callable bodies/calls.
+- Design target-side classical storage and execution semantics before
+  non-literal control flow, loops, or measurement bodies.
+- Design bounded callable bodies/calls only after scopes, resources, and call
+  effects have a tested contract.
 
 ---
 

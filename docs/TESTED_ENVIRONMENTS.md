@@ -9,9 +9,9 @@ it is not a cross-platform support promise.
 The recovery compiler profile is continuously exercised by the
 [`Compiler Core` workflow](../.github/workflows/compiler-core.yml). The latest
 remote evidence is [Compiler Core platform-matrix run
-#32063787617](https://github.com/TangoSplicer/SynQ/actions/runs/32063787617)
-for revision `7154e10`. Its Linux job passed the full **28/28** recovery-profile
-CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **21-test**
+#32067123839](https://github.com/TangoSplicer/SynQ/actions/runs/32067123839)
+for revision `881936f`. Its Linux job passed the full **29/29** recovery-profile
+CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **22-test**
 platform-neutral compiler/CLI/C-ABI smoke profile.
 
 The same workflow now includes distinct Ubuntu 22.04 and Windows MSVC
@@ -34,11 +34,12 @@ evidence, not minimum-version guarantees.
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
 
-> **Support boundary:** `windows-latest` has remote MSVC evidence for a 21-test
+> **Support boundary:** `windows-latest` has remote MSVC evidence for a 22-test
 > platform-neutral compiler/CLI/C-ABI smoke profile **and** an experimental
 > static-SDK clean-install external-consumer check. `macos-latest` has a separate
-> 21-test Clang platform-neutral smoke profile only. The full 28-test suite, the
-> Rust/Common Lisp/Clojure/Mercury fixtures, and OpenQASM Python reference checks
+> 22-test Clang platform-neutral smoke profile only. The full 29-test suite, the
+> direct Rust, source-only Alpha Rust-wrapper, Common Lisp/Clojure/Mercury fixtures,
+> and OpenQASM Python reference checks
 > remain Ubuntu-only evidence. These CI results do not establish a stable ABI,
 > shared-library delivery, registry package, broad package support, dynamic
 > linking, macOS SDK install, other Linux distribution, ARM, or future ABI
@@ -80,7 +81,7 @@ assuming a distribution package provides an equivalent compiler.
 
 The Windows smoke job is deliberately separate from the Ubuntu full profile. It
 installs `nlohmann-json` and OpenSSL with vcpkg, builds the recovery compiler
-with MSVC, and runs the platform-neutral 20-test profile. A distinct Windows
+with MSVC, and runs the platform-neutral 22-test profile. A distinct Windows
 job now proves the experimental static SDK clean-install consumer path. Neither
 Windows job attempts the Ubuntu-only interoperability or Python-reference checks.
 
@@ -104,7 +105,7 @@ ctest --test-dir compiler/build -C Release --output-on-failure
 ## Reproduce the macOS Clang smoke profile
 
 The macOS job has an independent Homebrew and Clang setup. It proves the same
-20-test platform-neutral compiler/CLI/C-ABI smoke profile as Windows, not static
+22-test platform-neutral compiler/CLI/C-ABI smoke profile as Windows, not static
 SDK installation, language-interoperability fixtures, or package distribution.
 
 ```bash
@@ -147,6 +148,13 @@ The installed path is an **experimental static-library integration mechanism**.
 It does not supply a stable shared library, binary compatibility commitment,
 language wrapper, registry package, cryptographic signature, provenance
 attestation, or operating-system support guarantee.
+
+The separate source-only Alpha Rust wrapper is tested only through the Ubuntu
+full recovery profile. It links the test/build C ABI shared library through
+`SYNQ_FFI_DIR` and is documented in
+[`EXPERIMENTAL_RUST_WRAPPER.md`](./EXPERIMENTAL_RUST_WRAPPER.md). It does not
+expand the installed static SDK into a Rust package or a portable shared-library
+delivery mechanism.
 
 The fixed Ubuntu 22.04 job is described in
 [`SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](./SECOND_CLEAN_INSTALL_ENVIRONMENT.md).

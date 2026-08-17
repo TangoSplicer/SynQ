@@ -120,7 +120,7 @@
 - [x] Publish tested-environment guidance and clean-install boundaries for the experimental static native SDK path.
 - [x] Design and implement bounded named-register declarations, operand resolution, range diagnostics, and strict OpenQASM mapping.
 - [x] Design and implement bounded strict-Hybrid `if` lowering with positive and negative semantic/export tests.
-- [ ] Update raw-ABI interoperability contracts and contributor materials without claiming safe wrappers or registry packages.
+- [x] Update raw-ABI interoperability contracts and contributor materials without claiming safe wrappers or registry packages.
 - [x] Update project status, readiness evidence, changelog, and the public Evidence Ledger after verified language increments.
 - [x] Design an installable experimental native C ABI SDK boundary without converting the test-only shared library into an unsupported production claim.
 - [x] Add a clean-prefix installation and external consumer conformance test for the experimental native SDK path.
@@ -149,5 +149,5 @@
 - [ ] Re-audit operational-readiness gaps and competitive differentiation before selecting bounded implementation increments.
 - [x] Publish and implement a bounded semantic-kernel contract with focused local and remote evidence.
 - [x] Publish and implement named-register resource and multi-register simulation semantics with focused local and remote evidence.
-- [ ] Publish and implement one safe, maintainable interoperability or delivery leverage point with focused local and remote evidence.
-- [ ] Run comprehensive local and remote verification and align all public readiness records after each accepted increment.
+- [x] Publish and implement the source-only Alpha Rust wrapper leverage point with focused local and remote evidence.
+- [x] Run comprehensive local and remote verification and align all public readiness records after each accepted increment.

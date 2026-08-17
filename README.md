@@ -9,9 +9,9 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32018610062](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062),
-which passed all five independently scoped jobs for revision `7154e10`: **28/28**
-Linux recovery-profile CTests, **20/20** Windows MSVC and macOS Clang
+platform-matrix run #32067123839](https://github.com/TangoSplicer/SynQ/actions/runs/32067123839),
+which passed all five independently scoped jobs for revision `881936f`: **29/29**
+Linux recovery-profile CTests, **22/22** Windows MSVC and macOS Clang
 platform-neutral CTests, and Ubuntu 22.04 plus Windows MSVC clean-install
 static-SDK consumer checks. The tested
 environment and exact clean-install boundaries are documented in
@@ -25,7 +25,7 @@ environment and exact clean-install boundaries are documented in
 | Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if` with one supported typed gate body. | No identifier/expression condition lowering, loops, measurement body, branch execution, or classical runtime. |
 | Local simulation | Opt-in pure-state probability calculation for explicit declared default or named registers and a limited gate set. | No samples/collapse, noise, control execution, providers, hardware execution, or general resource lifecycle. |
 | Semantic inspection | `synqc --inspect-semantics` renders resolved top-level classical binding metadata. | No runtime values, nested scopes, general type system, or execution behavior. |
-| Native interoperability | The Ubuntu full profile exercises C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers; Windows and macOS run independent platform-neutral compiler/CLI/C-ABI smoke coverage. Ubuntu 22.04 and Windows MSVC also prove static SDK clean-install consumers. | No macOS SDK clean-install proof, safe wrappers, registry packages, shared-library distribution, frozen ABI, or general cross-platform SDK guarantee. |
+| Native interoperability | The Ubuntu full profile exercises C, direct Rust, test-only Common Lisp, test-only Clojure/JNA, test-only Mercury, and a source-only Alpha Rust wrapper over the opaque C ABI; Windows and macOS run independent platform-neutral compiler/CLI/C-ABI smoke coverage. Ubuntu 22.04 and Windows MSVC also prove static SDK clean-install consumers. | The Alpha Rust wrapper is not a registry package or cross-platform delivery claim. There is no macOS SDK clean-install proof, shared-library distribution, frozen ABI, or general cross-platform SDK guarantee. |
 
 ## Quick start: verified compiler path
 
@@ -81,6 +81,7 @@ accepted/rejected control forms.
 | [`docs/COMPETITIVE_LEVERAGE_REVIEW_2026-08-17.md`](docs/COMPETITIVE_LEVERAGE_REVIEW_2026-08-17.md) | Evidence-backed three-leverage competitive direction. |
 | [`docs/ALPHA_SEMANTIC_KERNEL.md`](docs/ALPHA_SEMANTIC_KERNEL.md) | Bounded top-level semantic environment and inspection contract. |
 | [`docs/MULTI_REGISTER_SIMULATION.md`](docs/MULTI_REGISTER_SIMULATION.md) | Bounded named-register allocation and local-probability simulation contract. |
+| [`docs/EXPERIMENTAL_RUST_WRAPPER.md`](docs/EXPERIMENTAL_RUST_WRAPPER.md) | Source-only Alpha Rust wrapper and C ABI ownership contract. |
 | [`docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md`](docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md) | Prioritized language-core improvement assessment, grounded in current code and evidence. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Safe contribution workflow. |
 | [`SECURITY.md`](SECURITY.md) | Responsible vulnerability-reporting route. |
