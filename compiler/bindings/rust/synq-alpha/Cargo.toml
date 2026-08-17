@@ -1,0 +1,14 @@
+[package]
+name = "synq-alpha"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Experimental source-based Rust wrapper for the SynQ C ABI v1."
+license = "MIT OR LicenseRef-SynQ-Commercial"
+
+[lib]
+name = "synq_alpha"
+path = "src/lib.rs"
+
+# This crate intentionally has no registry dependencies. The build script links
+# an explicitly supplied local SynQ C ABI shared library through SYNQ_FFI_DIR.

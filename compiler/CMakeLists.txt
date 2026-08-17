@@ -256,6 +256,36 @@ if(BUILD_CORE_SMOKE_TESTS)
         )
         add_custom_target(synq_rust_abi_smoke_target ALL DEPENDS ${SYNQ_RUST_ABI_SMOKE})
         add_test(NAME synq_rust_abi_smoke COMMAND ${SYNQ_RUST_ABI_SMOKE})
+
+        find_program(SYNQ_CARGO_EXECUTABLE cargo REQUIRED)
+        set(SYNQ_RUST_ALPHA_WRAPPER_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/bindings/rust/synq-alpha)
+        set(SYNQ_RUST_ALPHA_WRAPPER_TARGET ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_alpha_wrapper_target)
+        set(SYNQ_RUST_ALPHA_WRAPPER_STAMP ${CMAKE_CURRENT_BINARY_DIR}/synq_rust_alpha_wrapper.stamp)
+        add_custom_command(
+            OUTPUT ${SYNQ_RUST_ALPHA_WRAPPER_STAMP}
+            COMMAND ${CMAKE_COMMAND} -E env
+                    "SYNQ_FFI_DIR=$<TARGET_FILE_DIR:synq_ffi_shared>"
+                    "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:synq_ffi_shared>:$ENV{LD_LIBRARY_PATH}"
+                    "CARGO_TARGET_DIR=${SYNQ_RUST_ALPHA_WRAPPER_TARGET}"
+                    ${SYNQ_CARGO_EXECUTABLE} test --manifest-path ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}/Cargo.toml --offline
+            COMMAND ${CMAKE_COMMAND} -E touch ${SYNQ_RUST_ALPHA_WRAPPER_STAMP}
+            WORKING_DIRECTORY ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}
+            DEPENDS synq_ffi_shared
+                    ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}/Cargo.toml
+                    ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}/build.rs
+                    ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}/src/lib.rs
+                    ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}/tests/ffi_contract.rs
+            VERBATIM
+        )
+        add_custom_target(synq_rust_alpha_wrapper_target ALL DEPENDS ${SYNQ_RUST_ALPHA_WRAPPER_STAMP})
+        add_test(
+            NAME synq_rust_alpha_wrapper
+            COMMAND ${CMAKE_COMMAND} -E env
+                    "SYNQ_FFI_DIR=$<TARGET_FILE_DIR:synq_ffi_shared>"
+                    "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:synq_ffi_shared>:$ENV{LD_LIBRARY_PATH}"
+                    "CARGO_TARGET_DIR=${SYNQ_RUST_ALPHA_WRAPPER_TARGET}"
+                    ${SYNQ_CARGO_EXECUTABLE} test --manifest-path ${SYNQ_RUST_ALPHA_WRAPPER_SOURCE}/Cargo.toml --offline
+        )
     endif()
 
     add_executable(synq_openqasm3_exporter_smoke tests/smoke/openqasm3_exporter_smoke.cpp)
