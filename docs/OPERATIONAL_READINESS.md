@@ -2,7 +2,7 @@
 
 **Status:** Planning and acceptance record. This document does not declare SynQ
 operationally ready.
-**Last reviewed:** 16 August 2026
+**Last reviewed:** 17 August 2026
 
 ## Purpose
 
@@ -21,10 +21,10 @@ evidence, and a maintenance model.
 
 | Area | Current evidence | Operational gap |
 | --- | --- | --- |
-| Compiler foundation | [Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849) passed 27/27 recovery-profile checks for revision `8f0de7e`, including installed-SDK conformance, Alpha named-register coverage, and literal-if source lowering. | The grammar and semantics remain intentionally narrow. |
-| Source model | Typed gates, bounded classical metadata/evaluation, qubit declarations with Alpha named operands, one literal-if gate source-lowering form, bounded simulation, named measurement metadata, and declaration-only callables exist behind exact gates/opt-ins. | No general expression evaluator, scopes, callable bodies/calls, or executable classical semantics exists. |
-| Quantum path | AST/strict Hybrid OpenQASM export and a bounded local probability simulator are tested for exact supported subsets. | Literal-if lowering is source generation only; export and local simulation are not provider integration or hardware execution. |
-| Native interoperability | C, Rust, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers exercise an opaque C ABI. | There are no distributed language packages, safe wrappers, or a frozen ABI policy. |
+| Compiler foundation | [Compiler Core #32069791226](https://github.com/TangoSplicer/SynQ/actions/runs/32069791226) passed 31/31 Linux recovery-profile checks and 23/23 Windows/macOS platform-neutral checks for revision `d1288c5`, plus the Ubuntu and Windows static-SDK consumer jobs. | The grammar and semantics remain intentionally narrow. |
+| Source model | Typed gates, bounded classical metadata/evaluation, qubit declarations with Alpha named operands, literal- and earlier Boolean-literal-declaration identifier-`if` source-lowering forms, bounded simulation, named measurement metadata, and declaration-only callables exist behind exact gates/opt-ins. | No Boolean-expression/alias/measurement-result control lowering, scopes, callable bodies/calls, or executable classical semantics exists. |
+| Quantum path | AST/strict Hybrid OpenQASM export and a bounded local probability simulator are tested for exact supported subsets. | `if` lowering is source generation only; export and local simulation are not provider integration or hardware execution. |
+| Native interoperability | C, direct Rust, source-only Alpha Rust wrapper, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers exercise an opaque C ABI. | There are no registry packages, stable safe wrappers, or a frozen ABI policy. |
 | Command-line workflow | `synqc` validates, exports supported OpenQASM subsets, evaluates bounded constants, and simulates bounded probabilities. | It is an experimental recovery-profile command, not a general executor, provider client, or stable CLI contract. |
 | Frontend | The frontend has 33 local unit tests and a successful production build. | It is not evidence of a compiled-language runtime or deployed backend integration. |
 | Performance | A local opt-in deterministic bounded-simulator benchmark and experimental install/archive path exist. | No claim can be made that SynQ matches Python’s execution performance or Java’s ecosystem/runtime benefits. |

@@ -9,6 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Bounded identifier-`if` target lowering:** Strict Hybrid OpenQASM 3 now
+  lowers one `if` gate body controlled by an earlier top-level Boolean-literal
+  declaration into generated immutable target Boolean storage. Exact-output,
+  negative-boundary, CLI, and OpenQASM reference-parser tests are included.
+  [Compiler Core platform-matrix run #32069791226](https://github.com/TangoSplicer/SynQ/actions/runs/32069791226)
+  passed all five jobs: 31 Linux CTests and 23 Windows/macOS platform-neutral
+  CTests. Boolean expressions, aliases, measurement results, loops, and local
+  branch execution remain unsupported.
 - **Source-only Alpha Rust wrapper:** Added the dependency-free `synq-alpha`
   Cargo package over the opaque C ABI, with RAII ownership, source parsing,
   OpenQASM 3 export, ABI identity access, and three Cargo conformance tests.
@@ -81,7 +89,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add macOS clean-install static-SDK evidence before making any macOS SDK or
   general cross-platform package claim.
 - Design target-side classical storage and execution semantics before
-  non-literal control flow, loops, or measurement bodies.
+  Boolean-expression, alias, measurement-result, loop, or measurement-body
+  control lowering.
 - Design bounded callable bodies/calls only after scopes, resources, and call
   effects have a tested contract.
 

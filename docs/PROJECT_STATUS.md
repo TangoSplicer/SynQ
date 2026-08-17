@@ -10,22 +10,22 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core platform-matrix run #32067123839](https://github.com/TangoSplicer/SynQ/actions/runs/32067123839)
-passed all five independent jobs for revision `881936f`: the Linux recovery
-profile passed **29/29** CTest checks; Windows MSVC and macOS Clang each passed
-**22/22** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
+ [Compiler Core platform-matrix run #32069791226](https://github.com/TangoSplicer/SynQ/actions/runs/32069791226)
+passed all five independent jobs for revision `d1288c5`: the Linux recovery
+profile passed **31/31** CTest checks; Windows MSVC and macOS Clang each passed
+**23/23** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
 built, installed, discovered, compiled, and ran the experimental static SDK
 consumer from a clean prefix. The exact tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 29 CTests. Separate Windows MSVC and macOS Clang profiles each pass 22 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 31 CTests. Separate Windows MSVC and macOS Clang profiles each pass 23 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
 | `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded constant evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
 | Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, and declaration-only callables. No scopes, assignments, general expressions, callable bodies/calls, or runtime semantics exist. |
 | Alpha semantic environment | **Remotely validated read-only inspection subset.** | `synqc --inspect-semantics` renders resolved top-level classical binding metadata: kind, static type, source line, and earlier-binding dependencies. It does not evaluate general source, produce runtime values, sample measurements, or introduce nested scopes. |
 | Named registers | **Remotely validated Alpha subset with bounded local simulation.** | Earlier declared `name[index]` operands resolve, strict-Hybrid export preserves declared registers, and the simulator maps explicit register declarations into a declaration-order bounded state vector while retaining source provenance. No lifetime, aliasing, deallocation, dynamic allocation, or hardware mapping semantics exist. |
-| Literal-if export | **Remotely validated strict source-lowering subset in [Compiler Core #48](https://github.com/TangoSplicer/SynQ/actions/runs/31952214849).** | One literal `if` with one supported typed gate body lowers to OpenQASM 3. Identifier/expression conditions, `while`, measurement bodies, and execution remain rejected. |
+| Bounded if export | **Remotely validated strict source-lowering subset in [Compiler Core #32069791226](https://github.com/TangoSplicer/SynQ/actions/runs/32069791226).** | One literal `if`, or one `if` controlled by an earlier top-level Boolean-literal declaration, with one supported typed gate body lowers to OpenQASM 3. Expressions, aliases, measurement results, `while`, measurement bodies, and execution remain rejected. |
 | Local simulation | **Remotely validated bounded probability model.** | One or more explicit declared registers, limited gates, opt-in combined resource limits, and deterministic probability output with source-register provenance. No samples, collapse, noise, control execution, provider, hardware, lifetime, or dynamic allocation behavior. |
 | C ABI and static SDK | **Remotely validated experimental static path on Ubuntu and Windows.** | Ubuntu 22.04 and Windows MSVC clean-install jobs each prove static library/header/CMake package discovery and the external C consumer. The macOS job is smoke-only. No frozen ABI, shared-library delivery, registry, macOS SDK, or general cross-platform SDK claim is made. |
 | Interoperability proofs | **Remotely exercised on the Ubuntu full profile.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. The Windows profile intentionally excludes those toolchain-specific fixtures. They are not released wrappers or language packages. |
@@ -46,9 +46,9 @@ states a reproducible, current validation path.
 
 ## Ordered remaining work
 
-1. Define target-side classical storage, write, lifetime, and execution semantics
-   before accepting non-literal conditions, loops, branch blocks, or measurement
-   bodies.
+1. Define target-side Boolean-expression evaluation, writes, lifetime, and
+   measurement-result storage before accepting Boolean expressions, aliases,
+   loops, branch blocks, or measurement bodies.
 2. Design callable bodies/calls, scopes, resource effects, and bounded execution
    separately, after the control-flow contract is testable.
 3. Add a macOS clean-install static-SDK conformance job before making any macOS

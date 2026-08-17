@@ -1,9 +1,9 @@
 # Strict Hybrid IR OpenQASM 3 Export
 
 **Status:** Remotely validated strict source-generation subset, including
-Alpha-gated named-register operands and literal-if gate lowering, in [Compiler
-Core #48][3].
-**Last reviewed:** 16 August 2026
+Alpha-gated named-register operands and bounded identifier-`if` gate lowering,
+in [Compiler Core #32069791226][3].
+**Last reviewed:** 17 August 2026
 
 ## Purpose
 
@@ -18,15 +18,20 @@ export without changing the existing AST exporter or public C ABI.
 ## Accepted internal subset
 
 The export path accepts declared typed qubit registers, supported typed gates,
-and unnamed measurements within each declaration’s range. It emits declared
-OpenQASM qubit registers and deterministic per-register classical measurement
-storage. It also lowers exactly one literal `if` condition with one supported
-typed gate body. The direct AST exporter remains default-register-only.
+unnamed measurements within each declaration’s range, and top-level Boolean
+literal declarations. It emits declared OpenQASM qubit registers, deterministic
+per-register classical measurement storage, and immutable generated Boolean
+target storage. It lowers one literal `if` condition or one whole identifier
+condition whose earlier source declaration is exactly `true` or `false`, with one
+supported typed gate body. The direct AST exporter remains default-register-only.
 
-Classical declarations, named measurement-result declarations, missing explicit
-register declarations, out-of-range operands, identifier/expression conditions,
-`while`, and literal-if measurement bodies are rejected. The function returns a
-diagnostic list and no program text on failure.
+Non-Boolean or non-literal classical declarations, declaration aliases, named
+measurement-result declarations, missing explicit register declarations,
+out-of-range operands, Boolean expressions, measurement-result conditions,
+`while`, and `if` measurement bodies are rejected. The function returns a
+diagnostic list and no program text on failure. See
+[`IDENTIFIER_IF_LOWERING.md`](./IDENTIFIER_IF_LOWERING.md) for the exact
+target-storage boundary.
 
 ## Explicit non-goals
 
@@ -37,10 +42,13 @@ simulation, provider integration, or hardware submission.
 ## Focused validation
 
 `synq_hybrid_openqasm3_exporter_smoke` verifies exact default-register,
-named-register, and literal-if gate output. It also verifies rejection for
-missing declarations, out-of-range operands, named measurement results,
-identifier conditions, `while`, and literal-if measurement bodies. The local
-recovery profile and [Compiler Core #48][3] both reported **27/27** CTest checks.
+named-register, literal-if, and identifier-if gate output. It also verifies
+rejection for declaration aliases, Boolean expressions, missing declarations,
+out-of-range operands, named measurement results, `while`, and `if` measurement
+bodies. The separate CLI fixture is accepted by the OpenQASM 3 reference parser.
+The local recovery profile and [Compiler Core #32069791226][3] both reported
+**31/31** Linux CTest checks; Windows/MSVC and macOS/Clang each reported
+**23/23** platform-neutral checks.
 
 ## CLI access
 
@@ -48,11 +56,11 @@ recovery profile and [Compiler Core #48][3] both reported **27/27** CTest checks
 lowers, and resolves source before calling this exporter. It preserves strict
 rejection behavior rather than falling back to the broader AST exporter. The
 CLI smoke covers default-register Bell lowering, Alpha named-register lowering,
-and Alpha literal-if gate lowering. [Compiler Core #48][3] passed **27/27**
-checks for this current CLI boundary.
+literal-if lowering, and bounded identifier-if gate lowering. [Compiler Core
+#32069791226][3] passed the five-job matrix for this current CLI boundary.
 
 ## References
 
 [1]: https://github.com/TangoSplicer/SynQ/actions/runs/31849244490 "SynQ Compiler Core #38"
 [2]: https://github.com/TangoSplicer/SynQ/actions/runs/31887104395 "SynQ Compiler Core #44"
-[3]: https://github.com/TangoSplicer/SynQ/actions/runs/31952214849 "SynQ Compiler Core #48"
+[3]: https://github.com/TangoSplicer/SynQ/actions/runs/32069791226 "SynQ Compiler Core identifier-if platform matrix"

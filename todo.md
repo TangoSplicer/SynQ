@@ -151,3 +151,4 @@
 - [x] Publish and implement named-register resource and multi-register simulation semantics with focused local and remote evidence.
 - [x] Publish and implement the source-only Alpha Rust wrapper leverage point with focused local and remote evidence.
 - [x] Run comprehensive local and remote verification and align all public readiness records after each accepted increment.
+- [x] Define and implement bounded identifier-`if` target lowering from earlier Boolean literal declarations, with exact output and external parser evidence.
