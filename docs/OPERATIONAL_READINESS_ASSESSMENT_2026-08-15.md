@@ -6,8 +6,8 @@ announcement.
 workflow, the experimental opaque C ABI and static SDK path, the source-only Alpha
 Rust wrapper, and the factual public-facing project position.
 **Evidence cut-off:** Compiler Core platform-matrix run
-[#32069791226][1] for implementation revision `d1288c5`, with repository
-evidence records aligned through the identifier-`if` evidence update.
+[#32075281245][1] for implementation revision `5558811`, with repository
+evidence records aligned through the negated identifier-`if` evidence update.
 
 ## Executive assessment
 
@@ -15,24 +15,25 @@ SynQ is **not a fully operational programming-language platform**. It is an
 **operational experimental language seed**: a narrowly specified and tested
 compiler workflow that a developer can build, validate, diagnose, inspect,
 export from, evaluate in a bounded classical subset, and simulate in a bounded
-quantum subset. The current recovery profile passed **31/31** CTest checks
+quantum subset. The current recovery profile passed **33/33** CTest checks
 locally and in the Ubuntu CI profile; independent Windows MSVC and macOS Clang
-profiles each passed **23/23** platform-neutral CTest checks. The same remote
+profiles each passed **24/24** platform-neutral CTest checks. The same remote
 matrix passed Ubuntu 22.04 and Windows MSVC experimental static-SDK external
 consumer jobs.[1] [2] [3]
 
-Four deliberately constrained leverage points are now implemented and tested:
+Five deliberately constrained evidence increments are now implemented and tested:
 read-only inspection of resolved top-level classical bindings, declaration-order
 multi-register local probability simulation, and a source-only Alpha Rust wrapper
 over the opaque C ABI, plus target-side lowering of one `if` gate controlled by
-an earlier Boolean-literal declaration. Those points improve inspectability,
-resource-model evidence, one ownership-safe host-language entry point, and one
-explicit classical-storage mapping. They do **not** make
+an earlier Boolean-literal declaration, plus `not` over that same immutable
+storage mapping. Those points improve inspectability, resource-model evidence,
+one ownership-safe host-language entry point, and one explicitly bounded
+classical-storage expression mapping. They do **not** make
 SynQ a general runtime, stable SDK, registry package, hardware client, or
 cross-platform delivery product.[2] [4] [5] [6]
 
 > **Readiness finding.** SynQ has completed the operational-baseline gates for a
-> bounded experimental developer workflow and its three selected leverage
+> bounded experimental developer workflow and its selected bounded leverage
 > increments. The next work must specify target-side classical storage and
 > Boolean-expression, alias, measurement-result, write, lifetime, and execution
 > semantics before wider control, then define callable effects and bodies, while
@@ -54,7 +55,7 @@ remote evidence distinct.
 
 | Evidence level | Meaning in this assessment | Current examples |
 | --- | --- | --- |
-| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 31 Linux CTests; 23 Windows and macOS platform-neutral CTests; two static-SDK consumer jobs; semantic inspection; multi-register simulation; bounded identifier-if export; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
+| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 33 Linux CTests; 24 Windows and macOS platform-neutral CTests; two static-SDK consumer jobs; semantic inspection; multi-register simulation; bounded identifier-if and negated identifier-if export; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
 | **Locally validated** | The documented operation was executed in the review environment but is not itself a separate CI assertion. | The full 29-test recovery build and source-only Rust-wrapper Cargo conformance path before publication. |
 | **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, non-literal control execution, callable bodies/calls, macOS SDK install, registry packages, provider access, and AI services.[2] [7] |
 
@@ -74,11 +75,11 @@ constrained than the long-term language vision.
 
 | Workflow area | Verified current capability | Hard boundary |
 | --- | --- | --- |
-| Build and test | Build the default C++17 recovery profile and run 31 focused CTest checks on the Ubuntu full profile. Independent Windows/MSVC and macOS/Clang profiles each run 23 platform-neutral checks.[1] | Historical optional targets remain outside this profile, and the two non-Linux counts do not establish a support commitment.[3] |
+| Build and test | Build the default C++17 recovery profile and run 33 focused CTest checks on the Ubuntu full profile. Independent Windows/MSVC and macOS/Clang profiles each run 24 platform-neutral checks.[1] | Historical optional targets remain outside this profile, and the two non-Linux counts do not establish a support commitment.[3] |
 | Diagnostics | Receive structured parser, semantic, resolver, evaluator, and simulator failures for supported constructs. | No lexer recovery, multi-error recovery, IDE/LSP protocol, or complete type diagnostics exists.[2] |
 | Quantum source model | Use a small typed gate subset: `h`, `x`, `y`, `z`, `cx`, `bell_pair`, and literal-angle `rx`, `ry`, `rz`, or `p`, bounded typed measurement syntax, and Alpha named-register operands. | No general gate language, dynamic indexing, lifetime model, aliasing, deallocation, dynamic allocation, or hardware semantics exists.[2] [5] |
 | Classical source model | Use literal declarations, earlier aliases, exact Alpha-gated one-operator Integer arithmetic, and exact Alpha-gated Boolean forms. `--inspect-semantics` reports resolved top-level binding metadata without evaluation.[4] | No general expressions, assignment, nested scopes, decimal evaluation, callable calls, runtime values, or executable classical control flow exists. |
-| OpenQASM output | Export a bounded AST subset; strict Hybrid export supports declared named registers, one literal-`if` gate body, or one earlier Boolean-literal-declaration identifier-`if` gate body. The identifier fixture has reference-parser validation. | Export is source generation only; it does not execute circuits, prove semantic equivalence, lower Boolean expressions/aliases/measurement results, or support named results. |
+| OpenQASM output | Export a bounded AST subset; strict Hybrid export supports declared named registers, one literal-`if` gate body, one earlier Boolean-literal-declaration identifier-`if` gate body, or `not` over that identifier. The two identifier fixtures have reference-parser validation. | Export is source generation only; it does not execute circuits, prove semantic equivalence, fold negated literals, lower binary Boolean expressions/aliases/measurement results, or support named results. |
 | Local quantum calculation | Calculate deterministic pure-state basis and marginal probability data across explicit default or named registers with declaration-order physical allocation and fixed combined limits.[5] | No sampling/collapse, noise, control-flow execution, provider connection, hardware submission, resource lifecycle, or dynamic allocation occurs. |
 | Classical evaluation | Evaluate opt-in Integer/Boolean/String literals, earlier aliases, and checked single-operator Integer arithmetic. | This is not a general interpreter or mutable runtime. |
 | Experimental controls | Require exact source opt-ins for the active Alpha language features. | The registry is not a package, permission, capability-security, or feature-lifecycle management system. |
@@ -123,7 +124,7 @@ internals through bindings or packages before ownership and behavior are known.
 | --- | --- | --- | --- |
 | **P0** | Coherent typed semantic core | Read-only top-level binding metadata exists, but general values, scopes, effects, result values, mutation, and ownership are undefined. | Written semantic subset, typed IR invariants, positive/negative tests, and no silent lowering gaps. |
 | **P0** | Versioned ABI and delivery lifecycle | The opaque C ABI policy, two static-SDK environments, and source-only Rust proof are useful experimental records, not stable distribution. | ABI conformance matrix, artifact-version policy, macOS SDK proof, signing/provenance plan, and a supported-platform matrix without premature stable-ABI claims. |
-| **P1** | Wider target-side classical control model | One earlier Boolean-literal declaration can now map to immutable target Boolean storage for one `if` gate. Boolean expressions, aliases, writes, lifetime, measurement-result mapping, loops, and measurement-body rules remain undefined. | Explicit widening rules, exact output, parser/import validation, negative fixtures, and no execution claim unless separately designed. |
+| **P1** | Wider target-side classical control model | One earlier Boolean-literal declaration, including one unary `not` over it, can now map to immutable target Boolean storage for one `if` gate. Literal folding, binary expressions, aliases, writes, lifetime, measurement-result mapping, loops, and measurement-body rules remain undefined. | Explicit widening rules, exact output, parser/import validation, negative fixtures, and no execution claim unless separately designed. |
 | **P1** | Callable bodies and calls | Declarations record names only. Bodies, parameter/return types, scopes, recursion, resource effects, and call behavior remain semantic decisions. | A non-recursive first subset, call/resource rules, diagnostics, and bounded lowering/execution fixtures. |
 | **P1** | Resource lifecycle and hardware mapping | Declaration-order allocation is defined only for bounded local simulation. | Lifetime, aliasing, deallocation, dynamic-allocation, and hardware-mapping rules with dedicated tests, if the language later needs them. |
 | **P2** | Language-specific delivery | The Alpha Rust wrapper has RAII ownership and Cargo conformance tests, but it is source-only and uses a build/test C ABI shared library. | A versioned and maintainable delivery method, compatibility policy, native-language ownership/error tests, and artifact evidence before any registry or stable-wrapper claim. |
@@ -150,15 +151,17 @@ Cargo tests run in the Ubuntu full profile against the test/build C ABI shared
 library.[1] [3] [6]
 
 The same baseline includes read-only semantic-environment inspection, bounded
-multi-register simulation, and identifier-`if` target lowering from immutable
-Boolean-literal declarations. These are completed leverage increments, not
+multi-register simulation, identifier-`if` target lowering from immutable
+Boolean-literal declarations, and unary negation over that same stored value.
+These are completed leverage increments, not
 evidence for runtime values, general resource management, or a distributed SDK.
 
 ### Stage B — Wider target-side control contract — next
 
-The literal-`if` and one Boolean-literal-declaration identifier-`if` gate
-source-lowering slices are complete. Before accepting an alias or Boolean
-expression condition, loop, branch block, or measurement body, SynQ must define
+The literal-`if`, one Boolean-literal-declaration identifier-`if`, and one
+negated-identifier `if` gate source-lowering slices are complete. Before
+accepting literal folding, aliases, binary Boolean-expression conditions, loop,
+branch block, or measurement body, SynQ must define
 the target-side classical store: its representation, allowed writes, lifetime,
 initial values, Boolean/Integer condition mapping, measurement-result behavior,
 and interaction with quantum resource boundaries. The first widening increment
@@ -226,8 +229,9 @@ availability, enterprise readiness, or universal language interoperability.
 The recommended immediate scope is now **wider target-side control semantics,
 followed by callable bodies/calls, with macOS static-SDK conformance as a
 separate platform-evidence increment**. This order preserves the completed
-semantic-inspection, multi-register-simulation, source-only Rust-wrapper, and
-identifier-if leverage work while avoiding unsupported surface area. It provides prospective
+semantic-inspection, multi-register-simulation, source-only Rust-wrapper,
+identifier-if, and negated identifier-if leverage work while avoiding unsupported
+surface area. It provides prospective
 contributors and adopters a clearer, reproducible contract than unverified
 breadth and is more credible for community growth, revenue exploration, and
 future acquisition discussions.

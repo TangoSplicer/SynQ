@@ -9,9 +9,9 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32069791226](https://github.com/TangoSplicer/SynQ/actions/runs/32069791226),
-which passed all five independently scoped jobs for revision `d1288c5`: **31/31**
-Linux recovery-profile CTests, **23/23** Windows MSVC and macOS Clang
+platform-matrix run #32075281245](https://github.com/TangoSplicer/SynQ/actions/runs/32075281245),
+which passed all five independently scoped jobs for revision `5558811`: **33/33**
+Linux recovery-profile CTests, **24/24** Windows MSVC and macOS Clang
 platform-neutral CTests, and Ubuntu 22.04 plus Windows MSVC clean-install
 static-SDK consumer checks. The tested
 environment and exact clean-install boundaries are documented in
@@ -22,7 +22,7 @@ environment and exact clean-install boundaries are documented in
 | Compiler and CLI | C++17 recovery build produces `libsynq_lib.a` and `synqc 0.1.0-experimental`. | No general executor, REPL, package manager, or stable CLI contract. |
 | Source profile | Typed gates, bounded declarations, Alpha Boolean/integer forms, qubit declarations, named measurement metadata, and declaration-only callables. | No scopes, blocks, callable bodies/calls, general expressions, or runtime semantics. |
 | Named registers | Alpha `name[index]` operands resolve against earlier declared registers, lower through strict Hybrid OpenQASM, and participate in bounded declaration-order local simulation. | No resource lifetime, deallocation, aliasing, dynamic allocation, or hardware mapping. |
-| Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if`, or an `if` controlled by one earlier top-level Boolean-literal declaration, with one supported typed gate body. | No Boolean-expression, alias, measurement-result, loop, measurement-body, branch-execution, or general classical-runtime lowering. |
+| Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if`, an `if` controlled by one earlier top-level Boolean-literal declaration, or `if not <that declaration>`, with one supported typed gate body. | No Boolean literal-negation folding, binary expression, alias, measurement-result, loop, measurement-body, branch-execution, or general classical-runtime lowering. |
 | Local simulation | Opt-in pure-state probability calculation for explicit declared default or named registers and a limited gate set. | No samples/collapse, noise, control execution, providers, hardware execution, or general resource lifecycle. |
 | Semantic inspection | `synqc --inspect-semantics` renders resolved top-level classical binding metadata. | No runtime values, nested scopes, general type system, or execution behavior. |
 | Native interoperability | The Ubuntu full profile exercises C, direct Rust, test-only Common Lisp, test-only Clojure/JNA, test-only Mercury, and a source-only Alpha Rust wrapper over the opaque C ABI; Windows and macOS run independent platform-neutral compiler/CLI/C-ABI smoke coverage. Ubuntu 22.04 and Windows MSVC also prove static SDK clean-install consumers. | The Alpha Rust wrapper is not a registry package or cross-platform delivery claim. There is no macOS SDK clean-install proof, shared-library distribution, frozen ABI, or general cross-platform SDK guarantee. |
@@ -72,6 +72,7 @@ accepted/rejected control forms.
 | [`docs/NAMED_REGISTER_OPERANDS.md`](docs/NAMED_REGISTER_OPERANDS.md) | Alpha named-register contract and simulator boundary. |
 | [`docs/STRICT_IF_LOWERING.md`](docs/STRICT_IF_LOWERING.md) | Strict literal-if source-lowering contract. |
 | [`docs/IDENTIFIER_IF_LOWERING.md`](docs/IDENTIFIER_IF_LOWERING.md) | Alpha identifier-if target-storage and source-lowering contract. |
+| [`docs/NEGATED_IDENTIFIER_IF_LOWERING.md`](docs/NEGATED_IDENTIFIER_IF_LOWERING.md) | Alpha negated identifier-if target-storage and source-lowering contract. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |

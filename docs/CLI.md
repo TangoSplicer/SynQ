@@ -1,8 +1,8 @@
 # SynQ Recovery-Profile CLI
 
 **Status:** Remotely validated supported recovery-profile workflow, including
-the bounded identifier-`if` strict-Hybrid source-lowering slice, in [Compiler
-Core platform matrix #32069791226][1].
+the bounded negated identifier-`if` strict-Hybrid source-lowering slice, in
+[Compiler Core platform matrix #32075281245][1].
 **Last reviewed:** 17 August 2026
 
 ## Build
@@ -22,7 +22,7 @@ historical runtime-dependent command-line source.
 | --- | --- | --- |
 | `synqc file.synq --validate` | Parses, lowers to Hybrid IR, and performs bounded name/static validation. | `0` success; `3` parse error; `4` lowering/resolution error. |
 | `synqc file.synq --emit-openqasm [--out output.qasm]` | Emits only the documented AST OpenQASM 3 source subset. | `0` success; `3` parse error; `5` unsupported export; `6` output-write failure. |
-| `synqc file.synq --emit-openqasm-hybrid [--out output.qasm]` | Emits the strict typed Hybrid OpenQASM subset: declared registers, supported gates, unnamed measurements, literal Boolean declarations, and one Alpha literal- or earlier Boolean-literal-declaration identifier-`if` gate body. | `0` success; `3` parse error; `4` lowering/resolution error; `5` unsupported export; `6` output-write failure. |
+| `synqc file.synq --emit-openqasm-hybrid [--out output.qasm]` | Emits the strict typed Hybrid OpenQASM subset: declared registers, supported gates, unnamed measurements, literal Boolean declarations, and one Alpha literal-, earlier Boolean-literal-declaration identifier-, or `not <that identifier>`-`if` gate body. | `0` success; `3` parse error; `4` lowering/resolution error; `5` unsupported export; `6` output-write failure. |
 | `synqc file.synq --inspect-semantics` | Renders resolved top-level classical binding names, kinds, static types, source lines, and earlier-binding dependencies without evaluation. | `0` success; `3` parse error; `4` lowering/resolution error. |
 | `synqc file.synq --eval-constants [--max-declarations n]` | Explicitly opts into declaration-only bounded constant evaluation. | `0` success; `3` parse error; `4` lowering/resolution error; `5` evaluation failure. |
 | `synqc file.synq --simulate [--max-qubits n] [--max-operations n]` | Explicitly computes bounded local basis/marginal probabilities for explicit declared registers, reporting source-register offsets and measurement provenance. | `0` success; `3` parse error; `4` lowering/resolution error; `5` simulation failure. |
@@ -84,13 +84,13 @@ above and their tested boundaries.
 
 The strict Hybrid mode rejects source structures the AST exporter may otherwise
 infer around: missing declarations, declaration-only classical/callable nodes,
-named measurement results, invalid explicit-register operands, Boolean-expression
-conditions, aliases, measurement-result conditions, `while`, and `if`
-measurement bodies. It accepts Alpha declared named registers, literal
-`if true/false` gate bodies, and one `if enabled` gate body when `enabled` is an
-earlier Boolean-literal declaration; it does not execute any form. Its generated
-register sizes are explicit typed declaration facts rather than operand-derived
-estimates.
+named measurement results, invalid explicit-register operands, negated Boolean
+literals, binary Boolean-expression conditions, aliases, measurement-result
+conditions, `while`, and `if` measurement bodies. It accepts Alpha declared
+named registers, literal `if true/false` gate bodies, one `if enabled` gate body,
+and one `if not enabled` gate body when `enabled` is an earlier Boolean-literal
+declaration; it does not execute any form. Its generated register sizes are
+explicit typed declaration facts rather than operand-derived estimates.
 
 ## Focused validation
 
@@ -98,12 +98,12 @@ estimates.
 as a separate process. It verifies successful validation, exact bounded OpenQASM
 file output, deterministic constant-evaluation/simulation output, and nonzero
 structured diagnostic failure. It also verifies explicit-register Bell-pair,
-Alpha named-register, Alpha literal-if, bounded identifier-if strict-Hybrid
-OpenQASM file output, and read-only semantic-environment output. The local
-recovery profile and [Compiler Core platform matrix #32069791226][1] both
-reported **31/31** Linux CTest checks; the separate Windows and macOS
-platform-neutral profiles each reported **23/23**.
+Alpha named-register, Alpha literal-if, bounded identifier-if, bounded negated
+identifier-if strict-Hybrid OpenQASM file output, and read-only semantic-
+environment output. The local recovery profile and [Compiler Core platform matrix
+#32075281245][1] both reported **33/33** Linux CTest checks; the separate Windows
+and macOS platform-neutral profiles each reported **24/24**.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32069791226 "SynQ Compiler Core identifier-if platform matrix"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32075281245 "SynQ Compiler Core negated identifier-if platform matrix"
