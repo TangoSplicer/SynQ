@@ -23,10 +23,12 @@ struct OpenQasm3ExportResult {
 // statement is rejected instead of being ignored or guessed at.
 OpenQasm3ExportResult export_openqasm3(const ProgramNode& program);
 
-// Export only the typed Hybrid IR quantum subset with one explicit default
-// `qubit q[n]` declaration, supported gates, and unnamed measurements. This is
-// an internal source-generation boundary; declarations, control nodes, named
-// measurement results, and unsupported register forms are rejected.
+// Export the typed Hybrid IR bounded source subset with explicit qubit
+// declarations, supported gates, unnamed measurements, top-level Boolean-literal
+// declarations, literal if gate bodies, and one earlier Boolean-declaration
+// identifier in an if gate condition. This is an internal source-generation
+// boundary; remaining control, named measurement results, aliases, and Boolean
+// expressions are rejected rather than assigned runtime semantics.
 OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program);
 
 }  // namespace synq::compiler

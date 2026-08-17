@@ -294,6 +294,17 @@ if(BUILD_CORE_SMOKE_TESTS)
     set(SYNQ_OPENQASM3_REFERENCE_FIXTURE ${CMAKE_CURRENT_BINARY_DIR}/synq_openqasm3_reference.qasm)
     add_test(NAME synq_openqasm3_exporter_smoke COMMAND synq_openqasm3_exporter_smoke ${SYNQ_OPENQASM3_REFERENCE_FIXTURE})
 
+    if(BUILD_RECOVERY_CLI)
+        set(SYNQ_IDENTIFIER_IF_OPENQASM3_FIXTURE ${CMAKE_CURRENT_BINARY_DIR}/synq_identifier_if_reference.qasm)
+        add_test(
+            NAME synq_identifier_if_hybrid_openqasm_export
+            COMMAND $<TARGET_FILE:synqc>
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/identifier_if_openqasm3.synq
+                    --emit-openqasm-hybrid --out ${SYNQ_IDENTIFIER_IF_OPENQASM3_FIXTURE}
+        )
+        set_tests_properties(synq_identifier_if_hybrid_openqasm_export PROPERTIES DEPENDS synq_cli_smoke)
+    endif()
+
     if(BUILD_OPENQASM_REFERENCE_CHECKS)
         find_package(Python3 COMPONENTS Interpreter REQUIRED)
         add_test(
@@ -307,6 +318,14 @@ if(BUILD_CORE_SMOKE_TESTS)
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_qiskit_qasm3_import.py ${SYNQ_OPENQASM3_REFERENCE_FIXTURE}
         )
         set_tests_properties(synq_openqasm3_qiskit_import PROPERTIES DEPENDS synq_openqasm3_exporter_smoke)
+
+        if(BUILD_RECOVERY_CLI)
+            add_test(
+                NAME synq_identifier_if_openqasm3_reference_parse
+                COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_IDENTIFIER_IF_OPENQASM3_FIXTURE}
+            )
+            set_tests_properties(synq_identifier_if_openqasm3_reference_parse PROPERTIES DEPENDS synq_identifier_if_hybrid_openqasm_export)
+        endif()
     endif()
 endif()
 

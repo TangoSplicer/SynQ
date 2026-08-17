@@ -75,7 +75,7 @@ FeatureRegistry make_default_feature_registry() {
     registry.register_feature({
         "classical-control-flow",
         FeatureStage::Alpha,
-        "Enables bounded Boolean literals/references plus one not/and/or operator form with one typed quantum or measurement body.",
+        "Enables bounded Boolean literals/references plus one not/and/or operator form with one typed quantum or measurement body; strict Hybrid lowering additionally accepts one earlier Boolean-literal declaration identifier in an if-gate condition.",
         "synq#bounded-classical-control-flow",
     });
     registry.register_feature({

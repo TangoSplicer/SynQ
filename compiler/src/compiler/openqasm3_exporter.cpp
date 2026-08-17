@@ -191,6 +191,7 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
     std::vector<std::string> declaration_order;
     std::unordered_map<std::string, bool> measured_registers;
     std::vector<std::string> measurement_order;
+    std::unordered_map<std::string, std::string> declared_boolean_storage;
 
     for (const HybridNode& node : program.nodes) {
         if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
@@ -262,11 +263,45 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
             continue;
         }
 
+        if (const auto* declaration = std::get_if<HybridDeclaration>(&node)) {
+            if (declaration->literal_kind != ClassicalLiteralKind::Boolean ||
+                declaration->initializer.kind != ClassicalExpressionKind::BooleanLiteral) {
+                add_diagnostic(result, declaration->span.line,
+                               "Hybrid OpenQASM 3 export supports only top-level Boolean literal declarations");
+                continue;
+            }
+            const auto inserted = declared_boolean_storage.emplace(
+                declaration->name, "synq_bool_" + declaration->name);
+            if (!inserted.second) {
+                add_diagnostic(result, declaration->span.line,
+                               "Hybrid OpenQASM 3 export accepts each Boolean declaration only once");
+                continue;
+            }
+            body << "bool " << inserted.first->second << " = "
+                 << (declaration->initializer.source_text == "true" ? "true" : "false") << ";\n";
+            continue;
+        }
+
         if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
-            if (control->kind != ClassicalControlKind::If ||
-                control->condition.kind != ClassicalConditionKind::BooleanLiteral) {
+            if (control->kind != ClassicalControlKind::If) {
                 add_diagnostic(result, control->span.line,
-                               "Hybrid OpenQASM 3 export lowers only literal if conditions, not identifier/expression conditions or while loops");
+                               "Hybrid OpenQASM 3 export lowers if conditions only; while-loop lowering is not supported");
+                continue;
+            }
+            std::string lowered_condition;
+            if (control->condition.kind == ClassicalConditionKind::BooleanLiteral) {
+                lowered_condition = control->condition.boolean_value ? "true" : "false";
+            } else if (control->condition.kind == ClassicalConditionKind::IdentifierReference) {
+                const auto storage = declared_boolean_storage.find(control->condition.source_text);
+                if (storage == declared_boolean_storage.end()) {
+                    add_diagnostic(result, control->span.line,
+                                   "Hybrid OpenQASM 3 identifier-if lowering requires an earlier top-level Boolean literal declaration; aliases, measurement results, non-Boolean values, and forward bindings are not supported");
+                    continue;
+                }
+                lowered_condition = storage->second;
+            } else {
+                add_diagnostic(result, control->span.line,
+                               "Hybrid OpenQASM 3 export lowers only literal or one earlier Boolean-declaration identifier if conditions; Boolean expressions are not supported");
                 continue;
             }
             const auto* gate = std::get_if<HybridQuantumGate>(&control->body);
@@ -285,7 +320,7 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
                 const auto declaration = declared_qubit_counts.find(gate->qubit_register_names[position]);
                 if (declaration == declared_qubit_counts.end() || gate->qubit_indices[position] >= declaration->second) {
                     add_diagnostic(result, gate->span.line,
-                                   "literal if quantum operand requires an earlier declared register and an in-range index");
+                                   "if quantum operand requires an earlier declared register and an in-range index");
                     operands_valid = false;
                     break;
                 }
@@ -298,8 +333,7 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
             std::size_t inferred_qubit_count = 0;
             lower_quantum_gate(typed_gate, lowered_body, inferred_qubit_count, result);
             if (!result.ok()) continue;
-            body << "if (" << (control->condition.boolean_value ? "true" : "false") << ") "
-                 << lowered_body.str();
+            body << "if (" << lowered_condition << ") " << lowered_body.str();
             continue;
         }
 

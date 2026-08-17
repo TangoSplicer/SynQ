@@ -1,0 +1,5 @@
+#[experimental(feature = "qubit-declarations")]
+#[experimental(feature = "classical-control-flow")]
+let enabled = true
+qubit q[1]
+if enabled then quantum h q[0]
