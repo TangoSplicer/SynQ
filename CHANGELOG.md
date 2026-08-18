@@ -9,6 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Compile-time literal-negation `if` lowering:** Strict Hybrid OpenQASM 3 now
+  folds `if not true` to `if (false)` and `if not false` to `if (true)` for one
+  supported typed gate body, without generated target Boolean storage. Exact
+  output, CLI emission, and OpenQASM reference-parser coverage are included.
+  [Compiler Core platform-matrix run #32188899985](https://github.com/TangoSplicer/SynQ/actions/runs/32188899985)
+  passed all five jobs: 35 Linux CTests and 25 Windows/macOS platform-neutral
+  CTests. Nested negation, binary expressions, aliases, measurement results,
+  loops, and local branch execution remain unsupported.
 - **Bounded negated identifier-`if` target lowering:** Strict Hybrid OpenQASM 3
   now lowers `if not <earlier Boolean-literal declaration>` for one supported
   typed gate body by reusing immutable generated target Boolean storage. Exact
@@ -97,9 +105,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Planned
 - Add macOS clean-install static-SDK evidence before making any macOS SDK or
   general cross-platform package claim.
-- Design target-side Boolean literal-negation folding, binary-expression
-  evaluation, classical storage writes/lifetime, and measurement-result handling
-  before wider control lowering.
+- Design target-side nested-negation and binary-expression evaluation, classical
+  storage writes/lifetime, and measurement-result handling before wider control
+  lowering.
 - Design bounded callable bodies/calls only after scopes, resources, and call
   effects have a tested contract.
 
