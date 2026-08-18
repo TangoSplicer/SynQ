@@ -71,11 +71,23 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
         }
 
         if (const auto* callable = dynamic_cast<const CallableDeclarationNode*>(statement)) {
+            std::optional<HybridQuantumGate> body;
+            if (callable->body != nullptr) {
+                body.emplace(HybridQuantumGate{callable->body->kind, callable->body->source_name,
+                                                callable->body->literal_angle, callable->body->qubit_indices,
+                                                callable->body->qubit_register_names, callable->body->span});
+            }
             lowered.nodes.emplace_back(HybridCallableDeclaration{
                 callable->kind,
                 callable->name,
+                std::move(body),
                 callable->span,
             });
+            continue;
+        }
+
+        if (const auto* call = dynamic_cast<const CallableCallNode*>(statement)) {
+            lowered.nodes.emplace_back(HybridCallableCall{call->name, call->span});
             continue;
         }
 

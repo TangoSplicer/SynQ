@@ -197,12 +197,13 @@ enum class CallableDeclarationKind {
     Kernel,
 };
 
-// Declaration-only callable metadata for the bounded recovery profile. It has
-// no parameter list, body, invocation, runtime, or backend semantics.
+// Alpha callable metadata. The legacy declaration-only form keeps a null body;
+// the bounded kernel increment may attach exactly one typed quantum-gate body.
 class CallableDeclarationNode : public ASTNode {
 public:
     CallableDeclarationKind kind = CallableDeclarationKind::Function;
     std::string name;
+    QuantumGateNode* body = nullptr;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -210,9 +211,30 @@ public:
                             std::size_t line_number, synq::compiler::SourceSpan source_span)
         : kind(declaration_kind), name(std::move(identifier)), line(line_number), span(source_span) {}
 
+    CallableDeclarationNode(CallableDeclarationKind declaration_kind, std::string identifier,
+                            QuantumGateNode* owned_body, std::size_t line_number,
+                            synq::compiler::SourceSpan source_span)
+        : kind(declaration_kind), name(std::move(identifier)), body(owned_body), line(line_number), span(source_span) {}
+
+    ~CallableDeclarationNode() override { delete body; }
+
     std::string toString() override {
         return std::string(kind == CallableDeclarationKind::Function ? "fn " : "kernel ") + name + "()";
     }
+};
+
+// Top-level callable invocation provenance for the bounded recovery profile.
+// It has no values, arguments, runtime dispatch, stack frame, or execution.
+class CallableCallNode : public ASTNode {
+public:
+    std::string name;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    CallableCallNode(std::string identifier, std::size_t line_number, synq::compiler::SourceSpan source_span)
+        : name(std::move(identifier)), line(line_number), span(source_span) {}
+
+    std::string toString() override { return "call " + name + "()"; }
 };
 
 // Typed representation of the first bounded classical-control-flow profile.

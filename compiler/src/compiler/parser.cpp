@@ -209,6 +209,14 @@ bool parse_callable_declaration(const std::string& source, std::string& name) {
     return is_identifier(name);
 }
 
+bool parse_bounded_kernel_body(const std::string& source, std::string& name, std::string& body) {
+    const std::size_t open = source.find("() {");
+    if (open == std::string::npos || source.size() <= open + 6 || source.back() != '}') return false;
+    name = trim(source.substr(0, open));
+    body = trim(source.substr(open + 4, source.size() - open - 5));
+    return is_identifier(name) && body.rfind("quantum ", 0) == 0 && body.find(';') == std::string::npos;
+}
+
 QuantumGateKind quantum_gate_kind(const std::string& source_name) {
     if (source_name == "h") return QuantumGateKind::H;
     if (source_name == "x") return QuantumGateKind::X;
@@ -519,9 +527,11 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                   "add #[experimental(feature = \"callable-declarations\")] before the gated construct");
             }
             std::string name;
-            if (!parse_callable_declaration(argument, name)) {
+            std::string body_source;
+            const bool has_body = operation == "kernel" && parse_bounded_kernel_body(argument, name, body_source);
+            if (!has_body && !parse_callable_declaration(argument, name)) {
                 return fail_parse("SYNQ-P013", span, "malformed bounded callable declaration",
-                                  "use fn <identifier>() or kernel <identifier>() with no parameters or body");
+                                  "use fn <identifier>(), kernel <identifier>(), or kernel <identifier>() { quantum <gate> <register[index]> }");
             }
             const auto inserted = declared_names.emplace(name, span);
             if (!inserted.second) {
@@ -532,17 +542,56 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             }
             const CallableDeclarationKind kind = operation == "fn" ? CallableDeclarationKind::Function
                                                                      : CallableDeclarationKind::Kernel;
-            root->statements.push_back(new CallableDeclarationNode(kind, name, line_number, span));
+            if (!has_body) {
+                root->statements.push_back(new CallableDeclarationNode(kind, name, line_number, span));
+                continue;
+            }
+            std::vector<std::string> quantum_arguments;
+            if (!parse_quantum_arguments(trim(body_source.substr(std::string("quantum ").size())), quantum_arguments)) {
+                return fail_parse("SYNQ-P013", span, "malformed bounded kernel body",
+                                  "use exactly one supported quantum gate with explicit register operands");
+            }
+            QuantumGateNode* gate = make_quantum_gate_node(quantum_arguments, line_number, span);
+            if (gate == nullptr) {
+                return fail_parse("SYNQ-P013", span, "malformed bounded kernel body",
+                                  "use exactly one supported quantum gate with explicit register operands");
+            }
+            const auto validation_error = synq::compiler::validate_quantum_gate_shape(*gate);
+            if (validation_error.has_value()) {
+                delete gate;
+                return fail_parse("SYNQ-P013", span, "malformed bounded kernel body",
+                                  "use exactly one supported quantum gate with explicit register operands");
+            }
+            if (gate->literal_angle.has_value() || uses_named_register_operand(*gate)) {
+                delete gate;
+                return fail_parse("SYNQ-P013", span, "bounded kernel bodies reject parameterized and named-register operands",
+                                  "use one non-parameterized gate over the earlier default register until callable resource rules expand");
+            }
+            root->statements.push_back(new CallableDeclarationNode(kind, name, gate, line_number, span));
+            continue;
+        }
+
+        if (operation == "call") {
+            if (!active_features.is_enabled("callable-declarations")) {
+                return fail_parse("SYNQ-P007", span, "callable calls require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"callable-declarations\")] before the gated construct");
+            }
+            std::string name;
+            if (!parse_callable_declaration(argument, name)) {
+                return fail_parse("SYNQ-P013", span, "malformed bounded callable call",
+                                  "use call <earlier-kernel-name>() with no arguments");
+            }
+            root->statements.push_back(new CallableCallNode(name, line_number, span));
             continue;
         }
 
         const bool known_instruction = operation == "print" || operation == "delay" ||
                                        operation == "quantum" || operation == "measure" || operation == "ai" ||
                                        operation == "if" || operation == "while" || operation == "qubit" ||
-                                       operation == "fn" || operation == "kernel";
+                                       operation == "fn" || operation == "kernel" || operation == "call";
         if (!known_instruction || argument.empty()) {
             return fail_parse("SYNQ-P003", span, "unsupported or incomplete recovery-profile instruction",
-                              "use let, qubit, fn, kernel, print, delay, quantum, measure, ai, if, or while with the documented argument form");
+                              "use let, qubit, fn, kernel, call, print, delay, quantum, measure, ai, if, or while with the documented argument form");
         }
         if (operation == "delay" && !is_non_negative_integer(argument)) {
             return fail_parse("SYNQ-P004", span, "delay requires a non-negative integer number of milliseconds",

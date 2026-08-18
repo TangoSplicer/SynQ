@@ -1,0 +1,5 @@
+#[experimental(feature = "qubit-declarations")]
+#[experimental(feature = "callable-declarations")]
+qubit q[1]
+kernel prepare() { quantum h q[0] }
+call prepare()

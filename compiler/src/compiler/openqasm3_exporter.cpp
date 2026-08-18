@@ -192,6 +192,7 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
     std::unordered_map<std::string, bool> measured_registers;
     std::vector<std::string> measurement_order;
     std::unordered_map<std::string, std::string> declared_boolean_storage;
+    std::unordered_map<std::string, HybridQuantumGate> callable_bodies;
 
     for (const HybridNode& node : program.nodes) {
         if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
@@ -202,6 +203,43 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
             }
             declared_qubit_counts.emplace(qubits->name, qubits->qubit_count);
             declaration_order.push_back(qubits->name);
+            continue;
+        }
+
+        if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (callable->kind != CallableDeclarationKind::Kernel || !callable->body.has_value()) {
+                add_diagnostic(result, callable->span.line,
+                               "Hybrid OpenQASM 3 export accepts only bounded one-gate kernel definitions before a call");
+                continue;
+            }
+            callable_bodies.emplace(callable->name, *callable->body);
+            continue;
+        }
+
+        if (const auto* call = std::get_if<HybridCallableCall>(&node)) {
+            const auto target = callable_bodies.find(call->name);
+            if (target == callable_bodies.end()) {
+                add_diagnostic(result, call->span.line,
+                               "Hybrid OpenQASM 3 bounded call lowering requires an earlier one-gate kernel definition");
+                continue;
+            }
+            const HybridQuantumGate& gate = target->second;
+            bool operands_valid = gate.qubit_register_names.size() == gate.qubit_indices.size();
+            for (std::size_t position = 0; operands_valid && position < gate.qubit_indices.size(); ++position) {
+                const auto declaration = declared_qubit_counts.find(gate.qubit_register_names[position]);
+                operands_valid = declaration != declared_qubit_counts.end() &&
+                    gate.qubit_indices[position] < declaration->second;
+            }
+            if (!operands_valid) {
+                add_diagnostic(result, call->span.line,
+                               "bounded kernel call requires an earlier declared register and an in-range body operand");
+                continue;
+            }
+            QuantumGateNode typed_gate(gate.kind, gate.source_name, gate.literal_angle,
+                                       gate.qubit_indices, gate.span.line, gate.span,
+                                       gate.qubit_register_names);
+            std::size_t inferred_qubit_count = 0;
+            lower_quantum_gate(typed_gate, body, inferred_qubit_count, result);
             continue;
         }
 
@@ -453,7 +491,10 @@ OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
     const bool requires_extended_lowering = std::any_of(program.nodes.begin(), program.nodes.end(),
         [](const HybridNode& node) {
             const auto* qubits = std::get_if<HybridQubitDeclaration>(&node);
-            return (qubits != nullptr && qubits->name != "q") || std::holds_alternative<HybridControlFlow>(node);
+            const auto* callable = std::get_if<HybridCallableDeclaration>(&node);
+            return (qubits != nullptr && qubits->name != "q") || std::holds_alternative<HybridControlFlow>(node) ||
+                std::holds_alternative<HybridCallableCall>(node) ||
+                (callable != nullptr && callable->body.has_value());
         });
     if (requires_extended_lowering) return export_extended_hybrid_openqasm3(program);
 

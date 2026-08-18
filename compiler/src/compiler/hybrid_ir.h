@@ -29,18 +29,24 @@ struct HybridQubitDeclaration {
     SourceSpan span;
 };
 
-struct HybridCallableDeclaration {
-    CallableDeclarationKind kind = CallableDeclarationKind::Function;
-    std::string name;
-    SourceSpan span;
-};
-
 struct HybridQuantumGate {
     QuantumGateKind kind = QuantumGateKind::Unknown;
     std::string source_name;
     std::optional<std::string> literal_angle;
     std::vector<std::size_t> qubit_indices;
     std::vector<std::string> qubit_register_names;
+    SourceSpan span;
+};
+
+struct HybridCallableDeclaration {
+    CallableDeclarationKind kind = CallableDeclarationKind::Function;
+    std::string name;
+    std::optional<HybridQuantumGate> body;
+    SourceSpan span;
+};
+
+struct HybridCallableCall {
+    std::string name;
     SourceSpan span;
 };
 
@@ -60,7 +66,8 @@ struct HybridControlFlow {
     SourceSpan span;
 };
 
-using HybridNode = std::variant<HybridDeclaration, HybridQubitDeclaration, HybridCallableDeclaration, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
+using HybridNode = std::variant<HybridDeclaration, HybridQubitDeclaration, HybridCallableDeclaration,
+                                HybridCallableCall, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
 
 struct HybridProgram {
     std::vector<HybridNode> nodes;

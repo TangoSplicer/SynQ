@@ -262,6 +262,7 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
     }
     std::unordered_map<std::string, std::size_t> qubit_counts;
+    std::unordered_map<std::string, HybridCallableDeclaration> callable_definitions;
 
     for (std::size_t node_index = 0; node_index < program.nodes.size(); ++node_index) {
         const HybridNode& node = program.nodes[node_index];
@@ -314,7 +315,32 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
 
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (callable->body.has_value()) {
+                Diagnostic qubit_error;
+                if (!validate_qubit_operands(callable->body->qubit_register_names,
+                                             callable->body->qubit_indices, callable->body->span,
+                                             qubit_counts, contains_explicit_default_register, qubit_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(qubit_error));
+                    return result;
+                }
+            }
+            callable_definitions.emplace(callable->name, *callable);
             resolved.nodes.emplace_back(*callable);
+            continue;
+        }
+
+        if (const auto* call = std::get_if<HybridCallableCall>(&node)) {
+            const auto target = callable_definitions.find(call->name);
+            if (target == callable_definitions.end() || !target->second.body.has_value() ||
+                target->second.kind != CallableDeclarationKind::Kernel) {
+                NameResolutionResult result;
+                result.diagnostics.push_back({"SYNQ-R003", DiagnosticSeverity::Error, call->span,
+                                              "bounded callable call requires an earlier one-gate kernel definition",
+                                              "declare kernel <name>() { quantum <gate> q[index] } before call <name>()"});
+                return result;
+            }
+            resolved.nodes.emplace_back(*call);
             continue;
         }
 

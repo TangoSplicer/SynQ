@@ -321,6 +321,15 @@ if(BUILD_CORE_SMOKE_TESTS)
                     --emit-openqasm-hybrid --out ${SYNQ_LITERAL_NEGATION_IF_OPENQASM3_FIXTURE}
         )
         set_tests_properties(synq_literal_negation_if_hybrid_openqasm_export PROPERTIES DEPENDS synq_cli_smoke)
+
+        set(SYNQ_BOUNDED_KERNEL_CALL_OPENQASM3_FIXTURE ${CMAKE_CURRENT_BINARY_DIR}/synq_bounded_kernel_call_reference.qasm)
+        add_test(
+            NAME synq_bounded_kernel_call_hybrid_openqasm_export
+            COMMAND $<TARGET_FILE:synqc>
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/bounded_kernel_call_openqasm3.synq
+                    --emit-openqasm-hybrid --out ${SYNQ_BOUNDED_KERNEL_CALL_OPENQASM3_FIXTURE}
+        )
+        set_tests_properties(synq_bounded_kernel_call_hybrid_openqasm_export PROPERTIES DEPENDS synq_cli_smoke)
     endif()
 
     if(BUILD_OPENQASM_REFERENCE_CHECKS)
@@ -355,6 +364,12 @@ if(BUILD_CORE_SMOKE_TESTS)
                 COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_LITERAL_NEGATION_IF_OPENQASM3_FIXTURE}
             )
             set_tests_properties(synq_literal_negation_if_openqasm3_reference_parse PROPERTIES DEPENDS synq_literal_negation_if_hybrid_openqasm_export)
+
+            add_test(
+                NAME synq_bounded_kernel_call_openqasm3_reference_parse
+                COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_BOUNDED_KERNEL_CALL_OPENQASM3_FIXTURE}
+            )
+            set_tests_properties(synq_bounded_kernel_call_openqasm3_reference_parse PROPERTIES DEPENDS synq_bounded_kernel_call_hybrid_openqasm_export)
         endif()
     endif()
 endif()
