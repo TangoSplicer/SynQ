@@ -9,6 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Bounded callable-kernel source lowering:** Strict Hybrid OpenQASM 3 now
+  accepts one earlier non-recursive, zero-parameter `kernel` with exactly one
+  non-parameterized default-register gate body and one later `call`, expanding
+  the typed gate at source-generation time. Parser, Hybrid IR, resolver, exact
+  output, CLI emission, and OpenQASM reference-parser coverage are included.
+  [Compiler Core platform-matrix run #32191872033](https://github.com/TangoSplicer/SynQ/actions/runs/32191872033)
+  passed all five jobs: 37 Linux CTests and 26 Windows/macOS platform-neutral
+  CTests. Functions, parameters, returns, named-register operands, recursion,
+  nested calls, control/measurement bodies, simulation, ABI execution, and
+  runtime dispatch remain unsupported.
 - **Compile-time literal-negation `if` lowering:** Strict Hybrid OpenQASM 3 now
   folds `if not true` to `if (false)` and `if not false` to `if (true)` for one
   supported typed gate body, without generated target Boolean storage. Exact
