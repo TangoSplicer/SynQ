@@ -153,6 +153,6 @@
 - [x] Run comprehensive local and remote verification and align all public readiness records after each accepted increment.
 - [x] Define and implement bounded identifier-`if` target lowering from earlier Boolean literal declarations, with exact output and external parser evidence.
 - [x] Specify and implement one strict-Hybrid `if not <earlier Boolean literal declaration>` target-lowering slice, retaining immutable target storage and explicit rejection of aliases, binary expressions, measurements, loops, and execution.
-- [ ] Specify and implement strict-Hybrid `if not true` and `if not false` lowering through explicit compile-time Boolean folding, with no new target storage, aliases, binary expressions, measurements, loops, or execution semantics.
+- [x] Specify and implement strict-Hybrid `if not true` and `if not false` lowering through explicit compile-time Boolean folding, with no new target storage, aliases, binary expressions, measurements, loops, or execution semantics.
 - [ ] Specify and implement a first non-recursive, zero-parameter callable-body and call subset only after defining its source scope, qubit-resource effect, lowering, and rejection contract.
 - [ ] Add and remotely validate a macOS clean-install static-SDK producer and external-C-consumer CI job before any macOS SDK or general cross-platform package claim.
