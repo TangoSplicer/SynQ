@@ -10,24 +10,25 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core platform-matrix run #32188899985](https://github.com/TangoSplicer/SynQ/actions/runs/32188899985)
-passed all five independent jobs for revision `5f8a614`: the Linux recovery
-profile passed **35/35** CTest checks; Windows MSVC and macOS Clang each passed
-**25/25** platform-neutral CTest checks; and Ubuntu 22.04 plus Windows MSVC each
-built, installed, discovered, compiled, and ran the experimental static SDK
-consumer from a clean prefix. The exact tested-environment boundary is recorded in
+ [Compiler Core platform-matrix run #32193130835](https://github.com/TangoSplicer/SynQ/actions/runs/32193130835)
+passed all six independent jobs for revision `6ef6351`: the Linux recovery
+profile passed **37/37** CTest checks; Windows MSVC and macOS Clang each passed
+**26/26** platform-neutral CTest checks; and Ubuntu 22.04, Windows MSVC, and macOS
+Clang each built, installed, discovered, compiled, and ran the experimental static
+SDK consumer from a clean prefix. The exact tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 35 CTests. Separate Windows MSVC and macOS Clang profiles each pass 25 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 37 CTests. Separate Windows MSVC and macOS Clang profiles each pass 26 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
 | `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded constant evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
-| Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, and declaration-only callables. No scopes, assignments, general expressions, callable bodies/calls, or runtime semantics exist. |
+| Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, declaration-only functions, and one zero-parameter one-gate kernel with one later strict-Hybrid source-only call expansion. No callable parameters/returns, local scopes, recursion, nested calls, assignments, general expressions, or runtime semantics exist. |
 | Alpha semantic environment | **Remotely validated read-only inspection subset.** | `synqc --inspect-semantics` renders resolved top-level classical binding metadata: kind, static type, source line, and earlier-binding dependencies. It does not evaluate general source, produce runtime values, sample measurements, or introduce nested scopes. |
 | Named registers | **Remotely validated Alpha subset with bounded local simulation.** | Earlier declared `name[index]` operands resolve, strict-Hybrid export preserves declared registers, and the simulator maps explicit register declarations into a declaration-order bounded state vector while retaining source provenance. No lifetime, aliasing, deallocation, dynamic allocation, or hardware mapping semantics exist. |
 | Bounded if export | **Remotely validated strict source-lowering subset in [Compiler Core #32188899985](https://github.com/TangoSplicer/SynQ/actions/runs/32188899985).** | One literal `if`, `if not true/false` through compile-time folding, one `if` controlled by an earlier top-level Boolean-literal declaration, or `if not <that declaration>`, with one supported typed gate body lowers to OpenQASM 3. Nested negation, binary expressions, aliases, measurement results, `while`, measurement bodies, and execution remain rejected. |
 | Local simulation | **Remotely validated bounded probability model.** | One or more explicit declared registers, limited gates, opt-in combined resource limits, and deterministic probability output with source-register provenance. No samples, collapse, noise, control execution, provider, hardware, lifetime, or dynamic allocation behavior. |
-| C ABI and static SDK | **Remotely validated experimental static path on Ubuntu and Windows.** | Ubuntu 22.04 and Windows MSVC clean-install jobs each prove static library/header/CMake package discovery and the external C consumer. The macOS job is smoke-only. No frozen ABI, shared-library delivery, registry, macOS SDK, or general cross-platform SDK claim is made. |
+| C ABI and static SDK | **Remotely validated experimental static path on Ubuntu, Windows, and macOS.** | Ubuntu 22.04, Windows MSVC, and macOS Clang clean-install jobs each prove static library/header/CMake package discovery and the external C consumer. No frozen ABI, shared-library delivery, registry, or general cross-platform SDK guarantee is made. |
+| Bounded callable-kernel export | **Remotely validated strict source-lowering subset in [Compiler Core #32191872033](https://github.com/TangoSplicer/SynQ/actions/runs/32191872033).** | One earlier zero-parameter `kernel` with exactly one non-parameterized default-register gate body, plus one later `call`, expands into the typed gate during strict Hybrid OpenQASM source generation. No function bodies, arguments, returns, named-register operands, recursion, nested calls, control bodies, simulation, ABI execution, or runtime dispatch are claimed. |
 | Interoperability proofs | **Remotely exercised on the Ubuntu full profile.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. The Windows profile intentionally excludes those toolchain-specific fixtures. They are not released wrappers or language packages. |
 | Alpha Rust wrapper | **Remotely exercised source-only adapter on the Ubuntu full profile.** | The dependency-free `synq-alpha` Cargo package owns the opaque program handle through RAII and exposes parse, OpenQASM 3 export, and ABI-identifier helpers. Three Cargo conformance tests pass through CMake against the test/build C ABI shared library. It is not published to a registry, bundled as a shared-library distribution, or a stable Rust API. |
 | Governance and maintenance | **Factual baseline published.** | `CHANGELOG.md`, contribution guidance, a security-reporting route, issue templates, support-environment guide, and ABI/distribution policy exist. They do not promise review times, support SLA, signing, or package availability. |
@@ -49,11 +50,10 @@ states a reproducible, current validation path.
 1. Define target-side nested-negation and binary-expression evaluation, writes,
    lifetime, and measurement-result storage before accepting wider Boolean
    expressions, aliases, loops, branch blocks, or measurement bodies.
-2. Design callable bodies/calls, scopes, resource effects, and bounded execution
-   separately, after the control-flow contract is testable.
-3. Add a macOS clean-install static-SDK conformance job before making any macOS
-   SDK or general cross-platform packaging claim.
-4. Expand language-specific wrappers or package delivery only after ownership,
+2. Define a wider callable contract only after parameters, scopes, returns,
+   resource effects, recursion rules, and execution boundaries have separate
+   written contracts and tests.
+3. Expand language-specific wrappers or package delivery only after ownership,
    compatibility, environment, and conformance commitments are explicit.
 
 ## Related records
