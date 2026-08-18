@@ -25,11 +25,11 @@ OpenQasm3ExportResult export_openqasm3(const ProgramNode& program);
 
 // Export the typed Hybrid IR bounded source subset with explicit qubit
 // declarations, supported gates, unnamed measurements, top-level Boolean-literal
-// declarations, literal if gate bodies, one earlier Boolean-declaration
-// identifier, or `not` over one such identifier in an if gate condition. This
-// is an internal source-generation boundary; remaining control, named
-// measurement results, aliases, and Boolean expressions are rejected rather
-// than assigned runtime semantics.
+// declarations, literal if gate bodies, compile-time `not` over a Boolean
+// literal, one earlier Boolean-declaration identifier, or `not` over one such
+// identifier in an if gate condition. This is an internal source-generation
+// boundary; remaining control, named measurement results, aliases, and Boolean
+// expressions are rejected rather than assigned runtime semantics.
 OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program);
 
 }  // namespace synq::compiler

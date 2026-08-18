@@ -130,14 +130,37 @@ bool lowers_bounded_if_gates_and_rejects_wider_control() {
                  negated_identifier_export.program == negated_identifier_expected,
                  "strict Hybrid export lowers not over one earlier Boolean-literal declaration identifier")) return false;
 
-    bool negated_literal_ok = false;
-    const auto negated_literal_if = lower_fixture(
+    bool negated_true_ok = false;
+    const auto negated_true_if = lower_fixture(
         "#[experimental(feature = \"qubit-declarations\")]\n"
         "#[experimental(feature = \"classical-control-flow\")]\n"
         "qubit q[1]\n"
-        "if not true then quantum h q[0]\n", negated_literal_ok);
-    if (!require(negated_literal_ok && !synq::compiler::export_hybrid_openqasm3(negated_literal_if).ok(),
-                 "strict Hybrid export rejects negated Boolean literals")) return false;
+        "if not true then quantum h q[0]\n", negated_true_ok);
+    const auto negated_true_export = synq::compiler::export_hybrid_openqasm3(negated_true_if);
+    const std::string negated_true_expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[1] q;\n"
+        "if (false) h q[0];\n";
+    if (!require(negated_true_ok && negated_true_export.ok() &&
+                 negated_true_export.program == negated_true_expected,
+                 "strict Hybrid export folds not true into a literal false condition without target storage")) return false;
+
+    bool negated_false_ok = false;
+    const auto negated_false_if = lower_fixture(
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "qubit q[1]\n"
+        "if not false then quantum h q[0]\n", negated_false_ok);
+    const auto negated_false_export = synq::compiler::export_hybrid_openqasm3(negated_false_if);
+    const std::string negated_false_expected =
+        "OPENQASM 3.0;\n"
+        "include \"stdgates.inc\";\n"
+        "qubit[1] q;\n"
+        "if (true) h q[0];\n";
+    if (!require(negated_false_ok && negated_false_export.ok() &&
+                 negated_false_export.program == negated_false_expected,
+                 "strict Hybrid export folds not false into a literal true condition without target storage")) return false;
 
     bool alias_ok = false;
     const auto alias_if = lower_fixture(

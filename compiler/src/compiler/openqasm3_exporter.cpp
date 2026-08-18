@@ -303,6 +303,13 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
                        control->condition.expression.kind == ClassicalBooleanExpressionKind::Not &&
                        control->condition.expression.operands.size() == 1 &&
                        control->condition.expression.operands.front().kind ==
+                           ClassicalBooleanExpressionKind::BooleanLiteral) {
+                lowered_condition = control->condition.expression.operands.front().boolean_value
+                    ? "false" : "true";
+            } else if (control->condition.kind == ClassicalConditionKind::BooleanExpression &&
+                       control->condition.expression.kind == ClassicalBooleanExpressionKind::Not &&
+                       control->condition.expression.operands.size() == 1 &&
+                       control->condition.expression.operands.front().kind ==
                            ClassicalBooleanExpressionKind::IdentifierReference) {
                 const auto storage = declared_boolean_storage.find(
                     control->condition.expression.operands.front().source_text);
@@ -314,7 +321,7 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
                 lowered_condition = "!" + storage->second;
             } else {
                 add_diagnostic(result, control->span.line,
-                               "Hybrid OpenQASM 3 export lowers only literal, one earlier Boolean-declaration identifier, or not <earlier Boolean-declaration identifier> if conditions; Boolean expressions are otherwise not supported");
+                               "Hybrid OpenQASM 3 export lowers only literal, not <Boolean literal>, one earlier Boolean-declaration identifier, or not <earlier Boolean-declaration identifier> if conditions; Boolean expressions are otherwise not supported");
                 continue;
             }
             const auto* gate = std::get_if<HybridQuantumGate>(&control->body);
