@@ -155,4 +155,9 @@
 - [x] Specify and implement one strict-Hybrid `if not <earlier Boolean literal declaration>` target-lowering slice, retaining immutable target storage and explicit rejection of aliases, binary expressions, measurements, loops, and execution.
 - [x] Specify and implement strict-Hybrid `if not true` and `if not false` lowering through explicit compile-time Boolean folding, with no new target storage, aliases, binary expressions, measurements, loops, or execution semantics.
 - [x] Specify and implement a first non-recursive, zero-parameter callable-body and call subset only after defining its source scope, qubit-resource effect, lowering, and rejection contract.
-- [ ] Add and remotely validate a macOS clean-install static-SDK producer and external-C-consumer CI job before any macOS SDK or general cross-platform package claim.
+- [x] Add and remotely validate a macOS clean-install static-SDK producer and external-C-consumer CI job before any macOS SDK or general cross-platform package claim.
+- [ ] Publish a usable experimental-language profile that distinguishes verified classical, quantum, and hybrid workflows from research-stage runtime goals.
+- [ ] Specify and implement bounded recursive constant-expression evaluation for existing typed Boolean and Integer expression trees, with explicit depth, operation, overflow, and dependency limits.
+- [ ] Specify safe mutable classical storage and assignment semantics before accepting executable state updates, loops, or general branch execution.
+- [ ] Specify measurement-result storage and target-side feedback semantics before accepting hybrid measurement-controlled source lowering or simulation execution.
+- [ ] Specify a practical bounded quantum-routine contract for parameterized kernels, explicit qubit operands, resource effects, and non-recursive call composition.
