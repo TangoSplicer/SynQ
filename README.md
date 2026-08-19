@@ -83,6 +83,7 @@ accepted/rejected control forms.
 | [`docs/CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md`](docs/CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md) | Beginner-first U5 local callable tutorial and safe failure explanation. |
 | [`docs/BOUNDED_BINARY_CLASSICAL_CALLABLE_EXECUTION.md`](docs/BOUNDED_BINARY_CLASSICAL_CALLABLE_EXECUTION.md) | Remotely verified U6 Alpha two-formal same-type local callable contract with strict parser, resolver, evaluator, source, simulator, and ABI boundaries. |
 | [`docs/BINARY_CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md`](docs/BINARY_CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md) | Beginner-first U6 two-input local callable tutorial and safe failure explanation. |
+| [`docs/CONFORMANCE_FIXTURE_MANIFEST_v0.1.0.md`](docs/CONFORMANCE_FIXTURE_MANIFEST_v0.1.0.md) | Versioned index of 15 pinned entry fixtures, their CTest owners, profile boundaries, and direct raw-source downloads. |
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |

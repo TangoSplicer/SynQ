@@ -151,6 +151,7 @@
 - [x] Publish and implement named-register resource and multi-register simulation semantics with focused local and remote evidence.
 - [x] Publish and implement the source-only Alpha Rust wrapper leverage point with focused local and remote evidence.
 - [x] Run comprehensive local and remote verification and align all public readiness records after each accepted increment.
+- [x] Publish a versioned public conformance-fixture manifest with direct repository download links, source suite ownership, verification run provenance, and explicit scope boundaries.
 - [x] Define and implement bounded identifier-`if` target lowering from earlier Boolean literal declarations, with exact output and external parser evidence.
 - [x] Specify and implement one strict-Hybrid `if not <earlier Boolean literal declaration>` target-lowering slice, retaining immutable target storage and explicit rejection of aliases, binary expressions, measurements, loops, and execution.
 - [x] Specify and implement strict-Hybrid `if not true` and `if not false` lowering through explicit compile-time Boolean folding, with no new target storage, aliases, binary expressions, measurements, loops, or execution semantics.
