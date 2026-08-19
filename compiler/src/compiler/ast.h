@@ -333,6 +333,7 @@ enum class ClassicalLiteralKind {
     Boolean,
     QuotedString,
     IntegerArithmeticExpression,
+    BooleanExpression,
     SourceText,
 };
 

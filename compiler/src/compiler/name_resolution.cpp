@@ -296,6 +296,22 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                 }
                 initializer_static_type = ClassicalStaticType::Integer;
             }
+            if (declaration->initializer.kind == ClassicalExpressionKind::BooleanExpression) {
+                Diagnostic boolean_error;
+                if (!declaration->initializer.boolean_expression.has_value() ||
+                    !resolve_boolean_expression(*declaration->initializer.boolean_expression, bindings,
+                                                initializer_binding_indices, boolean_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(boolean_error));
+                    return result;
+                }
+                initializer_static_type = ClassicalStaticType::Boolean;
+                for (const std::size_t binding_index : initializer_binding_indices) {
+                    for (const auto& entry : bindings) {
+                        if (entry.second.index == binding_index) initializer_binding_names.push_back(entry.second.name);
+                    }
+                }
+            }
 
             resolved.nodes.emplace_back(ResolvedHybridDeclaration{*declaration, initializer_binding_index,
                                                                    initializer_static_type,

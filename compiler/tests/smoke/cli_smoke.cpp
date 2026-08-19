@@ -69,7 +69,8 @@ int main(int argc, char** argv) {
     if (!require(write_file(quantum, "quantum h q[0]\nmeasure q[0]\n"), "writes quantum CLI fixture") ||
         !require(write_file(constants,
                             "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
-                            "let seed = 5\nlet total = seed + 4\nlet ready = true\n"),
+                            "#[experimental(feature = \"classical-control-flow\")]\n"
+                            "let seed = 5\nlet total = seed + 4\nlet ready = true\nlet disabled = not ready\n"),
                  "writes constant-evaluation CLI fixture") ||
         !require(write_file(semantics,
                             "let seed = 5\nlet selected = seed\nmeasure q[0] as observed\n"),
@@ -135,7 +136,8 @@ int main(int argc, char** argv) {
     if (!require(std::system((invoke + " " + quote(constants) + " --eval-constants > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("total = Integer:9") != std::string::npos &&
-                     read_file(stdout_path).find("ready = Boolean:true") != std::string::npos,
+                     read_file(stdout_path).find("ready = Boolean:true") != std::string::npos &&
+                     read_file(stdout_path).find("disabled = Boolean:false") != std::string::npos,
                  "experimental constant-evaluation mode prints deterministic evaluated bindings")) return 1;
 
     if (!require(std::system((invoke + " " + quote(semantics) + " --inspect-semantics > " + quote(stdout_path) +

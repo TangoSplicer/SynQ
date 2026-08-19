@@ -488,6 +488,15 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                 }
                 declaration_kind = ClassicalLiteralKind::IntegerArithmeticExpression;
             }
+            if (active_features.is_enabled("classical-control-flow") &&
+                synq::compiler::looks_like_boolean_expression(value)) {
+                ClassicalBooleanExpression boolean_expression;
+                if (!synq::compiler::parse_bounded_boolean_declaration_expression(value, span, boolean_expression)) {
+                    return fail_parse("SYNQ-P011", span, "malformed bounded Boolean expression",
+                                      "use exactly not <Boolean-literal-or-identifier> or <Boolean-literal-or-identifier> and/or <Boolean-literal-or-identifier>");
+                }
+                declaration_kind = ClassicalLiteralKind::BooleanExpression;
+            }
             const auto inserted = declared_names.emplace(identifier, span);
             if (!inserted.second) {
                 return fail_parse("SYNQ-S004", span,

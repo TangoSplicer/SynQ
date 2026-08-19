@@ -28,8 +28,7 @@ bool is_integer_literal(const std::string& text) {
     return true;
 }
 
-bool parse_integer_arithmetic_atom(const std::string& source_text,
-                                   const SourceSpan& span,
+bool parse_integer_arithmetic_atom(const std::string& source_text, const SourceSpan& span,
                                    ClassicalIntegerArithmeticExpression& expression) {
     if (is_integer_literal(source_text)) {
         expression = {ClassicalIntegerArithmeticExpressionKind::IntegerLiteral, source_text, span, {}};
@@ -37,6 +36,19 @@ bool parse_integer_arithmetic_atom(const std::string& source_text,
     }
     if (is_identifier_reference(source_text)) {
         expression = {ClassicalIntegerArithmeticExpressionKind::IdentifierReference, source_text, span, {}};
+        return true;
+    }
+    return false;
+}
+
+bool parse_boolean_atom(const std::string& source_text, const SourceSpan& span,
+                        ClassicalBooleanExpression& expression) {
+    if (source_text == "true" || source_text == "false") {
+        expression = {ClassicalBooleanExpressionKind::BooleanLiteral, source_text == "true", source_text, span, {}};
+        return true;
+    }
+    if (is_identifier_reference(source_text)) {
+        expression = {ClassicalBooleanExpressionKind::IdentifierReference, false, source_text, span, {}};
         return true;
     }
     return false;
@@ -53,6 +65,15 @@ bool looks_like_integer_arithmetic_expression(const std::string& source_text) {
     return false;
 }
 
+bool looks_like_boolean_expression(const std::string& source_text) {
+    std::istringstream tokens(source_text);
+    std::string token;
+    while (tokens >> token) {
+        if (token == "not" || token == "and" || token == "or") return true;
+    }
+    return false;
+}
+
 bool parse_bounded_integer_arithmetic_expression(const std::string& source_text,
                                                  const SourceSpan& span,
                                                  ClassicalIntegerArithmeticExpression& expression) {
@@ -65,15 +86,37 @@ bool parse_bounded_integer_arithmetic_expression(const std::string& source_text,
     ClassicalIntegerArithmeticExpression left;
     ClassicalIntegerArithmeticExpression right;
     if (!parse_integer_arithmetic_atom(words[0], span, left) ||
-        !parse_integer_arithmetic_atom(words[2], span, right)) {
-        return false;
-    }
+        !parse_integer_arithmetic_atom(words[2], span, right)) return false;
     const ClassicalIntegerArithmeticExpressionKind kind = words[1] == "+"
         ? ClassicalIntegerArithmeticExpressionKind::Add
         : words[1] == "-" ? ClassicalIntegerArithmeticExpressionKind::Subtract
                             : ClassicalIntegerArithmeticExpressionKind::Multiply;
     expression = {kind, source_text, span, {std::move(left), std::move(right)}};
     return true;
+}
+
+bool parse_bounded_boolean_declaration_expression(const std::string& source_text,
+                                                   const SourceSpan& span,
+                                                   ClassicalBooleanExpression& expression) {
+    std::istringstream tokens(source_text);
+    std::vector<std::string> words;
+    std::string word;
+    while (tokens >> word) words.push_back(word);
+    if (words.size() == 2 && words.front() == "not") {
+        ClassicalBooleanExpression operand;
+        if (!parse_boolean_atom(words[1], span, operand)) return false;
+        expression = {ClassicalBooleanExpressionKind::Not, false, source_text, span, {std::move(operand)}};
+        return true;
+    }
+    if (words.size() == 3 && (words[1] == "and" || words[1] == "or")) {
+        ClassicalBooleanExpression left;
+        ClassicalBooleanExpression right;
+        if (!parse_boolean_atom(words[0], span, left) || !parse_boolean_atom(words[2], span, right)) return false;
+        expression = {words[1] == "and" ? ClassicalBooleanExpressionKind::And : ClassicalBooleanExpressionKind::Or,
+                      false, source_text, span, {std::move(left), std::move(right)}};
+        return true;
+    }
+    return false;
 }
 
 ClassicalExpression make_classical_expression(const std::string& source_text,
@@ -106,6 +149,18 @@ ClassicalExpression make_classical_expression(const std::string& source_text,
                 expression.kind = ClassicalExpressionKind::IntegerArithmeticExpression;
                 expression.static_type = ClassicalStaticType::Integer;
                 expression.integer_arithmetic = std::move(arithmetic);
+                break;
+            }
+            expression.kind = ClassicalExpressionKind::OpaqueSource;
+            expression.static_type = ClassicalStaticType::Unknown;
+            break;
+        }
+        case ClassicalLiteralKind::BooleanExpression: {
+            ClassicalBooleanExpression boolean_expression;
+            if (parse_bounded_boolean_declaration_expression(source_text, span, boolean_expression)) {
+                expression.kind = ClassicalExpressionKind::BooleanExpression;
+                expression.static_type = ClassicalStaticType::Boolean;
+                expression.boolean_expression = std::move(boolean_expression);
                 break;
             }
             expression.kind = ClassicalExpressionKind::OpaqueSource;

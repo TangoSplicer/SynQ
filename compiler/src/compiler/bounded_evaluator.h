@@ -42,6 +42,8 @@ struct BoundedEvaluationOptions {
     // of a parsed program as an executable program.
     bool allow_experimental_constant_evaluation = false;
     std::size_t max_declarations = 64;
+    std::size_t max_expression_depth = 16;
+    std::size_t max_operations = 128;
 };
 
 struct BoundedEvaluationResult {

@@ -19,6 +19,31 @@ bool parse_integer(const std::string& text, std::int64_t& value) {
     return parsed.ec == std::errc{} && parsed.ptr == end;
 }
 
+struct EvaluationBudget {
+    std::size_t max_depth = 0;
+    std::size_t max_operations = 0;
+    std::size_t operations = 0;
+};
+
+bool enter_expression(const SourceSpan& span, std::size_t depth, EvaluationBudget& budget, Diagnostic& diagnostic) {
+    if (depth > budget.max_depth) {
+        diagnostic = error("SYNQ-E006", span, "bounded constant evaluation exceeds its expression-depth limit",
+                           "reduce expression nesting or increase the explicitly configured depth limit");
+        return false;
+    }
+    return true;
+}
+
+bool consume_operation(const SourceSpan& span, EvaluationBudget& budget, Diagnostic& diagnostic) {
+    if (budget.operations >= budget.max_operations) {
+        diagnostic = error("SYNQ-E007", span, "bounded constant evaluation exceeds its operation limit",
+                           "reduce expression operations or increase the explicitly configured operation limit");
+        return false;
+    }
+    ++budget.operations;
+    return true;
+}
+
 bool checked_arithmetic(ClassicalIntegerArithmeticExpressionKind kind, std::int64_t left, std::int64_t right,
                         std::int64_t& result) {
     constexpr auto minimum = std::numeric_limits<std::int64_t>::min();
@@ -47,7 +72,9 @@ bool checked_arithmetic(ClassicalIntegerArithmeticExpressionKind kind, std::int6
 
 bool evaluate_integer_tree(const ClassicalIntegerArithmeticExpression& expression,
                            const std::map<std::string, BoundedValue>& values,
-                           std::int64_t& result, Diagnostic& diagnostic) {
+                           std::int64_t& result, EvaluationBudget& budget,
+                           std::size_t depth, Diagnostic& diagnostic) {
+    if (!enter_expression(expression.span, depth, budget, diagnostic)) return false;
     if (expression.kind == ClassicalIntegerArithmeticExpressionKind::IntegerLiteral) {
         if (!parse_integer(expression.source_text, result)) {
             diagnostic = error("SYNQ-E004", expression.span, "invalid internal Integer literal in evaluation tree",
@@ -56,7 +83,6 @@ bool evaluate_integer_tree(const ClassicalIntegerArithmeticExpression& expressio
         }
         return true;
     }
-
     if (expression.kind == ClassicalIntegerArithmeticExpressionKind::IdentifierReference) {
         const auto found = values.find(expression.source_text);
         if (found == values.end() || found->second.kind != BoundedValueKind::Integer) {
@@ -68,30 +94,66 @@ bool evaluate_integer_tree(const ClassicalIntegerArithmeticExpression& expressio
         result = found->second.integer_value;
         return true;
     }
-
     if (expression.operands.size() != 2) {
         diagnostic = error("SYNQ-E004", expression.span, "invalid internal Integer arithmetic tree shape",
-                           "use a parser-produced one-operator Integer expression tree");
+                           "use a parser-produced bounded Integer expression tree");
         return false;
     }
-
     std::int64_t left = 0;
     std::int64_t right = 0;
-    if (!evaluate_integer_tree(expression.operands[0], values, left, diagnostic) ||
-        !evaluate_integer_tree(expression.operands[1], values, right, diagnostic)) {
-        return false;
-    }
+    if (!evaluate_integer_tree(expression.operands[0], values, left, budget, depth + 1, diagnostic) ||
+        !evaluate_integer_tree(expression.operands[1], values, right, budget, depth + 1, diagnostic) ||
+        !consume_operation(expression.span, budget, diagnostic)) return false;
     if (!checked_arithmetic(expression.kind, left, right, result)) {
         diagnostic = error("SYNQ-E005", expression.span, "Integer arithmetic is invalid or overflows int64",
-                           "use an in-range one-operator Integer expression");
+                           "use an in-range bounded Integer expression");
         return false;
     }
     return true;
 }
 
+bool evaluate_boolean_tree(const ClassicalBooleanExpression& expression,
+                           const std::map<std::string, BoundedValue>& values,
+                           bool& result, EvaluationBudget& budget,
+                           std::size_t depth, Diagnostic& diagnostic) {
+    if (!enter_expression(expression.span, depth, budget, diagnostic)) return false;
+    if (expression.kind == ClassicalBooleanExpressionKind::BooleanLiteral) {
+        result = expression.boolean_value;
+        return true;
+    }
+    if (expression.kind == ClassicalBooleanExpressionKind::IdentifierReference) {
+        const auto found = values.find(expression.source_text);
+        if (found == values.end() || found->second.kind != BoundedValueKind::Boolean) {
+            diagnostic = error("SYNQ-E003", expression.span,
+                               "Boolean evaluation reference `" + expression.source_text + "` has no prior evaluated Boolean binding",
+                               "use an earlier supported Boolean declaration");
+            return false;
+        }
+        result = found->second.boolean_value;
+        return true;
+    }
+    const std::size_t expected = expression.kind == ClassicalBooleanExpressionKind::Not ? 1 : 2;
+    if (expression.operands.size() != expected) {
+        diagnostic = error("SYNQ-E004", expression.span, "invalid internal Boolean expression tree shape",
+                           "use a parser-produced bounded Boolean expression tree");
+        return false;
+    }
+    bool left = false;
+    if (!evaluate_boolean_tree(expression.operands[0], values, left, budget, depth + 1, diagnostic) ||
+        !consume_operation(expression.span, budget, diagnostic)) return false;
+    if (expression.kind == ClassicalBooleanExpressionKind::Not) {
+        result = !left;
+        return true;
+    }
+    bool right = false;
+    if (!evaluate_boolean_tree(expression.operands[1], values, right, budget, depth + 1, diagnostic)) return false;
+    result = expression.kind == ClassicalBooleanExpressionKind::And ? left && right : left || right;
+    return true;
+}
+
 bool evaluate_initializer(const ResolvedHybridDeclaration& declaration,
                           const std::map<std::string, BoundedValue>& values,
-                          BoundedValue& value, Diagnostic& diagnostic) {
+                          BoundedValue& value, EvaluationBudget& budget, Diagnostic& diagnostic) {
     const auto& initializer = declaration.declaration.initializer;
     switch (initializer.kind) {
         case ClassicalExpressionKind::IntegerLiteral: {
@@ -134,15 +196,26 @@ bool evaluate_initializer(const ResolvedHybridDeclaration& declaration,
                 return false;
             }
             std::int64_t parsed = 0;
-            if (!evaluate_integer_tree(*initializer.integer_arithmetic, values, parsed, diagnostic)) return false;
+            if (!evaluate_integer_tree(*initializer.integer_arithmetic, values, parsed, budget, 1, diagnostic)) return false;
             value = BoundedValue{BoundedValueKind::Integer, parsed, false, {}};
+            return true;
+        }
+        case ClassicalExpressionKind::BooleanExpression: {
+            if (!initializer.boolean_expression.has_value()) {
+                diagnostic = error("SYNQ-E004", initializer.span, "missing internal Boolean expression tree",
+                                   "use a parser-produced bounded Boolean expression");
+                return false;
+            }
+            bool parsed = false;
+            if (!evaluate_boolean_tree(*initializer.boolean_expression, values, parsed, budget, 1, diagnostic)) return false;
+            value = BoundedValue{BoundedValueKind::Boolean, 0, parsed, {}};
             return true;
         }
         case ClassicalExpressionKind::DecimalLiteral:
         case ClassicalExpressionKind::OpaqueSource:
             diagnostic = error("SYNQ-E002", initializer.span,
                                "declaration initializer is outside the bounded constant-evaluation subset",
-                               "use Integer, Boolean, quoted String, prior-binding alias, or opted-in bounded Integer arithmetic");
+                               "use Integer, Boolean, quoted String, prior-binding alias, or bounded Alpha expressions");
             return false;
     }
     diagnostic = error("SYNQ-E004", initializer.span, "unknown internal declaration initializer kind",
@@ -176,9 +249,9 @@ BoundedEvaluationResult evaluate_bounded_constants(const ResolvedHybridProgram& 
                                            "reduce the program to the configured declaration limit"));
         return result;
     }
-
     BoundedEvaluation evaluation;
     std::map<std::string, BoundedValue> values;
+    EvaluationBudget budget{options.max_expression_depth, options.max_operations, 0};
     for (const auto& node : program.nodes) {
         const auto* declaration = std::get_if<ResolvedHybridDeclaration>(&node);
         if (declaration == nullptr) {
@@ -189,7 +262,7 @@ BoundedEvaluationResult evaluate_bounded_constants(const ResolvedHybridProgram& 
         }
         BoundedValue value;
         Diagnostic diagnostic;
-        if (!evaluate_initializer(*declaration, values, value, diagnostic)) {
+        if (!evaluate_initializer(*declaration, values, value, budget, diagnostic)) {
             result.diagnostics.push_back(std::move(diagnostic));
             return result;
         }
