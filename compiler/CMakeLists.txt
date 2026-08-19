@@ -27,7 +27,19 @@ option(BUILD_OPENQASM_REFERENCE_CHECKS "Run optional Python OpenQASM parser and 
 option(BUILD_RECOVERY_CLI "Build the supported recovery-profile synqc executable" ON)
 option(BUILD_RECOVERY_NATIVE_SDK "Install and test the experimental static C ABI SDK path" ON)
 option(SYNQ_ENABLE_BUILD_HARDENING "Enable supported compiler warnings and ELF linker hardening for recovery targets" ON)
+option(SYNQ_ENABLE_SANITIZERS "Enable the Linux Clang ASan/UBSan recovery-profile test instrumentation" OFF)
 option(BUILD_RECOVERY_BENCHMARKS "Build deterministic local recovery-profile benchmark utilities" OFF)
+
+# Evidence Ledger design: this is an opt-in Clang test configuration for the
+# isolated sanitizer profile. It does not alter ordinary developer or release
+# builds, and it is not a production-security mode or portability guarantee.
+if(SYNQ_ENABLE_SANITIZERS)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "SYNQ_ENABLE_SANITIZERS requires Clang for the documented ASan/UBSan profile")
+    endif()
+    add_compile_options(-fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover=all)
+    add_link_options(-fsanitize=address,undefined -fno-sanitize-recover=all)
+endif()
 
 file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 if(NOT BUILD_PYTHON_BINDINGS)

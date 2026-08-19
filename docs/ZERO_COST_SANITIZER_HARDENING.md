@@ -1,8 +1,8 @@
 # SynQ Zero-Cost Sanitizer Hardening Contract
 
-**Status:** Pre-implementation design contract. It does not claim that a
-sanitizer build, fuzz campaign, security audit, or runtime reliability closure
-has been completed.
+**Status:** Locally validated implementation; remote verification pending. This
+document does not claim that a sanitizer build is remotely verified, or that a
+fuzz campaign, security audit, or runtime reliability closure has been completed.
 
 ## Objective
 
@@ -32,6 +32,11 @@ ASan is a compiler instrumentation/runtime tool for classes of memory errors;
 UBSan instruments selected undefined behavior checks. Both are testing tools, and
 their runtimes are not a production-security substitute.[1] [2]
 
+LLVM documents that libFuzzer is an in-process coverage-guided engine whose
+target must tolerate malformed input and remain deterministic; that separate
+fuzz-target/corpus/reproduction design is intentionally deferred rather than
+misrepresented by the sanitizer profile.[3]
+
 ## Safety and determinism rules
 
 The profile must use no provider account, hardware credential, AI API, paid
@@ -51,6 +56,17 @@ validated** only when the additive workflow job and every existing Compiler Core
 job pass for the same implementation revision. The public record must state the
 sanitizer job’s exact CTest count, operating system, compiler, flags, runtime
 settings, and excluded paths.
+
+### Local evidence — 19 August 2026
+
+An isolated clean Clang `RelWithDebInfo` configuration with
+`SYNQ_ENABLE_SANITIZERS=ON` built and passed **32/32** platform-neutral recovery
+CTests under `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1`. The ordinary recovery profile
+was then rebuilt and passed **46/46** CTests without sanitizer instrumentation.
+Finally, configuring the sanitizer option with GNU C/C++ compilers failed with
+the documented `SYNQ_ENABLE_SANITIZERS requires Clang` message. These are local
+checks only; the additive workflow has not yet supplied remote evidence.
 
 ## Explicit non-claims
 

@@ -66,6 +66,45 @@ jobs:
             compiler/build/synqc*
             compiler/build/libsynq_ffi*
 
+  build-and-sanitizer-test-linux:
+    name: Linux Compiler Core ASan/UBSan (Clang)
+    runs-on: ubuntu-latest
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install sanitizer-profile build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake nlohmann-json3-dev libssl-dev
+
+      - name: Configure isolated Clang sanitizer profile
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          cmake -S compiler -B compiler/sanitizer-build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_CLI_TOOLS=OFF \
+            -DBUILD_COMPILER_EXECUTABLE=OFF \
+            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
+            -DBUILD_REPL=OFF \
+            -DBUILD_CORE_SMOKE_TESTS=ON \
+            -DBUILD_RECOVERY_INTEROP_SMOKE_TESTS=OFF \
+            -DBUILD_OPENQASM_REFERENCE_CHECKS=OFF \
+            -DBUILD_RECOVERY_NATIVE_SDK=OFF \
+            -DSYNQ_ENABLE_SANITIZERS=ON
+
+      - name: Build isolated Clang sanitizer profile
+        run: cmake --build compiler/sanitizer-build --parallel 2
+
+      - name: Run isolated Clang sanitizer profile
+        run: ctest --test-dir compiler/sanitizer-build --output-on-failure
+
   build-and-smoke-test-windows:
     name: Windows Compiler Core & Smoke Test (MSVC)
     runs-on: windows-latest
