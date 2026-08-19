@@ -319,9 +319,9 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
         }
 
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
-            if (callable->classical_body.has_value()) {
+            if (callable->classical_body.has_value() || callable->binary_classical_body.has_value()) {
                 add_diagnostic(result, callable->span.line,
-                               "strict Hybrid OpenQASM export explicitly rejects Alpha classical callable runtime declarations");
+                               "strict Hybrid OpenQASM export explicitly rejects Alpha local classical callable runtime declarations");
                 continue;
             }
             if (!callable->formals.empty() || callable->parameterized_body.has_value()) {
@@ -352,9 +352,10 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
         }
 
         if (const auto* declaration = std::get_if<HybridDeclaration>(&node)) {
-            if (declaration->classical_callable_invocation.has_value()) {
+            if (declaration->classical_callable_invocation.has_value() ||
+                declaration->binary_classical_callable_invocation.has_value()) {
                 add_diagnostic(result, declaration->span.line,
-                               "strict Hybrid OpenQASM export explicitly rejects Alpha classical callable runtime invocations");
+                               "strict Hybrid OpenQASM export explicitly rejects Alpha local classical callable runtime invocations");
                 continue;
             }
         }
@@ -748,8 +749,10 @@ OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
             return (qubits != nullptr && qubits->name != "q") || std::holds_alternative<HybridControlFlow>(node) ||
                 std::holds_alternative<HybridCallableCall>(node) ||
                 (callable != nullptr && (callable->body.has_value() || callable->parameterized_body.has_value() ||
-                                         callable->classical_body.has_value())) ||
-                (declaration != nullptr && declaration->classical_callable_invocation.has_value());
+                                         callable->classical_body.has_value() ||
+                                         callable->binary_classical_body.has_value())) ||
+                (declaration != nullptr && (declaration->classical_callable_invocation.has_value() ||
+                                             declaration->binary_classical_callable_invocation.has_value()));
         });
     if (requires_extended_lowering) return export_extended_hybrid_openqasm3(program);
 

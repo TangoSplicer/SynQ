@@ -58,6 +58,10 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 initializer.static_type = ClassicalStaticType::Unknown;
                 initializer.classical_callable_invocation = declaration->classical_callable_invocation;
             }
+            if (declaration->binary_classical_callable_invocation.has_value()) {
+                initializer.kind = ClassicalExpressionKind::ClassicalCallableInvocation;
+                initializer.static_type = ClassicalStaticType::Unknown;
+            }
             lowered.nodes.emplace_back(HybridDeclaration{
                 declaration->name,
                 declaration->value,
@@ -65,6 +69,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 std::move(initializer),
                 declaration->span,
                 declaration->classical_callable_invocation,
+                declaration->binary_classical_callable_invocation,
             });
             continue;
         }
@@ -126,6 +131,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 std::move(parameterized_body),
                 callable->span,
                 callable->classical_body,
+                callable->binary_classical_body,
             });
             continue;
         }

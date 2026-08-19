@@ -46,6 +46,11 @@ int main(void) {
         "#[experimental(feature = \"classical-callable-execution\")]\n"
         "fn increment(value: Integer) -> value + 1\n"
         "let answer = increment(41)\n";
+    const char* binary_classical_callable_runtime_in_memory_source =
+        "#[experimental(feature = \"classical-callable-execution\")]\n"
+        "#[experimental(feature = \"multi-formal-classical-callables\")]\n"
+        "fn add(left: Integer, right: Integer) -> left + right\n"
+        "let answer = add(20, 22)\n";
     FILE* source = fopen(path, "w");
     synq_program* program = NULL;
     char* diagnostic = NULL;
@@ -228,6 +233,31 @@ int main(void) {
     if (!require(status == SYNQ_STATUS_EXPORT_ERROR && openqasm == NULL && diagnostic != NULL &&
                  strstr(diagnostic, "explicitly rejects Alpha classical callable runtime") != NULL,
                  "C ABI explicitly rejects Alpha classical callable runtime execution/export nodes")) {
+        synq_string_free(openqasm);
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    synq_string_free(diagnostic);
+    synq_program_free(program);
+
+    program = NULL;
+    diagnostic = NULL;
+    status = synq_parse_source(binary_classical_callable_runtime_in_memory_source, &program, &diagnostic);
+    if (!require(status == SYNQ_STATUS_OK && program != NULL && diagnostic == NULL,
+                 "C consumer parses an Alpha binary classical callable-runtime source artifact")) {
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    openqasm = NULL;
+    diagnostic = NULL;
+    status = synq_export_openqasm3(program, &openqasm, &diagnostic);
+    if (!require(status == SYNQ_STATUS_EXPORT_ERROR && openqasm == NULL && diagnostic != NULL &&
+                 strstr(diagnostic, "explicitly rejects Alpha classical callable runtime") != NULL,
+                 "C ABI explicitly rejects Alpha binary classical callable runtime execution/export nodes")) {
         synq_string_free(openqasm);
         synq_string_free(diagnostic);
         synq_program_free(program);

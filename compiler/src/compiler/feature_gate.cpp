@@ -109,6 +109,12 @@ FeatureRegistry make_default_feature_registry() {
         "synq#bounded-classical-callable-execution",
     });
     registry.register_feature({
+        "multi-formal-classical-callables",
+        FeatureStage::Alpha,
+        "Enables the separately specified two-formal local classical callable subset when classical-callable-execution is also explicitly enabled; it does not enable scopes, returns, recursion, target execution, ABI execution, or quantum-resource effects.",
+        "synq#bounded-binary-classical-callable-execution",
+    });
+    registry.register_feature({
         "parameterized-quantum-routines",
         FeatureStage::Alpha,
         "Enables one-gate kernels with explicit angle/qubit formals and static source-only call expansion.",

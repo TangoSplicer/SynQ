@@ -458,7 +458,7 @@ ClassicalStaticType classical_callable_static_type(ClassicalCallableValueType ty
 bool is_valid_classical_callable(const HybridCallableDeclaration& callable) {
     if (callable.kind != CallableDeclarationKind::Function || callable.body.has_value() ||
         !callable.formals.empty() || callable.parameterized_body.has_value() ||
-        !callable.classical_body.has_value()) {
+        !callable.classical_body.has_value() || callable.binary_classical_body.has_value()) {
         return false;
     }
     const ClassicalCallableBody& body = *callable.classical_body;
@@ -489,6 +489,44 @@ bool is_valid_classical_callable(const HybridCallableDeclaration& callable) {
            body.source_expression == body.parameter_name;
 }
 
+bool is_valid_binary_classical_callable(const HybridCallableDeclaration& callable) {
+    if (callable.kind != CallableDeclarationKind::Function || callable.body.has_value() ||
+        !callable.formals.empty() || callable.parameterized_body.has_value() ||
+        callable.classical_body.has_value() || !callable.binary_classical_body.has_value()) {
+        return false;
+    }
+    const BinaryClassicalCallableBody& body = *callable.binary_classical_body;
+    if (!is_identifier(callable.name) || !is_identifier(body.first_parameter_name) ||
+        !is_identifier(body.second_parameter_name) || body.first_parameter_name == body.second_parameter_name ||
+        body.parameter_type == ClassicalCallableValueType::String) {
+        return false;
+    }
+    if (body.parameter_type == ClassicalCallableValueType::Integer) {
+        ClassicalIntegerArithmeticExpression expression;
+        if (!parse_bounded_integer_arithmetic_expression(body.source_expression, body.span, expression) ||
+            expression.operands.size() != 2 ||
+            expression.operands[0].kind != ClassicalIntegerArithmeticExpressionKind::IdentifierReference ||
+            expression.operands[0].source_text != body.first_parameter_name ||
+            expression.operands[1].kind != ClassicalIntegerArithmeticExpressionKind::IdentifierReference ||
+            expression.operands[1].source_text != body.second_parameter_name) {
+            return false;
+        }
+        return expression.kind == ClassicalIntegerArithmeticExpressionKind::Add ||
+               expression.kind == ClassicalIntegerArithmeticExpressionKind::Subtract ||
+               expression.kind == ClassicalIntegerArithmeticExpressionKind::Multiply;
+    }
+    ClassicalBooleanExpression expression;
+    return body.parameter_type == ClassicalCallableValueType::Boolean &&
+           parse_bounded_boolean_declaration_expression(body.source_expression, body.span, expression) &&
+           expression.operands.size() == 2 &&
+           expression.operands[0].kind == ClassicalBooleanExpressionKind::IdentifierReference &&
+           expression.operands[0].source_text == body.first_parameter_name &&
+           expression.operands[1].kind == ClassicalBooleanExpressionKind::IdentifierReference &&
+           expression.operands[1].source_text == body.second_parameter_name &&
+           (expression.kind == ClassicalBooleanExpressionKind::And ||
+            expression.kind == ClassicalBooleanExpressionKind::Or);
+}
+
 Diagnostic classical_callable_definition_diagnostic(const SourceSpan& span, const std::string& name) {
     return {"SYNQ-R009", DiagnosticSeverity::Error, span,
             "classical callable `" + name + "` has an unsupported local runtime body",
@@ -507,6 +545,26 @@ Diagnostic classical_callable_type_diagnostic(const SourceSpan& span, ClassicalS
             "classical callable actual has static type " + std::string(classical_static_type_name(actual)) +
                 ", not " + classical_static_type_name(expected),
             "use one literal or earlier immutable binding with the function formal's exact static type"};
+}
+
+Diagnostic binary_classical_callable_definition_diagnostic(const SourceSpan& span, const std::string& name) {
+    return {"SYNQ-R011", DiagnosticSeverity::Error, span,
+            "binary classical callable `" + name + "` has an unsupported local runtime body",
+            "use exactly two distinct same-type Integer or Boolean formals and one documented binary return expression"};
+}
+
+Diagnostic binary_classical_callable_invocation_diagnostic(const SourceSpan& span, const std::string& name) {
+    return {"SYNQ-R011", DiagnosticSeverity::Error, span,
+            "binary classical callable invocation requires an earlier supported function `" + name + "`",
+            "declare the matching U6 fn before one immutable <function>(<first-actual>, <second-actual>) initializer"};
+}
+
+Diagnostic binary_classical_callable_type_diagnostic(const SourceSpan& span, ClassicalStaticType expected,
+                                                     ClassicalStaticType actual, const char* position) {
+    return {"SYNQ-R012", DiagnosticSeverity::Error, span,
+            std::string("binary classical callable ") + position + " actual has static type " +
+                classical_static_type_name(actual) + ", not " + classical_static_type_name(expected),
+            "use an ordered literal or earlier immutable binding with each formal's exact static type"};
 }
 
 }  // namespace
@@ -546,6 +604,9 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             ClassicalStaticType initializer_static_type = declaration->initializer.static_type;
             std::optional<std::size_t> classical_callable_declaration_index;
             std::optional<std::size_t> classical_callable_actual_binding_index;
+            std::optional<std::size_t> binary_classical_callable_declaration_index;
+            std::optional<std::size_t> binary_classical_callable_first_actual_binding_index;
+            std::optional<std::size_t> binary_classical_callable_second_actual_binding_index;
             if (declaration->classical_callable_invocation.has_value()) {
                 const ClassicalCallableInvocation& invocation = *declaration->classical_callable_invocation;
                 const auto target = callable_definitions.find(invocation.function_name);
@@ -577,6 +638,57 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                 }
                 initializer_static_type = expected;
                 classical_callable_declaration_index = target_index->second;
+            }
+            if (declaration->binary_classical_callable_invocation.has_value()) {
+                const BinaryClassicalCallableInvocation& invocation = *declaration->binary_classical_callable_invocation;
+                const auto target = callable_definitions.find(invocation.function_name);
+                const auto target_index = callable_definition_indices.find(invocation.function_name);
+                if (target == callable_definitions.end() || target_index == callable_definition_indices.end() ||
+                    !is_valid_binary_classical_callable(target->second)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(binary_classical_callable_invocation_diagnostic(
+                        declaration->span, invocation.function_name));
+                    return result;
+                }
+                const ClassicalStaticType expected =
+                    classical_callable_static_type(target->second.binary_classical_body->parameter_type);
+                const auto resolve_actual = [&bindings, &initializer_binding_names](
+                                                const std::string& source, ClassicalLiteralKind kind,
+                                                ClassicalStaticType& actual,
+                                                std::optional<std::size_t>& binding_index) {
+                    actual = ClassicalStaticType::Unknown;
+                    if (kind == ClassicalLiteralKind::Integer) actual = ClassicalStaticType::Integer;
+                    if (kind == ClassicalLiteralKind::Boolean) actual = ClassicalStaticType::Boolean;
+                    if (kind == ClassicalLiteralKind::QuotedString) actual = ClassicalStaticType::String;
+                    if (kind == ClassicalLiteralKind::SourceText) {
+                        const auto binding = bindings.find(source);
+                        if (binding != bindings.end() && binding->second.kind == SemanticBindingKind::Value) {
+                            actual = binding->second.static_type;
+                            binding_index = binding->second.index;
+                            initializer_binding_names.push_back(binding->second.name);
+                        }
+                    }
+                };
+                ClassicalStaticType first_actual;
+                ClassicalStaticType second_actual;
+                resolve_actual(invocation.first_actual_source, invocation.first_actual_kind, first_actual,
+                               binary_classical_callable_first_actual_binding_index);
+                resolve_actual(invocation.second_actual_source, invocation.second_actual_kind, second_actual,
+                               binary_classical_callable_second_actual_binding_index);
+                if (first_actual != expected) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(binary_classical_callable_type_diagnostic(
+                        declaration->span, expected, first_actual, "first"));
+                    return result;
+                }
+                if (second_actual != expected) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(binary_classical_callable_type_diagnostic(
+                        declaration->span, expected, second_actual, "second"));
+                    return result;
+                }
+                initializer_static_type = expected;
+                binary_classical_callable_declaration_index = target_index->second;
             }
             if (declaration->initializer.kind == ClassicalExpressionKind::IdentifierReference &&
                 is_identifier(declaration->source_value)) {
@@ -627,7 +739,10 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                                                                    initializer_static_type,
                                                                    std::move(initializer_binding_indices),
                                                                    classical_callable_declaration_index,
-                                                                   classical_callable_actual_binding_index});
+                                                                   classical_callable_actual_binding_index,
+                                                                   binary_classical_callable_declaration_index,
+                                                                   binary_classical_callable_first_actual_binding_index,
+                                                                   binary_classical_callable_second_actual_binding_index});
             resolved.semantic_bindings.push_back({declaration->name, SemanticBindingKind::Value,
                                                   initializer_static_type, node_index, declaration->span,
                                                   std::move(initializer_binding_names)});
@@ -761,6 +876,18 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
 
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (callable->binary_classical_body.has_value()) {
+                if (!is_valid_binary_classical_callable(*callable)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(binary_classical_callable_definition_diagnostic(
+                        callable->span, callable->name));
+                    return result;
+                }
+                callable_definitions.emplace(callable->name, *callable);
+                callable_definition_indices.emplace(callable->name, node_index);
+                resolved.nodes.emplace_back(*callable);
+                continue;
+            }
             if (callable->classical_body.has_value()) {
                 if (!is_valid_classical_callable(*callable)) {
                     NameResolutionResult result;

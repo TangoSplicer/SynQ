@@ -1,7 +1,8 @@
 # Bounded Binary Classical Callable Execution (U6 Design Contract)
 
-**Feature stage:** Proposed Alpha U6 contract; not implemented and not a
-capability claim.
+**Feature stage:** Implemented Alpha U6 candidate; not remotely verified and
+not a capability claim until the implementation revision passes the full
+six-job Compiler Core matrix.
 **Current baseline:** U5 is remotely verified at revision `7307c00` by
 [Compiler Core #32266056516][1] (45/45 Linux recovery CTests, 31/31 Windows
 MSVC and macOS Clang platform-neutral CTests, and three clean-install
@@ -174,6 +175,10 @@ implementation revision.
    macOS static-SDK clean-install consumers.
 8. Only then may repository status, changelog, readiness records, and the
    public Evidence Ledger call this exact U6 slice remotely verified.
+
+The focused U6 fixture, CLI smoke extension, C ABI boundary extension, and the
+full local **46/46** recovery suite passed for the implementation candidate.
+Remote matrix evidence remains required before any availability claim.
 
 ## Explicit non-goals
 

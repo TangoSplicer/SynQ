@@ -69,9 +69,11 @@ bool contains_measurement_feedback_node(const ProgramNode& program) {
 bool contains_classical_callable_runtime_node(const ProgramNode& program) {
     for (const ASTNode* statement : program.statements) {
         const auto* callable = dynamic_cast<const CallableDeclarationNode*>(statement);
-        if (callable != nullptr && callable->classical_body.has_value()) return true;
+        if (callable != nullptr && (callable->classical_body.has_value() ||
+                                    callable->binary_classical_body.has_value())) return true;
         const auto* declaration = dynamic_cast<const DeclarationNode*>(statement);
-        if (declaration != nullptr && declaration->classical_callable_invocation.has_value()) return true;
+        if (declaration != nullptr && (declaration->classical_callable_invocation.has_value() ||
+                                       declaration->binary_classical_callable_invocation.has_value())) return true;
     }
     return false;
 }

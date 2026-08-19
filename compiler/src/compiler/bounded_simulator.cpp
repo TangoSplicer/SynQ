@@ -235,10 +235,10 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
             continue;
         }
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
-            if (callable->classical_body.has_value()) {
+            if (callable->classical_body.has_value() || callable->binary_classical_body.has_value()) {
                 result.diagnostics.push_back(error("SYNQ-SIM002", callable->span,
-                                                   "simulator explicitly rejects Alpha classical callable runtime declarations",
-                                                   "use --eval-runtime for the documented local U5 classical subset"));
+                                                   "simulator explicitly rejects Alpha local classical callable runtime declarations",
+                                                   "use --eval-runtime for the documented local U5/U6 classical subsets"));
                 return result;
             }
             if (!callable->formals.empty() || callable->parameterized_body.has_value()) {
@@ -253,10 +253,11 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
             return result;
         }
         if (const auto* declaration = std::get_if<ResolvedHybridDeclaration>(&node)) {
-            if (declaration->declaration.classical_callable_invocation.has_value()) {
+            if (declaration->declaration.classical_callable_invocation.has_value() ||
+                declaration->declaration.binary_classical_callable_invocation.has_value()) {
                 result.diagnostics.push_back(error("SYNQ-SIM002", declaration->declaration.span,
-                                                   "simulator explicitly rejects Alpha classical callable runtime invocations",
-                                                   "use --eval-runtime for the documented local U5 classical subset"));
+                                                   "simulator explicitly rejects Alpha local classical callable runtime invocations",
+                                                   "use --eval-runtime for the documented local U5/U6 classical subsets"));
                 return result;
             }
         }

@@ -189,6 +189,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_classical_callable_runtime_smoke PRIVATE synq_lib)
     add_test(NAME synq_classical_callable_runtime_smoke COMMAND synq_classical_callable_runtime_smoke)
 
+    add_executable(synq_binary_classical_callable_runtime_smoke tests/smoke/binary_classical_callable_runtime_smoke.cpp)
+    target_include_directories(synq_binary_classical_callable_runtime_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_binary_classical_callable_runtime_smoke PRIVATE synq_lib)
+    add_test(NAME synq_binary_classical_callable_runtime_smoke COMMAND synq_binary_classical_callable_runtime_smoke)
+
     add_executable(synq_bounded_simulator_smoke tests/smoke/bounded_simulator_smoke.cpp)
     target_include_directories(synq_bounded_simulator_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_bounded_simulator_smoke PRIVATE synq_lib)

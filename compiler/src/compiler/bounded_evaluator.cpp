@@ -340,6 +340,34 @@ bool evaluate_callable_actual(const ClassicalCallableInvocation& invocation,
     return true;
 }
 
+bool evaluate_binary_callable_actual(const std::string& source, ClassicalLiteralKind kind,
+                                    const SourceSpan& span,
+                                    const std::map<std::string, BoundedValue>& values,
+                                    BoundedValue& value, Diagnostic& diagnostic) {
+    if (kind == ClassicalLiteralKind::Integer) {
+        std::int64_t parsed = 0;
+        if (!parse_integer(source, parsed)) {
+            diagnostic = error("SYNQ-E015", span, "invalid internal U6 Integer actual",
+                               "use a parser-produced literal or earlier immutable binding");
+            return false;
+        }
+        value = {BoundedValueKind::Integer, parsed, false, {}};
+        return true;
+    }
+    if (kind == ClassicalLiteralKind::Boolean) {
+        value = {BoundedValueKind::Boolean, 0, source == "true", {}};
+        return true;
+    }
+    const auto binding = values.find(source);
+    if (kind != ClassicalLiteralKind::SourceText || binding == values.end()) {
+        diagnostic = error("SYNQ-E015", span, "U6 binary callable actual has no evaluated immutable binding",
+                           "use an earlier immutable binding or a supported Integer or Boolean literal actual");
+        return false;
+    }
+    value = binding->second;
+    return true;
+}
+
 bool evaluate_classical_callable(const HybridCallableDeclaration& callable,
                                  const BoundedValue& actual, BoundedValue& result,
                                  EvaluationBudget& budget, Diagnostic& diagnostic) {
@@ -395,6 +423,51 @@ bool evaluate_classical_callable(const HybridCallableDeclaration& callable,
     diagnostic = error("SYNQ-E013", body.span, "runtime received an invalid U5 String callable body",
                        "use a resolver-produced parameter-only String body");
     return false;
+}
+
+bool evaluate_binary_classical_callable(const HybridCallableDeclaration& callable,
+                                        const BoundedValue& first_actual,
+                                        const BoundedValue& second_actual,
+                                        BoundedValue& result,
+                                        EvaluationBudget& budget, Diagnostic& diagnostic) {
+    if (!callable.binary_classical_body.has_value() || callable.classical_body.has_value()) {
+        diagnostic = error("SYNQ-E015", callable.span, "runtime received a callable without a U6 binary local body",
+                           "use a resolver-produced U6 two-formal function");
+        return false;
+    }
+    const BinaryClassicalCallableBody& body = *callable.binary_classical_body;
+    const BoundedValueKind expected = bounded_kind_for_callable_type(body.parameter_type);
+    if (body.parameter_type == ClassicalCallableValueType::String || first_actual.kind != expected ||
+        second_actual.kind != expected) {
+        diagnostic = error("SYNQ-E015", body.span, "runtime received static-type-incompatible U6 binary actuals",
+                           "use a resolver-produced exact-type two-actual callable invocation");
+        return false;
+    }
+    std::map<std::string, BoundedValue> frame;
+    frame.emplace(body.first_parameter_name, first_actual);
+    frame.emplace(body.second_parameter_name, second_actual);
+    if (body.parameter_type == ClassicalCallableValueType::Integer) {
+        ClassicalIntegerArithmeticExpression expression;
+        if (!parse_bounded_integer_arithmetic_expression(body.source_expression, body.span, expression)) {
+            diagnostic = error("SYNQ-E015", body.span, "runtime received an invalid U6 Integer callable body",
+                               "use a resolver-produced first-formal plus/minus/times second-formal body");
+            return false;
+        }
+        std::int64_t value = 0;
+        if (!evaluate_integer_tree(expression, frame, value, budget, 1, diagnostic)) return false;
+        result = {BoundedValueKind::Integer, value, false, {}};
+        return true;
+    }
+    ClassicalBooleanExpression expression;
+    if (!parse_bounded_boolean_declaration_expression(body.source_expression, body.span, expression)) {
+        diagnostic = error("SYNQ-E015", body.span, "runtime received an invalid U6 Boolean callable body",
+                           "use a resolver-produced first-formal and/or second-formal body");
+        return false;
+    }
+    bool value = false;
+    if (!evaluate_boolean_tree(expression, frame, value, budget, 1, diagnostic)) return false;
+    result = {BoundedValueKind::Boolean, 0, value, {}};
+    return true;
 }
 
 }  // namespace
@@ -564,10 +637,16 @@ BoundedRuntimeEvaluationResult evaluate_bounded_runtime(const ResolvedHybridProg
 
     for (const ResolvedHybridNode& node : program.nodes) {
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
-            if (!callable->classical_body.has_value()) {
+            if (!callable->classical_body.has_value() && !callable->binary_classical_body.has_value()) {
                 result.diagnostics.push_back(error("SYNQ-E014", callable->span,
-                                                   "bounded runtime evaluation rejects non-U5 callable declarations",
-                                                   "use only one-formal U5 local fn declarations in --eval-runtime input"));
+                                                   "bounded runtime evaluation rejects non-local callable declarations",
+                                                   "use only documented U5 or U6 local fn declarations in --eval-runtime input"));
+                return result;
+            }
+            if (callable->classical_body.has_value() && callable->binary_classical_body.has_value()) {
+                result.diagnostics.push_back(error("SYNQ-E015", callable->span,
+                                                   "runtime received a callable with conflicting U5 and U6 bodies",
+                                                   "use one resolver-produced callable body shape"));
                 return result;
             }
             if (callables.size() >= options.max_callable_declarations) {
@@ -583,7 +662,36 @@ BoundedRuntimeEvaluationResult evaluate_bounded_runtime(const ResolvedHybridProg
         if (const auto* declaration = std::get_if<ResolvedHybridDeclaration>(&node)) {
             BoundedValue value;
             Diagnostic diagnostic;
-            if (declaration->declaration.classical_callable_invocation.has_value()) {
+            if (declaration->declaration.binary_classical_callable_invocation.has_value()) {
+                if (invocations >= options.max_callable_invocations || options.max_call_depth < 1) {
+                    result.diagnostics.push_back(error("SYNQ-E012", declaration->declaration.span,
+                                                       "bounded runtime evaluation exceeds its callable invocation or call-depth limit",
+                                                       "reduce U6 invocations or retain the documented non-nested call depth"));
+                    return result;
+                }
+                const BinaryClassicalCallableInvocation& invocation =
+                    *declaration->declaration.binary_classical_callable_invocation;
+                const auto callable = callables.find(invocation.function_name);
+                if (callable == callables.end() || !callable->second.binary_classical_body.has_value() ||
+                    !declaration->binary_classical_callable_declaration_index.has_value()) {
+                    result.diagnostics.push_back(error("SYNQ-E015", declaration->declaration.span,
+                                                       "runtime received an unresolved U6 binary callable invocation",
+                                                       "use a resolver-produced earlier U6 two-formal function invocation"));
+                    return result;
+                }
+                BoundedValue first_actual;
+                BoundedValue second_actual;
+                if (!evaluate_binary_callable_actual(invocation.first_actual_source, invocation.first_actual_kind,
+                                                     invocation.span, values, first_actual, diagnostic) ||
+                    !evaluate_binary_callable_actual(invocation.second_actual_source, invocation.second_actual_kind,
+                                                     invocation.span, values, second_actual, diagnostic) ||
+                    !evaluate_binary_classical_callable(callable->second, first_actual, second_actual,
+                                                        value, budget, diagnostic)) {
+                    result.diagnostics.push_back(std::move(diagnostic));
+                    return result;
+                }
+                ++invocations;
+            } else if (declaration->declaration.classical_callable_invocation.has_value()) {
                 if (invocations >= options.max_callable_invocations || options.max_call_depth < 1) {
                     result.diagnostics.push_back(error("SYNQ-E012", declaration->declaration.span,
                                                        "bounded runtime evaluation exceeds its callable invocation or call-depth limit",
@@ -616,8 +724,8 @@ BoundedRuntimeEvaluationResult evaluate_bounded_runtime(const ResolvedHybridProg
         }
 
         result.diagnostics.push_back(error("SYNQ-E014", {},
-                                           "bounded runtime evaluation accepts only immutable declarations and U5 local functions",
-                                           "keep --eval-runtime input within the documented U5 classical subset"));
+                                           "bounded runtime evaluation accepts only immutable declarations and documented local functions",
+                                           "keep --eval-runtime input within the documented U5/U6 classical subsets"));
         return result;
     }
 

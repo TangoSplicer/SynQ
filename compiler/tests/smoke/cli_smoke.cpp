@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
     const auto constants = base.string() + "_constants.synq";
     const auto state = base.string() + "_state.synq";
     const auto runtime = base.string() + "_runtime.synq";
+    const auto binary_runtime = base.string() + "_binary_runtime.synq";
     const auto semantics = base.string() + "_semantics.synq";
     const auto simulation = base.string() + "_simulation.synq";
     const auto multi_register_simulation = base.string() + "_multi_register_simulation.synq";
@@ -86,6 +87,12 @@ int main(int argc, char** argv) {
                             "fn increment(value: Integer) -> value + 1\n"
                             "let answer = increment(41)\n"),
                  "writes classical callable-runtime CLI fixture") ||
+        !require(write_file(binary_runtime,
+                            "#[experimental(feature = \"classical-callable-execution\")]\n"
+                            "#[experimental(feature = \"multi-formal-classical-callables\")]\n"
+                            "fn add(left: Integer, right: Integer) -> left + right\n"
+                            "let answer = add(20, 22)\n"),
+                 "writes binary classical callable-runtime CLI fixture") ||
         !require(write_file(semantics,
                             "let seed = 5\nlet selected = seed\nmeasure q[0] as observed\n"),
                  "writes semantic-inspection CLI fixture") ||
@@ -165,6 +172,11 @@ int main(int argc, char** argv) {
                      read_file(stdout_path).find("answer = Integer:42") != std::string::npos,
                  "explicit runtime-evaluation mode prints the bounded local callable result")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(binary_runtime) + " --eval-runtime > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("answer = Integer:42") != std::string::npos,
+                 "explicit runtime-evaluation mode prints the bounded binary local callable result")) return 1;
+
     if (!require(std::system((invoke + " " + quote(semantics) + " --inspect-semantics > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("binding selected | Value | Integer | line 2 | depends-on seed") != std::string::npos &&
@@ -195,6 +207,7 @@ int main(int argc, char** argv) {
     std::filesystem::remove(constants);
     std::filesystem::remove(state);
     std::filesystem::remove(runtime);
+    std::filesystem::remove(binary_runtime);
     std::filesystem::remove(semantics);
     std::filesystem::remove(simulation);
     std::filesystem::remove(multi_register_simulation);

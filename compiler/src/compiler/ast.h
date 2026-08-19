@@ -225,6 +225,27 @@ struct ClassicalCallableInvocation {
     synq::compiler::SourceSpan span;
 };
 
+// U6 keeps the wider two-formal callable form separate from U5 so existing
+// one-formal source retains its exact parser, resolver, and runtime contract.
+// The two names and actuals are ordered and are never quantum resources.
+struct BinaryClassicalCallableBody {
+    std::string first_parameter_name;
+    std::string second_parameter_name;
+    ClassicalCallableValueType parameter_type = ClassicalCallableValueType::Integer;
+    std::string source_expression;
+    ClassicalLiteralKind expression_kind{};
+    synq::compiler::SourceSpan span;
+};
+
+struct BinaryClassicalCallableInvocation {
+    std::string function_name;
+    std::string first_actual_source;
+    ClassicalLiteralKind first_actual_kind{};
+    std::string second_actual_source;
+    ClassicalLiteralKind second_actual_kind{};
+    synq::compiler::SourceSpan span;
+};
+
 enum class RoutineFormalKind {
     Angle,
     Qubit,
@@ -253,6 +274,7 @@ public:
     std::vector<RoutineFormal> formals;
     std::optional<ParameterizedRoutineBody> parameterized_body;
     std::optional<ClassicalCallableBody> classical_body;
+    std::optional<BinaryClassicalCallableBody> binary_classical_body;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -404,6 +426,7 @@ public:
     std::string value;
     ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
     std::optional<ClassicalCallableInvocation> classical_callable_invocation;
+    std::optional<BinaryClassicalCallableInvocation> binary_classical_callable_invocation;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 

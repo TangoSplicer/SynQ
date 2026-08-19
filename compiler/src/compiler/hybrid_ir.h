@@ -22,6 +22,7 @@ struct HybridDeclaration {
     ClassicalExpression initializer;
     SourceSpan span;
     std::optional<ClassicalCallableInvocation> classical_callable_invocation;
+    std::optional<BinaryClassicalCallableInvocation> binary_classical_callable_invocation;
 };
 
 struct HybridMutableDeclaration {
@@ -76,6 +77,7 @@ struct HybridCallableDeclaration {
     std::optional<HybridParameterizedRoutineBody> parameterized_body;
     SourceSpan span;
     std::optional<ClassicalCallableBody> classical_body;
+    std::optional<BinaryClassicalCallableBody> binary_classical_body;
 };
 
 struct HybridCallableCall {

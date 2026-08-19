@@ -48,6 +48,11 @@ struct ResolvedHybridDeclaration {
     // earlier immutable actual binding. It is static provenance, not a frame.
     std::optional<std::size_t> classical_callable_declaration_index;
     std::optional<std::size_t> classical_callable_actual_binding_index;
+    // U6 preserves one earlier binary local-function target and one provenance
+    // slot per ordered actual. These are static references, never runtime frames.
+    std::optional<std::size_t> binary_classical_callable_declaration_index;
+    std::optional<std::size_t> binary_classical_callable_first_actual_binding_index;
+    std::optional<std::size_t> binary_classical_callable_second_actual_binding_index;
 };
 
 struct ResolvedHybridMutableDeclaration {
