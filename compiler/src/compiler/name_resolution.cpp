@@ -1,10 +1,13 @@
 // Bounded recovery-profile scoped name resolution implementation.
 #include "name_resolution.h"
 
+#include <algorithm>
 #include <cctype>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 namespace synq::compiler {
@@ -295,6 +298,111 @@ bool validate_qubit_measurement(const HybridMeasurement& measurement,
                                    qubit_counts, contains_explicit_default_register, error);
 }
 
+bool is_literal_angle_parameter(const std::string& value) {
+    if (value == "pi" || value == "-pi") return true;
+    std::size_t position = !value.empty() && value.front() == '-' ? 1 : 0;
+    if (position != value.size()) {
+        bool has_digit = false;
+        bool has_decimal_point = false;
+        bool decimal = true;
+        for (; position < value.size(); ++position) {
+            const unsigned char character = static_cast<unsigned char>(value[position]);
+            if (std::isdigit(character) != 0) {
+                has_digit = true;
+            } else if (value[position] == '.' && !has_decimal_point) {
+                has_decimal_point = true;
+            } else {
+                decimal = false;
+                break;
+            }
+        }
+        if (decimal && has_digit) return true;
+    }
+    const std::string prefix = value.rfind("-pi/", 0) == 0 ? "-pi/" : "pi/";
+    const std::string denominator = value.rfind(prefix, 0) == 0 ? value.substr(prefix.size()) : "";
+    return !denominator.empty() && denominator != "0" &&
+           std::all_of(denominator.begin(), denominator.end(), [](unsigned char character) {
+               return std::isdigit(character) != 0;
+           });
+}
+
+bool parse_routine_actual_qubit(const std::string& source, std::string& register_name, std::size_t& index) {
+    const std::size_t open = source.find('[');
+    if (open == std::string::npos || open == 0 || source.back() != ']' ||
+        source.find('[', open + 1) != std::string::npos || !is_identifier(source.substr(0, open))) {
+        return false;
+    }
+    const std::string index_text = source.substr(open + 1, source.size() - open - 2);
+    if (index_text.empty() || !std::all_of(index_text.begin(), index_text.end(), [](unsigned char character) {
+            return std::isdigit(character) != 0;
+        })) {
+        return false;
+    }
+    index = 0;
+    for (char character : index_text) {
+        const std::size_t digit = static_cast<std::size_t>(character - '0');
+        if (index > (std::numeric_limits<std::size_t>::max() - digit) / 10) return false;
+        index = index * 10 + digit;
+    }
+    register_name = source.substr(0, open);
+    return true;
+}
+
+bool is_valid_parameterized_routine(const HybridCallableDeclaration& callable) {
+    if (callable.kind != CallableDeclarationKind::Kernel || callable.formals.empty() ||
+        !callable.parameterized_body.has_value()) {
+        return false;
+    }
+    std::unordered_set<std::string> names;
+    std::size_t angle_count = 0;
+    for (const HybridRoutineFormal& formal : callable.formals) {
+        if (!is_identifier(formal.name) || !names.emplace(formal.name).second) return false;
+        if (formal.kind == RoutineFormalKind::Angle) ++angle_count;
+    }
+    if (angle_count > 1) return false;
+    const HybridParameterizedRoutineBody& body = *callable.parameterized_body;
+    const auto has_formal = [&callable](RoutineFormalKind kind, const std::string& name) {
+        return std::any_of(callable.formals.begin(), callable.formals.end(), [&kind, &name](const HybridRoutineFormal& formal) {
+            return formal.kind == kind && formal.name == name;
+        });
+    };
+    const bool one_angle_one_qubit = callable.formals.size() == 2 &&
+        callable.formals[0].kind == RoutineFormalKind::Angle && callable.formals[1].kind == RoutineFormalKind::Qubit &&
+        body.angle_formal.has_value() && *body.angle_formal == callable.formals[0].name &&
+        body.qubit_formals.size() == 1 && body.qubit_formals[0] == callable.formals[1].name &&
+        (body.kind == QuantumGateKind::Rx || body.kind == QuantumGateKind::Ry ||
+         body.kind == QuantumGateKind::Rz || body.kind == QuantumGateKind::Phase);
+    const bool one_qubit = callable.formals.size() == 1 && callable.formals[0].kind == RoutineFormalKind::Qubit &&
+        !body.angle_formal.has_value() && body.qubit_formals.size() == 1 &&
+        body.qubit_formals[0] == callable.formals[0].name &&
+        (body.kind == QuantumGateKind::H || body.kind == QuantumGateKind::X ||
+         body.kind == QuantumGateKind::Y || body.kind == QuantumGateKind::Z);
+    const bool two_qubits = callable.formals.size() == 2 && callable.formals[0].kind == RoutineFormalKind::Qubit &&
+        callable.formals[1].kind == RoutineFormalKind::Qubit && !body.angle_formal.has_value() &&
+        body.qubit_formals.size() == 2 && body.qubit_formals[0] == callable.formals[0].name &&
+        body.qubit_formals[1] == callable.formals[1].name && body.qubit_formals[0] != body.qubit_formals[1] &&
+        body.kind == QuantumGateKind::Cx;
+    return one_angle_one_qubit || one_qubit || two_qubits;
+}
+
+Diagnostic invalid_parameterized_routine_diagnostic(const SourceSpan& span) {
+    return {"SYNQ-R004", DiagnosticSeverity::Error, span,
+            "parameterized quantum routine has an unsupported formal-to-body relation",
+            "define one documented kernel signature with one formal-only supported gate body"};
+}
+
+Diagnostic parameterized_routine_call_diagnostic(const SourceSpan& span, const std::string& name) {
+    return {"SYNQ-R004", DiagnosticSeverity::Error, span,
+            "parameterized quantum routine call requires an earlier supported kernel `" + name + "`",
+            "define the matching documented parameterized kernel before its call"};
+}
+
+Diagnostic parameterized_routine_call_shape_diagnostic(const SourceSpan& span) {
+    return {"SYNQ-R005", DiagnosticSeverity::Error, span,
+            "parameterized quantum routine call actuals do not match the declared ordered signature",
+            "supply the exact documented literal-angle and/or register[index] actual sequence"};
+}
+
 }  // namespace
 
 NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
@@ -501,6 +609,16 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
 
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (!callable->formals.empty() || callable->parameterized_body.has_value()) {
+                if (!is_valid_parameterized_routine(*callable)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(invalid_parameterized_routine_diagnostic(callable->span));
+                    return result;
+                }
+                callable_definitions.emplace(callable->name, *callable);
+                resolved.nodes.emplace_back(*callable);
+                continue;
+            }
             if (callable->body.has_value()) {
                 Diagnostic qubit_error;
                 if (!validate_qubit_operands(callable->body->qubit_register_names,
@@ -518,6 +636,64 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
 
         if (const auto* call = std::get_if<HybridCallableCall>(&node)) {
             const auto target = callable_definitions.find(call->name);
+            if (!call->arguments.empty()) {
+                if (target == callable_definitions.end() || !is_valid_parameterized_routine(target->second)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(parameterized_routine_call_diagnostic(call->span, call->name));
+                    return result;
+                }
+                const HybridCallableDeclaration& routine = target->second;
+                if (call->arguments.size() != routine.formals.size()) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(parameterized_routine_call_shape_diagnostic(call->span));
+                    return result;
+                }
+                std::vector<std::string> register_names;
+                std::vector<std::size_t> qubit_indices;
+                for (std::size_t position = 0; position < routine.formals.size(); ++position) {
+                    const HybridRoutineFormal& formal = routine.formals[position];
+                    const std::string& actual = call->arguments[position];
+                    if (formal.kind == RoutineFormalKind::Angle) {
+                        if (!is_literal_angle_parameter(actual)) {
+                            NameResolutionResult result;
+                            result.diagnostics.push_back(parameterized_routine_call_shape_diagnostic(call->span));
+                            return result;
+                        }
+                        continue;
+                    }
+                    std::string register_name;
+                    std::size_t qubit_index = 0;
+                    if (!parse_routine_actual_qubit(actual, register_name, qubit_index)) {
+                        NameResolutionResult result;
+                        result.diagnostics.push_back(parameterized_routine_call_shape_diagnostic(call->span));
+                        return result;
+                    }
+                    register_names.push_back(std::move(register_name));
+                    qubit_indices.push_back(qubit_index);
+                }
+                Diagnostic qubit_error;
+                if (!validate_qubit_operands(register_names, qubit_indices, call->span, qubit_counts,
+                                             contains_explicit_default_register, qubit_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(qubit_error));
+                    return result;
+                }
+                if (qubit_indices.size() == 2 && register_names[0] == register_names[1] &&
+                    qubit_indices[0] == qubit_indices[1]) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back({"SYNQ-R006", DiagnosticSeverity::Error, call->span,
+                                                  "two-qubit parameterized routine call aliases one physical source qubit",
+                                                  "use two distinct declared register[index] operands"});
+                    return result;
+                }
+                resolved.nodes.emplace_back(*call);
+                continue;
+            }
+            if (target != callable_definitions.end() && target->second.parameterized_body.has_value()) {
+                NameResolutionResult result;
+                result.diagnostics.push_back(parameterized_routine_call_shape_diagnostic(call->span));
+                return result;
+            }
             if (target == callable_definitions.end() || !target->second.body.has_value() ||
                 target->second.kind != CallableDeclarationKind::Kernel) {
                 NameResolutionResult result;

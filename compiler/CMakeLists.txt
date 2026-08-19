@@ -164,6 +164,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_callable_declaration_smoke PRIVATE synq_lib)
     add_test(NAME synq_callable_declaration_smoke COMMAND synq_callable_declaration_smoke)
 
+    add_executable(synq_parameterized_routine_smoke tests/smoke/parameterized_routine_smoke.cpp)
+    target_include_directories(synq_parameterized_routine_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_parameterized_routine_smoke PRIVATE synq_lib)
+    add_test(NAME synq_parameterized_routine_smoke COMMAND synq_parameterized_routine_smoke)
+
     add_executable(synq_bounded_evaluator_smoke tests/smoke/bounded_evaluator_smoke.cpp)
     target_include_directories(synq_bounded_evaluator_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_bounded_evaluator_smoke PRIVATE synq_lib)
@@ -335,6 +340,15 @@ if(BUILD_CORE_SMOKE_TESTS)
                     --emit-openqasm-hybrid --out ${SYNQ_BOUNDED_KERNEL_CALL_OPENQASM3_FIXTURE}
         )
         set_tests_properties(synq_bounded_kernel_call_hybrid_openqasm_export PROPERTIES DEPENDS synq_cli_smoke)
+
+        set(SYNQ_PARAMETERIZED_ROUTINE_OPENQASM3_FIXTURE ${CMAKE_CURRENT_BINARY_DIR}/synq_parameterized_routine_reference.qasm)
+        add_test(
+            NAME synq_parameterized_routine_hybrid_openqasm_export
+            COMMAND $<TARGET_FILE:synqc>
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/parameterized_routine_openqasm3.synq
+                    --emit-openqasm-hybrid --out ${SYNQ_PARAMETERIZED_ROUTINE_OPENQASM3_FIXTURE}
+        )
+        set_tests_properties(synq_parameterized_routine_hybrid_openqasm_export PROPERTIES DEPENDS synq_cli_smoke)
     endif()
 
     if(BUILD_OPENQASM_REFERENCE_CHECKS)
@@ -375,6 +389,12 @@ if(BUILD_CORE_SMOKE_TESTS)
                 COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_BOUNDED_KERNEL_CALL_OPENQASM3_FIXTURE}
             )
             set_tests_properties(synq_bounded_kernel_call_openqasm3_reference_parse PROPERTIES DEPENDS synq_bounded_kernel_call_hybrid_openqasm_export)
+
+            add_test(
+                NAME synq_parameterized_routine_openqasm3_reference_parse
+                COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/interop/validate_openqasm3.py ${SYNQ_PARAMETERIZED_ROUTINE_OPENQASM3_FIXTURE}
+            )
+            set_tests_properties(synq_parameterized_routine_openqasm3_reference_parse PROPERTIES DEPENDS synq_parameterized_routine_hybrid_openqasm_export)
         endif()
     endif()
 endif()

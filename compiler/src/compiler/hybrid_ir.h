@@ -54,15 +54,31 @@ struct HybridQuantumGate {
     SourceSpan span;
 };
 
+struct HybridRoutineFormal {
+    RoutineFormalKind kind = RoutineFormalKind::Qubit;
+    std::string name;
+};
+
+struct HybridParameterizedRoutineBody {
+    QuantumGateKind kind = QuantumGateKind::Unknown;
+    std::string source_name;
+    std::optional<std::string> angle_formal;
+    std::vector<std::string> qubit_formals;
+    SourceSpan span;
+};
+
 struct HybridCallableDeclaration {
     CallableDeclarationKind kind = CallableDeclarationKind::Function;
     std::string name;
     std::optional<HybridQuantumGate> body;
+    std::vector<HybridRoutineFormal> formals;
+    std::optional<HybridParameterizedRoutineBody> parameterized_body;
     SourceSpan span;
 };
 
 struct HybridCallableCall {
     std::string name;
+    std::vector<std::string> arguments;
     SourceSpan span;
 };
 

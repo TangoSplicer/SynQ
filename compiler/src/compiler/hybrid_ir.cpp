@@ -99,17 +99,30 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                                                 callable->body->literal_angle, callable->body->qubit_indices,
                                                 callable->body->qubit_register_names, callable->body->span});
             }
+            std::vector<HybridRoutineFormal> formals;
+            formals.reserve(callable->formals.size());
+            for (const RoutineFormal& formal : callable->formals) {
+                formals.push_back({formal.kind, formal.name});
+            }
+            std::optional<HybridParameterizedRoutineBody> parameterized_body;
+            if (callable->parameterized_body.has_value()) {
+                const ParameterizedRoutineBody& source = *callable->parameterized_body;
+                parameterized_body.emplace(HybridParameterizedRoutineBody{
+                    source.kind, source.source_name, source.angle_formal, source.qubit_formals, source.span});
+            }
             lowered.nodes.emplace_back(HybridCallableDeclaration{
                 callable->kind,
                 callable->name,
                 std::move(body),
+                std::move(formals),
+                std::move(parameterized_body),
                 callable->span,
             });
             continue;
         }
 
         if (const auto* call = dynamic_cast<const CallableCallNode*>(statement)) {
-            lowered.nodes.emplace_back(HybridCallableCall{call->name, call->span});
+            lowered.nodes.emplace_back(HybridCallableCall{call->name, call->arguments, call->span});
             continue;
         }
 

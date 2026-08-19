@@ -103,6 +103,12 @@ FeatureRegistry make_default_feature_registry() {
         "synq#bounded-callable-declarations",
     });
     registry.register_feature({
+        "parameterized-quantum-routines",
+        FeatureStage::Alpha,
+        "Enables one-gate kernels with explicit angle/qubit formals and static source-only call expansion.",
+        "synq#bounded-parameterized-quantum-routines",
+    });
+    registry.register_feature({
         "mutable-classical-state",
         FeatureStage::Alpha,
         "Enables bounded top-level var and set syntax with typed local state evaluation only; it does not enable target-side storage, branches, loops, or quantum execution.",

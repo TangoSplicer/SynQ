@@ -1,0 +1,13 @@
+#[experimental(feature = "qubit-declarations")]
+#[experimental(feature = "named-qubit-register-operands")]
+#[experimental(feature = "callable-declarations")]
+#[experimental(feature = "parameterized-quantum-gates")]
+#[experimental(feature = "parameterized-quantum-routines")]
+qubit qa[2]
+qubit qb[2]
+kernel rotate(angle theta, qubit target) { quantum rz(theta) target }
+kernel flip(qubit target) { quantum x target }
+kernel link(qubit control, qubit target) { quantum cx control, target }
+call rotate(pi/2, qa[0])
+call flip(qb[1])
+call link(qa[1], qb[0])

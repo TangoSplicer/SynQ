@@ -213,6 +213,30 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
             qubit_count += qubits->qubit_count;
             continue;
         }
+        if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (!callable->formals.empty() || callable->parameterized_body.has_value()) {
+                result.diagnostics.push_back(error("SYNQ-SIM002", callable->span,
+                                                   "simulator explicitly rejects Alpha parameterized quantum routine declarations",
+                                                   "use strict Hybrid OpenQASM export; routine simulation has no approved contract"));
+                return result;
+            }
+            result.diagnostics.push_back(error("SYNQ-SIM002", callable->span,
+                                               "simulator rejects callable declarations",
+                                               "use only qubit declarations, supported gates, and trailing unnamed measurements"));
+            return result;
+        }
+        if (const auto* call = std::get_if<HybridCallableCall>(&node)) {
+            if (!call->arguments.empty()) {
+                result.diagnostics.push_back(error("SYNQ-SIM002", call->span,
+                                                   "simulator explicitly rejects Alpha parameterized quantum routine calls",
+                                                   "use strict Hybrid OpenQASM export; routine simulation has no approved contract"));
+                return result;
+            }
+            result.diagnostics.push_back(error("SYNQ-SIM002", call->span,
+                                               "simulator rejects callable calls",
+                                               "use only qubit declarations, supported gates, and trailing unnamed measurements"));
+            return result;
+        }
         if (const auto* gate = std::get_if<HybridQuantumGate>(&node)) {
             if (measurements_started) {
                 result.diagnostics.push_back(error("SYNQ-SIM002", gate->span,

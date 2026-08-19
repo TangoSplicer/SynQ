@@ -197,6 +197,24 @@ enum class CallableDeclarationKind {
     Kernel,
 };
 
+enum class RoutineFormalKind {
+    Angle,
+    Qubit,
+};
+
+struct RoutineFormal {
+    RoutineFormalKind kind = RoutineFormalKind::Qubit;
+    std::string name;
+};
+
+struct ParameterizedRoutineBody {
+    QuantumGateKind kind = QuantumGateKind::Unknown;
+    std::string source_name;
+    std::optional<std::string> angle_formal;
+    std::vector<std::string> qubit_formals;
+    synq::compiler::SourceSpan span;
+};
+
 // Alpha callable metadata. The legacy declaration-only form keeps a null body;
 // the bounded kernel increment may attach exactly one typed quantum-gate body.
 class CallableDeclarationNode : public ASTNode {
@@ -204,6 +222,8 @@ public:
     CallableDeclarationKind kind = CallableDeclarationKind::Function;
     std::string name;
     QuantumGateNode* body = nullptr;
+    std::vector<RoutineFormal> formals;
+    std::optional<ParameterizedRoutineBody> parameterized_body;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -228,11 +248,16 @@ public:
 class CallableCallNode : public ASTNode {
 public:
     std::string name;
+    std::vector<std::string> arguments;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
     CallableCallNode(std::string identifier, std::size_t line_number, synq::compiler::SourceSpan source_span)
         : name(std::move(identifier)), line(line_number), span(source_span) {}
+
+    CallableCallNode(std::string identifier, std::vector<std::string> actuals, std::size_t line_number,
+                     synq::compiler::SourceSpan source_span)
+        : name(std::move(identifier)), arguments(std::move(actuals)), line(line_number), span(source_span) {}
 
     std::string toString() override { return "call " + name + "()"; }
 };

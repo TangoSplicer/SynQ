@@ -6,6 +6,7 @@
 #include <memory>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace synq::compiler {
 namespace {
@@ -68,6 +69,66 @@ bool is_literal_angle_parameter(const std::string& value) {
            std::all_of(denominator.begin(), denominator.end(), [](unsigned char character) {
                return std::isdigit(character) != 0;
            });
+}
+
+bool is_identifier(const std::string& value) {
+    if (value.empty()) return false;
+    const unsigned char first = static_cast<unsigned char>(value.front());
+    if (!(std::isalpha(first) != 0 || value.front() == '_')) return false;
+    return std::all_of(value.begin() + 1, value.end(), [](unsigned char character) {
+        return std::isalnum(character) != 0 || character == '_';
+    });
+}
+
+bool parse_routine_actual_qubit(const std::string& source, std::string& register_name, std::size_t& index) {
+    const std::size_t open = source.find('[');
+    if (open == std::string::npos || open == 0 || source.back() != ']' ||
+        source.find('[', open + 1) != std::string::npos || !is_identifier(source.substr(0, open))) {
+        return false;
+    }
+    const std::string index_text = source.substr(open + 1, source.size() - open - 2);
+    if (index_text.empty() || !std::all_of(index_text.begin(), index_text.end(), [](unsigned char character) {
+            return std::isdigit(character) != 0;
+        })) {
+        return false;
+    }
+    index = 0;
+    for (char character : index_text) {
+        const std::size_t digit = static_cast<std::size_t>(character - '0');
+        if (index > (std::numeric_limits<std::size_t>::max() - digit) / 10) return false;
+        index = index * 10 + digit;
+    }
+    register_name = source.substr(0, open);
+    return true;
+}
+
+bool is_valid_parameterized_routine(const HybridCallableDeclaration& callable) {
+    if (callable.kind != CallableDeclarationKind::Kernel || callable.formals.empty() ||
+        !callable.parameterized_body.has_value()) {
+        return false;
+    }
+    std::unordered_set<std::string> names;
+    for (const HybridRoutineFormal& formal : callable.formals) {
+        if (!is_identifier(formal.name) || !names.emplace(formal.name).second) return false;
+    }
+    const HybridParameterizedRoutineBody& body = *callable.parameterized_body;
+    const bool one_angle_one_qubit = callable.formals.size() == 2 &&
+        callable.formals[0].kind == RoutineFormalKind::Angle && callable.formals[1].kind == RoutineFormalKind::Qubit &&
+        body.angle_formal.has_value() && *body.angle_formal == callable.formals[0].name &&
+        body.qubit_formals.size() == 1 && body.qubit_formals[0] == callable.formals[1].name &&
+        (body.kind == QuantumGateKind::Rx || body.kind == QuantumGateKind::Ry ||
+         body.kind == QuantumGateKind::Rz || body.kind == QuantumGateKind::Phase);
+    const bool one_qubit = callable.formals.size() == 1 && callable.formals[0].kind == RoutineFormalKind::Qubit &&
+        !body.angle_formal.has_value() && body.qubit_formals.size() == 1 &&
+        body.qubit_formals[0] == callable.formals[0].name &&
+        (body.kind == QuantumGateKind::H || body.kind == QuantumGateKind::X ||
+         body.kind == QuantumGateKind::Y || body.kind == QuantumGateKind::Z);
+    const bool two_qubits = callable.formals.size() == 2 && callable.formals[0].kind == RoutineFormalKind::Qubit &&
+        callable.formals[1].kind == RoutineFormalKind::Qubit && !body.angle_formal.has_value() &&
+        body.qubit_formals.size() == 2 && body.qubit_formals[0] == callable.formals[0].name &&
+        body.qubit_formals[1] == callable.formals[1].name && body.qubit_formals[0] != body.qubit_formals[1] &&
+        body.kind == QuantumGateKind::Cx;
+    return one_angle_one_qubit || one_qubit || two_qubits;
 }
 
 bool split_parameterized_kernel(const std::string& kernel, std::string& gate, std::string& parameter) {
@@ -193,6 +254,9 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
     std::vector<std::string> measurement_order;
     std::unordered_map<std::string, std::string> declared_boolean_storage;
     std::unordered_map<std::string, HybridQuantumGate> callable_bodies;
+    std::unordered_map<std::string, HybridCallableDeclaration> parameterized_callable_definitions;
+    std::size_t parameterized_declaration_count = 0;
+    std::size_t parameterized_call_count = 0;
 
     for (const HybridNode& node : program.nodes) {
         if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
@@ -207,6 +271,24 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
         }
 
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (!callable->formals.empty() || callable->parameterized_body.has_value()) {
+                ++parameterized_declaration_count;
+                if (parameterized_declaration_count > 32) {
+                    add_diagnostic(result, callable->span.line,
+                                   "SYNQ-H003: strict Hybrid export accepts at most 32 parameterized routine declarations");
+                    continue;
+                }
+                if (!is_valid_parameterized_routine(*callable)) {
+                    add_diagnostic(result, callable->span.line,
+                                   "strict Hybrid export rejects an unresolved or malformed parameterized routine declaration");
+                    continue;
+                }
+                if (!parameterized_callable_definitions.emplace(callable->name, *callable).second) {
+                    add_diagnostic(result, callable->span.line,
+                                   "strict Hybrid export accepts each parameterized routine declaration only once");
+                }
+                continue;
+            }
             if (callable->kind != CallableDeclarationKind::Kernel || !callable->body.has_value()) {
                 add_diagnostic(result, callable->span.line,
                                "Hybrid OpenQASM 3 export accepts only bounded one-gate kernel definitions before a call");
@@ -217,6 +299,79 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
         }
 
         if (const auto* call = std::get_if<HybridCallableCall>(&node)) {
+            if (!call->arguments.empty()) {
+                ++parameterized_call_count;
+                if (parameterized_call_count > 128) {
+                    add_diagnostic(result, call->span.line,
+                                   "SYNQ-H003: strict Hybrid export accepts at most 128 parameterized routine calls");
+                    continue;
+                }
+                const auto parameterized_target = parameterized_callable_definitions.find(call->name);
+                if (parameterized_target == parameterized_callable_definitions.end() ||
+                    !is_valid_parameterized_routine(parameterized_target->second)) {
+                    add_diagnostic(result, call->span.line,
+                                   "strict Hybrid export requires a resolved earlier parameterized routine definition before expansion");
+                    continue;
+                }
+                const HybridCallableDeclaration& routine = parameterized_target->second;
+                if (call->arguments.size() != routine.formals.size()) {
+                    add_diagnostic(result, call->span.line,
+                                   "strict Hybrid export received parameterized routine actuals with an incompatible signature");
+                    continue;
+                }
+                std::optional<std::string> literal_angle;
+                std::vector<std::size_t> qubit_indices;
+                std::vector<std::string> register_names;
+                bool actuals_valid = true;
+                for (std::size_t position = 0; position < routine.formals.size(); ++position) {
+                    const HybridRoutineFormal& formal = routine.formals[position];
+                    const std::string& actual = call->arguments[position];
+                    if (formal.kind == RoutineFormalKind::Angle) {
+                        if (!is_literal_angle_parameter(actual)) {
+                            actuals_valid = false;
+                            break;
+                        }
+                        literal_angle = actual;
+                        continue;
+                    }
+                    std::string register_name;
+                    std::size_t index = 0;
+                    if (!parse_routine_actual_qubit(actual, register_name, index)) {
+                        actuals_valid = false;
+                        break;
+                    }
+                    const auto declaration = declared_qubit_counts.find(register_name);
+                    if (declaration == declared_qubit_counts.end() || index >= declaration->second) {
+                        actuals_valid = false;
+                        break;
+                    }
+                    register_names.push_back(std::move(register_name));
+                    qubit_indices.push_back(index);
+                }
+                if (qubit_indices.size() == 2 && register_names[0] == register_names[1] &&
+                    qubit_indices[0] == qubit_indices[1]) {
+                    actuals_valid = false;
+                }
+                if (!actuals_valid) {
+                    add_diagnostic(result, call->span.line,
+                                   "strict Hybrid export rejects unresolved or invalid parameterized routine call actuals");
+                    continue;
+                }
+                const HybridParameterizedRoutineBody& routine_body = *routine.parameterized_body;
+                HybridQuantumGate expanded{routine_body.kind, routine_body.source_name, literal_angle,
+                                           std::move(qubit_indices), std::move(register_names), call->span};
+                QuantumGateNode typed_gate(expanded.kind, expanded.source_name, expanded.literal_angle,
+                                           expanded.qubit_indices, expanded.span.line, expanded.span,
+                                           expanded.qubit_register_names);
+                std::size_t inferred_qubit_count = 0;
+                lower_quantum_gate(typed_gate, body, inferred_qubit_count, result);
+                continue;
+            }
+            if (parameterized_callable_definitions.find(call->name) != parameterized_callable_definitions.end()) {
+                add_diagnostic(result, call->span.line,
+                               "strict Hybrid export received a parameterized routine call without its required actuals");
+                continue;
+            }
             const auto target = callable_bodies.find(call->name);
             if (target == callable_bodies.end()) {
                 add_diagnostic(result, call->span.line,
@@ -506,7 +661,7 @@ OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
             const auto* callable = std::get_if<HybridCallableDeclaration>(&node);
             return (qubits != nullptr && qubits->name != "q") || std::holds_alternative<HybridControlFlow>(node) ||
                 std::holds_alternative<HybridCallableCall>(node) ||
-                (callable != nullptr && callable->body.has_value());
+                (callable != nullptr && (callable->body.has_value() || callable->parameterized_body.has_value()));
         });
     if (requires_extended_lowering) return export_extended_hybrid_openqasm3(program);
 

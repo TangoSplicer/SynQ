@@ -239,12 +239,117 @@ bool parse_callable_declaration(const std::string& source, std::string& name) {
     return is_identifier(name);
 }
 
+QuantumGateKind quantum_gate_kind(const std::string& source_name);
+
 bool parse_bounded_kernel_body(const std::string& source, std::string& name, std::string& body) {
     const std::size_t open = source.find("() {");
     if (open == std::string::npos || source.size() <= open + 6 || source.back() != '}') return false;
     name = trim(source.substr(0, open));
     body = trim(source.substr(open + 4, source.size() - open - 5));
     return is_identifier(name) && body.rfind("quantum ", 0) == 0 && body.find(';') == std::string::npos;
+}
+
+bool split_comma_list(const std::string& source, std::vector<std::string>& values) {
+    values.clear();
+    std::size_t start = 0;
+    while (start <= source.size()) {
+        const std::size_t comma = source.find(',', start);
+        const std::string value = trim(source.substr(start, comma == std::string::npos ? std::string::npos : comma - start));
+        if (value.empty()) return false;
+        values.push_back(value);
+        if (comma == std::string::npos) return true;
+        start = comma + 1;
+    }
+    return false;
+}
+
+bool parse_parameterized_routine_call(const std::string& source, std::string& name,
+                                      std::vector<std::string>& actuals) {
+    const std::size_t open = source.find('(');
+    if (open == std::string::npos || source.back() != ')' || open == 0) return false;
+    name = trim(source.substr(0, open));
+    return is_identifier(name) && split_comma_list(source.substr(open + 1, source.size() - open - 2), actuals);
+}
+
+bool looks_like_parameterized_routine_call(const std::string& source) {
+    const std::size_t open = source.find('(');
+    return open != std::string::npos && source.back() == ')' &&
+           !trim(source.substr(open + 1, source.size() - open - 2)).empty();
+}
+
+bool looks_like_parameterized_routine_declaration(const std::string& source) {
+    const std::size_t open = source.find('(');
+    const std::size_t close = source.find(')', open == std::string::npos ? 0 : open + 1);
+    return open != std::string::npos && close != std::string::npos && close > open &&
+           !trim(source.substr(open + 1, close - open - 1)).empty();
+}
+
+bool parse_parameterized_routine(const std::string& source, std::string& name,
+                                 std::vector<RoutineFormal>& formals,
+                                 ParameterizedRoutineBody& body,
+                                 const synq::compiler::SourceSpan& span) {
+    const std::size_t open = source.find('(');
+    const std::size_t close = source.find(')', open == std::string::npos ? 0 : open + 1);
+    if (open == std::string::npos || close == std::string::npos || close <= open || source.back() != '}') return false;
+    name = trim(source.substr(0, open));
+    const std::string suffix = trim(source.substr(close + 1));
+    if (!is_identifier(name) || suffix.rfind("{ quantum ", 0) != 0) return false;
+    std::vector<std::string> formal_tokens;
+    if (!split_comma_list(source.substr(open + 1, close - open - 1), formal_tokens)) return false;
+    formals.clear();
+    for (const std::string& token : formal_tokens) {
+        std::istringstream words(token);
+        std::string type;
+        std::string identifier;
+        std::string extra;
+        words >> type >> identifier >> extra;
+        if (!extra.empty() || !is_identifier(identifier) ||
+            std::any_of(formals.begin(), formals.end(), [&identifier](const RoutineFormal& formal) { return formal.name == identifier; })) return false;
+        if (type == "angle") {
+            if (std::any_of(formals.begin(), formals.end(), [](const RoutineFormal& formal) { return formal.kind == RoutineFormalKind::Angle; })) return false;
+            formals.push_back({RoutineFormalKind::Angle, identifier});
+        } else if (type == "qubit") {
+            formals.push_back({RoutineFormalKind::Qubit, identifier});
+        } else {
+            return false;
+        }
+    }
+    const std::string gate_source = trim(suffix.substr(10, suffix.size() - 11));
+    std::istringstream gate_words(gate_source);
+    std::string kernel;
+    gate_words >> kernel;
+    std::string operands;
+    std::getline(gate_words, operands);
+    operands = trim(operands);
+    if (kernel.empty() || operands.empty()) return false;
+    const std::size_t angle_open = kernel.find('(');
+    const bool has_angle = angle_open != std::string::npos;
+    const std::string gate_name = has_angle ? kernel.substr(0, angle_open) : kernel;
+    std::optional<std::string> angle;
+    if (has_angle) {
+        if (kernel.back() != ')' || kernel.find('(', angle_open + 1) != std::string::npos) return false;
+        angle = kernel.substr(angle_open + 1, kernel.size() - angle_open - 2);
+        if (!is_identifier(*angle)) return false;
+    }
+    std::vector<std::string> qubits;
+    if (!split_comma_list(operands, qubits)) return false;
+    const auto formal_named = [&formals](const std::string& candidate, RoutineFormalKind kind) {
+        return std::any_of(formals.begin(), formals.end(), [&candidate, kind](const RoutineFormal& formal) {
+            return formal.kind == kind && formal.name == candidate;
+        });
+    };
+    const QuantumGateKind kind = quantum_gate_kind(gate_name);
+    const bool valid_parameterized = has_angle &&
+        (kind == QuantumGateKind::Rx || kind == QuantumGateKind::Ry || kind == QuantumGateKind::Rz || kind == QuantumGateKind::Phase) &&
+        formal_named(*angle, RoutineFormalKind::Angle) && qubits.size() == 1 && formal_named(qubits[0], RoutineFormalKind::Qubit);
+    const bool valid_fixed = !has_angle &&
+        (kind == QuantumGateKind::H || kind == QuantumGateKind::X || kind == QuantumGateKind::Y || kind == QuantumGateKind::Z) &&
+        qubits.size() == 1 && formal_named(qubits[0], RoutineFormalKind::Qubit);
+    const bool valid_cx = !has_angle && kind == QuantumGateKind::Cx && qubits.size() == 2 && qubits[0] != qubits[1] &&
+        formal_named(qubits[0], RoutineFormalKind::Qubit) && formal_named(qubits[1], RoutineFormalKind::Qubit);
+    if (!valid_parameterized && !valid_fixed && !valid_cx) return false;
+    body = {kind, gate_name, angle, qubits, span};
+    return true;
 }
 
 QuantumGateKind quantum_gate_kind(const std::string& source_name) {
@@ -604,9 +709,33 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                   "add #[experimental(feature = \"callable-declarations\")] before the gated construct");
             }
             std::string name;
+            std::vector<RoutineFormal> routine_formals;
+            ParameterizedRoutineBody routine_body;
+            if (operation == "kernel" && parse_parameterized_routine(argument, name, routine_formals, routine_body, span)) {
+                if (!active_features.is_enabled("parameterized-quantum-routines") ||
+                    !active_features.is_enabled("parameterized-quantum-gates")) {
+                    return fail_parse("SYNQ-P007", span, "parameterized quantum routines require explicit Alpha opt-ins",
+                                      "add parameterized-quantum-routines and parameterized-quantum-gates annotations before the routine");
+                }
+                const auto inserted = declared_names.emplace(name, span);
+                if (!inserted.second) {
+                    return fail_parse("SYNQ-S004", span, "duplicate top-level declaration `" + name +
+                                      "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                      "rename the later routine or reuse the existing declaration");
+                }
+                auto* routine = new CallableDeclarationNode(CallableDeclarationKind::Kernel, name, line_number, span);
+                routine->formals = std::move(routine_formals);
+                routine->parameterized_body = std::move(routine_body);
+                root->statements.push_back(routine);
+                continue;
+            }
             std::string body_source;
             const bool has_body = operation == "kernel" && parse_bounded_kernel_body(argument, name, body_source);
             if (!has_body && !parse_callable_declaration(argument, name)) {
+                if (operation == "kernel" && looks_like_parameterized_routine_declaration(argument)) {
+                    return fail_parse("SYNQ-P017", span, "malformed parameterized quantum routine declaration",
+                                      "use one documented typed signature with one formal-only supported gate body");
+                }
                 return fail_parse("SYNQ-P013", span, "malformed bounded callable declaration",
                                   "use fn <identifier>(), kernel <identifier>(), or kernel <identifier>() { quantum <gate> <register[index]> }");
             }
@@ -654,7 +783,20 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                   "add #[experimental(feature = \"callable-declarations\")] before the gated construct");
             }
             std::string name;
+            std::vector<std::string> actuals;
+            if (parse_parameterized_routine_call(argument, name, actuals)) {
+                if (!active_features.is_enabled("parameterized-quantum-routines")) {
+                    return fail_parse("SYNQ-P007", span, "parameterized routine calls require an Alpha feature opt-in",
+                                      "add #[experimental(feature = \"parameterized-quantum-routines\")] before the call");
+                }
+                root->statements.push_back(new CallableCallNode(name, std::move(actuals), line_number, span));
+                continue;
+            }
             if (!parse_callable_declaration(argument, name)) {
+                if (looks_like_parameterized_routine_call(argument)) {
+                    return fail_parse("SYNQ-P018", span, "malformed parameterized quantum routine call",
+                                      "use call <earlier-routine>(<matching-literal-angle-and-or-register[index]-actuals>)");
+                }
                 return fail_parse("SYNQ-P013", span, "malformed bounded callable call",
                                   "use call <earlier-kernel-name>() with no arguments");
             }
