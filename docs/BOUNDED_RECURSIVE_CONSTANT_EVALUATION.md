@@ -1,8 +1,10 @@
 # Bounded Recursive Constant Evaluation
 
 **Feature stage:** Alpha  
-**Status:** Design contract; implementation and validation evidence must be
-recorded separately before this behavior is presented as available.
+**Status:** Implemented Alpha contract. The Boolean declaration-expression
+portion is remotely validated in [Compiler Core platform-matrix run
+#32239066421](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421).
+Integer-expression evaluation retains its separately documented bounded scope.
 
 ## Scope
 
@@ -56,7 +58,17 @@ floating point, target-side expression execution, quantum simulation execution,
 or hardware execution. It does not change strict Hybrid OpenQASM export until a
 separate target-expression lowering contract is implemented.
 
-## Evidence required before availability claim
+## Recorded Boolean-evaluation evidence
+
+The implementation evaluates the accepted Boolean trees through
+`synqc --eval-constants` after parser and resolver validation. It enforces the
+default depth and operation values in this contract, reports depth exhaustion as
+`SYNQ-E006` and operation exhaustion as `SYNQ-E007`, and returns no partial
+evaluation environment after failure. The cited six-job run passed 37 Linux
+Ctests, 26 Windows MSVC CTests, 26 macOS Clang CTests, and three clean-install
+static-SDK external-consumer jobs.
+
+## Evidence required before any further availability claim
 
 The increment requires positive and negative parser, typed-IR, resolver,
 evaluator, and CLI fixtures; depth, operation, overflow, forward-reference, and

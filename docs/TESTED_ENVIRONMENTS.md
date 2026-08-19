@@ -9,16 +9,16 @@ it is not a cross-platform support promise.
 The recovery compiler profile is continuously exercised by the
 [`Compiler Core` workflow](../.github/workflows/compiler-core.yml). The latest
 remote evidence is [Compiler Core platform-matrix run
-#32188899985](https://github.com/TangoSplicer/SynQ/actions/runs/32188899985)
-for revision `5f8a614`. Its Linux job passed the full **35/35** recovery-profile
-CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **25-test**
+#32239066421](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421)
+for revision `c9db036`. Its Linux job passed the full **37/37** recovery-profile
+CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **26-test**
 platform-neutral compiler/CLI/C-ABI smoke profile.
 
-The same workflow now includes distinct Ubuntu 22.04 and Windows MSVC
+The same workflow includes distinct Ubuntu 22.04, Windows MSVC, and macOS Clang
 clean-install jobs. Each builds a minimal static SDK producer, installs it into a
 fresh temporary prefix, configures an external public-header C consumer through
-`CMAKE_PREFIX_PATH`, and executes that consumer. Both jobs passed in
-[the same platform-matrix run](https://github.com/TangoSplicer/SynQ/actions/runs/32018610062).
+`CMAKE_PREFIX_PATH`, and executes that consumer. All three jobs passed in
+[the same platform-matrix run](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421).
 
 The local confirmation made on 16 August 2026 used the following Ubuntu 24.04
 environment. It rebuilt the same recovery profile and independently passed the
@@ -27,22 +27,23 @@ evidence, not minimum-version guarantees.
 
 | Component | Local confirmation | CI installation/source |
 | --- | --- | --- |
-| Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` full recovery profile, `windows-latest` MSVC platform-neutral smoke and clean-install SDK jobs, `macos-latest` Clang platform-neutral smoke job, and fixed `ubuntu-22.04` static-SDK conformance job |
+| Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` full recovery profile, `windows-latest` MSVC platform-neutral smoke and clean-install SDK jobs, `macos-latest` Clang platform-neutral smoke and clean-install SDK jobs, and fixed `ubuntu-22.04` static-SDK conformance job |
 | CMake | 3.28.3 | `apt` `cmake`; project requires CMake 3.18 or later |
 | C++ compiler | GCC 13.3.0 | `apt` `g++` on Ubuntu; MSVC via `windows-latest`; Apple Clang via `macos-latest`; project requires C++17 support |
 | OpenSSL | 3.0.13 | `apt` `libssl-dev` |
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
 
-> **Support boundary:** `windows-latest` has remote MSVC evidence for a 25-test
+> **Support boundary:** `windows-latest` has remote MSVC evidence for a 26-test
 > platform-neutral compiler/CLI/C-ABI smoke profile **and** an experimental
 > static-SDK clean-install external-consumer check. `macos-latest` has a separate
-> 25-test Clang platform-neutral smoke profile only. The full 35-test suite, the
+> 26-test Clang platform-neutral smoke profile **and** an experimental static-SDK
+> clean-install external-consumer check. The full 37-test suite, the
 > direct Rust, source-only Alpha Rust-wrapper, Common Lisp/Clojure/Mercury fixtures,
 > and OpenQASM Python reference checks
 > remain Ubuntu-only evidence. These CI results do not establish a stable ABI,
 > shared-library delivery, registry package, broad package support, dynamic
-> linking, macOS SDK install, other Linux distribution, ARM, or future ABI
+> linking, general cross-platform distribution, other Linux distribution, ARM, or future ABI
 > compatibility claim.
 
 ## Reproduce the supported recovery profile
@@ -81,7 +82,7 @@ assuming a distribution package provides an equivalent compiler.
 
 The Windows smoke job is deliberately separate from the Ubuntu full profile. It
 installs `nlohmann-json` and OpenSSL with vcpkg, builds the recovery compiler
-with MSVC, and runs the platform-neutral 25-test profile. A distinct Windows
+with MSVC, and runs the platform-neutral 26-test profile. A distinct Windows
 job now proves the experimental static SDK clean-install consumer path. Neither
 Windows job attempts the Ubuntu-only interoperability or Python-reference checks.
 
@@ -105,8 +106,10 @@ ctest --test-dir compiler/build -C Release --output-on-failure
 ## Reproduce the macOS Clang smoke profile
 
 The macOS job has an independent Homebrew and Clang setup. It proves the same
-25-test platform-neutral compiler/CLI/C-ABI smoke profile as Windows, not static
-SDK installation, language-interoperability fixtures, or package distribution.
+26-test platform-neutral compiler/CLI/C-ABI smoke profile as Windows. A separate
+macOS job proves the experimental static-SDK clean-install external-consumer
+path; neither job validates language-interoperability fixtures or package
+distribution.
 
 ```bash
 brew update
@@ -158,10 +161,10 @@ delivery mechanism.
 
 The fixed Ubuntu 22.04 job is described in
 [`SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](./SECOND_CLEAN_INSTALL_ENVIRONMENT.md).
-Together with the Windows MSVC job, it validates the same experimental static
-path in two distinct operating-system families. It does not broaden the support
-boundary to macOS, shared libraries, registry packages, stable ABI compatibility,
-or general cross-platform distribution.
+Together with the Windows MSVC and macOS Clang jobs, it validates the same
+experimental static path in three CI operating-system families. It does not
+broaden the support boundary to shared libraries, registry packages, stable ABI
+compatibility, or general cross-platform distribution.
 
 ## Reporting an environment problem
 

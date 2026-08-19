@@ -9,6 +9,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Alpha Boolean declaration-expression evaluation:** `synqc --eval-constants`
+  now evaluates resolved immutable top-level Boolean literal/reference/`not`/
+  `and`/`or` trees deterministically. The implementation applies explicit
+  default expression-depth (`16`) and request-wide operation (`128`) budgets,
+  reports exhaustion through `SYNQ-E006`/`SYNQ-E007`, and does not introduce
+  short-circuit, assignment, mutable state, branch execution, target-side
+  expression execution, or measurement-result semantics. Parser, typed IR,
+  resolver, evaluator, CLI, positive/negative budget, and full matrix coverage
+  are included. [Compiler Core platform-matrix run
+  #32239066421](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421)
+  passed all six jobs: 37 Linux CTests, 26 Windows MSVC CTests, 26 macOS Clang
+  CTests, and clean-install experimental static-SDK external-consumer checks on
+  Ubuntu 22.04, Windows MSVC, and macOS Clang.
 - **Bounded callable-kernel source lowering:** Strict Hybrid OpenQASM 3 now
   accepts one earlier non-recursive, zero-parameter `kernel` with exactly one
   non-parameterized default-register gate body and one later `call`, expanding
@@ -113,13 +126,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   evidence and explicit non-claims.
 
 ### Planned
-- Add macOS clean-install static-SDK evidence before making any macOS SDK or
-  general cross-platform package claim.
-- Design target-side nested-negation and binary-expression evaluation, classical
-  storage writes/lifetime, and measurement-result handling before wider control
-  lowering.
-- Design bounded callable bodies/calls only after scopes, resources, and call
-  effects have a tested contract.
+- Define safe typed mutable cells, assignment, state lifetime, and deterministic
+  local state-transition rules before accepting executable updates, loops, or
+  branch execution.
+- Define practical bounded parameterized quantum routines with explicit qubit
+  operands, non-recursive composition, and resource-alias rejection.
+- Define typed measurement-result storage and target-side feedback semantics
+  before measurement-controlled lowering or simulation execution.
 
 ---
 

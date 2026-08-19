@@ -23,7 +23,7 @@ and a structured rejection where it does not.
 
 | Layer | Current verified behavior | Current boundary |
 | --- | --- | --- |
-| Classical | Immutable top-level Boolean, Integer, and String declarations; bounded Boolean and one-operation Integer expression trees; bounded constant evaluation; limited strict-Hybrid conditional source lowering. | No general recursive evaluation, assignments, scopes, precedence grammar, loop execution, or mutable runtime state. |
+| Classical | Immutable top-level Boolean, Integer, and String declarations; bounded Boolean and one-operation Integer expression trees; recursively evaluated Boolean declaration expressions with explicit depth/operation budgets; limited strict-Hybrid conditional source lowering. | No assignment, scopes, precedence grammar, loop execution, mutable runtime state, or general runtime semantics. |
 | Quantum | Typed gates, explicit declared-register operands, named-register allocation for bounded ideal-probability simulation, measurements, and strict OpenQASM 3 source export. | No noise, sampling/collapse, reset lifecycle, hardware/provider execution, optimization, dynamic allocation, or general resource ownership. |
 | Callable composition | One zero-parameter `kernel` with one non-parameterized default-register gate body may be followed by one `call`; strict Hybrid export expands that gate as source. | No parameters, returns, function bodies, named-register callable operands, recursion, nested calls, runtime dispatch, simulation execution, or ABI execution. |
 | Hybrid control | Literal and bounded immutable-Boolean `if` source-lowering forms with one gate body. | No measurement feedback, state writes, `else`, loops, branch execution, or general target-control contract. |
@@ -40,7 +40,7 @@ before its values, effects, and target representation have a contract.
 
 | Stage | Classical usability | Quantum usability | Hybrid integration | Completion evidence |
 | --- | --- | --- | --- | --- |
-| U1 — Bounded constant programs | Recursive typed Boolean and Integer constant evaluation over immutable top-level bindings with fixed depth, operation, and overflow limits. | Existing typed gates and declared-register operands remain unchanged. | Compile-time conditions may use only expressions whose bounded evaluator proves a Boolean result. | Positive/negative evaluator, resolver, CLI, exact-export, local full-suite, and remote CI fixtures. |
+| U1 — Bounded constant programs | **Completed Alpha Boolean slice:** recursively typed Boolean constant evaluation over immutable top-level bindings with fixed depth and operation limits; existing checked Integer boundary remains separately constrained. | Existing typed gates and declared-register operands remain unchanged. | Compile-time conditions may use only expressions whose bounded evaluator proves a Boolean result; this is not target-side expression execution. | Positive/negative evaluator, resolver, CLI, local full-suite, and six-job remote CI fixtures passed in [Compiler Core #32239066421](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421). |
 | U2 — Explicit classical state | Typed mutable cells, assignment, state lifetime, and deterministic local evaluation rules. | Quantum operations retain explicit resource validation. | No measurement feedback or loop execution until target storage and branch effects are separately defined. | State-transition fixtures, invalid-write diagnostics, bounded resource tests, and remote CI evidence. |
 | U3 — Practical quantum routines | Typed scalar angle and explicit qubit parameters, non-recursive call graph, resource alias rejection, and static source expansion. | Reusable routines over caller-supplied qubits; no allocation inside a routine. | Classical parameters remain compile-time constants initially. | Parser/IR/resolver/exporter conformance, call-graph and alias-negative tests, reference-parser checks, and CI. |
 | U4 — Measurement feedback | Typed measurement-result storage with explicit local and target-side representation. | Measurements can feed one bounded conditional correction path. | Defined result lifetime, target Boolean storage, and source-only/local-simulation behavior. | Deterministic simulator fixtures, exact lowered source, negative lifetime/unsupported-target tests, and CI. |
@@ -91,13 +91,14 @@ security/support commitment.
 
 ## Immediate implementation order
 
-1. Implement **U1** as bounded recursive constant evaluation over the existing
-   typed expression trees. This gives a useful, testable classical-program
-   workflow without inventing mutable execution semantics.
+1. **U1 Boolean declaration evaluation is complete** as a bounded immutable
+   compile-time workflow; it does not add mutable execution semantics.
 2. Write the U2 mutable-state contract before accepting assignment syntax.
-3. Implement U3 explicit-parameter quantum routines only after the state and
+3. Implement U2 only after its typed state, deterministic ordering, lifetime,
+   and rejection rules are testable locally.
+4. Implement U3 explicit-parameter quantum routines only after the state and
    resource-effect vocabulary is stable.
-4. Implement U4 measurement feedback only after its local and target-side
+5. Implement U4 measurement feedback only after its local and target-side
    storage contract is independently testable.
 
 ## References
