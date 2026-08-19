@@ -160,6 +160,6 @@
 - [x] Specify and implement Alpha bounded recursive Boolean declaration-expression evaluation over existing typed trees, with explicit depth, operation, dependency, and existing overflow boundaries.
 - [x] Specify safe mutable classical storage and assignment semantics before accepting executable state updates, loops, or general branch execution.
 - [x] Implement, locally validate, remotely verify, and document the bounded U2 mutable-cell and assignment subset before making any mutable-state availability claim.
-- [ ] Specify measurement-result storage and target-side feedback semantics before accepting hybrid measurement-controlled source lowering or simulation execution.
+- [x] Specify, implement, locally validate, remotely verify, and document the bounded U4 named-measurement/direct-`x` feedback subset before making any hybrid-feedback availability claim (Compiler Core #32250265354: 44/44 Linux, 30/30 Windows MSVC and macOS Clang, plus three clean-install SDK jobs).
 - [x] Specify a practical bounded quantum-routine contract for parameterized kernels, explicit qubit operands, resource effects, and non-recursive call composition.
 - [x] Implement, locally validate, remotely verify, and document the bounded U3 parameterized quantum-routine subset before making any routine availability claim (Compiler Core #32247154982: 41/41 Linux, 28/28 Windows MSVC and macOS Clang, plus three clean-install SDK jobs).

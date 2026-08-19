@@ -9,6 +9,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Alpha bounded measurement feedback (U4):** The feature-gated
+  `measurement-feedback` subset accepts one top-level `measure register[index]
+  as result` immediately followed by one direct `if result then quantum x
+  register[index]`. Typed AST/Hybrid IR retain opt-in result provenance;
+  resolution creates one terminal feedback node and rejects non-direct,
+  non-adjacent, reused, invalid, and post-feedback shapes. Strict Hybrid export
+  emits one exporter-owned scalar `bit`, one measurement assignment, and one
+  conditional `x`. The bounded simulator enumerates the zero/one measurement
+  branches deterministically and returns weighted final probabilities without a
+  sampled host value. ABI v1 explicitly rejects U4 nodes. Parser/IR/resolver/
+  exporter/CLI/reference-parser/simulator/C-ABI/limit and compatibility fixtures
+  are included. [Compiler Core platform-matrix run #32250265354](https://github.com/TangoSplicer/SynQ/actions/runs/32250265354)
+  passed all six jobs for revision `62baf18`: 44 Linux CTests, 30 Windows MSVC
+  CTests, 30 macOS Clang CTests, and clean-install experimental static-SDK
+  external-consumer checks on Ubuntu 22.04, Windows MSVC, and macOS Clang. This
+  adds no general measurement API, sampled host result, `else`, loop, general
+  control execution, user target-side state, routine feedback, provider, or
+  hardware claim.
 - **Alpha bounded parameterized quantum routines (U3):** The feature-gated
   `parameterized-quantum-routines` subset accepts exactly three one-gate kernel
   signatures: literal-angle plus one qubit for `rx`/`ry`/`rz`/`p`, one qubit for
@@ -157,10 +175,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   evidence and explicit non-claims.
 
 ### Planned
-- Define typed measurement-result storage and target-side feedback semantics
-  before measurement-controlled lowering or simulation execution.
 - Define wider callable semantics only after scope, return, resource-effect,
   recursion, and execution contracts are independently specified and tested.
+- Define any expansion beyond one U4 feedback pair only after multiple-result
+  lifetime, `else`, general-control, and target/runtime contracts are separately
+  specified and tested.
 
 ---
 

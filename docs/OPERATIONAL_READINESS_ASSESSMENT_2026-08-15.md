@@ -6,8 +6,8 @@ announcement.
 workflow, the experimental opaque C ABI and static SDK path, the source-only Alpha
 Rust wrapper, and the factual public-facing project position.
 **Evidence cut-off:** Compiler Core platform-matrix run
-[#32247154982][1] for implementation revision `be18e0f`, with repository
-evidence records aligned through the bounded Alpha U3 parameterized-routine update.
+[#32250265354][1] for implementation revision `62baf18`, with repository
+evidence records aligned through the bounded Alpha U4 measurement-feedback update.
 
 ## Executive assessment
 
@@ -15,9 +15,9 @@ SynQ is **not a fully operational programming-language platform**. It is an
 **operational experimental language seed**: a narrowly specified and tested
 compiler workflow that a developer can build, validate, diagnose, inspect,
 export from, evaluate in a bounded classical subset, and simulate in a bounded
-quantum subset. The current recovery profile passed **41/41** CTest checks
+quantum subset. The current recovery profile passed **44/44** CTest checks
 locally and in the Ubuntu CI profile; independent Windows MSVC and macOS Clang
-profiles each passed **28/28** platform-neutral CTest checks. The same remote
+profiles each passed **30/30** platform-neutral CTest checks. The same remote
 matrix passed Ubuntu 22.04, Windows MSVC, and macOS Clang experimental static-
 SDK external-consumer jobs.[1] [2] [3]
 
@@ -32,16 +32,18 @@ classical-storage expression mapping, compile-time negated-literal folding, and
 feature-gated typed top-level mutable cells with deterministic local-only evaluation,
 and bounded parameterized quantum routines with explicit qubit/angle formals,
 static source expansion, resource-alias rejection, and explicit non-execution
-boundaries.
+boundaries, plus one U4 named measurement immediately consumed by one direct
+conditional `x` correction with strict source lowering and deterministic local
+two-branch probability enumeration.
 They do **not** make
 SynQ a general runtime, stable SDK, registry package, hardware client, or
 cross-platform delivery product.[2] [4] [5] [6]
 
 > **Readiness finding.** SynQ has completed the operational-baseline gates for a
 > bounded experimental developer workflow and its selected bounded leverage
-> increments. The next work must define measurement-result storage and feedback.
-> Target-side classical storage, branch execution, and wider
-> control remain separate later contracts.
+> increments. U4 verifies one exact measurement-result feedback pair only.
+> General target-side classical storage, `else`, wider branch execution, and
+> general control remain separate later contracts.
 
 The appropriate public label remains **“experimental hybrid quantum–classical
 language kernel with a tested local developer workflow.”** The terms
@@ -59,9 +61,9 @@ remote evidence distinct.
 
 | Evidence level | Meaning in this assessment | Current examples |
 | --- | --- | --- |
-| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 41 Linux CTests; 28 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded `if` export; U3 parameterized routine source expansion; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
+| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 44 Linux CTests; 30 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded `if` export; U3 parameterized routine source expansion; U4 one-result/direct-`x` feedback; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
 | **Locally validated** | The documented operation was executed in the review environment but is not itself a separate CI assertion. | Local build/test troubleshooting or exploratory work not represented by a dedicated checked-in remote fixture. |
-| **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, target-side state/control execution, measurement feedback, registry packages, provider access, and AI services.[2] [7] |
+| **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, target-side user state/control execution, multiple-result feedback, registry packages, provider access, and AI services.[2] [7] |
 
 The distinction is material. The current six-job matrix establishes only the
 scoped profile results named above. It does not establish cross-platform binary
@@ -80,12 +82,12 @@ constrained than the long-term language vision.
 
 | Workflow area | Verified current capability | Hard boundary |
 | --- | --- | --- |
-| Build and test | Build the default C++17 recovery profile and run 41 focused CTest checks on the Ubuntu full profile. Independent Windows/MSVC and macOS/Clang profiles each run 28 platform-neutral checks.[1] | Historical optional targets remain outside this profile, and the two non-Linux counts do not establish a support commitment.[3] |
+| Build and test | Build the default C++17 recovery profile and run 44 focused CTest checks on the Ubuntu full profile. Independent Windows/MSVC and macOS/Clang profiles each run 30 platform-neutral checks.[1] | Historical optional targets remain outside this profile, and the two non-Linux counts do not establish a support commitment.[3] |
 | Diagnostics | Receive structured parser, semantic, resolver, evaluator, and simulator failures for supported constructs. | No lexer recovery, multi-error recovery, IDE/LSP protocol, or complete type diagnostics exists.[2] |
-| Quantum source model | Use a small typed gate subset: `h`, `x`, `y`, `z`, `cx`, `bell_pair`, and literal-angle `rx`, `ry`, `rz`, or `p`, bounded typed measurement syntax, Alpha named-register operands, and U3 one-gate routines with explicit literal/operand substitution. | No general gate language, dynamic indexing, lifetime model, routine capture/allocation/execution, aliasing, deallocation, dynamic allocation, or hardware semantics exists.[2] [5] |
+| Quantum source model | Use a small typed gate subset: `h`, `x`, `y`, `z`, `cx`, `bell_pair`, and literal-angle `rx`, `ry`, `rz`, or `p`, bounded typed measurement syntax, Alpha named-register operands, U3 one-gate routines, and U4 one-result/direct-`x` feedback. | No general gate language, dynamic indexing, lifetime model, routine capture/allocation/execution, aliasing, deallocation, dynamic allocation, or hardware semantics exists.[2] [5] |
 | Classical source model | Use literal declarations, earlier aliases, exact Alpha-gated one-operator Integer arithmetic and Boolean forms, plus feature-gated top-level `var`/`set` cells with fixed static types. `--inspect-semantics` reports binding/cell metadata without evaluation.[4] | No general expressions, nested scopes, decimal evaluation, callable calls, runtime values, target-side state, or executable classical control flow exists. |
-| OpenQASM output | Export a bounded AST subset; strict Hybrid export supports declared named registers, one literal-`if` gate body, compile-time `not true/false`, one earlier Boolean-literal-declaration identifier-`if` gate body, or `not` over that identifier. The three control fixtures have reference-parser validation. | Export is source generation only; it does not execute circuits, prove semantic equivalence, fold nested negation, lower binary Boolean expressions/aliases/measurement results, or support named results. |
-| Local quantum calculation | Calculate deterministic pure-state basis and marginal probability data across explicit default or named registers with declaration-order physical allocation and fixed combined limits.[5] | No sampling/collapse, noise, control-flow execution, provider connection, hardware submission, resource lifecycle, or dynamic allocation occurs. |
+| OpenQASM output | Export a bounded AST subset; strict Hybrid export supports documented literal/immutable-Boolean `if` forms and the exact U4 named-measurement/direct-`x` form, with reference-parser validation. | Export is source generation only; it does not execute circuits, prove semantic equivalence, lower binary/alias controls, or support general named-result control. |
+| Local quantum calculation | Calculate deterministic pure-state basis and marginal probability data across explicit default or named registers with declaration-order physical allocation and fixed combined limits.[5] U4 adds one terminal two-branch measurement/direct-`x` model without a sampled host value. | No general sampling/collapse API, noise, general control-flow execution, provider connection, hardware submission, resource lifecycle, or dynamic allocation occurs. |
 | Classical evaluation | Evaluate opt-in immutable Integer/Boolean/String literals, aliases, checked bounded expressions, and separate top-level mutable Boolean/Integer/String cells in source order. | This is not a general interpreter, target runtime, or branch executor. |
 | Experimental controls | Require exact source opt-ins for the active Alpha language features. | The registry is not a package, permission, capability-security, or feature-lifecycle management system. |
 | Native interoperability | The Ubuntu full profile exercises C, direct Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, test-only Mercury, and the source-only Alpha Rust wrapper over the opaque C ABI.[1] [6] | The non-C fixtures are Ubuntu-only execution evidence. There is no released wrapper, registry package, stable ABI, installed shared library, or general cross-platform SDK guarantee. |
@@ -161,24 +163,22 @@ Boolean-literal declarations, unary negation over that same stored value, and
 compile-time literal negation. These are completed leverage increments, not
 evidence for runtime values, general resource management, or a distributed SDK.
 
-### Stage B — Wider target-side control contract — next
+### Stage B — Bounded measurement feedback — completed Alpha slice
 
-The literal-`if`, compile-time literal-negation-`if`, one Boolean-literal-
-declaration identifier-`if`, and one negated-identifier `if` gate
-source-lowering slices are complete. Before accepting nested negation, aliases,
-binary Boolean-expression conditions, loop, branch block, or measurement body,
-SynQ must define
-the target-side classical store: its representation, allowed writes, lifetime,
-initial values, Boolean/Integer condition mapping, measurement-result behavior,
-and interaction with quantum resource boundaries. The first widening increment
-should choose target lowering **or** local execution, not imply both.
+The literal-`if`, compile-time literal-negation-`if`, immutable Boolean-
+identifier forms, and U4 one-result/direct-`x` form are complete. U4 declares
+its target scalar bit, result lifetime, immediate correction, branch-enumeration
+model, ABI rejection, and source-only boundary together. Before accepting nested
+negation, aliases, binary conditions, `else`, loops, branch blocks, multiple
+results, or measurement bodies, SynQ must specify their representation and
+separate target lowering from local execution.
 
 | Choice | Suitable only when | Minimum evidence |
 | --- | --- | --- |
 | **Target lowering** | The source construct has an exact OpenQASM 3 representation under a defined source subset. | Exact output, parser/import validation, rejection fixtures, and no claim of local execution. |
 | **Local execution** | Classical/result semantics and bounded quantum interaction are fully specified. | State model, termination/resource limits, deterministic result behavior, error model, and simulator fixtures. |
 
-### Stage C — Wider callable bodies and calls — after the feedback contract
+### Stage C — Wider callable bodies and calls — next language-core design
 
 U3 now admits exactly three non-recursive one-gate parameterized kernel forms,
 but it does not admit general callable bodies or calls. Only after feedback,
@@ -232,19 +232,19 @@ availability, enterprise readiness, or universal language interoperability.
 
 ## Decision record
 
-The recommended immediate scope is now **typed measurement-result storage and
-one bounded feedback design**. This order preserves the remotely verified U3
-parameterized-routine resource and source-expansion layer alongside the
-completed semantic-inspection, multi-register-simulation, source-only Rust-wrapper,
-strict `if` lowering, and local-only mutable-state leverage work while avoiding
-unsupported target-side state or branch-execution surface area. It provides prospective
+The recommended immediate scope is now a **wider callable/control design
+contract**, not implementation breadth. This preserves remotely verified U3
+resource/source expansion and U4 measurement feedback alongside the completed
+semantic-inspection, multi-register-simulation, source-only Rust-wrapper,
+strict `if` lowering, and local-only mutable-state work while avoiding unsupported
+general target-side state or branch-execution surface area. It provides prospective
 contributors and adopters a clearer, reproducible contract than unverified
 breadth and is more credible for community growth, revenue exploration, and
 future acquisition discussions.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32247154982 "SynQ Compiler Core platform matrix — bounded Alpha parameterized quantum routines"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32250265354 "SynQ Compiler Core platform matrix — bounded Alpha measurement feedback"
 
 [2]: ./PROJECT_STATUS.md "Current SynQ Project Status"
 

@@ -1,10 +1,13 @@
 # Bounded Measurement Feedback
 
-**Feature stage:** Proposed Alpha contract for U4.  
-**Status:** Design only. This document reserves a deliberately narrow
-measurement-to-correction meaning; it does **not** make measurement feedback,
-target execution, simulator behavior, or ABI behavior available until the
-implementation and verification gate below pass.
+**Feature stage:** Implemented Alpha U4 contract.
+**Status:** Remotely verified for revision `62baf18` by the six-job [Compiler
+Core platform-matrix run #32250265354](https://github.com/TangoSplicer/SynQ/actions/runs/32250265354):
+**44/44** Linux recovery-profile CTests, **30/30** Windows MSVC and macOS Clang
+platform-neutral CTests, and clean-install static-SDK consumer checks on Ubuntu,
+Windows, and macOS. This document defines a deliberately narrow
+measurement-to-correction meaning; it does **not** make general measurement
+feedback, target execution, or ABI behavior available.
 
 ## Purpose and design position
 
@@ -161,8 +164,7 @@ stable ABI behavior, registry packages, or performance guarantees.
 
 ## Verification gate before any availability claim
 
-Before repository material describes U4 as available, the implementation must
-add positive and negative parser, AST, Hybrid IR, resolver, strict-exporter,
+The implementation includes positive and negative parser, AST, Hybrid IR, resolver, strict-exporter,
 bounded-simulator, CLI, and C ABI fixtures. Required coverage includes the
 default-register and named-register variants; same-qubit and separate-target
 correction; gate absence; malformed named result; missing, forward,
@@ -172,10 +174,11 @@ rejection; exact strict-Hybrid output; independent OpenQASM parser validation;
 branch-probability correctness; zero-probability branches; legacy unnamed
 measurement preservation; and explicit ABI rejection.
 
-The full local recovery suite and the six-job Compiler Core matrix must pass on
-the implementation revision. Until both pass, the project status, changelog,
-tested-environment record, usable-language profile, readiness assessments, and
-public Evidence Ledger must keep U4 as designed only.
+The full local **44/44** recovery suite and the six-job Compiler Core matrix
+passed on revision `62baf18`. The project status, changelog, tested-environment
+record, usable-language profile, readiness assessments, and public Evidence
+Ledger may therefore describe this exact U4 slice as remotely verified, subject
+to every explicit non-goal above.
 
 ## References
 
