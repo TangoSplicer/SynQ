@@ -10,20 +10,21 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core platform-matrix run #32239066421](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421)
-passed all six independent jobs for revision `c9db036`: the Linux recovery
-profile passed **37/37** CTest checks; Windows MSVC and macOS Clang each passed
-**26/26** platform-neutral CTest checks; and Ubuntu 22.04, Windows MSVC, and macOS
+ [Compiler Core platform-matrix run #32242711770](https://github.com/TangoSplicer/SynQ/actions/runs/32242711770)
+passed all six independent jobs for revision `d62b5ed`: the Linux recovery
+profile passed **38/38** CTest checks; Windows MSVC and macOS Clang each passed
+**27/27** platform-neutral CTest checks; and Ubuntu 22.04, Windows MSVC, and macOS
 Clang each built, installed, discovered, compiled, and ran the experimental static
 SDK consumer from a clean prefix. The exact tested-environment boundary is recorded in
 [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 37 CTests. Separate Windows MSVC and macOS Clang profiles each pass 26 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
-| `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded constant evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
-| Typed source model | **Remotely validated bounded subset.** | Supports documented declarations, typed gates, unnamed/named measurement metadata, Alpha expressions, declaration-only functions, and one zero-parameter one-gate kernel with one later strict-Hybrid source-only call expansion. No callable parameters/returns, local scopes, recursion, nested calls, assignments, mutable state, general expressions, or runtime semantics exist. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 38 CTests. Separate Windows MSVC and macOS Clang profiles each pass 27 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
+| `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, bounded immutable evaluation, bounded local mutable-state evaluation, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
+| Typed source model | **Remotely validated bounded subset.** | Supports documented immutable declarations, Alpha top-level mutable `var`/`set` cells, typed gates, unnamed/named measurement metadata, Alpha expressions, declaration-only functions, and one zero-parameter one-gate kernel with one later strict-Hybrid source-only call expansion. No callable parameters/returns, local scopes, recursion, nested calls, branch execution, general expressions, target-side state lowering, or general runtime semantics exist. |
 | Bounded Boolean declaration evaluation | **Remotely validated Alpha compile-time subset.** | `synqc --eval-constants` deterministically evaluates immutable top-level Boolean literal/reference/`not`/`and`/`or` trees after static resolution, with default expression-depth `16`, request-wide operation budget `128`, and no short-circuit runtime meaning. Depth and operation exhaustion yield structured diagnostics. No assignment, state mutation, loop/branch execution, target-side expression execution, measurement-result value, or simulation execution is claimed. |
+| Bounded mutable classical state | **Remotely validated Alpha local-only subset.** | Feature-gated top-level `var` and whole-cell `set` use fixed Boolean/Integer/String static types, prior-only resolution, source-order snapshot evaluation, defaults of 64 cells/128 state transitions/16 expression depth/128 operations, and final declaration/write provenance through `synqc --eval-state`. Parser, typed AST/IR, resolver, evaluator, CLI, semantic inspection, and rejection fixtures passed. Strict Hybrid export and bounded quantum simulation reject state nodes; no branches, loops, target storage, measurement values, ABI state execution, or hardware execution is claimed. |
 | Alpha semantic environment | **Remotely validated read-only inspection subset.** | `synqc --inspect-semantics` renders resolved top-level classical binding metadata: kind, static type, source line, and earlier-binding dependencies. It does not evaluate general source, produce runtime values, sample measurements, or introduce nested scopes. |
 | Named registers | **Remotely validated Alpha subset with bounded local simulation.** | Earlier declared `name[index]` operands resolve, strict-Hybrid export preserves declared registers, and the simulator maps explicit register declarations into a declaration-order bounded state vector while retaining source provenance. No lifetime, aliasing, deallocation, dynamic allocation, or hardware mapping semantics exist. |
 | Bounded if export | **Remotely validated strict source-lowering subset in [Compiler Core #32188899985](https://github.com/TangoSplicer/SynQ/actions/runs/32188899985).** | One literal `if`, `if not true/false` through compile-time folding, one `if` controlled by an earlier top-level Boolean-literal declaration, or `if not <that declaration>`, with one supported typed gate body lowers to OpenQASM 3. Nested negation, binary expressions, aliases, measurement results, `while`, measurement bodies, and execution remain rejected. |
@@ -48,19 +49,16 @@ states a reproducible, current validation path.
 
 ## Ordered remaining work
 
-1. Define mutable-cell, assignment, state-lifetime, and deterministic local
-   evaluation rules before accepting executable state updates, loops, or branch
-   execution.
-2. Define practical bounded quantum routines only after explicit qubit/angle
+1. Define practical bounded quantum routines only after explicit qubit/angle
    parameters, resource aliasing, and non-recursive call effects have a written
    contract.
-3. Define measurement-result storage and target-side feedback only after local
+2. Define measurement-result storage and target-side feedback only after local
    and target representations, result lifetime, and rejection paths are
    independently testable.
-4. Define a wider callable contract only after parameters, scopes, returns,
+3. Define a wider callable contract only after parameters, scopes, returns,
    resource effects, recursion rules, and execution boundaries have separate
    written contracts and tests.
-5. Expand language-specific wrappers or package delivery only after ownership,
+4. Expand language-specific wrappers or package delivery only after ownership,
    compatibility, environment, and conformance commitments are explicit.
 
 ## Related records

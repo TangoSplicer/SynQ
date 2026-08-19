@@ -9,6 +9,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Alpha bounded mutable classical state:** The feature-gated top-level
+  `var`/`set` subset now has typed AST and Hybrid IR nodes, sequential resolver
+  checks, deterministic local-only `synqc --eval-state`, final cell declaration/
+  last-write provenance, and default bounds of 64 cells, 128 transitions, 16
+  expression depth, and 128 Boolean/Integer operations. It accepts only fixed
+  Boolean/Integer/String cell types and earlier references with exact write
+  types. `SYNQ-P014`–`SYNQ-P016`, `SYNQ-S005`–`SYNQ-S007`, and
+  `SYNQ-E008`–`SYNQ-E010` cover the gated syntax, resolver, opt-in, bound, and
+  unsupported-node paths. Strict Hybrid OpenQASM and bounded quantum simulation
+  reject state nodes; no branch execution, target storage, measurement feedback,
+  ABI state execution, or general runtime is introduced. [Compiler Core
+  platform-matrix run #32242711770](https://github.com/TangoSplicer/SynQ/actions/runs/32242711770)
+  passed all six jobs: 38 Linux CTests, 27 Windows MSVC CTests, 27 macOS Clang
+  CTests, and clean-install experimental static-SDK external-consumer checks on
+  Ubuntu 22.04, Windows MSVC, and macOS Clang.
 - **Alpha Boolean declaration-expression evaluation:** `synqc --eval-constants`
   now evaluates resolved immutable top-level Boolean literal/reference/`not`/
   `and`/`or` trees deterministically. The implementation applies explicit

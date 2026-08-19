@@ -6,8 +6,8 @@ announcement.
 workflow, the experimental opaque C ABI and static SDK path, the source-only Alpha
 Rust wrapper, and the factual public-facing project position.
 **Evidence cut-off:** Compiler Core platform-matrix run
-[#32188899985][1] for implementation revision `5f8a614`, with repository
-evidence records aligned through the literal-negation-`if` evidence update.
+[#32242711770][1] for implementation revision `d62b5ed`, with repository
+evidence records aligned through the bounded Alpha U2 mutable-state update.
 
 ## Executive assessment
 
@@ -15,30 +15,31 @@ SynQ is **not a fully operational programming-language platform**. It is an
 **operational experimental language seed**: a narrowly specified and tested
 compiler workflow that a developer can build, validate, diagnose, inspect,
 export from, evaluate in a bounded classical subset, and simulate in a bounded
-quantum subset. The current recovery profile passed **35/35** CTest checks
+quantum subset. The current recovery profile passed **38/38** CTest checks
 locally and in the Ubuntu CI profile; independent Windows MSVC and macOS Clang
-profiles each passed **25/25** platform-neutral CTest checks. The same remote
-matrix passed Ubuntu 22.04 and Windows MSVC experimental static-SDK external
-consumer jobs.[1] [2] [3]
+profiles each passed **27/27** platform-neutral CTest checks. The same remote
+matrix passed Ubuntu 22.04, Windows MSVC, and macOS Clang experimental static-
+SDK external-consumer jobs.[1] [2] [3]
 
-Five deliberately constrained evidence increments are now implemented and tested:
+Six deliberately constrained evidence increments are now implemented and tested:
 read-only inspection of resolved top-level classical bindings, declaration-order
 multi-register local probability simulation, and a source-only Alpha Rust wrapper
 over the opaque C ABI, plus target-side lowering of one `if` gate controlled by
 an earlier Boolean-literal declaration, plus `not` over that same immutable
 storage mapping. Those points improve inspectability, resource-model evidence,
 one ownership-safe host-language entry point, and one explicitly bounded
-classical-storage expression mapping, plus compile-time negated-literal folding.
+classical-storage expression mapping, compile-time negated-literal folding, and
+feature-gated typed top-level mutable cells with deterministic local-only evaluation.
 They do **not** make
 SynQ a general runtime, stable SDK, registry package, hardware client, or
 cross-platform delivery product.[2] [4] [5] [6]
 
 > **Readiness finding.** SynQ has completed the operational-baseline gates for a
 > bounded experimental developer workflow and its selected bounded leverage
-> increments. The next work must specify target-side classical storage and
-> Boolean-expression, alias, measurement-result, write, lifetime, and execution
-> semantics before wider control, then define callable effects and bodies, while
-> separately adding macOS static-SDK conformance evidence.
+> increments. The next work must define practical parameterized quantum routines
+> with explicit qubit resources and non-recursive effects, then measurement-result
+> storage and feedback. Target-side classical storage, branch execution, and wider
+> control remain separate later contracts.
 
 The appropriate public label remains **“experimental hybrid quantum–classical
 language kernel with a tested local developer workflow.”** The terms
@@ -56,11 +57,11 @@ remote evidence distinct.
 
 | Evidence level | Meaning in this assessment | Current examples |
 | --- | --- | --- |
-| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 35 Linux CTests; 25 Windows and macOS platform-neutral CTests; two static-SDK consumer jobs; semantic inspection; multi-register simulation; bounded identifier-if, negated identifier-if, and literal-negation-if export; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
+| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 38 Linux CTests; 27 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded identifier-if, negated identifier-if, and literal-negation-if export; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
 | **Locally validated** | The documented operation was executed in the review environment but is not itself a separate CI assertion. | The full 29-test recovery build and source-only Rust-wrapper Cargo conformance path before publication. |
-| **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, non-literal control execution, callable bodies/calls, macOS SDK install, registry packages, provider access, and AI services.[2] [7] |
+| **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, target-side state/control execution, parameterized routines, measurement feedback, registry packages, provider access, and AI services.[2] [7] |
 
-The distinction is material. The current five-job matrix establishes only the
+The distinction is material. The current six-job matrix establishes only the
 scoped profile results named above. It does not establish cross-platform binary
 compatibility, performance thresholds, package availability, a stable ABI, or a
 general language implementation.[1] [3]
@@ -70,22 +71,23 @@ general language implementation.[1] [3]
 The default profile builds `synq_lib` and the experimental
 `synqc 0.1.0-experimental` command. The command validates the bounded source
 profile, emits constrained OpenQASM 3 forms, renders a read-only semantic
-environment, evaluates a declaration-only constant subset, and calculates
-bounded local quantum probabilities.[2] Its behavior is intentionally more
+environment, evaluates a declaration-only constant subset and a separate
+bounded mutable-state subset, and calculates bounded local quantum
+probabilities.[2] Its behavior is intentionally more
 constrained than the long-term language vision.
 
 | Workflow area | Verified current capability | Hard boundary |
 | --- | --- | --- |
-| Build and test | Build the default C++17 recovery profile and run 35 focused CTest checks on the Ubuntu full profile. Independent Windows/MSVC and macOS/Clang profiles each run 25 platform-neutral checks.[1] | Historical optional targets remain outside this profile, and the two non-Linux counts do not establish a support commitment.[3] |
+| Build and test | Build the default C++17 recovery profile and run 38 focused CTest checks on the Ubuntu full profile. Independent Windows/MSVC and macOS/Clang profiles each run 27 platform-neutral checks.[1] | Historical optional targets remain outside this profile, and the two non-Linux counts do not establish a support commitment.[3] |
 | Diagnostics | Receive structured parser, semantic, resolver, evaluator, and simulator failures for supported constructs. | No lexer recovery, multi-error recovery, IDE/LSP protocol, or complete type diagnostics exists.[2] |
 | Quantum source model | Use a small typed gate subset: `h`, `x`, `y`, `z`, `cx`, `bell_pair`, and literal-angle `rx`, `ry`, `rz`, or `p`, bounded typed measurement syntax, and Alpha named-register operands. | No general gate language, dynamic indexing, lifetime model, aliasing, deallocation, dynamic allocation, or hardware semantics exists.[2] [5] |
-| Classical source model | Use literal declarations, earlier aliases, exact Alpha-gated one-operator Integer arithmetic, and exact Alpha-gated Boolean forms. `--inspect-semantics` reports resolved top-level binding metadata without evaluation.[4] | No general expressions, assignment, nested scopes, decimal evaluation, callable calls, runtime values, or executable classical control flow exists. |
+| Classical source model | Use literal declarations, earlier aliases, exact Alpha-gated one-operator Integer arithmetic and Boolean forms, plus feature-gated top-level `var`/`set` cells with fixed static types. `--inspect-semantics` reports binding/cell metadata without evaluation.[4] | No general expressions, nested scopes, decimal evaluation, callable calls, runtime values, target-side state, or executable classical control flow exists. |
 | OpenQASM output | Export a bounded AST subset; strict Hybrid export supports declared named registers, one literal-`if` gate body, compile-time `not true/false`, one earlier Boolean-literal-declaration identifier-`if` gate body, or `not` over that identifier. The three control fixtures have reference-parser validation. | Export is source generation only; it does not execute circuits, prove semantic equivalence, fold nested negation, lower binary Boolean expressions/aliases/measurement results, or support named results. |
 | Local quantum calculation | Calculate deterministic pure-state basis and marginal probability data across explicit default or named registers with declaration-order physical allocation and fixed combined limits.[5] | No sampling/collapse, noise, control-flow execution, provider connection, hardware submission, resource lifecycle, or dynamic allocation occurs. |
-| Classical evaluation | Evaluate opt-in Integer/Boolean/String literals, earlier aliases, and checked single-operator Integer arithmetic. | This is not a general interpreter or mutable runtime. |
+| Classical evaluation | Evaluate opt-in immutable Integer/Boolean/String literals, aliases, checked bounded expressions, and separate top-level mutable Boolean/Integer/String cells in source order. | This is not a general interpreter, target runtime, or branch executor. |
 | Experimental controls | Require exact source opt-ins for the active Alpha language features. | The registry is not a package, permission, capability-security, or feature-lifecycle management system. |
 | Native interoperability | The Ubuntu full profile exercises C, direct Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, test-only Mercury, and the source-only Alpha Rust wrapper over the opaque C ABI.[1] [6] | The non-C fixtures are Ubuntu-only execution evidence. There is no released wrapper, registry package, stable ABI, installed shared library, or general cross-platform SDK guarantee. |
-| Delivery baseline | `synqc`, documentation, tested-environment guidance, contribution/security routes, and an experimental static CMake SDK path exist. Ubuntu 22.04 and Windows MSVC independently prove static producer, install, discovery, compile, link, and C-consumer execution.[1] [3] | No macOS SDK clean-install result, signing, provenance attestation, reproducible-build proof, security audit, release matrix, or support SLA exists. |
+| Delivery baseline | `synqc`, documentation, tested-environment guidance, contribution/security routes, and an experimental static CMake SDK path exist. Ubuntu 22.04, Windows MSVC, and macOS Clang independently prove static producer, install, discovery, compile, link, and C-consumer execution.[1] [3] | No signing, provenance attestation, reproducible-build proof, security audit, release matrix, or support SLA exists. |
 
 ## Safety, reliability, and usability assessment
 
@@ -107,11 +109,11 @@ editor integration, or user-tested ergonomic study.
 | Operational gate | Finding | Evidence status | Remaining condition before a stronger claim |
 | --- | --- | --- | --- |
 | G1 — Supported CLI | Complete for the bounded recovery workflow. | Remotely validated. | Define output-compatibility and deprecation policy before stability claims. |
-| G2 — Executable semantic slice | Complete for bounded constant evaluation and bounded local probability calculation. | Remotely validated. | Design general execution separately; do not extrapolate from the bounded evaluator/simulator. |
-| G3 — Inspectable semantic slice | Complete for read-only top-level binding metadata. | Remotely validated. | Define runtime values, scopes, and mutation semantics separately before claiming evaluation or execution. |
+| G2 — Executable semantic slice | Complete for bounded immutable evaluation, bounded local mutable state, and bounded local probability calculation. | Remotely validated. | Design general execution separately; do not extrapolate from the bounded evaluators/simulator. |
+| G3 — Inspectable semantic slice | Complete for read-only top-level binding and mutable-cell metadata. | Remotely validated. | Define general runtime values, scopes, target-side storage, and branch effects separately before claiming execution. |
 | G4 — Quantum developer loop | Complete for local validate/export/simulate exploration, including bounded named-register allocation. | Remotely validated. | Add provider or hardware paths only with separate credentials, safety, and integration evidence. |
 | G5 — Tooling and diagnostics | Complete as a bounded compiler baseline. | Remotely validated. | Add stable textual/structured output policy, broader examples, and editor-facing diagnostics. |
-| G6 — Interoperability contract | Complete only as an experimental opaque-C-ABI foundation, two-environment static-SDK proof, and source-only Alpha Rust-wrapper proof. | Remotely validated, narrowly scoped. | Add a macOS SDK conformance job, artifact lifecycle evidence, and any package delivery one ecosystem at a time. |
+| G6 — Interoperability contract | Complete only as an experimental opaque-C-ABI foundation, three-environment static-SDK proof, and source-only Alpha Rust-wrapper proof. | Remotely validated, narrowly scoped. | Add artifact lifecycle evidence and any package delivery one ecosystem at a time. |
 | G7 — Performance and reliability | Build/test configuration is validated; no CI performance contract exists. | Remote build/test only. | Add reproducible benchmark matrix, regression thresholds, sanitizers, fuzzing, and security review. |
 | G8 — Distribution and maintenance | Versioned artifact configuration, environment guidance, contribution process, security route, and issue templates exist. | Mixed: remote compiler baseline; local package/archive checks. | Add signing/provenance, maintained known-issues practice, and only then any support or distribution claim. |
 
@@ -123,8 +125,8 @@ internals through bindings or packages before ownership and behavior are known.
 
 | Priority | Remaining gap | Why it blocks a stronger operational claim | Required completion evidence |
 | --- | --- | --- | --- |
-| **P0** | Coherent typed semantic core | Read-only top-level binding metadata exists, but general values, scopes, effects, result values, mutation, and ownership are undefined. | Written semantic subset, typed IR invariants, positive/negative tests, and no silent lowering gaps. |
-| **P0** | Versioned ABI and delivery lifecycle | The opaque C ABI policy, two static-SDK environments, and source-only Rust proof are useful experimental records, not stable distribution. | ABI conformance matrix, artifact-version policy, macOS SDK proof, signing/provenance plan, and a supported-platform matrix without premature stable-ABI claims. |
+| **P0** | Coherent typed semantic core | Immutable bindings and bounded local mutable cells exist, but general values, scopes, effects, measurement-result values, ownership, and target/runtime semantics remain undefined. | Written semantic subset, typed IR invariants, positive/negative tests, and no silent lowering gaps. |
+| **P0** | Versioned ABI and delivery lifecycle | The opaque C ABI policy, three static-SDK CI environments, and source-only Rust proof are useful experimental records, not stable distribution. | ABI conformance matrix, artifact-version policy, signing/provenance plan, and a supported-platform matrix without premature stable-ABI claims. |
 | **P1** | Wider target-side classical control model | One earlier Boolean-literal declaration, including one unary `not` over it, can now map to immutable target Boolean storage for one `if` gate. `not true/false` folds at compile time without target storage. Nested negation, binary expressions, aliases, writes, lifetime, measurement-result mapping, loops, and measurement-body rules remain undefined. | Explicit widening rules, exact output, parser/import validation, negative fixtures, and no execution claim unless separately designed. |
 | **P1** | Callable bodies and calls | Declarations record names only. Bodies, parameter/return types, scopes, recursion, resource effects, and call behavior remain semantic decisions. | A non-recursive first subset, call/resource rules, diagnostics, and bounded lowering/execution fixtures. |
 | **P1** | Resource lifecycle and hardware mapping | Declaration-order allocation is defined only for bounded local simulation. | Lifetime, aliasing, deallocation, dynamic-allocation, and hardware-mapping rules with dedicated tests, if the language later needs them. |
@@ -228,19 +230,19 @@ availability, enterprise readiness, or universal language interoperability.
 
 ## Decision record
 
-The recommended immediate scope is now **wider target-side control semantics,
-followed by callable bodies/calls, with macOS static-SDK conformance as a
-separate platform-evidence increment**. This order preserves the completed
-semantic-inspection, multi-register-simulation, source-only Rust-wrapper,
-identifier-if, and negated identifier-if leverage work while avoiding unsupported
-surface area. It provides prospective
+The recommended immediate scope is now **practical bounded parameterized quantum
+routines with explicit qubit resources and alias rejection, followed by typed
+measurement-result storage and feedback design**. This order preserves the
+completed semantic-inspection, multi-register-simulation, source-only Rust-wrapper,
+strict `if` lowering, and local-only mutable-state leverage work while avoiding
+unsupported target-side state or branch-execution surface area. It provides prospective
 contributors and adopters a clearer, reproducible contract than unverified
 breadth and is more credible for community growth, revenue exploration, and
 future acquisition discussions.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32069791226 "SynQ Compiler Core platform matrix — bounded identifier-if lowering"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32242711770 "SynQ Compiler Core platform matrix — bounded Alpha mutable classical state"
 
 [2]: ./PROJECT_STATUS.md "Current SynQ Project Status"
 
