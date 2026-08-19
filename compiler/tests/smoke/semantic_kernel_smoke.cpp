@@ -54,10 +54,19 @@ int main() {
            "named measurement result is descriptive Boolean metadata without an invented runtime value");
 
     const std::string rendered = synq::compiler::render_semantic_environment(resolved);
-    expect(rendered.find("semantic environment: top-level immutable bindings") != std::string::npos &&
+    expect(rendered.find("semantic environment: top-level classical bindings") != std::string::npos &&
                rendered.find("binding selected | Value | Integer | line 2 | depends-on seed") != std::string::npos &&
                rendered.find("binding observed | MeasurementResult | Boolean | line 4") != std::string::npos,
            "inspection renderer reports binding kind, static type, provenance, and dependencies deterministically");
+
+    const auto mutable_resolved = resolve_successfully(
+        "#[experimental(feature = \"mutable-classical-state\")]\n"
+        "var ready = true\n");
+    expect(mutable_resolved.semantic_bindings.size() == 1 &&
+               mutable_resolved.semantic_bindings.front().kind == synq::compiler::SemanticBindingKind::MutableCell &&
+               mutable_resolved.semantic_bindings.front().static_type == synq::compiler::ClassicalStaticType::Boolean &&
+               render_semantic_environment(mutable_resolved).find("binding ready | MutableCell | Boolean | line 2") != std::string::npos,
+           "inspection identifies mutable-cell metadata without rendering an evaluated runtime value");
 
     const auto opaque = resolve_successfully("let unresolved_shape = one + two\n");
     expect(opaque.semantic_bindings.size() == 1 &&

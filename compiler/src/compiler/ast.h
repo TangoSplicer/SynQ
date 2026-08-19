@@ -363,6 +363,43 @@ public:
     }
 };
 
+// Alpha mutable classical cell declaration. The parser preserves the same
+// typed initializer provenance as `let`; interpretation is performed only by
+// the separate bounded state evaluator.
+class MutableDeclarationNode : public ASTNode {
+public:
+    std::string name;
+    std::string value;
+    ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    MutableDeclarationNode(std::string identifier, std::string source_value, std::size_t line_number,
+                           ClassicalLiteralKind kind, synq::compiler::SourceSpan source_span)
+        : name(std::move(identifier)), value(std::move(source_value)), literal_kind(kind), line(line_number),
+          span(source_span) {}
+
+    std::string toString() override { return "var " + name + " = " + value; }
+};
+
+// Alpha whole-cell assignment. It does not imply branch execution, target-side
+// storage, aliases, compound assignment, or a general runtime.
+class AssignmentNode : public ASTNode {
+public:
+    std::string target;
+    std::string value;
+    ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
+    std::size_t line = 0;
+    synq::compiler::SourceSpan span;
+
+    AssignmentNode(std::string identifier, std::string source_value, std::size_t line_number,
+                   ClassicalLiteralKind kind, synq::compiler::SourceSpan source_span)
+        : target(std::move(identifier)), value(std::move(source_value)), literal_kind(kind), line(line_number),
+          span(source_span) {}
+
+    std::string toString() override { return "set " + target + " = " + value; }
+};
+
 // (Additional AST node classes like FunctionNode and ClassNode remain future work.)
 
 #endif

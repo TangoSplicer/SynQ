@@ -1,6 +1,7 @@
 // Bounded recovery-profile scoped name resolution over the internal Hybrid IR.
-// Only whole-identifier declaration initializers are references in this first
-// pass. Other SourceText remains unevaluated and unresolved by design.
+// Whole-identifier initializers plus bounded parser-owned Boolean/Integer trees
+// resolve against prior top-level bindings. Other SourceText remains
+// unevaluated and unresolved by design.
 #ifndef SYNQ_COMPILER_NAME_RESOLUTION_H
 #define SYNQ_COMPILER_NAME_RESOLUTION_H
 
@@ -16,6 +17,7 @@ namespace synq::compiler {
 
 enum class SemanticBindingKind {
     Value,
+    MutableCell,
     MeasurementResult,
 };
 
@@ -44,15 +46,32 @@ struct ResolvedHybridDeclaration {
     std::vector<std::size_t> initializer_binding_indices;
 };
 
+struct ResolvedHybridMutableDeclaration {
+    HybridMutableDeclaration declaration;
+    std::optional<std::size_t> initializer_binding_index;
+    ClassicalStaticType initializer_static_type = ClassicalStaticType::Unknown;
+    std::vector<std::size_t> initializer_binding_indices;
+};
+
+struct ResolvedHybridAssignment {
+    HybridAssignment assignment;
+    std::size_t target_binding_index = 0;
+    ClassicalStaticType target_static_type = ClassicalStaticType::Unknown;
+    std::optional<std::size_t> value_binding_index;
+    ClassicalStaticType value_static_type = ClassicalStaticType::Unknown;
+    std::vector<std::size_t> value_binding_indices;
+};
+
 struct ResolvedHybridControlFlow {
     HybridControlFlow control;
     std::optional<std::size_t> condition_binding_index;
     std::vector<std::size_t> condition_binding_indices;
 };
 
-using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, HybridQubitDeclaration, HybridCallableDeclaration,
-                                        HybridCallableCall, HybridQuantumGate, HybridMeasurement,
-                                        ResolvedHybridControlFlow>;
+using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, ResolvedHybridMutableDeclaration,
+                                        ResolvedHybridAssignment, HybridQubitDeclaration,
+                                        HybridCallableDeclaration, HybridCallableCall, HybridQuantumGate,
+                                        HybridMeasurement, ResolvedHybridControlFlow>;
 
 struct ResolvedHybridProgram {
     std::vector<ResolvedHybridNode> nodes;

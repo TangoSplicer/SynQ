@@ -20,6 +20,7 @@ enum class Mode {
     EmitHybridOpenQasm,
     InspectSemantics,
     EvaluateConstants,
+    EvaluateState,
     Simulate,
 };
 
@@ -30,6 +31,11 @@ struct Command {
     std::size_t max_declarations = 64;
     std::size_t max_qubits = 10;
     std::size_t max_operations = 1024;
+    std::size_t max_state_cells = 64;
+    std::size_t max_state_transitions = 128;
+    std::size_t max_expression_depth = 16;
+    std::size_t max_state_operations = 128;
+    bool has_max_operations = false;
 };
 
 void print_help(std::ostream& output) {
@@ -40,6 +46,7 @@ void print_help(std::ostream& output) {
            << "  synqc <source.synq> --emit-openqasm-hybrid [--out <file.qasm>]\n"
            << "  synqc <source.synq> --inspect-semantics\n"
            << "  synqc <source.synq> --eval-constants [--max-declarations <n>]\n"
+           << "  synqc <source.synq> --eval-state [--max-state-cells <n>] [--max-state-transitions <n>] [--max-expression-depth <n>] [--max-operations <n>]\n"
            << "  synqc <source.synq> --simulate [--max-qubits <n>] [--max-operations <n>]\n\n"
            << "Modes:\n"
            << "  --validate        Parse, lower, and resolve the documented bounded profile.\n"
@@ -47,6 +54,7 @@ void print_help(std::ostream& output) {
            << "  --emit-openqasm-hybrid  Emit strict Hybrid IR OpenQASM with explicit q[n].\n"
            << "  --inspect-semantics  Render resolved top-level binding metadata without evaluation.\n"
            << "  --eval-constants  Explicitly run bounded declaration-only constant evaluation.\n"
+           << "  --eval-state      Explicitly run bounded top-level mutable-cell evaluation.\n"
            << "  --simulate        Explicitly calculate deterministic bounded local probabilities.\n\n"
            << "This command does not submit jobs,\n"
            << "run legacy runtime components, or evaluate general SynQ source.\n";
@@ -93,6 +101,10 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EvaluateConstants;
             selected_mode = true;
+        } else if (argument == "--eval-state") {
+            if (selected_mode) { error = "select exactly one mode"; return false; }
+            command.mode = Mode::EvaluateState;
+            selected_mode = true;
         } else if (argument == "--simulate") {
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::Simulate;
@@ -111,8 +123,27 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
                 return false;
             }
         } else if (argument == "--max-operations") {
-            if (++index >= argc || !parse_positive_size(argv[index], command.max_operations)) {
+            std::size_t parsed = 0;
+            if (++index >= argc || !parse_positive_size(argv[index], parsed)) {
                 error = "--max-operations requires a positive whole number";
+                return false;
+            }
+            command.max_operations = parsed;
+            command.max_state_operations = parsed;
+            command.has_max_operations = true;
+        } else if (argument == "--max-state-cells") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_state_cells)) {
+                error = "--max-state-cells requires a positive whole number";
+                return false;
+            }
+        } else if (argument == "--max-state-transitions") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_state_transitions)) {
+                error = "--max-state-transitions requires a positive whole number";
+                return false;
+            }
+        } else if (argument == "--max-expression-depth") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_expression_depth)) {
+                error = "--max-expression-depth requires a positive whole number";
                 return false;
             }
         } else {
@@ -121,7 +152,7 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
         }
     }
     if (!selected_mode) {
-        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --inspect-semantics, --eval-constants, or --simulate";
+        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --inspect-semantics, --eval-constants, --eval-state, or --simulate";
         return false;
     }
     if (command.output_path.has_value() && command.mode != Mode::EmitOpenQasm &&
@@ -133,8 +164,20 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
         error = "--max-declarations is supported only with --eval-constants";
         return false;
     }
-    if ((command.max_qubits != 10 || command.max_operations != 1024) && command.mode != Mode::Simulate) {
+    if ((command.max_qubits != 10 || (command.has_max_operations && command.mode == Mode::Simulate)) &&
+        command.mode != Mode::Simulate) {
         error = "--max-qubits and --max-operations are supported only with --simulate";
+        return false;
+    }
+    if ((command.max_state_cells != 64 || command.max_state_transitions != 128 ||
+         command.max_expression_depth != 16 ||
+         (command.has_max_operations && command.mode == Mode::EvaluateState)) &&
+        command.mode != Mode::EvaluateState) {
+        error = "--max-state-cells, --max-state-transitions, and --max-expression-depth are supported only with --eval-state";
+        return false;
+    }
+    if (command.has_max_operations && command.mode != Mode::Simulate && command.mode != Mode::EvaluateState) {
+        error = "--max-operations is supported only with --simulate or --eval-state";
         return false;
     }
     return true;
@@ -162,6 +205,23 @@ void print_value(const synq::compiler::EvaluatedBinding& binding) {
             break;
     }
     std::cout << "\n";
+}
+
+void print_state_cell(const synq::compiler::EvaluatedStateCell& cell) {
+    std::cout << "cell " << cell.name << " = " << synq::compiler::bounded_value_kind_name(cell.value.kind) << ":";
+    switch (cell.value.kind) {
+        case synq::compiler::BoundedValueKind::Integer:
+            std::cout << cell.value.integer_value;
+            break;
+        case synq::compiler::BoundedValueKind::Boolean:
+            std::cout << (cell.value.boolean_value ? "true" : "false");
+            break;
+        case synq::compiler::BoundedValueKind::String:
+            std::cout << '"' << cell.value.string_value << '"';
+            break;
+    }
+    std::cout << " | declared line " << cell.declaration_span.line
+              << " | last write line " << cell.last_write_span.line << "\n";
 }
 
 std::string basis_label(std::size_t basis, std::size_t qubits) {
@@ -283,6 +343,19 @@ int main(int argc, char** argv) {
                       << "] probability_one = "
                       << measurement.probability_one << "\n";
         }
+        return 0;
+    }
+
+    if (command.mode == Mode::EvaluateState) {
+        synq::compiler::BoundedStateEvaluationOptions options;
+        options.allow_experimental_state_evaluation = true;
+        options.max_state_cells = command.max_state_cells;
+        options.max_state_transitions = command.max_state_transitions;
+        options.max_expression_depth = command.max_expression_depth;
+        options.max_operations = command.max_state_operations;
+        const auto evaluation = synq::compiler::evaluate_bounded_state(*resolved.program, options);
+        if (!evaluation.ok()) return render_diagnostics(command.source_path, evaluation.diagnostics, 5);
+        for (const auto& cell : evaluation.evaluation->cells) print_state_cell(cell);
         return 0;
     }
 

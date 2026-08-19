@@ -61,6 +61,28 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
             continue;
         }
 
+        if (const auto* declaration = dynamic_cast<const MutableDeclarationNode*>(statement)) {
+            lowered.nodes.emplace_back(HybridMutableDeclaration{
+                declaration->name,
+                declaration->value,
+                declaration->literal_kind,
+                make_classical_expression(declaration->value, declaration->literal_kind, declaration->span),
+                declaration->span,
+            });
+            continue;
+        }
+
+        if (const auto* assignment = dynamic_cast<const AssignmentNode*>(statement)) {
+            lowered.nodes.emplace_back(HybridAssignment{
+                assignment->target,
+                assignment->value,
+                assignment->literal_kind,
+                make_classical_expression(assignment->value, assignment->literal_kind, assignment->span),
+                assignment->span,
+            });
+            continue;
+        }
+
         if (const auto* qubits = dynamic_cast<const QubitDeclarationNode*>(statement)) {
             lowered.nodes.emplace_back(HybridQubitDeclaration{
                 qubits->name,

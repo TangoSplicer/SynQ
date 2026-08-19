@@ -53,12 +53,47 @@ struct BoundedEvaluationResult {
     bool ok() const;
 };
 
+struct EvaluatedStateCell {
+    std::string name;
+    BoundedValue value;
+    SourceSpan declaration_span;
+    SourceSpan last_write_span;
+};
+
+struct BoundedStateEvaluation {
+    std::vector<EvaluatedStateCell> cells;
+};
+
+struct BoundedStateEvaluationOptions {
+    // The caller must explicitly opt in: parsed state syntax does not imply a
+    // general runtime, branch execution, target lowering, or quantum execution.
+    bool allow_experimental_state_evaluation = false;
+    std::size_t max_state_cells = 64;
+    std::size_t max_state_transitions = 128;
+    std::size_t max_expression_depth = 16;
+    std::size_t max_operations = 128;
+};
+
+struct BoundedStateEvaluationResult {
+    std::optional<BoundedStateEvaluation> evaluation;
+    std::vector<Diagnostic> diagnostics;
+
+    bool ok() const;
+};
+
 // Evaluates only a sequence of resolved top-level declarations with supported
 // literal, alias, or one-operator Integer arithmetic initializers. Qubits,
 // measurements, gates, controls, callables, decimals, opaque source, I/O,
 // mutable state, loops, calls, and quantum execution are rejected explicitly.
 BoundedEvaluationResult evaluate_bounded_constants(const ResolvedHybridProgram& program,
                                                    const BoundedEvaluationOptions& options);
+
+// Evaluates only the explicit U2 sequence of resolved immutable declarations,
+// mutable-cell declarations, and whole-cell assignments. It is deterministic,
+// top-level only, and rejects quantum nodes, controls, calls, measurement
+// values, target lowering, and all unsupported expression forms.
+BoundedStateEvaluationResult evaluate_bounded_state(const ResolvedHybridProgram& program,
+                                                     const BoundedStateEvaluationOptions& options);
 
 const char* bounded_value_kind_name(BoundedValueKind kind);
 

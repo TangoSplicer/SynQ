@@ -102,6 +102,12 @@ FeatureRegistry make_default_feature_registry() {
         "Enables declaration-only fn name() and kernel name() metadata without parameters, bodies, calls, or execution.",
         "synq#bounded-callable-declarations",
     });
+    registry.register_feature({
+        "mutable-classical-state",
+        FeatureStage::Alpha,
+        "Enables bounded top-level var and set syntax with typed local state evaluation only; it does not enable target-side storage, branches, loops, or quantum execution.",
+        "synq#bounded-mutable-classical-state",
+    });
     return registry;
 }
 

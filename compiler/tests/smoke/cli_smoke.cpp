@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
     const auto base = std::filesystem::temp_directory_path() / "synq_cli_smoke";
     const auto quantum = base.string() + "_quantum.synq";
     const auto constants = base.string() + "_constants.synq";
+    const auto state = base.string() + "_state.synq";
     const auto semantics = base.string() + "_semantics.synq";
     const auto simulation = base.string() + "_simulation.synq";
     const auto multi_register_simulation = base.string() + "_multi_register_simulation.synq";
@@ -72,6 +73,13 @@ int main(int argc, char** argv) {
                             "#[experimental(feature = \"classical-control-flow\")]\n"
                             "let seed = 5\nlet total = seed + 4\nlet ready = true\nlet disabled = not ready\n"),
                  "writes constant-evaluation CLI fixture") ||
+        !require(write_file(state,
+                            "#[experimental(feature = \"mutable-classical-state\")]\n"
+                            "#[experimental(feature = \"integer-arithmetic-expressions\")]\n"
+                            "#[experimental(feature = \"classical-control-flow\")]\n"
+                            "let seed = 5\nvar total = seed\nset total = total + 4\n"
+                            "var ready = true\nset ready = not ready\n"),
+                 "writes mutable-state CLI fixture") ||
         !require(write_file(semantics,
                             "let seed = 5\nlet selected = seed\nmeasure q[0] as observed\n"),
                  "writes semantic-inspection CLI fixture") ||
@@ -140,6 +148,12 @@ int main(int argc, char** argv) {
                      read_file(stdout_path).find("disabled = Boolean:false") != std::string::npos,
                  "experimental constant-evaluation mode prints deterministic evaluated bindings")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(state) + " --eval-state > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("cell total = Integer:9 | declared line 5 | last write line 6") != std::string::npos &&
+                     read_file(stdout_path).find("cell ready = Boolean:false | declared line 7 | last write line 8") != std::string::npos,
+                 "explicit state-evaluation mode prints final typed cells and source-order write provenance")) return 1;
+
     if (!require(std::system((invoke + " " + quote(semantics) + " --inspect-semantics > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("binding selected | Value | Integer | line 2 | depends-on seed") != std::string::npos &&
@@ -168,6 +182,7 @@ int main(int argc, char** argv) {
 
     std::filesystem::remove(quantum);
     std::filesystem::remove(constants);
+    std::filesystem::remove(state);
     std::filesystem::remove(semantics);
     std::filesystem::remove(simulation);
     std::filesystem::remove(multi_register_simulation);

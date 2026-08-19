@@ -320,6 +320,18 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
             continue;
         }
 
+        if (const auto* declaration = std::get_if<HybridMutableDeclaration>(&node)) {
+            add_diagnostic(result, declaration->span.line,
+                           "Hybrid OpenQASM 3 export does not lower mutable SynQ state declarations");
+            continue;
+        }
+
+        if (const auto* assignment = std::get_if<HybridAssignment>(&node)) {
+            add_diagnostic(result, assignment->span.line,
+                           "Hybrid OpenQASM 3 export does not lower mutable SynQ state assignments");
+            continue;
+        }
+
         if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
             if (control->kind != ClassicalControlKind::If) {
                 add_diagnostic(result, control->span.line,
@@ -568,6 +580,18 @@ OpenQasm3ExportResult export_hybrid_openqasm3(const HybridProgram& program) {
         if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
             add_diagnostic(result, control->span.line,
                            "Hybrid OpenQASM 3 export does not lower bounded classical control-flow nodes");
+            continue;
+        }
+
+        if (const auto* declaration = std::get_if<HybridMutableDeclaration>(&node)) {
+            add_diagnostic(result, declaration->span.line,
+                           "Hybrid OpenQASM 3 export does not lower mutable SynQ state declarations");
+            continue;
+        }
+
+        if (const auto* assignment = std::get_if<HybridAssignment>(&node)) {
+            add_diagnostic(result, assignment->span.line,
+                           "Hybrid OpenQASM 3 export does not lower mutable SynQ state assignments");
             continue;
         }
 

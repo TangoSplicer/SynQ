@@ -1,9 +1,11 @@
 # Bounded Mutable Classical State
 
-**Feature stage:** Proposed Alpha contract for U2.  
-**Status:** Design only. This document reserves a narrow implementation target;
-it does **not** make mutable declarations, assignments, state evaluation, or
-target-side state lowering available.
+**Feature stage:** Alpha contract for U2.
+**Status:** Implemented and locally validated on the recovery profile
+(**38/38** CTests). Remote six-job Compiler Core confirmation is still required
+before repository status, release records, tested-environment guidance, or the
+public Evidence Ledger present U2 as remotely verified. The implementation does
+not add target-side state lowering.
 
 ## Purpose and design position
 
@@ -137,9 +139,9 @@ deterministic classical-state path, not an implied hybrid executor.
 
 ## Required parser, IR, and resolver representation
 
-The implementation must extend the existing recovery architecture instead of
-creating a second state model. The expected additions are listed below as an
-implementation contract, not as currently present source behavior.
+The implementation extends the existing recovery architecture rather than
+creating a second state model. The following source-aligned representations are
+present in the locally validated recovery profile.
 
 | Layer | Required U2 representation | Required rejection behavior |
 | --- | --- | --- |
@@ -199,17 +201,18 @@ execution, package delivery, or stability promises.
 
 Before documentation calls U2 available, the implementation must include
 positive and negative parser, AST, Hybrid IR, resolver, evaluator, CLI, and
-exporter/simulator-rejection fixtures. The test matrix must cover feature-gate
+exporter/simulator-rejection fixtures. The local matrix covers feature-gate
 absence, malformed syntax, duplicate names, forward references, immutable and
 unknown targets, Boolean/Integer/String type mismatches, same-cell reads,
 write ordering, no partial result on failure, every stated resource bound,
 integer overflow, and unchanged rejection in strict-Hybrid export and local
 simulation.
 
-The full local recovery suite and the existing six-job remote Compiler Core
-matrix must pass for the implementation revision. Only then may the project
-status, changelog, tested-environment record, usable-language profile, and
-public Evidence Ledger call the capability verified.
+The full local recovery suite passed **38/38** CTests for the implementation
+revision. The existing six-job remote Compiler Core matrix must also pass. Only
+then may the project status, changelog, tested-environment record,
+usable-language profile, and public Evidence Ledger call the capability
+verified.
 
 ## References
 

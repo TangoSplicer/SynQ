@@ -20,6 +20,7 @@ bool NameResolutionResult::ok() const {
 const char* semantic_binding_kind_name(SemanticBindingKind kind) {
     switch (kind) {
         case SemanticBindingKind::Value: return "Value";
+        case SemanticBindingKind::MutableCell: return "MutableCell";
         case SemanticBindingKind::MeasurementResult: return "MeasurementResult";
     }
     return "Value";
@@ -113,12 +114,59 @@ Diagnostic invalid_integer_arithmetic_diagnostic(const ClassicalIntegerArithmeti
     };
 }
 
+Diagnostic invalid_mutable_initializer_diagnostic(const SourceSpan& span, const std::string& name) {
+    return {
+        "SYNQ-S005",
+        DiagnosticSeverity::Error,
+        span,
+        "mutable cell `" + name + "` requires an earlier supported Boolean, Integer, or String initializer",
+        "use a supported literal or an earlier statically typed immutable/mutable binding"
+    };
+}
+
+Diagnostic invalid_mutable_assignment_target_diagnostic(const SourceSpan& span, const std::string& name) {
+    return {
+        "SYNQ-S006",
+        DiagnosticSeverity::Error,
+        span,
+        "assignment target `" + name + "` is not an earlier mutable cell",
+        "declare `" + name + "` earlier with var and use whole-cell set syntax"
+    };
+}
+
+Diagnostic mutable_assignment_type_diagnostic(const SourceSpan& span, const std::string& name,
+                                              ClassicalStaticType expected, ClassicalStaticType actual) {
+    return {
+        "SYNQ-S007",
+        DiagnosticSeverity::Error,
+        span,
+        "assignment to mutable cell `" + name + "` has static type " +
+            classical_static_type_name(actual) + ", not " + classical_static_type_name(expected),
+        "assign an expression with the cell's existing static type"
+    };
+}
+
 struct BindingInfo {
     std::size_t index = 0;
     ClassicalStaticType static_type = ClassicalStaticType::Unknown;
     std::string name;
     SemanticBindingKind kind = SemanticBindingKind::Value;
 };
+
+bool is_state_value_type(ClassicalStaticType type) {
+    return type == ClassicalStaticType::Boolean || type == ClassicalStaticType::Integer ||
+           type == ClassicalStaticType::String;
+}
+
+void append_binding_names(const std::unordered_map<std::string, BindingInfo>& bindings,
+                          const std::vector<std::size_t>& binding_indices,
+                          std::vector<std::string>& binding_names) {
+    for (const std::size_t binding_index : binding_indices) {
+        for (const auto& entry : bindings) {
+            if (entry.second.index == binding_index) binding_names.push_back(entry.second.name);
+        }
+    }
+}
 
 bool resolve_boolean_expression(const ClassicalBooleanExpression& expression,
                                 const std::unordered_map<std::string, BindingInfo>& bindings,
@@ -280,6 +328,14 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                     result.diagnostics.push_back(unresolved_binding_diagnostic(*declaration));
                     return result;
                 }
+                if (binding->second.kind == SemanticBindingKind::MutableCell) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back({"SYNQ-S005", DiagnosticSeverity::Error, declaration->span,
+                                                  "immutable declaration `" + declaration->name +
+                                                      "` cannot read mutable cell `" + declaration->source_value + "`",
+                                                  "use var for a time-dependent value or keep let initializers immutable"});
+                    return result;
+                }
                 initializer_binding_index = binding->second.index;
                 initializer_static_type = binding->second.static_type;
                 initializer_binding_names.push_back(binding->second.name);
@@ -306,11 +362,7 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                     return result;
                 }
                 initializer_static_type = ClassicalStaticType::Boolean;
-                for (const std::size_t binding_index : initializer_binding_indices) {
-                    for (const auto& entry : bindings) {
-                        if (entry.second.index == binding_index) initializer_binding_names.push_back(entry.second.name);
-                    }
-                }
+                append_binding_names(bindings, initializer_binding_indices, initializer_binding_names);
             }
 
             resolved.nodes.emplace_back(ResolvedHybridDeclaration{*declaration, initializer_binding_index,
@@ -321,6 +373,124 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
                                                   std::move(initializer_binding_names)});
             bindings.emplace(declaration->name, BindingInfo{node_index, initializer_static_type,
                                                             declaration->name, SemanticBindingKind::Value});
+            continue;
+        }
+
+        if (const auto* declaration = std::get_if<HybridMutableDeclaration>(&node)) {
+            std::optional<std::size_t> initializer_binding_index;
+            std::vector<std::size_t> initializer_binding_indices;
+            std::vector<std::string> initializer_binding_names;
+            ClassicalStaticType initializer_static_type = declaration->initializer.static_type;
+            if (declaration->initializer.kind == ClassicalExpressionKind::IdentifierReference &&
+                is_identifier(declaration->source_value)) {
+                const auto binding = bindings.find(declaration->source_value);
+                if (binding == bindings.end()) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(invalid_mutable_initializer_diagnostic(declaration->span, declaration->name));
+                    return result;
+                }
+                initializer_binding_index = binding->second.index;
+                initializer_static_type = binding->second.static_type;
+                initializer_binding_names.push_back(binding->second.name);
+            }
+            if (declaration->initializer.kind == ClassicalExpressionKind::IntegerArithmeticExpression) {
+                Diagnostic arithmetic_error;
+                if (!declaration->initializer.integer_arithmetic.has_value() ||
+                    !resolve_integer_arithmetic_expression(*declaration->initializer.integer_arithmetic, bindings,
+                                                           initializer_binding_indices, initializer_binding_names,
+                                                           arithmetic_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(arithmetic_error));
+                    return result;
+                }
+                initializer_static_type = ClassicalStaticType::Integer;
+            }
+            if (declaration->initializer.kind == ClassicalExpressionKind::BooleanExpression) {
+                Diagnostic boolean_error;
+                if (!declaration->initializer.boolean_expression.has_value() ||
+                    !resolve_boolean_expression(*declaration->initializer.boolean_expression, bindings,
+                                                initializer_binding_indices, boolean_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(boolean_error));
+                    return result;
+                }
+                initializer_static_type = ClassicalStaticType::Boolean;
+                append_binding_names(bindings, initializer_binding_indices, initializer_binding_names);
+            }
+            if (!is_state_value_type(initializer_static_type)) {
+                NameResolutionResult result;
+                result.diagnostics.push_back(invalid_mutable_initializer_diagnostic(declaration->span, declaration->name));
+                return result;
+            }
+            resolved.nodes.emplace_back(ResolvedHybridMutableDeclaration{*declaration, initializer_binding_index,
+                                                                          initializer_static_type,
+                                                                          std::move(initializer_binding_indices)});
+            resolved.semantic_bindings.push_back({declaration->name, SemanticBindingKind::MutableCell,
+                                                  initializer_static_type, node_index, declaration->span,
+                                                  std::move(initializer_binding_names)});
+            bindings.emplace(declaration->name, BindingInfo{node_index, initializer_static_type,
+                                                            declaration->name, SemanticBindingKind::MutableCell});
+            continue;
+        }
+
+        if (const auto* assignment = std::get_if<HybridAssignment>(&node)) {
+            const auto target = bindings.find(assignment->target_name);
+            if (target == bindings.end() || target->second.kind != SemanticBindingKind::MutableCell) {
+                NameResolutionResult result;
+                result.diagnostics.push_back(invalid_mutable_assignment_target_diagnostic(assignment->span,
+                                                                                            assignment->target_name));
+                return result;
+            }
+            std::optional<std::size_t> value_binding_index;
+            std::vector<std::size_t> value_binding_indices;
+            std::vector<std::string> ignored_binding_names;
+            ClassicalStaticType value_static_type = assignment->value.static_type;
+            if (assignment->value.kind == ClassicalExpressionKind::IdentifierReference &&
+                is_identifier(assignment->source_value)) {
+                const auto binding = bindings.find(assignment->source_value);
+                if (binding == bindings.end()) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(mutable_assignment_type_diagnostic(
+                        assignment->span, assignment->target_name, target->second.static_type,
+                        ClassicalStaticType::Unknown));
+                    return result;
+                }
+                value_binding_index = binding->second.index;
+                value_static_type = binding->second.static_type;
+            }
+            if (assignment->value.kind == ClassicalExpressionKind::IntegerArithmeticExpression) {
+                Diagnostic arithmetic_error;
+                if (!assignment->value.integer_arithmetic.has_value() ||
+                    !resolve_integer_arithmetic_expression(*assignment->value.integer_arithmetic, bindings,
+                                                           value_binding_indices, ignored_binding_names,
+                                                           arithmetic_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(arithmetic_error));
+                    return result;
+                }
+                value_static_type = ClassicalStaticType::Integer;
+            }
+            if (assignment->value.kind == ClassicalExpressionKind::BooleanExpression) {
+                Diagnostic boolean_error;
+                if (!assignment->value.boolean_expression.has_value() ||
+                    !resolve_boolean_expression(*assignment->value.boolean_expression, bindings,
+                                                value_binding_indices, boolean_error)) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(std::move(boolean_error));
+                    return result;
+                }
+                value_static_type = ClassicalStaticType::Boolean;
+            }
+            if (!is_state_value_type(value_static_type) || value_static_type != target->second.static_type) {
+                NameResolutionResult result;
+                result.diagnostics.push_back(mutable_assignment_type_diagnostic(
+                    assignment->span, assignment->target_name, target->second.static_type, value_static_type));
+                return result;
+            }
+            resolved.nodes.emplace_back(ResolvedHybridAssignment{*assignment, target->second.index,
+                                                                  target->second.static_type, value_binding_index,
+                                                                  value_static_type,
+                                                                  std::move(value_binding_indices)});
             continue;
         }
 
@@ -430,7 +600,7 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
 
 std::string render_semantic_environment(const ResolvedHybridProgram& program) {
     std::ostringstream output;
-    output << "semantic environment: top-level immutable bindings\n";
+    output << "semantic environment: top-level classical bindings\n";
     if (program.semantic_bindings.empty()) {
         output << "(no classical bindings)\n";
         return output.str();

@@ -109,6 +109,36 @@ ClassicalLiteralKind classify_declaration_literal(const std::string& value) {
     return ClassicalLiteralKind::SourceText;
 }
 
+bool classify_bounded_classical_value(const std::string& value,
+                                      const synq::compiler::FeatureRegistry& active_features,
+                                      const synq::compiler::SourceSpan& span,
+                                      ClassicalLiteralKind& declaration_kind,
+                                      std::string& message,
+                                      std::string& help) {
+    declaration_kind = classify_declaration_literal(value);
+    if (active_features.is_enabled("integer-arithmetic-expressions") &&
+        synq::compiler::looks_like_integer_arithmetic_expression(value)) {
+        ClassicalIntegerArithmeticExpression arithmetic;
+        if (!synq::compiler::parse_bounded_integer_arithmetic_expression(value, span, arithmetic)) {
+            message = "malformed bounded integer arithmetic expression";
+            help = "use exactly <integer-literal-or-identifier> +, -, or * <integer-literal-or-identifier>";
+            return false;
+        }
+        declaration_kind = ClassicalLiteralKind::IntegerArithmeticExpression;
+    }
+    if (active_features.is_enabled("classical-control-flow") &&
+        synq::compiler::looks_like_boolean_expression(value)) {
+        ClassicalBooleanExpression boolean_expression;
+        if (!synq::compiler::parse_bounded_boolean_declaration_expression(value, span, boolean_expression)) {
+            message = "malformed bounded Boolean expression";
+            help = "use exactly not <Boolean-literal-or-identifier> or <Boolean-literal-or-identifier> and/or <Boolean-literal-or-identifier>";
+            return false;
+        }
+        declaration_kind = ClassicalLiteralKind::BooleanExpression;
+    }
+    return true;
+}
+
 bool is_parameterized_kernel(const std::string& kernel) {
     const std::size_t open = kernel.find('(');
     if (open == std::string::npos) return is_identifier(kernel);
@@ -478,24 +508,11 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             if (!is_identifier(identifier) || value.empty()) {
                 return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
             }
-            ClassicalLiteralKind declaration_kind = classify_declaration_literal(value);
-            if (active_features.is_enabled("integer-arithmetic-expressions") &&
-                synq::compiler::looks_like_integer_arithmetic_expression(value)) {
-                ClassicalIntegerArithmeticExpression arithmetic;
-                if (!synq::compiler::parse_bounded_integer_arithmetic_expression(value, span, arithmetic)) {
-                    return fail_parse("SYNQ-P011", span, "malformed bounded integer arithmetic expression",
-                                      "use exactly <integer-literal-or-identifier> +, -, or * <integer-literal-or-identifier>");
-                }
-                declaration_kind = ClassicalLiteralKind::IntegerArithmeticExpression;
-            }
-            if (active_features.is_enabled("classical-control-flow") &&
-                synq::compiler::looks_like_boolean_expression(value)) {
-                ClassicalBooleanExpression boolean_expression;
-                if (!synq::compiler::parse_bounded_boolean_declaration_expression(value, span, boolean_expression)) {
-                    return fail_parse("SYNQ-P011", span, "malformed bounded Boolean expression",
-                                      "use exactly not <Boolean-literal-or-identifier> or <Boolean-literal-or-identifier> and/or <Boolean-literal-or-identifier>");
-                }
-                declaration_kind = ClassicalLiteralKind::BooleanExpression;
+            ClassicalLiteralKind declaration_kind;
+            std::string message;
+            std::string help;
+            if (!classify_bounded_classical_value(value, active_features, span, declaration_kind, message, help)) {
+                return fail_parse("SYNQ-P011", span, message, help);
             }
             const auto inserted = declared_names.emplace(identifier, span);
             if (!inserted.second) {
@@ -505,6 +522,57 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                   "rename the later binding or reuse the existing declaration according to future language semantics");
             }
             root->statements.push_back(new DeclarationNode(identifier, value, line_number, declaration_kind, span));
+            continue;
+        }
+
+        if (operation == "var") {
+            if (!active_features.is_enabled("mutable-classical-state")) {
+                return fail_parse("SYNQ-P014", span, "mutable declarations require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"mutable-classical-state\")] before var or set");
+            }
+            const auto assignment = argument.find('=');
+            const std::string identifier = assignment == std::string::npos ? "" : trim(argument.substr(0, assignment));
+            const std::string value = assignment == std::string::npos ? "" : trim(argument.substr(assignment + 1));
+            if (!is_identifier(identifier) || value.empty()) {
+                return fail_parse("SYNQ-P015", span, "malformed mutable declaration",
+                                  "use var <identifier> = <supported-expression>");
+            }
+            ClassicalLiteralKind declaration_kind;
+            std::string message;
+            std::string help;
+            if (!classify_bounded_classical_value(value, active_features, span, declaration_kind, message, help)) {
+                return fail_parse("SYNQ-P011", span, message, help);
+            }
+            const auto inserted = declared_names.emplace(identifier, span);
+            if (!inserted.second) {
+                return fail_parse("SYNQ-S004", span,
+                                  "duplicate top-level declaration `" + identifier +
+                                      "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                  "rename the mutable cell or reuse the existing declaration according to the bounded state contract");
+            }
+            root->statements.push_back(new MutableDeclarationNode(identifier, value, line_number, declaration_kind, span));
+            continue;
+        }
+
+        if (operation == "set") {
+            if (!active_features.is_enabled("mutable-classical-state")) {
+                return fail_parse("SYNQ-P014", span, "mutable assignments require an alpha feature opt-in",
+                                  "add #[experimental(feature = \"mutable-classical-state\")] before var or set");
+            }
+            const auto assignment = argument.find('=');
+            const std::string identifier = assignment == std::string::npos ? "" : trim(argument.substr(0, assignment));
+            const std::string value = assignment == std::string::npos ? "" : trim(argument.substr(assignment + 1));
+            if (!is_identifier(identifier) || value.empty()) {
+                return fail_parse("SYNQ-P016", span, "malformed mutable assignment",
+                                  "use set <earlier-mutable-identifier> = <supported-expression>");
+            }
+            ClassicalLiteralKind declaration_kind;
+            std::string message;
+            std::string help;
+            if (!classify_bounded_classical_value(value, active_features, span, declaration_kind, message, help)) {
+                return fail_parse("SYNQ-P011", span, message, help);
+            }
+            root->statements.push_back(new AssignmentNode(identifier, value, line_number, declaration_kind, span));
             continue;
         }
 

@@ -1,7 +1,7 @@
 // Minimal recovery-profile Hybrid IR.
-// This internal representation preserves only already parsed typed classical
-// declarations, quantum gates, and measurements. It defines no execution,
-// allocation, ownership, result-value, or backend semantics.
+// This internal representation preserves parsed immutable declarations, Alpha
+// mutable cells/assignments, quantum gates, and measurements. It defines no
+// target execution, allocation, ownership, result-value, or backend semantics.
 #ifndef SYNQ_COMPILER_HYBRID_IR_H
 #define SYNQ_COMPILER_HYBRID_IR_H
 
@@ -20,6 +20,22 @@ struct HybridDeclaration {
     std::string source_value;
     ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
     ClassicalExpression initializer;
+    SourceSpan span;
+};
+
+struct HybridMutableDeclaration {
+    std::string name;
+    std::string source_value;
+    ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
+    ClassicalExpression initializer;
+    SourceSpan span;
+};
+
+struct HybridAssignment {
+    std::string target_name;
+    std::string source_value;
+    ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
+    ClassicalExpression value;
     SourceSpan span;
 };
 
@@ -66,8 +82,9 @@ struct HybridControlFlow {
     SourceSpan span;
 };
 
-using HybridNode = std::variant<HybridDeclaration, HybridQubitDeclaration, HybridCallableDeclaration,
-                                HybridCallableCall, HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
+using HybridNode = std::variant<HybridDeclaration, HybridMutableDeclaration, HybridAssignment,
+                                HybridQubitDeclaration, HybridCallableDeclaration, HybridCallableCall,
+                                HybridQuantumGate, HybridMeasurement, HybridControlFlow>;
 
 struct HybridProgram {
     std::vector<HybridNode> nodes;

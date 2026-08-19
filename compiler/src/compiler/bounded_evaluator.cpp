@@ -223,9 +223,82 @@ bool evaluate_initializer(const ResolvedHybridDeclaration& declaration,
     return false;
 }
 
+bool evaluate_state_expression(const ClassicalExpression& expression,
+                               const std::map<std::string, BoundedValue>& values,
+                               BoundedValue& value, EvaluationBudget& budget, Diagnostic& diagnostic) {
+    switch (expression.kind) {
+        case ClassicalExpressionKind::IntegerLiteral: {
+            std::int64_t parsed = 0;
+            if (!parse_integer(expression.source_text, parsed)) {
+                diagnostic = error("SYNQ-E010", expression.span, "invalid internal Integer literal in state evaluation",
+                                   "use a parser-produced supported state expression");
+                return false;
+            }
+            value = BoundedValue{BoundedValueKind::Integer, parsed, false, {}};
+            return true;
+        }
+        case ClassicalExpressionKind::BooleanLiteral:
+            value = BoundedValue{BoundedValueKind::Boolean, 0, expression.source_text == "true", {}};
+            return true;
+        case ClassicalExpressionKind::QuotedStringLiteral:
+            if (expression.source_text.size() < 2) {
+                diagnostic = error("SYNQ-E010", expression.span, "invalid internal quoted-string state expression",
+                                   "use a parser-produced supported state expression");
+                return false;
+            }
+            value = BoundedValue{BoundedValueKind::String, 0, false,
+                                 expression.source_text.substr(1, expression.source_text.size() - 2)};
+            return true;
+        case ClassicalExpressionKind::IdentifierReference: {
+            const auto found = values.find(expression.source_text);
+            if (found == values.end()) {
+                diagnostic = error("SYNQ-E010", expression.span,
+                                   "state evaluation reference has no earlier evaluated binding",
+                                   "use an earlier immutable declaration or mutable cell");
+                return false;
+            }
+            value = found->second;
+            return true;
+        }
+        case ClassicalExpressionKind::IntegerArithmeticExpression: {
+            if (!expression.integer_arithmetic.has_value()) {
+                diagnostic = error("SYNQ-E010", expression.span, "missing internal Integer state expression tree",
+                                   "use a parser-produced bounded Integer expression");
+                return false;
+            }
+            std::int64_t parsed = 0;
+            if (!evaluate_integer_tree(*expression.integer_arithmetic, values, parsed, budget, 0, diagnostic)) return false;
+            value = BoundedValue{BoundedValueKind::Integer, parsed, false, {}};
+            return true;
+        }
+        case ClassicalExpressionKind::BooleanExpression: {
+            if (!expression.boolean_expression.has_value()) {
+                diagnostic = error("SYNQ-E010", expression.span, "missing internal Boolean state expression tree",
+                                   "use a parser-produced bounded Boolean expression");
+                return false;
+            }
+            bool parsed = false;
+            if (!evaluate_boolean_tree(*expression.boolean_expression, values, parsed, budget, 0, diagnostic)) return false;
+            value = BoundedValue{BoundedValueKind::Boolean, 0, parsed, {}};
+            return true;
+        }
+        case ClassicalExpressionKind::DecimalLiteral:
+        case ClassicalExpressionKind::OpaqueSource:
+            diagnostic = error("SYNQ-E010", expression.span,
+                               "state evaluation expression is outside the bounded U2 subset",
+                               "use Boolean, Integer, quoted String, prior-binding alias, or bounded Alpha expressions");
+            return false;
+    }
+    diagnostic = error("SYNQ-E010", expression.span, "unknown internal state expression kind",
+                       "use a parser-produced supported state expression");
+    return false;
+}
+
 }  // namespace
 
 bool BoundedEvaluationResult::ok() const { return evaluation.has_value() && diagnostics.empty(); }
+
+bool BoundedStateEvaluationResult::ok() const { return evaluation.has_value() && diagnostics.empty(); }
 
 const char* bounded_value_kind_name(BoundedValueKind kind) {
     switch (kind) {
@@ -270,6 +343,101 @@ BoundedEvaluationResult evaluate_bounded_constants(const ResolvedHybridProgram& 
         evaluation.bindings.push_back(EvaluatedBinding{declaration->declaration.name, std::move(value),
                                                        declaration->declaration.span});
     }
+    result.evaluation = std::move(evaluation);
+    return result;
+}
+
+BoundedStateEvaluationResult evaluate_bounded_state(const ResolvedHybridProgram& program,
+                                                     const BoundedStateEvaluationOptions& options) {
+    BoundedStateEvaluationResult result;
+    if (!options.allow_experimental_state_evaluation) {
+        result.diagnostics.push_back(error("SYNQ-E008", {}, "bounded state evaluation requires explicit opt-in",
+                                           "set allow_experimental_state_evaluation to true after reviewing its limits"));
+        return result;
+    }
+
+    BoundedStateEvaluation evaluation;
+    std::map<std::string, BoundedValue> values;
+    std::map<std::string, std::size_t> cell_indices;
+    EvaluationBudget budget{options.max_expression_depth, options.max_operations, 0};
+    std::size_t transitions = 0;
+    const auto consume_transition = [&](const SourceSpan& span) -> bool {
+        if (transitions >= options.max_state_transitions) {
+            result.diagnostics.push_back(error("SYNQ-E009", span,
+                                               "bounded state evaluation exceeds its state-transition limit",
+                                               "reduce state initializations/writes or increase the explicitly configured limit"));
+            return false;
+        }
+        ++transitions;
+        return true;
+    };
+
+    for (const ResolvedHybridNode& node : program.nodes) {
+        if (const auto* declaration = std::get_if<ResolvedHybridDeclaration>(&node)) {
+            BoundedValue value;
+            Diagnostic diagnostic;
+            if (!evaluate_state_expression(declaration->declaration.initializer, values, value, budget, diagnostic)) {
+                result.diagnostics.push_back(std::move(diagnostic));
+                return result;
+            }
+            values.emplace(declaration->declaration.name, std::move(value));
+            continue;
+        }
+
+        if (const auto* declaration = std::get_if<ResolvedHybridMutableDeclaration>(&node)) {
+            if (evaluation.cells.size() >= options.max_state_cells) {
+                result.diagnostics.push_back(error("SYNQ-E009", declaration->declaration.span,
+                                                   "bounded state evaluation exceeds its mutable-cell limit",
+                                                   "reduce mutable cells or increase the explicitly configured limit"));
+                return result;
+            }
+            BoundedValue value;
+            Diagnostic diagnostic;
+            if (!evaluate_state_expression(declaration->declaration.initializer, values, value, budget, diagnostic)) {
+                result.diagnostics.push_back(std::move(diagnostic));
+                return result;
+            }
+            if (!consume_transition(declaration->declaration.span)) return result;
+            cell_indices.emplace(declaration->declaration.name, evaluation.cells.size());
+            values.emplace(declaration->declaration.name, value);
+            evaluation.cells.push_back({declaration->declaration.name, std::move(value), declaration->declaration.span,
+                                        declaration->declaration.span});
+            continue;
+        }
+
+        if (const auto* assignment = std::get_if<ResolvedHybridAssignment>(&node)) {
+            const auto cell = cell_indices.find(assignment->assignment.target_name);
+            if (cell == cell_indices.end()) {
+                result.diagnostics.push_back(error("SYNQ-E010", assignment->assignment.span,
+                                                   "state evaluator received an assignment without an active mutable cell",
+                                                   "use a resolver-produced assignment to an earlier mutable cell"));
+                return result;
+            }
+            BoundedValue value;
+            Diagnostic diagnostic;
+            if (!evaluate_state_expression(assignment->assignment.value, values, value, budget, diagnostic)) {
+                result.diagnostics.push_back(std::move(diagnostic));
+                return result;
+            }
+            if (value.kind != evaluation.cells[cell->second].value.kind) {
+                result.diagnostics.push_back(error("SYNQ-E010", assignment->assignment.span,
+                                                   "state evaluator received a static-type-incompatible assignment",
+                                                   "use a resolver-produced assignment with the cell's exact static type"));
+                return result;
+            }
+            if (!consume_transition(assignment->assignment.span)) return result;
+            values[assignment->assignment.target_name] = value;
+            evaluation.cells[cell->second].value = std::move(value);
+            evaluation.cells[cell->second].last_write_span = assignment->assignment.span;
+            continue;
+        }
+
+        result.diagnostics.push_back(error("SYNQ-E010", {},
+                                           "bounded state evaluation accepts only immutable declarations, mutable cells, and assignments",
+                                           "keep U2 state-evaluation inputs within the documented top-level classical subset"));
+        return result;
+    }
+
     result.evaluation = std::move(evaluation);
     return result;
 }
