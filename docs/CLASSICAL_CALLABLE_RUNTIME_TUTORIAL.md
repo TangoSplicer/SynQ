@@ -1,9 +1,10 @@
 # First Local Function: U5 Classical Callable Runtime
 
-**Status:** Candidate tutorial for the proposed Alpha U5 feature. The source and
-commands below are covered by local conformance checks, but U5 is **not remotely
-verified or publicly available** until its implementation revision passes the
-full six-job Compiler Core matrix.
+**Status:** Remotely verified Alpha U5 tutorial for revision `7307c00`. The
+source and commands below are covered by local conformance checks and the
+six-job [Compiler Core #32266056516](https://github.com/TangoSplicer/SynQ/actions/runs/32266056516)
+matrix (45/45 Linux, 31/31 Windows MSVC and macOS Clang). This does not turn U5
+into a general runtime, target executor, ABI execution path, or hardware service.
 
 ## What you will learn
 

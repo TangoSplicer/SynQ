@@ -1,9 +1,12 @@
 # Bounded Classical Callable Execution (U5)
 
-**Feature stage:** Proposed Alpha contract for U5.  
-**Status:** Design only. This document does **not** claim callable execution,
-local lexical scopes, a general runtime, target-side execution, ABI execution,
-or hardware behavior until the implementation and verification gate below pass.
+**Feature stage:** Implemented Alpha U5 contract.
+**Status:** Remotely verified for revision `7307c00` by the six-job [Compiler
+Core platform-matrix run #32266056516](https://github.com/TangoSplicer/SynQ/actions/runs/32266056516):
+45/45 Linux recovery-profile CTests, 31/31 Windows MSVC and macOS Clang
+platform-neutral CTests, and clean-install static-SDK consumer checks on Ubuntu,
+Windows, and macOS. This does **not** claim local lexical scopes, a general
+runtime, target-side execution, ABI execution, or hardware behavior.
 
 ## Goal
 
@@ -127,8 +130,7 @@ composition rather than silently delegating it to a host language.
 
 ## Implementation and verification gate
 
-Before U5 is described as available, the implementation must provide all of the
-following:
+The implementation provides all of the following:
 
 1. Typed AST/Hybrid IR provenance for the U5 declaration, body, invocation, and
    result binding without weakening existing `fn`, `kernel`, or quantum `call`.
@@ -139,8 +141,9 @@ following:
    independent no-new-service tests.
 5. At least one beginner guide example and one safe-failure explanation.
 6. A full local recovery suite followed by the existing six-job Compiler Core
-   matrix. Only after all six jobs pass may repository status, changelog,
-   readiness records, and the Evidence Ledger call U5 remotely verified.
+   matrix. The local 45/45 suite and all six remote jobs passed; repository
+   status, changelog, readiness records, and the Evidence Ledger may therefore
+   call this exact U5 slice remotely verified.
 
 ## References
 

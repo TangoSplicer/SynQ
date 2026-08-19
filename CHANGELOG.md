@@ -9,6 +9,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Alpha bounded classical callable runtime (U5):** The feature-gated
+  `classical-callable-execution` subset accepts one earlier
+  `fn name(value: Integer|Boolean|String) ->` parameter-only body and one
+  immutable `let result = name(actual)` invocation. Typed AST/Hybrid IR and
+  resolution retain function, actual, exact type, and earlier-definition
+  provenance. `synqc --eval-runtime` evaluates one local depth-1 frame with
+  checked `int64` arithmetic and 32-declaration/128-invocation/depth-16/
+  128-operation limits; failure is atomic. Strict Hybrid export, bounded quantum
+  simulation, and ABI v1 explicitly reject U5 nodes. Parser, resolver, evaluator,
+  CLI, C ABI, boundary, limit, tutorial, and compatibility fixtures are included.
+  [Compiler Core platform-matrix run #32266056516](https://github.com/TangoSplicer/SynQ/actions/runs/32266056516)
+  passed all six jobs for revision `7307c00`: 45 Linux CTests, 31 Windows MSVC
+  CTests, 31 macOS Clang CTests, and clean-install experimental static-SDK
+  external-consumer checks on Ubuntu 22.04, Windows MSVC, and macOS Clang. This
+  adds no general runtime, capture, mutable local state, multi-argument calls,
+  returns, recursion, nested calls, target execution, provider, network, AI, or
+  hardware claim.
 - **Alpha bounded measurement feedback (U4):** The feature-gated
   `measurement-feedback` subset accepts one top-level `measure register[index]
   as result` immediately followed by one direct `if result then quantum x

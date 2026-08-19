@@ -6,8 +6,8 @@ announcement.
 workflow, the experimental opaque C ABI and static SDK path, the source-only Alpha
 Rust wrapper, and the factual public-facing project position.
 **Evidence cut-off:** Compiler Core platform-matrix run
-[#32250265354][1] for implementation revision `62baf18`, with repository
-evidence records aligned through the bounded Alpha U4 measurement-feedback update.
+[#32266056516][1] for implementation revision `7307c00`, with repository
+evidence records aligned through the bounded Alpha U5 classical-callable update.
 
 ## Executive assessment
 
@@ -15,9 +15,9 @@ SynQ is **not a fully operational programming-language platform**. It is an
 **operational experimental language seed**: a narrowly specified and tested
 compiler workflow that a developer can build, validate, diagnose, inspect,
 export from, evaluate in a bounded classical subset, and simulate in a bounded
-quantum subset. The current recovery profile passed **44/44** CTest checks
+quantum subset. The current recovery profile passed **45/45** CTest checks
 locally and in the Ubuntu CI profile; independent Windows MSVC and macOS Clang
-profiles each passed **30/30** platform-neutral CTest checks. The same remote
+profiles each passed **31/31** platform-neutral CTest checks. The same remote
 matrix passed Ubuntu 22.04, Windows MSVC, and macOS Clang experimental static-
 SDK external-consumer jobs.[1] [2] [3]
 
@@ -34,16 +34,17 @@ and bounded parameterized quantum routines with explicit qubit/angle formals,
 static source expansion, resource-alias rejection, and explicit non-execution
 boundaries, plus one U4 named measurement immediately consumed by one direct
 conditional `x` correction with strict source lowering and deterministic local
-two-branch probability enumeration.
+two-branch probability enumeration, plus U5 one-formal local classical callable
+evaluation with explicit source/export/simulator/ABI rejection boundaries.
 They do **not** make
 SynQ a general runtime, stable SDK, registry package, hardware client, or
 cross-platform delivery product.[2] [4] [5] [6]
 
 > **Readiness finding.** SynQ has completed the operational-baseline gates for a
 > bounded experimental developer workflow and its selected bounded leverage
-> increments. U4 verifies one exact measurement-result feedback pair only.
-> General target-side classical storage, `else`, wider branch execution, and
-> general control remain separate later contracts.
+> increments. U5 verifies one exact local callable frame and U4 one feedback
+> pair only. General target-side classical storage, `else`, wider branch
+> execution, scopes, and general calls remain separate later contracts.
 
 The appropriate public label remains **“experimental hybrid quantum–classical
 language kernel with a tested local developer workflow.”** The terms
@@ -61,7 +62,7 @@ remote evidence distinct.
 
 | Evidence level | Meaning in this assessment | Current examples |
 | --- | --- | --- |
-| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 44 Linux CTests; 30 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded `if` export; U3 parameterized routine source expansion; U4 one-result/direct-`x` feedback; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
+| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 45 Linux CTests; 31 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded `if` export; U3 parameterized routine source expansion; U4 feedback; U5 one-formal local callable evaluation; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
 | **Locally validated** | The documented operation was executed in the review environment but is not itself a separate CI assertion. | Local build/test troubleshooting or exploratory work not represented by a dedicated checked-in remote fixture. |
 | **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, target-side user state/control execution, multiple-result feedback, registry packages, provider access, and AI services.[2] [7] |
 
@@ -244,7 +245,7 @@ future acquisition discussions.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32250265354 "SynQ Compiler Core platform matrix — bounded Alpha measurement feedback"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32266056516 "SynQ Compiler Core platform matrix — bounded Alpha classical callable runtime"
 
 [2]: ./PROJECT_STATUS.md "Current SynQ Project Status"
 

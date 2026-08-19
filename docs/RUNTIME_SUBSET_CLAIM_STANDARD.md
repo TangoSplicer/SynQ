@@ -4,9 +4,9 @@
 SynQ already has a complete runtime, a stable release, a general-purpose
 language implementation, or a hardware service.
 
-**Current implementation baseline:** The remotely verified U4 feedback revision
-`62baf18` passed [Compiler Core #32250265354][1]: 44/44 Linux recovery CTests,
-30/30 Windows MSVC and macOS Clang platform-neutral CTests, and three
+**Current implementation baseline:** The remotely verified U5 callable revision
+`7307c00` passed [Compiler Core #32266056516][1]: 45/45 Linux recovery CTests,
+31/31 Windows MSVC and macOS Clang platform-neutral CTests, and three
 clean-install experimental static-SDK consumer jobs.
 
 ## Purpose
@@ -110,8 +110,9 @@ runs may therefore provide no-cost additional evidence.[3]
 
 1. **Versioned semantic core:** values, lexical scopes, deterministic evaluation,
    assignments, structured runtime errors, and budgets.
-2. **Bounded callable runtime:** non-recursive callable execution, arguments,
-   returns, call frames, explicit resource effects, and call-depth limits.
+2. **Bounded callable runtime:** U5 completes one non-recursive, one-formal,
+   parameter-only local callable slice with a depth-1 frame. Wider arguments,
+   returns, scopes, and effects remain separate contracts.
 3. **Bounded hybrid runtime:** branch semantics, repeated measurement/result
    lifetime rules, explicit correction effects, and a deterministic simulator
    model; source lowering remains separately described.
@@ -127,7 +128,7 @@ Hardware service remains outside this standard.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32250265354 "SynQ Compiler Core — Alpha bounded measurement feedback"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32266056516 "SynQ Compiler Core — Alpha bounded classical callable runtime"
 [2]: https://www.nist.gov/itl/voting/conformance-testing-101 "NIST Conformance Testing 101"
 [3]: https://llvm.org/docs/LibFuzzer.html "LLVM libFuzzer documentation"
 [4]: https://reproducible-builds.org/ "Reproducible Builds"
