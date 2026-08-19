@@ -176,5 +176,6 @@
 - [ ] Specify and implement wider bounded callable execution beyond U5/U6, with argument/return contracts, explicit quantum-resource effects, non-recursion rules, and deterministic failure paths before widening routine bodies.
 - [ ] Specify and implement a general-but-bounded hybrid control model only after measurement-result lifetime, `else`, branch effects, state interaction, and local/target representation contracts are independently testable.
 - [ ] Build a versioned language conformance suite that runs positive, negative, differential, and regression fixtures in the free Compiler Core matrix, with coverage targets recorded as engineering evidence rather than a completeness percentage.
+- [x] Publish the first versioned requirement-to-test conformance matrix for the verified bounded U1–U6 local-runtime candidates, including requirement IDs, fixture owners, profile scope, and known closure gaps.
 - [ ] Add zero-budget reliability evidence: sanitizer-enabled builds where available, deterministic seed/replay controls, parser/runtime fuzzing or property tests, and a security/known-limit review.
 - [ ] Publish a stable-runtime candidate only after the documented subset has a reproducible installation path, compatibility/deprecation policy, executable examples, diagnostics guide, release checklist, and repeated six-job remote evidence.
