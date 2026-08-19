@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
     const auto quantum = base.string() + "_quantum.synq";
     const auto constants = base.string() + "_constants.synq";
     const auto state = base.string() + "_state.synq";
+    const auto runtime = base.string() + "_runtime.synq";
     const auto semantics = base.string() + "_semantics.synq";
     const auto simulation = base.string() + "_simulation.synq";
     const auto multi_register_simulation = base.string() + "_multi_register_simulation.synq";
@@ -80,6 +81,11 @@ int main(int argc, char** argv) {
                             "let seed = 5\nvar total = seed\nset total = total + 4\n"
                             "var ready = true\nset ready = not ready\n"),
                  "writes mutable-state CLI fixture") ||
+        !require(write_file(runtime,
+                            "#[experimental(feature = \"classical-callable-execution\")]\n"
+                            "fn increment(value: Integer) -> value + 1\n"
+                            "let answer = increment(41)\n"),
+                 "writes classical callable-runtime CLI fixture") ||
         !require(write_file(semantics,
                             "let seed = 5\nlet selected = seed\nmeasure q[0] as observed\n"),
                  "writes semantic-inspection CLI fixture") ||
@@ -154,6 +160,11 @@ int main(int argc, char** argv) {
                      read_file(stdout_path).find("cell ready = Boolean:false | declared line 7 | last write line 8") != std::string::npos,
                  "explicit state-evaluation mode prints final typed cells and source-order write provenance")) return 1;
 
+    if (!require(std::system((invoke + " " + quote(runtime) + " --eval-runtime > " + quote(stdout_path) +
+                              " 2> " + quote(stderr_path)).c_str()) == 0 &&
+                     read_file(stdout_path).find("answer = Integer:42") != std::string::npos,
+                 "explicit runtime-evaluation mode prints the bounded local callable result")) return 1;
+
     if (!require(std::system((invoke + " " + quote(semantics) + " --inspect-semantics > " + quote(stdout_path) +
                               " 2> " + quote(stderr_path)).c_str()) == 0 &&
                      read_file(stdout_path).find("binding selected | Value | Integer | line 2 | depends-on seed") != std::string::npos &&
@@ -183,6 +194,7 @@ int main(int argc, char** argv) {
     std::filesystem::remove(quantum);
     std::filesystem::remove(constants);
     std::filesystem::remove(state);
+    std::filesystem::remove(runtime);
     std::filesystem::remove(semantics);
     std::filesystem::remove(simulation);
     std::filesystem::remove(multi_register_simulation);

@@ -294,11 +294,116 @@ bool evaluate_state_expression(const ClassicalExpression& expression,
     return false;
 }
 
+BoundedValueKind bounded_kind_for_callable_type(ClassicalCallableValueType type) {
+    switch (type) {
+        case ClassicalCallableValueType::Integer: return BoundedValueKind::Integer;
+        case ClassicalCallableValueType::Boolean: return BoundedValueKind::Boolean;
+        case ClassicalCallableValueType::String: return BoundedValueKind::String;
+    }
+    return BoundedValueKind::Integer;
+}
+
+bool evaluate_callable_actual(const ClassicalCallableInvocation& invocation,
+                              const std::map<std::string, BoundedValue>& values,
+                              BoundedValue& value, Diagnostic& diagnostic) {
+    if (invocation.actual_kind == ClassicalLiteralKind::Integer) {
+        std::int64_t parsed = 0;
+        if (!parse_integer(invocation.actual_source, parsed)) {
+            diagnostic = error("SYNQ-E013", invocation.span, "invalid internal U5 Integer actual",
+                               "use a parser-produced literal or earlier immutable binding");
+            return false;
+        }
+        value = {BoundedValueKind::Integer, parsed, false, {}};
+        return true;
+    }
+    if (invocation.actual_kind == ClassicalLiteralKind::Boolean) {
+        value = {BoundedValueKind::Boolean, 0, invocation.actual_source == "true", {}};
+        return true;
+    }
+    if (invocation.actual_kind == ClassicalLiteralKind::QuotedString) {
+        if (invocation.actual_source.size() < 2) {
+            diagnostic = error("SYNQ-E013", invocation.span, "invalid internal U5 String actual",
+                               "use a parser-produced quoted String literal or earlier immutable binding");
+            return false;
+        }
+        value = {BoundedValueKind::String, 0, false,
+                 invocation.actual_source.substr(1, invocation.actual_source.size() - 2)};
+        return true;
+    }
+    const auto binding = values.find(invocation.actual_source);
+    if (invocation.actual_kind != ClassicalLiteralKind::SourceText || binding == values.end()) {
+        diagnostic = error("SYNQ-E013", invocation.span, "U5 callable actual has no evaluated immutable binding",
+                           "use one earlier immutable binding or a supported literal actual");
+        return false;
+    }
+    value = binding->second;
+    return true;
+}
+
+bool evaluate_classical_callable(const HybridCallableDeclaration& callable,
+                                 const BoundedValue& actual, BoundedValue& result,
+                                 EvaluationBudget& budget, Diagnostic& diagnostic) {
+    if (!callable.classical_body.has_value()) {
+        diagnostic = error("SYNQ-E013", callable.span, "runtime received a callable without a U5 local body",
+                           "use a resolver-produced U5 one-formal function");
+        return false;
+    }
+    const ClassicalCallableBody& body = *callable.classical_body;
+    if (actual.kind != bounded_kind_for_callable_type(body.parameter_type)) {
+        diagnostic = error("SYNQ-E013", body.span, "runtime received a static-type-incompatible U5 actual",
+                           "use a resolver-produced exact-type callable invocation");
+        return false;
+    }
+    std::map<std::string, BoundedValue> frame;
+    frame.emplace(body.parameter_name, actual);
+    if (body.parameter_type == ClassicalCallableValueType::Integer) {
+        if (body.source_expression == body.parameter_name) {
+            result = actual;
+            return true;
+        }
+        ClassicalIntegerArithmeticExpression expression;
+        if (!parse_bounded_integer_arithmetic_expression(body.source_expression, body.span, expression)) {
+            diagnostic = error("SYNQ-E013", body.span, "runtime received an invalid U5 Integer callable body",
+                               "use a resolver-produced parameter plus/minus/times Integer-literal body");
+            return false;
+        }
+        std::int64_t value = 0;
+        if (!evaluate_integer_tree(expression, frame, value, budget, 1, diagnostic)) return false;
+        result = {BoundedValueKind::Integer, value, false, {}};
+        return true;
+    }
+    if (body.parameter_type == ClassicalCallableValueType::Boolean) {
+        if (body.source_expression == body.parameter_name) {
+            result = actual;
+            return true;
+        }
+        ClassicalBooleanExpression expression;
+        if (!parse_bounded_boolean_declaration_expression(body.source_expression, body.span, expression)) {
+            diagnostic = error("SYNQ-E013", body.span, "runtime received an invalid U5 Boolean callable body",
+                               "use a resolver-produced parameter or not-parameter body");
+            return false;
+        }
+        bool value = false;
+        if (!evaluate_boolean_tree(expression, frame, value, budget, 1, diagnostic)) return false;
+        result = {BoundedValueKind::Boolean, 0, value, {}};
+        return true;
+    }
+    if (body.parameter_type == ClassicalCallableValueType::String && body.source_expression == body.parameter_name) {
+        result = actual;
+        return true;
+    }
+    diagnostic = error("SYNQ-E013", body.span, "runtime received an invalid U5 String callable body",
+                       "use a resolver-produced parameter-only String body");
+    return false;
+}
+
 }  // namespace
 
 bool BoundedEvaluationResult::ok() const { return evaluation.has_value() && diagnostics.empty(); }
 
 bool BoundedStateEvaluationResult::ok() const { return evaluation.has_value() && diagnostics.empty(); }
+
+bool BoundedRuntimeEvaluationResult::ok() const { return evaluation.has_value() && diagnostics.empty(); }
 
 const char* bounded_value_kind_name(BoundedValueKind kind) {
     switch (kind) {
@@ -435,6 +540,84 @@ BoundedStateEvaluationResult evaluate_bounded_state(const ResolvedHybridProgram&
         result.diagnostics.push_back(error("SYNQ-E010", {},
                                            "bounded state evaluation accepts only immutable declarations, mutable cells, and assignments",
                                            "keep U2 state-evaluation inputs within the documented top-level classical subset"));
+        return result;
+    }
+
+    result.evaluation = std::move(evaluation);
+    return result;
+}
+
+BoundedRuntimeEvaluationResult evaluate_bounded_runtime(const ResolvedHybridProgram& program,
+                                                        const BoundedRuntimeEvaluationOptions& options) {
+    BoundedRuntimeEvaluationResult result;
+    if (!options.allow_experimental_runtime_evaluation) {
+        result.diagnostics.push_back(error("SYNQ-E011", {}, "bounded runtime evaluation requires explicit opt-in",
+                                           "set allow_experimental_runtime_evaluation to true after reviewing its local-only limits"));
+        return result;
+    }
+
+    BoundedRuntimeEvaluation evaluation;
+    std::map<std::string, BoundedValue> values;
+    std::map<std::string, HybridCallableDeclaration> callables;
+    EvaluationBudget budget{options.max_expression_depth, options.max_operations, 0};
+    std::size_t invocations = 0;
+
+    for (const ResolvedHybridNode& node : program.nodes) {
+        if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (!callable->classical_body.has_value()) {
+                result.diagnostics.push_back(error("SYNQ-E014", callable->span,
+                                                   "bounded runtime evaluation rejects non-U5 callable declarations",
+                                                   "use only one-formal U5 local fn declarations in --eval-runtime input"));
+                return result;
+            }
+            if (callables.size() >= options.max_callable_declarations) {
+                result.diagnostics.push_back(error("SYNQ-E012", callable->span,
+                                                   "bounded runtime evaluation exceeds its callable-declaration limit",
+                                                   "reduce U5 local function declarations or increase the explicitly configured limit"));
+                return result;
+            }
+            callables.emplace(callable->name, *callable);
+            continue;
+        }
+
+        if (const auto* declaration = std::get_if<ResolvedHybridDeclaration>(&node)) {
+            BoundedValue value;
+            Diagnostic diagnostic;
+            if (declaration->declaration.classical_callable_invocation.has_value()) {
+                if (invocations >= options.max_callable_invocations || options.max_call_depth < 1) {
+                    result.diagnostics.push_back(error("SYNQ-E012", declaration->declaration.span,
+                                                       "bounded runtime evaluation exceeds its callable invocation or call-depth limit",
+                                                       "reduce U5 invocations or retain the documented non-nested call depth"));
+                    return result;
+                }
+                const ClassicalCallableInvocation& invocation = *declaration->declaration.classical_callable_invocation;
+                const auto callable = callables.find(invocation.function_name);
+                if (callable == callables.end() ||
+                    !declaration->classical_callable_declaration_index.has_value()) {
+                    result.diagnostics.push_back(error("SYNQ-E013", declaration->declaration.span,
+                                                       "runtime received an unresolved U5 callable invocation",
+                                                       "use a resolver-produced earlier U5 function invocation"));
+                    return result;
+                }
+                BoundedValue actual;
+                if (!evaluate_callable_actual(invocation, values, actual, diagnostic) ||
+                    !evaluate_classical_callable(callable->second, actual, value, budget, diagnostic)) {
+                    result.diagnostics.push_back(std::move(diagnostic));
+                    return result;
+                }
+                ++invocations;
+            } else if (!evaluate_state_expression(declaration->declaration.initializer, values, value, budget, diagnostic)) {
+                result.diagnostics.push_back(std::move(diagnostic));
+                return result;
+            }
+            values.emplace(declaration->declaration.name, value);
+            evaluation.bindings.push_back({declaration->declaration.name, std::move(value), declaration->declaration.span});
+            continue;
+        }
+
+        result.diagnostics.push_back(error("SYNQ-E014", {},
+                                           "bounded runtime evaluation accepts only immutable declarations and U5 local functions",
+                                           "keep --eval-runtime input within the documented U5 classical subset"));
         return result;
     }
 

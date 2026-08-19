@@ -21,6 +21,7 @@ enum class Mode {
     InspectSemantics,
     EvaluateConstants,
     EvaluateState,
+    EvaluateRuntime,
     Simulate,
 };
 
@@ -35,6 +36,10 @@ struct Command {
     std::size_t max_state_transitions = 128;
     std::size_t max_expression_depth = 16;
     std::size_t max_state_operations = 128;
+    std::size_t max_callable_declarations = 32;
+    std::size_t max_callable_invocations = 128;
+    std::size_t max_call_depth = 1;
+    std::size_t max_runtime_operations = 128;
     bool has_max_operations = false;
 };
 
@@ -47,6 +52,7 @@ void print_help(std::ostream& output) {
            << "  synqc <source.synq> --inspect-semantics\n"
            << "  synqc <source.synq> --eval-constants [--max-declarations <n>]\n"
            << "  synqc <source.synq> --eval-state [--max-state-cells <n>] [--max-state-transitions <n>] [--max-expression-depth <n>] [--max-operations <n>]\n"
+           << "  synqc <source.synq> --eval-runtime [--max-callables <n>] [--max-invocations <n>] [--max-call-depth <n>] [--max-expression-depth <n>] [--max-operations <n>]\n"
            << "  synqc <source.synq> --simulate [--max-qubits <n>] [--max-operations <n>]\n\n"
            << "Modes:\n"
            << "  --validate        Parse, lower, and resolve the documented bounded profile.\n"
@@ -55,6 +61,7 @@ void print_help(std::ostream& output) {
            << "  --inspect-semantics  Render resolved top-level binding metadata without evaluation.\n"
            << "  --eval-constants  Explicitly run bounded declaration-only constant evaluation.\n"
            << "  --eval-state      Explicitly run bounded top-level mutable-cell evaluation.\n"
+           << "  --eval-runtime    Explicitly run bounded local classical callable evaluation.\n"
            << "  --simulate        Explicitly calculate deterministic bounded local probabilities.\n\n"
            << "This command does not submit jobs,\n"
            << "run legacy runtime components, or evaluate general SynQ source.\n";
@@ -105,6 +112,10 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::EvaluateState;
             selected_mode = true;
+        } else if (argument == "--eval-runtime") {
+            if (selected_mode) { error = "select exactly one mode"; return false; }
+            command.mode = Mode::EvaluateRuntime;
+            selected_mode = true;
         } else if (argument == "--simulate") {
             if (selected_mode) { error = "select exactly one mode"; return false; }
             command.mode = Mode::Simulate;
@@ -130,6 +141,7 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
             }
             command.max_operations = parsed;
             command.max_state_operations = parsed;
+            command.max_runtime_operations = parsed;
             command.has_max_operations = true;
         } else if (argument == "--max-state-cells") {
             if (++index >= argc || !parse_positive_size(argv[index], command.max_state_cells)) {
@@ -146,13 +158,28 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
                 error = "--max-expression-depth requires a positive whole number";
                 return false;
             }
+        } else if (argument == "--max-callables") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_callable_declarations)) {
+                error = "--max-callables requires a positive whole number";
+                return false;
+            }
+        } else if (argument == "--max-invocations") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_callable_invocations)) {
+                error = "--max-invocations requires a positive whole number";
+                return false;
+            }
+        } else if (argument == "--max-call-depth") {
+            if (++index >= argc || !parse_positive_size(argv[index], command.max_call_depth)) {
+                error = "--max-call-depth requires a positive whole number";
+                return false;
+            }
         } else {
             error = "unknown argument: " + argument;
             return false;
         }
     }
     if (!selected_mode) {
-        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --inspect-semantics, --eval-constants, --eval-state, or --simulate";
+        error = "select one of --validate, --emit-openqasm, --emit-openqasm-hybrid, --inspect-semantics, --eval-constants, --eval-state, --eval-runtime, or --simulate";
         return false;
     }
     if (command.output_path.has_value() && command.mode != Mode::EmitOpenQasm &&
@@ -169,15 +196,22 @@ bool parse_command(int argc, char** argv, Command& command, std::string& error) 
         error = "--max-qubits and --max-operations are supported only with --simulate";
         return false;
     }
-    if ((command.max_state_cells != 64 || command.max_state_transitions != 128 ||
-         command.max_expression_depth != 16 ||
-         (command.has_max_operations && command.mode == Mode::EvaluateState)) &&
-        command.mode != Mode::EvaluateState) {
-        error = "--max-state-cells, --max-state-transitions, and --max-expression-depth are supported only with --eval-state";
+    if ((command.max_state_cells != 64 || command.max_state_transitions != 128) && command.mode != Mode::EvaluateState) {
+        error = "--max-state-cells and --max-state-transitions are supported only with --eval-state";
         return false;
     }
-    if (command.has_max_operations && command.mode != Mode::Simulate && command.mode != Mode::EvaluateState) {
-        error = "--max-operations is supported only with --simulate or --eval-state";
+    if ((command.max_callable_declarations != 32 || command.max_callable_invocations != 128 || command.max_call_depth != 1) &&
+        command.mode != Mode::EvaluateRuntime) {
+        error = "--max-callables, --max-invocations, and --max-call-depth are supported only with --eval-runtime";
+        return false;
+    }
+    if (command.max_expression_depth != 16 && command.mode != Mode::EvaluateState && command.mode != Mode::EvaluateRuntime) {
+        error = "--max-expression-depth is supported only with --eval-state or --eval-runtime";
+        return false;
+    }
+    if (command.has_max_operations && command.mode != Mode::Simulate && command.mode != Mode::EvaluateState &&
+        command.mode != Mode::EvaluateRuntime) {
+        error = "--max-operations is supported only with --simulate, --eval-state, or --eval-runtime";
         return false;
     }
     return true;
@@ -356,6 +390,20 @@ int main(int argc, char** argv) {
         const auto evaluation = synq::compiler::evaluate_bounded_state(*resolved.program, options);
         if (!evaluation.ok()) return render_diagnostics(command.source_path, evaluation.diagnostics, 5);
         for (const auto& cell : evaluation.evaluation->cells) print_state_cell(cell);
+        return 0;
+    }
+
+    if (command.mode == Mode::EvaluateRuntime) {
+        synq::compiler::BoundedRuntimeEvaluationOptions options;
+        options.allow_experimental_runtime_evaluation = true;
+        options.max_callable_declarations = command.max_callable_declarations;
+        options.max_callable_invocations = command.max_callable_invocations;
+        options.max_call_depth = command.max_call_depth;
+        options.max_expression_depth = command.max_expression_depth;
+        options.max_operations = command.max_runtime_operations;
+        const auto evaluation = synq::compiler::evaluate_bounded_runtime(*resolved.program, options);
+        if (!evaluation.ok()) return render_diagnostics(command.source_path, evaluation.diagnostics, 5);
+        for (const auto& binding : evaluation.evaluation->bindings) print_value(binding);
         return 0;
     }
 

@@ -72,11 +72,10 @@ Parsing a U5 program, emitting source, or using the ABI does not execute it.
 
 ## Required gates and diagnostics
 
-The source must enable `classical-callable-execution`. U5 keeps the existing
-`callable-declarations` gate as a prerequisite implementation detail, but the
-beginner-facing syntax requires only the U5 annotation in examples. The
-implementation must ensure that its feature registry documents the dependency
-and that direct programmatic parser configuration cannot bypass it.
+The source must enable `classical-callable-execution`. U5 intentionally does
+not require the older declaration-only `callable-declarations` annotation: the
+two gates cover distinct source forms. The implementation must ensure that
+direct programmatic parser configuration cannot bypass the U5 gate.
 
 The implementation reserves these diagnostic families after collision checking
 against the current registry:
@@ -85,10 +84,11 @@ against the current registry:
 | --- | --- |
 | `SYNQ-P019` | Malformed U5 function declaration or unsupported typed body. |
 | `SYNQ-P020` | Malformed U5 invocation expression. |
-| `SYNQ-R007` | Invocation has no earlier U5 function or has an invalid result/capture relation. |
-| `SYNQ-R008` | Actual/body static type or formal-reference rule is violated. |
+| `SYNQ-R009` | Invocation has no earlier U5 function or has an invalid result/capture relation. |
+| `SYNQ-R010` | Actual/body static type or formal-reference rule is violated. |
 | `SYNQ-E011` | Runtime evaluation requires explicit opt-in. |
-| `SYNQ-E012` | Callable declaration, invocation, depth, or operation bound is exceeded. |
+| `SYNQ-E012` | Callable declaration, invocation, or call-depth bound is exceeded. |
+| `SYNQ-E007` | The inherited checked-expression operation budget is exceeded. |
 | `SYNQ-E013` | Runtime evaluator encounters an invalid internal U5 frame/body shape. |
 | `SYNQ-E014` | Runtime evaluator receives a non-U5 or otherwise unsupported node. |
 

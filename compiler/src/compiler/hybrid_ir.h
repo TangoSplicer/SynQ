@@ -21,6 +21,7 @@ struct HybridDeclaration {
     ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
     ClassicalExpression initializer;
     SourceSpan span;
+    std::optional<ClassicalCallableInvocation> classical_callable_invocation;
 };
 
 struct HybridMutableDeclaration {
@@ -74,6 +75,7 @@ struct HybridCallableDeclaration {
     std::vector<HybridRoutineFormal> formals;
     std::optional<HybridParameterizedRoutineBody> parameterized_body;
     SourceSpan span;
+    std::optional<ClassicalCallableBody> classical_body;
 };
 
 struct HybridCallableCall {

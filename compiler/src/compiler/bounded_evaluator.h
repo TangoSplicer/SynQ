@@ -81,6 +81,28 @@ struct BoundedStateEvaluationResult {
     bool ok() const;
 };
 
+struct BoundedRuntimeEvaluation {
+    std::vector<EvaluatedBinding> bindings;
+};
+
+struct BoundedRuntimeEvaluationOptions {
+    // This remains an explicit local-only opt-in. It does not make parsed
+    // functions executable through exports, the ABI, a provider, or hardware.
+    bool allow_experimental_runtime_evaluation = false;
+    std::size_t max_callable_declarations = 32;
+    std::size_t max_callable_invocations = 128;
+    std::size_t max_call_depth = 1;
+    std::size_t max_expression_depth = 16;
+    std::size_t max_operations = 128;
+};
+
+struct BoundedRuntimeEvaluationResult {
+    std::optional<BoundedRuntimeEvaluation> evaluation;
+    std::vector<Diagnostic> diagnostics;
+
+    bool ok() const;
+};
+
 // Evaluates only a sequence of resolved top-level declarations with supported
 // literal, alias, or one-operator Integer arithmetic initializers. Qubits,
 // measurements, gates, controls, callables, decimals, opaque source, I/O,
@@ -94,6 +116,13 @@ BoundedEvaluationResult evaluate_bounded_constants(const ResolvedHybridProgram& 
 // values, target lowering, and all unsupported expression forms.
 BoundedStateEvaluationResult evaluate_bounded_state(const ResolvedHybridProgram& program,
                                                      const BoundedStateEvaluationOptions& options);
+
+// Evaluates the U5 local classical callable subset only: immutable declarations
+// plus earlier one-formal non-recursive function definitions and one-actual
+// immutable invocation initializers. All quantum, control, state, ABI, target,
+// and unsupported callable nodes are rejected explicitly.
+BoundedRuntimeEvaluationResult evaluate_bounded_runtime(const ResolvedHybridProgram& program,
+                                                        const BoundedRuntimeEvaluationOptions& options);
 
 const char* bounded_value_kind_name(BoundedValueKind kind);
 

@@ -199,6 +199,32 @@ enum class CallableDeclarationKind {
     Kernel,
 };
 
+enum class ClassicalLiteralKind;
+
+// U5 local callable parameters remain separate from quantum routine formals.
+// They use only the existing bounded local value kinds and never denote qubits
+// or arbitrary runtime objects.
+enum class ClassicalCallableValueType {
+    Integer,
+    Boolean,
+    String,
+};
+
+struct ClassicalCallableBody {
+    std::string parameter_name;
+    ClassicalCallableValueType parameter_type = ClassicalCallableValueType::Integer;
+    std::string source_expression;
+    ClassicalLiteralKind expression_kind{};
+    synq::compiler::SourceSpan span;
+};
+
+struct ClassicalCallableInvocation {
+    std::string function_name;
+    std::string actual_source;
+    ClassicalLiteralKind actual_kind{};
+    synq::compiler::SourceSpan span;
+};
+
 enum class RoutineFormalKind {
     Angle,
     Qubit,
@@ -226,6 +252,7 @@ public:
     QuantumGateNode* body = nullptr;
     std::vector<RoutineFormal> formals;
     std::optional<ParameterizedRoutineBody> parameterized_body;
+    std::optional<ClassicalCallableBody> classical_body;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -376,6 +403,7 @@ public:
     std::string name;
     std::string value;
     ClassicalLiteralKind literal_kind = ClassicalLiteralKind::SourceText;
+    std::optional<ClassicalCallableInvocation> classical_callable_invocation;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 

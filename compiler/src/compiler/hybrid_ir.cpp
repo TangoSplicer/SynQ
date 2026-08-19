@@ -51,12 +51,20 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
 
     for (const ASTNode* statement : program.statements) {
         if (const auto* declaration = dynamic_cast<const DeclarationNode*>(statement)) {
+            ClassicalExpression initializer = make_classical_expression(declaration->value, declaration->literal_kind,
+                                                                         declaration->span);
+            if (declaration->classical_callable_invocation.has_value()) {
+                initializer.kind = ClassicalExpressionKind::ClassicalCallableInvocation;
+                initializer.static_type = ClassicalStaticType::Unknown;
+                initializer.classical_callable_invocation = declaration->classical_callable_invocation;
+            }
             lowered.nodes.emplace_back(HybridDeclaration{
                 declaration->name,
                 declaration->value,
                 declaration->literal_kind,
-                make_classical_expression(declaration->value, declaration->literal_kind, declaration->span),
+                std::move(initializer),
                 declaration->span,
+                declaration->classical_callable_invocation,
             });
             continue;
         }
@@ -117,6 +125,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 std::move(formals),
                 std::move(parameterized_body),
                 callable->span,
+                callable->classical_body,
             });
             continue;
         }

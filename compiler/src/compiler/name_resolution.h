@@ -44,6 +44,10 @@ struct ResolvedHybridDeclaration {
     // Indices of earlier declaration operands used by a bounded integer
     // arithmetic initializer. Empty means no identifier arithmetic operands.
     std::vector<std::size_t> initializer_binding_indices;
+    // U5 preserves one earlier local-function target and, optionally, one
+    // earlier immutable actual binding. It is static provenance, not a frame.
+    std::optional<std::size_t> classical_callable_declaration_index;
+    std::optional<std::size_t> classical_callable_actual_binding_index;
 };
 
 struct ResolvedHybridMutableDeclaration {

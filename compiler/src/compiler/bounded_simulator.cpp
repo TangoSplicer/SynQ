@@ -235,6 +235,12 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
             continue;
         }
         if (const auto* callable = std::get_if<HybridCallableDeclaration>(&node)) {
+            if (callable->classical_body.has_value()) {
+                result.diagnostics.push_back(error("SYNQ-SIM002", callable->span,
+                                                   "simulator explicitly rejects Alpha classical callable runtime declarations",
+                                                   "use --eval-runtime for the documented local U5 classical subset"));
+                return result;
+            }
             if (!callable->formals.empty() || callable->parameterized_body.has_value()) {
                 result.diagnostics.push_back(error("SYNQ-SIM002", callable->span,
                                                    "simulator explicitly rejects Alpha parameterized quantum routine declarations",
@@ -245,6 +251,14 @@ BoundedSimulationResult simulate_bounded_quantum(const ResolvedHybridProgram& pr
                                                "simulator rejects callable declarations",
                                                "use only qubit declarations, supported gates, and trailing unnamed measurements"));
             return result;
+        }
+        if (const auto* declaration = std::get_if<ResolvedHybridDeclaration>(&node)) {
+            if (declaration->declaration.classical_callable_invocation.has_value()) {
+                result.diagnostics.push_back(error("SYNQ-SIM002", declaration->declaration.span,
+                                                   "simulator explicitly rejects Alpha classical callable runtime invocations",
+                                                   "use --eval-runtime for the documented local U5 classical subset"));
+                return result;
+            }
         }
         if (const auto* call = std::get_if<HybridCallableCall>(&node)) {
             if (!call->arguments.empty()) {

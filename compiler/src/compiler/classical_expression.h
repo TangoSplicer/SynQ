@@ -18,6 +18,7 @@ enum class ClassicalExpressionKind {
     IdentifierReference,
     IntegerArithmeticExpression,
     BooleanExpression,
+    ClassicalCallableInvocation,
     OpaqueSource,
 };
 
@@ -36,6 +37,7 @@ struct ClassicalExpression {
     SourceSpan span;
     std::optional<ClassicalIntegerArithmeticExpression> integer_arithmetic;
     std::optional<ClassicalBooleanExpression> boolean_expression;
+    std::optional<ClassicalCallableInvocation> classical_callable_invocation;
 };
 
 bool looks_like_integer_arithmetic_expression(const std::string& source_text);

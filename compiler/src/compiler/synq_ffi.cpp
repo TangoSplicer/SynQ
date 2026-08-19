@@ -66,6 +66,16 @@ bool contains_measurement_feedback_node(const ProgramNode& program) {
     return false;
 }
 
+bool contains_classical_callable_runtime_node(const ProgramNode& program) {
+    for (const ASTNode* statement : program.statements) {
+        const auto* callable = dynamic_cast<const CallableDeclarationNode*>(statement);
+        if (callable != nullptr && callable->classical_body.has_value()) return true;
+        const auto* declaration = dynamic_cast<const DeclarationNode*>(statement);
+        if (declaration != nullptr && declaration->classical_callable_invocation.has_value()) return true;
+    }
+    return false;
+}
+
 }  // namespace
 
 extern "C" unsigned int synq_abi_version(void) {
@@ -159,6 +169,11 @@ extern "C" synq_status synq_export_openqasm3(const synq_program* program,
     }
 
     try {
+        if (contains_classical_callable_runtime_node(*program->program)) {
+            return return_error(SYNQ_STATUS_EXPORT_ERROR,
+                                "experimental C ABI explicitly rejects Alpha classical callable runtime nodes; use the compiler CLI --eval-runtime path instead",
+                                out_diagnostic);
+        }
         if (contains_measurement_feedback_node(*program->program)) {
             return return_error(SYNQ_STATUS_EXPORT_ERROR,
                                 "experimental C ABI explicitly rejects Alpha measurement-feedback nodes; use the compiler CLI strict Hybrid OpenQASM or bounded local simulation paths instead",

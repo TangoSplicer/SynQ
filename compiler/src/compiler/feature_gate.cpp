@@ -103,6 +103,12 @@ FeatureRegistry make_default_feature_registry() {
         "synq#bounded-callable-declarations",
     });
     registry.register_feature({
+        "classical-callable-execution",
+        FeatureStage::Alpha,
+        "Enables one explicit typed, non-recursive local classical function expression with one immutable invocation; it does not enable target execution, ABI execution, network access, or quantum routine calls.",
+        "synq#bounded-classical-callable-execution",
+    });
+    registry.register_feature({
         "parameterized-quantum-routines",
         FeatureStage::Alpha,
         "Enables one-gate kernels with explicit angle/qubit formals and static source-only call expansion.",

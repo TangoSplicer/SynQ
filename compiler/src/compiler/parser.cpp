@@ -239,6 +239,99 @@ bool parse_callable_declaration(const std::string& source, std::string& name) {
     return is_identifier(name);
 }
 
+bool parse_classical_callable_type(const std::string& source, ClassicalCallableValueType& type) {
+    if (source == "Integer") {
+        type = ClassicalCallableValueType::Integer;
+        return true;
+    }
+    if (source == "Boolean") {
+        type = ClassicalCallableValueType::Boolean;
+        return true;
+    }
+    if (source == "String") {
+        type = ClassicalCallableValueType::String;
+        return true;
+    }
+    return false;
+}
+
+bool parse_classical_callable_declaration(const std::string& source, std::string& name,
+                                          ClassicalCallableBody& body,
+                                          const synq::compiler::SourceSpan& span) {
+    const std::string separator = " -> ";
+    const std::size_t arrow = source.find(separator);
+    if (arrow == std::string::npos || source.find(separator, arrow + separator.size()) != std::string::npos) return false;
+    const std::string signature = trim(source.substr(0, arrow));
+    const std::string expression = trim(source.substr(arrow + separator.size()));
+    const std::size_t open = signature.find('(');
+    if (open == std::string::npos || signature.empty() || signature.back() != ')' ||
+        signature.find('(', open + 1) != std::string::npos || expression.empty()) {
+        return false;
+    }
+    name = trim(signature.substr(0, open));
+    const std::string formal = trim(signature.substr(open + 1, signature.size() - open - 2));
+    const std::size_t colon = formal.find(':');
+    if (!is_identifier(name) || colon == std::string::npos || formal.find(':', colon + 1) != std::string::npos) return false;
+    const std::string parameter = trim(formal.substr(0, colon));
+    ClassicalCallableValueType parameter_type;
+    if (!is_identifier(parameter) || !parse_classical_callable_type(trim(formal.substr(colon + 1)), parameter_type)) return false;
+
+    ClassicalLiteralKind expression_kind = ClassicalLiteralKind::SourceText;
+    if (parameter_type == ClassicalCallableValueType::Integer) {
+        if (expression != parameter) {
+            std::istringstream words(expression);
+            std::string left;
+            std::string operation;
+            std::string right;
+            std::string extra;
+            if (!(words >> left >> operation >> right) || (words >> extra) || left != parameter ||
+                (operation != "+" && operation != "-" && operation != "*") || !is_integer_literal(right)) {
+                return false;
+            }
+            expression_kind = ClassicalLiteralKind::IntegerArithmeticExpression;
+        }
+    } else if (parameter_type == ClassicalCallableValueType::Boolean) {
+        if (expression == parameter) {
+            expression_kind = ClassicalLiteralKind::SourceText;
+        } else if (expression == "not " + parameter) {
+            expression_kind = ClassicalLiteralKind::BooleanExpression;
+        } else {
+            return false;
+        }
+    } else if (expression != parameter) {
+        return false;
+    }
+
+    body = {parameter, parameter_type, expression, expression_kind, span};
+    return true;
+}
+
+bool looks_like_classical_callable_declaration(const std::string& source) {
+    return source.find("->") != std::string::npos;
+}
+
+bool parse_classical_callable_invocation(const std::string& source,
+                                         ClassicalCallableInvocation& invocation,
+                                         const synq::compiler::SourceSpan& span) {
+    const std::size_t open = source.find('(');
+    if (open == std::string::npos || source.empty() || source.back() != ')' ||
+        source.find('(', open + 1) != std::string::npos || source.find(',', open + 1) != std::string::npos) {
+        return false;
+    }
+    const std::string name = trim(source.substr(0, open));
+    const std::string actual = trim(source.substr(open + 1, source.size() - open - 2));
+    if (!is_identifier(name) || actual.empty() || (!is_identifier(actual) && !is_integer_literal(actual) &&
+        actual != "true" && actual != "false" && !(actual.size() >= 2 && actual.front() == '"' && actual.back() == '"'))) {
+        return false;
+    }
+    invocation = {name, actual, classify_declaration_literal(actual), span};
+    return true;
+}
+
+bool looks_like_classical_callable_invocation(const std::string& source) {
+    return source.find('(') != std::string::npos || source.find(')') != std::string::npos;
+}
+
 QuantumGateKind quantum_gate_kind(const std::string& source_name);
 
 bool parse_bounded_kernel_body(const std::string& source, std::string& name, std::string& body) {
@@ -613,12 +706,26 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
             if (!is_identifier(identifier) || value.empty()) {
                 return fail_parse("SYNQ-P002", span, "malformed declaration", "use let <identifier> = <value>");
             }
+            ClassicalCallableInvocation invocation;
+            const bool looks_like_invocation = looks_like_classical_callable_invocation(value);
+            if (looks_like_invocation) {
+                if (!active_features.is_enabled("classical-callable-execution")) {
+                    return fail_parse("SYNQ-P007", span, "classical callable execution requires an alpha feature opt-in",
+                                      "add #[experimental(feature = \"classical-callable-execution\")] before the invocation");
+                }
+                if (!parse_classical_callable_invocation(value, invocation, span)) {
+                    return fail_parse("SYNQ-P020", span, "malformed classical callable invocation",
+                                      "use let <binding> = <earlier-function>(<one literal or earlier immutable binding>)");
+                }
+            }
             ClassicalLiteralKind declaration_kind;
             std::string message;
             std::string help;
-            if (!classify_bounded_classical_value(value, active_features, span, declaration_kind, message, help)) {
+            if (!looks_like_invocation &&
+                !classify_bounded_classical_value(value, active_features, span, declaration_kind, message, help)) {
                 return fail_parse("SYNQ-P011", span, message, help);
             }
+            if (looks_like_invocation) declaration_kind = ClassicalLiteralKind::SourceText;
             const auto inserted = declared_names.emplace(identifier, span);
             if (!inserted.second) {
                 return fail_parse("SYNQ-S004", span,
@@ -626,7 +733,9 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                       "`; first declared on line " + std::to_string(inserted.first->second.line),
                                   "rename the later binding or reuse the existing declaration according to future language semantics");
             }
-            root->statements.push_back(new DeclarationNode(identifier, value, line_number, declaration_kind, span));
+            auto* declaration = new DeclarationNode(identifier, value, line_number, declaration_kind, span);
+            if (looks_like_invocation) declaration->classical_callable_invocation = std::move(invocation);
+            root->statements.push_back(declaration);
             continue;
         }
 
@@ -704,9 +813,32 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
         }
 
         if (operation == "fn" || operation == "kernel") {
-            if (!active_features.is_enabled("callable-declarations")) {
+            const bool looks_like_u5_declaration = operation == "fn" && looks_like_classical_callable_declaration(argument);
+            if (looks_like_u5_declaration && !active_features.is_enabled("classical-callable-execution")) {
+                return fail_parse("SYNQ-P007", span, "classical callable execution requires an alpha feature opt-in",
+                                  "add #[experimental(feature = \"classical-callable-execution\")] before the function declaration");
+            }
+            if (!looks_like_u5_declaration && !active_features.is_enabled("callable-declarations")) {
                 return fail_parse("SYNQ-P007", span, "callable declarations require an alpha feature opt-in",
                                   "add #[experimental(feature = \"callable-declarations\")] before the gated construct");
+            }
+            if (looks_like_u5_declaration) {
+                std::string name;
+                ClassicalCallableBody classical_body;
+                if (!parse_classical_callable_declaration(argument, name, classical_body, span)) {
+                    return fail_parse("SYNQ-P019", span, "malformed bounded classical callable declaration",
+                                      "use fn <name>(<parameter>: Integer|Boolean|String) -> one documented parameter-only expression");
+                }
+                const auto inserted = declared_names.emplace(name, span);
+                if (!inserted.second) {
+                    return fail_parse("SYNQ-S004", span, "duplicate top-level declaration `" + name +
+                                      "`; first declared on line " + std::to_string(inserted.first->second.line),
+                                      "rename the later callable or reuse the existing declaration");
+                }
+                auto* callable = new CallableDeclarationNode(CallableDeclarationKind::Function, name, line_number, span);
+                callable->classical_body = std::move(classical_body);
+                root->statements.push_back(callable);
+                continue;
             }
             std::string name;
             std::vector<RoutineFormal> routine_formals;
