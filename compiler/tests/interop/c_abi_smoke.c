@@ -35,6 +35,13 @@ int main(void) {
         "qubit q[1]\n"
         "kernel rotate(angle theta, qubit target) { quantum rz(theta) target }\n"
         "call rotate(pi/2, q[0])\n";
+    const char* measurement_feedback_in_memory_source =
+        "#[experimental(feature = \"qubit-declarations\")]\n"
+        "#[experimental(feature = \"classical-control-flow\")]\n"
+        "#[experimental(feature = \"measurement-feedback\")]\n"
+        "qubit q[2]\n"
+        "measure q[0] as observed\n"
+        "if observed then quantum x q[1]\n";
     FILE* source = fopen(path, "w");
     synq_program* program = NULL;
     char* diagnostic = NULL;
@@ -167,6 +174,31 @@ int main(void) {
     if (!require(status == SYNQ_STATUS_EXPORT_ERROR && openqasm == NULL && diagnostic != NULL &&
                  strstr(diagnostic, "explicitly rejects Alpha parameterized quantum routine") != NULL,
                  "C ABI explicitly rejects Alpha parameterized routine execution/export nodes")) {
+        synq_string_free(openqasm);
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    synq_string_free(diagnostic);
+    synq_program_free(program);
+
+    program = NULL;
+    diagnostic = NULL;
+    status = synq_parse_source(measurement_feedback_in_memory_source, &program, &diagnostic);
+    if (!require(status == SYNQ_STATUS_OK && program != NULL && diagnostic == NULL,
+                 "C consumer parses an Alpha measurement-feedback source artifact")) {
+        synq_string_free(diagnostic);
+        synq_program_free(program);
+        remove(path);
+        return 1;
+    }
+    openqasm = NULL;
+    diagnostic = NULL;
+    status = synq_export_openqasm3(program, &openqasm, &diagnostic);
+    if (!require(status == SYNQ_STATUS_EXPORT_ERROR && openqasm == NULL && diagnostic != NULL &&
+                 strstr(diagnostic, "explicitly rejects Alpha measurement-feedback") != NULL,
+                 "C ABI explicitly rejects Alpha measurement-feedback execution/export nodes")) {
         synq_string_free(openqasm);
         synq_string_free(diagnostic);
         synq_program_free(program);

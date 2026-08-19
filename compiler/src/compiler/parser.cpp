@@ -839,9 +839,26 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                 result.diagnostics.push_back(std::move(body_error));
                 return result;
             }
+            const auto* candidate_gate = dynamic_cast<const QuantumGateNode*>(body);
+            const auto* prior_measurement = root->statements.empty()
+                ? nullptr : dynamic_cast<const MeasurementNode*>(root->statements.back());
+            const bool direct_feedback_candidate = operation == "if" &&
+                condition.kind == ClassicalConditionKind::IdentifierReference &&
+                condition.expression.kind == ClassicalBooleanExpressionKind::IdentifierReference &&
+                condition.expression.operands.empty() && candidate_gate != nullptr &&
+                candidate_gate->kind == QuantumGateKind::X && !candidate_gate->literal_angle.has_value() &&
+                candidate_gate->qubit_indices.size() == 1 && candidate_gate->qubit_register_names.size() == 1 &&
+                prior_measurement != nullptr && prior_measurement->result_name.has_value() &&
+                *prior_measurement->result_name == condition.expression.source_text;
+            if (direct_feedback_candidate && !active_features.is_enabled("measurement-feedback")) {
+                delete body;
+                return fail_parse("SYNQ-P007", span, "measurement feedback requires an alpha feature opt-in",
+                                  "add #[experimental(feature = \"measurement-feedback\")] before the named measurement and conditional x correction");
+            }
             root->statements.push_back(new ClassicalControlNode(
                 operation == "if" ? ClassicalControlKind::If : ClassicalControlKind::While,
-                condition, body, line_number, span));
+                condition, body, line_number, span,
+                active_features.is_enabled("measurement-feedback")));
         } else if (operation == "quantum") {
             std::vector<std::string> quantum_arguments;
             if (!parse_quantum_arguments(argument, quantum_arguments)) {
@@ -894,7 +911,8 @@ synq::compiler::ParseResult Parser::parseStreamWithDiagnostics(std::istream& inp
                                   "add #[experimental(feature = \"named-qubit-register-operands\")] before the gated construct");
             }
             root->statements.push_back(new MeasurementNode(qubit_index, line_number, span,
-                                                           std::move(result_name), std::move(register_name)));
+                                                           std::move(result_name), std::move(register_name),
+                                                           active_features.is_enabled("measurement-feedback")));
         } else {
             root->statements.push_back(new InstructionNode(operation, {argument}, line_number, span));
         }

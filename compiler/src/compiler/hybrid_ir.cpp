@@ -144,6 +144,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                 measurement->qubit_register_name,
                 measurement->result_name,
                 measurement->span,
+                measurement->feedback_enabled,
             });
             continue;
         }
@@ -156,6 +157,7 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                     HybridQuantumGate{gate->kind, gate->source_name, gate->literal_angle, gate->qubit_indices,
                                       gate->qubit_register_names, gate->span},
                     control->span,
+                    control->feedback_enabled,
                 });
                 continue;
             }
@@ -164,8 +166,9 @@ HybridLoweringResult lower_to_hybrid_ir(const ProgramNode& program) {
                     control->kind,
                     control->condition,
                     HybridMeasurement{measurement->qubit_index, measurement->qubit_register_name,
-                                      measurement->result_name, measurement->span},
+                                      measurement->result_name, measurement->span, measurement->feedback_enabled},
                     control->span,
+                    control->feedback_enabled,
                 });
                 continue;
             }

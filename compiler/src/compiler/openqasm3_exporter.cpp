@@ -131,6 +131,20 @@ bool is_valid_parameterized_routine(const HybridCallableDeclaration& callable) {
     return one_angle_one_qubit || one_qubit || two_qubits;
 }
 
+bool is_direct_measurement_feedback_condition(const HybridControlFlow& control, const std::string& result_name) {
+    return control.kind == ClassicalControlKind::If &&
+           control.condition.kind == ClassicalConditionKind::IdentifierReference &&
+           control.condition.expression.kind == ClassicalBooleanExpressionKind::IdentifierReference &&
+           control.condition.expression.source_text == result_name &&
+           control.condition.expression.operands.empty();
+}
+
+bool is_direct_measurement_feedback_correction(const HybridControlFlow& control) {
+    const auto* gate = std::get_if<HybridQuantumGate>(&control.body);
+    return gate != nullptr && gate->kind == QuantumGateKind::X && !gate->literal_angle.has_value() &&
+           gate->qubit_indices.size() == 1 && gate->qubit_register_names.size() == 1;
+}
+
 bool split_parameterized_kernel(const std::string& kernel, std::string& gate, std::string& parameter) {
     const std::size_t open = kernel.find('(');
     if (open == std::string::npos || kernel.back() != ')' || kernel.find('(', open + 1) != std::string::npos) return false;
@@ -257,8 +271,42 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
     std::unordered_map<std::string, HybridCallableDeclaration> parameterized_callable_definitions;
     std::size_t parameterized_declaration_count = 0;
     std::size_t parameterized_call_count = 0;
+    std::optional<HybridMeasurement> pending_feedback_measurement;
+    std::string pending_feedback_storage;
+    bool emitted_feedback_storage = false;
 
     for (const HybridNode& node : program.nodes) {
+        if (pending_feedback_measurement.has_value()) {
+            const auto* control = std::get_if<HybridControlFlow>(&node);
+            if (control == nullptr || !control->feedback_enabled ||
+                !is_direct_measurement_feedback_condition(*control, *pending_feedback_measurement->result_name)) {
+                add_diagnostic(result, pending_feedback_measurement->span.line,
+                               "SYNQ-H004: strict Hybrid export requires an immediate direct conditional x correction after a named U4 measurement");
+                return result;
+            }
+            if (!is_direct_measurement_feedback_correction(*control)) {
+                add_diagnostic(result, control->span.line,
+                               "SYNQ-H004: strict Hybrid export accepts only one direct conditional x correction for a U4 measurement result");
+                return result;
+            }
+            const auto& correction = std::get<HybridQuantumGate>(control->body);
+            const auto declaration = declared_qubit_counts.find(correction.qubit_register_names.front());
+            if (declaration == declared_qubit_counts.end() || correction.qubit_indices.front() >= declaration->second) {
+                add_diagnostic(result, correction.span.line,
+                               "SYNQ-H004: U4 conditional correction requires an earlier declared in-range qubit operand");
+                return result;
+            }
+            QuantumGateNode typed_gate(correction.kind, correction.source_name, correction.literal_angle,
+                                       correction.qubit_indices, correction.span.line, correction.span,
+                                       correction.qubit_register_names);
+            std::ostringstream lowered_body;
+            std::size_t inferred_qubit_count = 0;
+            lower_quantum_gate(typed_gate, lowered_body, inferred_qubit_count, result);
+            if (!result.ok()) return result;
+            body << "if (" << pending_feedback_storage << ") " << lowered_body.str();
+            pending_feedback_measurement.reset();
+            continue;
+        }
         if (const auto* qubits = std::get_if<HybridQubitDeclaration>(&node)) {
             if (declared_qubit_counts.find(qubits->name) != declared_qubit_counts.end()) {
                 add_diagnostic(result, qubits->span.line,
@@ -437,8 +485,26 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
                 continue;
             }
             if (measurement->result_name.has_value()) {
-                add_diagnostic(result, measurement->span.line,
-                               "Hybrid OpenQASM 3 export does not lower named SynQ measurement-result declarations");
+                if (!measurement->feedback_enabled) {
+                    add_diagnostic(result, measurement->span.line,
+                                   "Hybrid OpenQASM 3 export does not lower named SynQ measurement-result declarations");
+                    continue;
+                }
+                if (emitted_feedback_storage) {
+                    add_diagnostic(result, measurement->span.line,
+                                   "SYNQ-H004: strict Hybrid export accepts at most one U4 named measurement-feedback pair");
+                    return result;
+                }
+                if (measurement->qubit_index >= declaration->second) {
+                    add_diagnostic(result, measurement->span.line,
+                                   "measurement operand is outside its explicit qubit declaration range");
+                    continue;
+                }
+                pending_feedback_storage = "synq_measure_" + *measurement->result_name;
+                body << pending_feedback_storage << " = measure " << measurement->qubit_register_name << "["
+                     << measurement->qubit_index << "];\n";
+                pending_feedback_measurement = *measurement;
+                emitted_feedback_storage = true;
                 continue;
             }
             if (measurement->qubit_index >= declaration->second) {
@@ -567,6 +633,11 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
                        "Hybrid OpenQASM 3 export supports only qubit declarations, typed quantum gates, and unnamed measurements");
     }
 
+    if (pending_feedback_measurement.has_value()) {
+        add_diagnostic(result, pending_feedback_measurement->span.line,
+                       "SYNQ-H004: strict Hybrid export requires an immediate direct conditional x correction after a named U4 measurement");
+        return result;
+    }
     if (!result.ok()) return result;
     if (declaration_order.empty()) {
         add_diagnostic(result, 0, "Hybrid OpenQASM 3 export requires at least one explicit qubit declaration");
@@ -579,6 +650,7 @@ OpenQasm3ExportResult export_extended_hybrid_openqasm3(const HybridProgram& prog
     for (const std::string& name : declaration_order) {
         output << "qubit[" << declared_qubit_counts.at(name) << "] " << name << ";\n";
     }
+    if (emitted_feedback_storage) output << "bit " << pending_feedback_storage << ";\n";
     for (const std::string& name : measurement_order) {
         output << "bit[" << declared_qubit_counts.at(name) << "] c_" << name << ";\n";
     }

@@ -87,6 +87,7 @@ struct HybridMeasurement {
     std::string qubit_register_name = "q";
     std::optional<std::string> result_name;
     SourceSpan span;
+    bool feedback_enabled = false;
 };
 
 using HybridControlBody = std::variant<HybridQuantumGate, HybridMeasurement>;
@@ -96,6 +97,7 @@ struct HybridControlFlow {
     ClassicalCondition condition;
     HybridControlBody body;
     SourceSpan span;
+    bool feedback_enabled = false;
 };
 
 using HybridNode = std::variant<HybridDeclaration, HybridMutableDeclaration, HybridAssignment,

@@ -137,6 +137,26 @@ Diagnostic invalid_mutable_assignment_target_diagnostic(const SourceSpan& span, 
     };
 }
 
+Diagnostic invalid_measurement_feedback_result_diagnostic(const SourceSpan& span, const std::string& name) {
+    return {
+        "SYNQ-R007",
+        DiagnosticSeverity::Error,
+        span,
+        "measurement result `" + name + "` is not an immediate single-use U4 feedback condition",
+        "place `if " + name + " then quantum x register[index]` immediately after its named measurement and use it once"
+    };
+}
+
+Diagnostic invalid_measurement_feedback_correction_diagnostic(const SourceSpan& span) {
+    return {
+        "SYNQ-R008",
+        DiagnosticSeverity::Error,
+        span,
+        "U4 measurement feedback requires one direct conditional x correction over one explicit qubit operand",
+        "use if <measurement-result> then quantum x register[index]"
+    };
+}
+
 Diagnostic mutable_assignment_type_diagnostic(const SourceSpan& span, const std::string& name,
                                               ClassicalStaticType expected, ClassicalStaticType actual) {
     return {
@@ -202,6 +222,29 @@ bool resolve_boolean_expression(const ClassicalBooleanExpression& expression,
         if (!resolve_boolean_expression(operand, bindings, binding_indices, error)) return false;
     }
     return true;
+}
+
+bool expression_references_identifier(const ClassicalBooleanExpression& expression, const std::string& name) {
+    if (expression.kind == ClassicalBooleanExpressionKind::IdentifierReference && expression.source_text == name) {
+        return true;
+    }
+    return std::any_of(expression.operands.begin(), expression.operands.end(), [&name](const auto& operand) {
+        return expression_references_identifier(operand, name);
+    });
+}
+
+bool is_direct_measurement_feedback_condition(const HybridControlFlow& control, const std::string& result_name) {
+    return control.kind == ClassicalControlKind::If &&
+           control.condition.kind == ClassicalConditionKind::IdentifierReference &&
+           control.condition.expression.kind == ClassicalBooleanExpressionKind::IdentifierReference &&
+           control.condition.expression.source_text == result_name &&
+           control.condition.expression.operands.empty();
+}
+
+bool is_direct_measurement_feedback_correction(const HybridControlFlow& control) {
+    const auto* gate = std::get_if<HybridQuantumGate>(&control.body);
+    return gate != nullptr && gate->kind == QuantumGateKind::X && !gate->literal_angle.has_value() &&
+           gate->qubit_indices.size() == 1 && gate->qubit_register_names.size() == 1;
 }
 
 bool resolve_integer_arithmetic_expression(const ClassicalIntegerArithmeticExpression& expression,
@@ -419,9 +462,18 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
     }
     std::unordered_map<std::string, std::size_t> qubit_counts;
     std::unordered_map<std::string, HybridCallableDeclaration> callable_definitions;
+    std::unordered_set<std::string> consumed_measurement_results;
+    bool terminal_feedback_seen = false;
 
     for (std::size_t node_index = 0; node_index < program.nodes.size(); ++node_index) {
         const HybridNode& node = program.nodes[node_index];
+        if (terminal_feedback_seen) {
+            NameResolutionResult result;
+            result.diagnostics.push_back(invalid_measurement_feedback_result_diagnostic(
+                {},
+                "feedback result"));
+            return result;
+        }
 
         if (const auto* declaration = std::get_if<HybridDeclaration>(&node)) {
             std::optional<std::size_t> initializer_binding_index;
@@ -719,6 +771,22 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
         }
 
         if (const auto* control = std::get_if<HybridControlFlow>(&node)) {
+            if (control->feedback_enabled && control->condition.kind == ClassicalConditionKind::IdentifierReference) {
+                const auto binding = bindings.find(control->condition.source_text);
+                if (binding != bindings.end() && binding->second.kind == SemanticBindingKind::MeasurementResult &&
+                    consumed_measurement_results.find(control->condition.source_text) != consumed_measurement_results.end()) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(invalid_measurement_feedback_result_diagnostic(
+                        control->span, control->condition.source_text));
+                    return result;
+                }
+                if (binding != bindings.end() && binding->second.kind == SemanticBindingKind::MeasurementResult) {
+                    NameResolutionResult result;
+                    result.diagnostics.push_back(invalid_measurement_feedback_result_diagnostic(
+                        control->span, control->condition.source_text));
+                    return result;
+                }
+            }
             std::optional<std::size_t> condition_binding_index;
             std::vector<std::size_t> condition_binding_indices;
             Diagnostic condition_error;
@@ -759,14 +827,48 @@ NameResolutionResult resolve_hybrid_names(const HybridProgram& program) {
             result.diagnostics.push_back(std::move(qubit_error));
             return result;
         }
-        resolved.nodes.emplace_back(measurement);
         if (measurement.result_name.has_value()) {
+            const std::string& result_name = *measurement.result_name;
             resolved.semantic_bindings.push_back({*measurement.result_name, SemanticBindingKind::MeasurementResult,
                                                   ClassicalStaticType::Boolean, node_index, measurement.span, {}});
             bindings.emplace(*measurement.result_name, BindingInfo{node_index, ClassicalStaticType::Boolean,
                                                                     *measurement.result_name,
                                                                     SemanticBindingKind::MeasurementResult});
+
+            if (measurement.feedback_enabled && node_index + 1 < program.nodes.size()) {
+                const auto* next_control = std::get_if<HybridControlFlow>(&program.nodes[node_index + 1]);
+                if (next_control != nullptr && next_control->feedback_enabled &&
+                    expression_references_identifier(next_control->condition.expression, result_name)) {
+                    if (!is_direct_measurement_feedback_condition(*next_control, result_name)) {
+                        NameResolutionResult result;
+                        result.diagnostics.push_back(invalid_measurement_feedback_result_diagnostic(
+                            next_control->span, result_name));
+                        return result;
+                    }
+                    if (!is_direct_measurement_feedback_correction(*next_control)) {
+                        NameResolutionResult result;
+                        result.diagnostics.push_back(invalid_measurement_feedback_correction_diagnostic(
+                            next_control->span));
+                        return result;
+                    }
+                    const auto& correction = std::get<HybridQuantumGate>(next_control->body);
+                    if (!validate_qubit_operands(correction.qubit_register_names, correction.qubit_indices,
+                                                 correction.span, qubit_counts,
+                                                 contains_explicit_default_register, qubit_error)) {
+                        NameResolutionResult result;
+                        result.diagnostics.push_back(std::move(qubit_error));
+                        return result;
+                    }
+                    resolved.nodes.emplace_back(ResolvedHybridMeasurementFeedback{
+                        measurement, *next_control, node_index});
+                    consumed_measurement_results.insert(result_name);
+                    terminal_feedback_seen = true;
+                    ++node_index;
+                    continue;
+                }
+            }
         }
+        resolved.nodes.emplace_back(measurement);
     }
 
     NameResolutionResult result;

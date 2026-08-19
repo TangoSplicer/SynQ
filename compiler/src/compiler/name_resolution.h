@@ -68,10 +68,20 @@ struct ResolvedHybridControlFlow {
     std::vector<std::size_t> condition_binding_indices;
 };
 
+// U4's sole hybrid feedback form joins one named measurement with its immediate
+// direct conditional X correction. It records provenance and static ordering;
+// it is not a general control-flow or measurement execution node.
+struct ResolvedHybridMeasurementFeedback {
+    HybridMeasurement measurement;
+    HybridControlFlow correction;
+    std::size_t result_binding_index = 0;
+};
+
 using ResolvedHybridNode = std::variant<ResolvedHybridDeclaration, ResolvedHybridMutableDeclaration,
                                         ResolvedHybridAssignment, HybridQubitDeclaration,
                                         HybridCallableDeclaration, HybridCallableCall, HybridQuantumGate,
-                                        HybridMeasurement, ResolvedHybridControlFlow>;
+                                        HybridMeasurement, ResolvedHybridControlFlow,
+                                        ResolvedHybridMeasurementFeedback>;
 
 struct ResolvedHybridProgram {
     std::vector<ResolvedHybridNode> nodes;

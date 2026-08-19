@@ -109,6 +109,12 @@ FeatureRegistry make_default_feature_registry() {
         "synq#bounded-parameterized-quantum-routines",
     });
     registry.register_feature({
+        "measurement-feedback",
+        FeatureStage::Alpha,
+        "Enables one immediate named-measurement result followed by one direct conditional X correction in the bounded U4 profile.",
+        "synq#bounded-measurement-feedback",
+    });
+    registry.register_feature({
         "mutable-classical-state",
         FeatureStage::Alpha,
         "Enables bounded top-level var and set syntax with typed local state evaluation only; it does not enable target-side storage, branches, loops, or quantum execution.",

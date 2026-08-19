@@ -150,6 +150,7 @@ public:
     std::size_t qubit_index = 0;
     std::string qubit_register_name = "q";
     std::optional<std::string> result_name;
+    bool feedback_enabled = false;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
@@ -163,9 +164,10 @@ public:
     MeasurementNode(std::size_t index, std::size_t line_number,
                     synq::compiler::SourceSpan source_span,
                     std::optional<std::string> declared_result,
-                    std::string source_register = "q")
+                    std::string source_register = "q", bool enable_feedback = false)
         : qubit_index(index), qubit_register_name(std::move(source_register)),
-          result_name(std::move(declared_result)), line(line_number), span(source_span) {}
+          result_name(std::move(declared_result)), feedback_enabled(enable_feedback),
+          line(line_number), span(source_span) {}
 
     std::string toString() override {
         return "measure " + qubit_register_name + "[" + std::to_string(qubit_index) + "]" +
@@ -330,14 +332,17 @@ public:
     ClassicalControlKind kind;
     ClassicalCondition condition;
     ASTNode* body = nullptr;
+    bool feedback_enabled = false;
     std::size_t line = 0;
     synq::compiler::SourceSpan span;
 
     ClassicalControlNode(ClassicalControlKind control_kind, ClassicalCondition typed_condition, ASTNode* owned_body,
-                         std::size_t line_number, synq::compiler::SourceSpan source_span)
+                         std::size_t line_number, synq::compiler::SourceSpan source_span,
+                         bool enable_feedback = false)
         : kind(control_kind),
           condition(std::move(typed_condition)),
           body(owned_body),
+          feedback_enabled(enable_feedback),
           line(line_number),
           span(source_span) {}
 

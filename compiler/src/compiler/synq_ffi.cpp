@@ -56,6 +56,16 @@ bool contains_parameterized_routine_node(const ProgramNode& program) {
     return false;
 }
 
+bool contains_measurement_feedback_node(const ProgramNode& program) {
+    for (const ASTNode* statement : program.statements) {
+        const auto* measurement = dynamic_cast<const MeasurementNode*>(statement);
+        if (measurement != nullptr && measurement->feedback_enabled && measurement->result_name.has_value()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 }  // namespace
 
 extern "C" unsigned int synq_abi_version(void) {
@@ -149,6 +159,11 @@ extern "C" synq_status synq_export_openqasm3(const synq_program* program,
     }
 
     try {
+        if (contains_measurement_feedback_node(*program->program)) {
+            return return_error(SYNQ_STATUS_EXPORT_ERROR,
+                                "experimental C ABI explicitly rejects Alpha measurement-feedback nodes; use the compiler CLI strict Hybrid OpenQASM or bounded local simulation paths instead",
+                                out_diagnostic);
+        }
         if (contains_parameterized_routine_node(*program->program)) {
             return return_error(SYNQ_STATUS_EXPORT_ERROR,
                                 "experimental C ABI explicitly rejects Alpha parameterized quantum routine nodes; use the compiler CLI strict Hybrid OpenQASM path instead",
