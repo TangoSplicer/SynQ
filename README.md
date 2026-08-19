@@ -76,6 +76,7 @@ accepted/rejected control forms.
 | [`docs/LITERAL_NEGATION_IF_LOWERING.md`](docs/LITERAL_NEGATION_IF_LOWERING.md) | Alpha compile-time literal-negation if source-lowering contract. |
 | [`docs/BOUNDED_CALLABLE_KERNELS.md`](docs/BOUNDED_CALLABLE_KERNELS.md) | Alpha non-recursive one-gate kernel and source-only call-expansion contract. |
 | [`docs/BOUNDED_RECURSIVE_CONSTANT_EVALUATION.md`](docs/BOUNDED_RECURSIVE_CONSTANT_EVALUATION.md) | Alpha bounded immutable Boolean and Integer declaration-expression evaluation contract. |
+| [`docs/BOUNDED_MUTABLE_CLASSICAL_STATE.md`](docs/BOUNDED_MUTABLE_CLASSICAL_STATE.md) | Proposed U2 typed mutable-cell and assignment contract; not an availability claim. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |

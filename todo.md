@@ -158,6 +158,7 @@
 - [x] Add and remotely validate a macOS clean-install static-SDK producer and external-C-consumer CI job before any macOS SDK or general cross-platform package claim.
 - [x] Publish a usable experimental-language profile that distinguishes verified classical, quantum, and hybrid workflows from research-stage runtime goals.
 - [x] Specify and implement Alpha bounded recursive Boolean declaration-expression evaluation over existing typed trees, with explicit depth, operation, dependency, and existing overflow boundaries.
-- [ ] Specify safe mutable classical storage and assignment semantics before accepting executable state updates, loops, or general branch execution.
+- [x] Specify safe mutable classical storage and assignment semantics before accepting executable state updates, loops, or general branch execution.
+- [ ] Implement, locally validate, remotely verify, and document the bounded U2 mutable-cell and assignment subset before making any mutable-state availability claim.
 - [ ] Specify measurement-result storage and target-side feedback semantics before accepting hybrid measurement-controlled source lowering or simulation execution.
 - [ ] Specify a practical bounded quantum-routine contract for parameterized kernels, explicit qubit operands, resource effects, and non-recursive call composition.
