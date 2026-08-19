@@ -1,11 +1,11 @@
 # Bounded Mutable Classical State
 
 **Feature stage:** Alpha contract for U2.
-**Status:** Implemented and locally validated on the recovery profile
-(**38/38** CTests). Remote six-job Compiler Core confirmation is still required
-before repository status, release records, tested-environment guidance, or the
-public Evidence Ledger present U2 as remotely verified. The implementation does
-not add target-side state lowering.
+**Status:** Remotely verified by the six-job [Compiler Core platform-matrix run
+#32242711770](https://github.com/TangoSplicer/SynQ/actions/runs/32242711770) for
+revision `d62b5ed` (**38/38** Linux recovery-profile CTests and **27/27** Windows
+MSVC/macOS Clang platform-neutral CTests, plus three clean-install SDK jobs). The
+implementation does not add target-side state lowering.
 
 ## Purpose and design position
 
@@ -209,10 +209,10 @@ integer overflow, and unchanged rejection in strict-Hybrid export and local
 simulation.
 
 The full local recovery suite passed **38/38** CTests for the implementation
-revision. The existing six-job remote Compiler Core matrix must also pass. Only
-then may the project status, changelog, tested-environment record,
-usable-language profile, and public Evidence Ledger call the capability
-verified.
+revision, and the existing six-job remote Compiler Core matrix also passed. The
+project status, changelog, tested-environment record, usable-language profile,
+and public Evidence Ledger may therefore call the bounded U2 capability remotely
+verified while retaining all boundaries above.
 
 ## References
 

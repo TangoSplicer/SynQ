@@ -25,7 +25,7 @@ and a structured rejection where it does not.
 | --- | --- | --- |
 | Classical | Immutable top-level Boolean, Integer, and String declarations; bounded Boolean and one-operation Integer expression trees; recursively evaluated Boolean declaration expressions; and feature-gated top-level typed `var`/`set` cells evaluated deterministically under explicit budgets. | No scopes, precedence grammar, loop/branch execution, target-side state lowering, measurement values, or general runtime semantics. |
 | Quantum | Typed gates, explicit declared-register operands, named-register allocation for bounded ideal-probability simulation, measurements, and strict OpenQASM 3 source export. | No noise, sampling/collapse, reset lifecycle, hardware/provider execution, optimization, dynamic allocation, or general resource ownership. |
-| Callable composition | One zero-parameter `kernel` with one non-parameterized default-register gate body may be followed by one `call`; strict Hybrid export expands that gate as source. | No parameters, returns, function bodies, named-register callable operands, recursion, nested calls, runtime dispatch, simulation execution, or ABI execution. |
+| Callable composition | A zero-parameter one-gate kernel remains available. U3 additionally supports exactly three parameterized kernels: literal angle plus qubit rotation/phase, one qubit fixed gate, or two qubit `cx`; strict Hybrid export expands one source-order gate per verified call. | No returns, function bodies, capture, allocation, recursion, nested routine calls, runtime angle/execution, routine simulation, or ABI execution. |
 | Hybrid control | Literal and bounded immutable-Boolean `if` source-lowering forms with one gate body; state nodes are explicitly rejected by strict Hybrid export and local simulation. | No measurement feedback, target-side state writes, `else`, loops, branch execution, or general target-control contract. |
 
 The verified test and platform details remain in
@@ -42,7 +42,7 @@ before its values, effects, and target representation have a contract.
 | --- | --- | --- | --- | --- |
 | U1 — Bounded constant programs | **Completed Alpha Boolean slice:** recursively typed Boolean constant evaluation over immutable top-level bindings with fixed depth and operation limits; existing checked Integer boundary remains separately constrained. | Existing typed gates and declared-register operands remain unchanged. | Compile-time conditions may use only expressions whose bounded evaluator proves a Boolean result; this is not target-side expression execution. | Positive/negative evaluator, resolver, CLI, local full-suite, and six-job remote CI fixtures passed in [Compiler Core #32239066421](https://github.com/TangoSplicer/SynQ/actions/runs/32239066421). |
 | U2 — Explicit classical state | **Completed Alpha local-only slice:** typed top-level mutable cells, exact-type whole-cell assignment, declaration/write lifetime provenance, and deterministic `--eval-state` evaluation with explicit resource limits, as specified in [`BOUNDED_MUTABLE_CLASSICAL_STATE.md`](./BOUNDED_MUTABLE_CLASSICAL_STATE.md). | Quantum operations retain explicit resource validation; state nodes are rejected by simulation. | No measurement feedback, loop/branch execution, target-side storage, or target-side assignment lowering. | Parser/IR/resolver/evaluator/CLI/semantic/exporter/simulator fixtures plus the six-job remote matrix passed in [Compiler Core #32242711770](https://github.com/TangoSplicer/SynQ/actions/runs/32242711770). |
-| U3 — Practical quantum routines | Proposed typed scalar angle and explicit qubit parameters, non-recursive call graph, resource-alias rejection, and static source expansion in [`BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md`](./BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md). | Reusable routines over caller-supplied qubits; no allocation inside a routine. | Classical parameters remain compile-time literals initially. | Parser/IR/resolver/exporter conformance, call-graph and alias-negative tests, reference-parser checks, and CI. |
+| U3 — Practical quantum routines | **Completed Alpha slice:** typed angle/qubit formals, three one-gate signatures, earlier-only lookup, ordered actual validation, duplicate-qubit alias rejection, bounded strict-Hybrid source expansion, and explicit simulator/C-ABI rejection, as specified in [`BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md`](./BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md). | Reusable routines over caller-supplied explicit qubits; no allocation inside a routine. | Angles remain documented literals and expansion remains source generation, not execution. | Parser/AST/IR/resolver/exporter/CLI/reference-parser/simulator/ABI fixtures plus the six-job remote matrix passed in [Compiler Core #32247154982](https://github.com/TangoSplicer/SynQ/actions/runs/32247154982). |
 | U4 — Measurement feedback | Typed measurement-result storage with explicit local and target-side representation. | Measurements can feed one bounded conditional correction path. | Defined result lifetime, target Boolean storage, and source-only/local-simulation behavior. | Deterministic simulator fixtures, exact lowered source, negative lifetime/unsupported-target tests, and CI. |
 
 ## Design rules
@@ -93,11 +93,9 @@ security/support commitment.
 
 1. **U1 and U2 are complete** as bounded immutable evaluation and bounded
    local-only typed-state workflows; neither adds target-side execution semantics.
-2. Write the U3 explicit-parameter quantum-routine contract before accepting
-   parameter or resource-alias syntax.
-3. Implement U3 only after its qubit/angle parameters, non-recursive call graph,
-   and resource-effect rejection rules are testable locally.
-4. Implement U4 measurement feedback only after its local and target-side
+2. **U3 is complete** as a bounded source-expansion-only routine layer; it does
+   not add routine execution or a general callable model.
+3. Implement U4 measurement feedback only after its local and target-side
    storage contract is independently testable.
 
 ## References

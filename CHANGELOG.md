@@ -9,6 +9,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Alpha bounded parameterized quantum routines (U3):** The feature-gated
+  `parameterized-quantum-routines` subset accepts exactly three one-gate kernel
+  signatures: literal-angle plus one qubit for `rx`/`ry`/`rz`/`p`, one qubit for
+  `h`/`x`/`y`/`z`, or two qubits for `cx`. Typed AST and Hybrid IR retain ordered
+  formals, symbolic body operands, actuals, and spans. Resolution enforces
+  earlier definitions, exact ordered kinds/arity, declared in-range actuals, and
+  distinct two-qubit resources. Strict Hybrid OpenQASM expands one static gate per
+  call with 32-declaration/128-call limits; the simulator and C ABI explicitly
+  reject U3 nodes. The implementation adds parser, AST/IR, resolver, exact-output,
+  CLI, reference-parser, simulator, ABI, limit, and zero-parameter compatibility
+  fixtures. [Compiler Core platform-matrix run #32247154982](https://github.com/TangoSplicer/SynQ/actions/runs/32247154982)
+  passed all six jobs for revision `be18e0f`: 41 Linux CTests, 28 Windows MSVC
+  CTests, 28 macOS Clang CTests, and clean-install experimental static-SDK
+  external-consumer checks on Ubuntu 22.04, Windows MSVC, and macOS Clang. This
+  introduces no routine execution, target-side routine definition, capture,
+  allocation, recursion, nested calls, runtime angle, hardware, or provider claim.
 - **Alpha bounded mutable classical state:** The feature-gated top-level
   `var`/`set` subset now has typed AST and Hybrid IR nodes, sequential resolver
   checks, deterministic local-only `synqc --eval-state`, final cell declaration/
@@ -141,13 +157,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   evidence and explicit non-claims.
 
 ### Planned
-- Define safe typed mutable cells, assignment, state lifetime, and deterministic
-  local state-transition rules before accepting executable updates, loops, or
-  branch execution.
-- Define practical bounded parameterized quantum routines with explicit qubit
-  operands, non-recursive composition, and resource-alias rejection.
 - Define typed measurement-result storage and target-side feedback semantics
   before measurement-controlled lowering or simulation execution.
+- Define wider callable semantics only after scope, return, resource-effect,
+  recursion, and execution contracts are independently specified and tested.
 
 ---
 

@@ -9,9 +9,9 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32242711770](https://github.com/TangoSplicer/SynQ/actions/runs/32242711770),
-which passed all six independently scoped jobs for revision `d62b5ed`: **38/38**
-Linux recovery-profile CTests, **27/27** Windows MSVC and macOS Clang
+platform-matrix run #32247154982](https://github.com/TangoSplicer/SynQ/actions/runs/32247154982),
+which passed all six independently scoped jobs for revision `be18e0f`: **41/41**
+Linux recovery-profile CTests, **28/28** Windows MSVC and macOS Clang
 platform-neutral CTests, and Ubuntu 22.04, Windows MSVC, and macOS Clang
 clean-install static-SDK consumer checks. The tested
 environment and exact clean-install boundaries are documented in
@@ -20,7 +20,7 @@ environment and exact clean-install boundaries are documented in
 | Area | Verified experimental capability | Explicit boundary |
 | --- | --- | --- |
 | Compiler and CLI | C++17 recovery build produces `libsynq_lib.a` and `synqc 0.1.0-experimental`, including explicit bounded `--eval-state`. | No general executor, REPL, package manager, or stable CLI contract. |
-| Source profile | Typed gates, bounded declarations, Alpha Boolean/integer forms, recursively evaluated immutable top-level Boolean declaration expressions under `--eval-constants`, explicitly gated top-level `var`/`set` cells under `--eval-state`, qubit declarations, named measurement metadata, declaration-only functions, and one Alpha non-recursive zero-parameter one-gate kernel with a later strict-Hybrid source-only call expansion. | No scopes, callable parameters, returns, recursion, nested calls, control/measurement bodies, target-side state lowering, simulator/ABI state execution, general expressions, or general runtime semantics. |
+| Source profile | Typed gates, bounded declarations, Alpha Boolean/integer forms, recursively evaluated immutable top-level Boolean declaration expressions under `--eval-constants`, explicitly gated top-level `var`/`set` cells under `--eval-state`, qubit declarations, named measurement metadata, declaration-only functions, zero-parameter one-gate kernels, and Alpha parameterized quantum routines with literal-angle and/or explicit `register[index]` actuals. | No scopes, returns, recursion, nested routine calls, function bodies, control/measurement bodies, target-side state lowering, routine simulation, routine ABI execution, general expressions, or general runtime semantics. |
 | Named registers | Alpha `name[index]` operands resolve against earlier declared registers, lower through strict Hybrid OpenQASM, and participate in bounded declaration-order local simulation. | No resource lifetime, deallocation, aliasing, dynamic allocation, or hardware mapping. |
 | Control lowering | Strict Hybrid OpenQASM lowers one Alpha literal `if`, `if not true/false` through compile-time literal folding, an `if` controlled by one earlier top-level Boolean-literal declaration, or `if not <that declaration>`, with one supported typed gate body. | No nested negation, binary expression, alias, measurement-result, loop, measurement-body, branch-execution, or general classical-runtime lowering. |
 | Local simulation | Opt-in pure-state probability calculation for explicit declared default or named registers and a limited gate set. | No samples/collapse, noise, control execution, providers, hardware execution, or general resource lifecycle. |
@@ -77,7 +77,7 @@ accepted/rejected control forms.
 | [`docs/BOUNDED_CALLABLE_KERNELS.md`](docs/BOUNDED_CALLABLE_KERNELS.md) | Alpha non-recursive one-gate kernel and source-only call-expansion contract. |
 | [`docs/BOUNDED_RECURSIVE_CONSTANT_EVALUATION.md`](docs/BOUNDED_RECURSIVE_CONSTANT_EVALUATION.md) | Alpha bounded immutable Boolean and Integer declaration-expression evaluation contract. |
 | [`docs/BOUNDED_MUTABLE_CLASSICAL_STATE.md`](docs/BOUNDED_MUTABLE_CLASSICAL_STATE.md) | Remotely validated Alpha U2 local mutable-cell and assignment contract, including strict non-runtime and non-target boundaries. |
-| [`docs/BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md`](docs/BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md) | Proposed U3 explicit qubit/angle routine and static source-expansion contract; not an availability claim. |
+| [`docs/BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md`](docs/BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md) | Remotely verified U3 Alpha explicit qubit/angle routine and static source-expansion contract. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |

@@ -162,4 +162,4 @@
 - [x] Implement, locally validate, remotely verify, and document the bounded U2 mutable-cell and assignment subset before making any mutable-state availability claim.
 - [ ] Specify measurement-result storage and target-side feedback semantics before accepting hybrid measurement-controlled source lowering or simulation execution.
 - [x] Specify a practical bounded quantum-routine contract for parameterized kernels, explicit qubit operands, resource effects, and non-recursive call composition.
-- [ ] Implement, locally validate, remotely verify, and document the bounded U3 parameterized quantum-routine subset before making any routine availability claim.
+- [x] Implement, locally validate, remotely verify, and document the bounded U3 parameterized quantum-routine subset before making any routine availability claim (Compiler Core #32247154982: 41/41 Linux, 28/28 Windows MSVC and macOS Clang, plus three clean-install SDK jobs).

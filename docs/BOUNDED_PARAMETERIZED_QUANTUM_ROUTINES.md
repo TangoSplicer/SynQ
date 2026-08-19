@@ -1,15 +1,19 @@
 # Bounded Parameterized Quantum Routines
 
-**Feature stage:** Proposed Alpha contract for U3.
-**Status:** Design only. This document reserves a small source-expansion target;
-it does **not** make routine parameters, routine execution, target-side
+**Feature stage:** Implemented Alpha U3 contract.
+**Status:** Remotely verified for revision `be18e0f` by the six-job [Compiler Core
+platform-matrix run #32247154982](https://github.com/TangoSplicer/SynQ/actions/runs/32247154982):
+41/41 Linux recovery-profile CTests, 28/28 Windows MSVC and macOS Clang
+platform-neutral CTests, and clean-install static-SDK consumer checks on Ubuntu,
+Windows, and macOS. This document defines a small source-expansion target; it does
+**not** make routine execution, target-side
 subroutines, simulation execution, ABI execution, or hardware behavior
 available.
 
 ## Purpose and design position
 
 U1 made immutable Boolean computation inspectable. U2 added a separately
-bounded local-only classical cell store. U3 adds the smallest reusable quantum
+bounded local-only classical cell store. U3 adds the smallest remotely verified reusable quantum
 abstraction that can be checked without scopes, general calls, or ownership
 inference: one named routine with typed angle and/or qubit formals, one typed
 gate body, and one later top-level invocation over caller-owned qubits.
@@ -153,7 +157,7 @@ mapping, provider integration, package delivery, or stability promises.
 
 ## Verification gate before any availability claim
 
-Before documentation calls U3 available, implementation must add positive and
+The implementation includes positive and
 negative parser, typed-AST, Hybrid-IR, resolver, strict-Hybrid exact-output,
 CLI, OpenQASM reference-parser, simulator-rejection, and ABI-rejection fixtures.
 The matrix must cover all three signatures, earlier-only visibility, every
@@ -162,10 +166,11 @@ body operands, wrong call arity/kind/order, named-register arguments, duplicate
 two-qubit actuals, out-of-range operands, declaration/call limits, source-order
 expansion, and unchanged zero-parameter kernel behavior.
 
-The full local recovery suite and the existing six-job Compiler Core matrix must
-pass on the implementation revision. Only then may the repository status,
-changelog, tested-environment record, usable-language profile, operational
-readiness assessment, and public Evidence Ledger call U3 verified.
+The implementation revision passed the full local **41/41** recovery suite and
+the six-job remote Compiler Core matrix. The repository status, changelog,
+tested-environment record, usable-language profile, operational readiness
+assessment, and public Evidence Ledger may therefore describe this bounded U3
+slice as remotely verified, subject to all explicit non-goals above.
 
 ## References
 
