@@ -1,8 +1,11 @@
 # First Two-Input Local Function: U6 Binary Classical Callables
 
-**Status:** Implementation candidate with a passing local recovery suite; this
-tutorial is **not remotely verified or publicly available** until its exact
-implementation revision passes the full six-job Compiler Core matrix.
+**Status:** Remotely verified Alpha U6 tutorial for revision `9a1a9b3`. The
+source and commands below are covered by the 46/46 local recovery suite and the
+six-job [Compiler Core #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206)
+matrix (32/32 Windows MSVC and macOS Clang platform-neutral CTests plus three
+clean-install static-SDK consumer jobs). This remains a local bounded subset,
+not a general runtime, target executor, ABI execution path, or hardware service.
 
 U6 adds one small local-only step after the verified U5 one-input function: a
 function may read **two ordered values of the same type** and compute one value

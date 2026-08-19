@@ -23,7 +23,7 @@ and a structured rejection where it does not.
 
 | Layer | Current verified behavior | Current boundary |
 | --- | --- | --- |
-| Classical | Immutable top-level Boolean, Integer, and String declarations; bounded expressions; gated top-level typed `var`/`set`; and U5 one-formal local callable evaluation through `--eval-runtime`. | No general lexical scope, multi-argument/recursive/nested callable execution, loop/branch execution, target-side state lowering, measurement values, or general runtime semantics. |
+| Classical | Immutable top-level Boolean, Integer, and String declarations; bounded expressions; gated top-level typed `var`/`set`; U5 one-formal local callable evaluation; and U6 same-type two-formal local callable evaluation through `--eval-runtime`. | No general lexical scope, arbitrary-arity/mixed-type/recursive/nested callable execution, loop/branch execution, target-side state lowering, measurement values, or general runtime semantics. |
 | Quantum | Typed gates, explicit declared-register operands, named-register allocation for bounded ideal-probability simulation, measurements, and strict OpenQASM 3 source export. | No noise, sampling/collapse, reset lifecycle, hardware/provider execution, optimization, dynamic allocation, or general resource ownership. |
 | Callable composition | A zero-parameter one-gate kernel remains available. U3 additionally supports exactly three parameterized kernels: literal angle plus qubit rotation/phase, one qubit fixed gate, or two qubit `cx`; strict Hybrid export expands one source-order gate per verified call. | No returns, function bodies, capture, allocation, recursion, nested routine calls, runtime angle/execution, routine simulation, or ABI execution. |
 | Hybrid control | Literal and bounded immutable-Boolean `if` source-lowering forms with one gate body, plus U4 one-result/one-direct-`x` feedback through exact strict source lowering and deterministic local branch enumeration. | No target-side user state writes, `else`, loops, general branch execution, multiple results, general measurement APIs, or general target-control contract. |
@@ -45,6 +45,7 @@ before its values, effects, and target representation have a contract.
 | U3 — Practical quantum routines | **Completed Alpha slice:** typed angle/qubit formals, three one-gate signatures, earlier-only lookup, ordered actual validation, duplicate-qubit alias rejection, bounded strict-Hybrid source expansion, and explicit simulator/C-ABI rejection, as specified in [`BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md`](./BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md). | Reusable routines over caller-supplied explicit qubits; no allocation inside a routine. | Angles remain documented literals and expansion remains source generation, not execution. | Parser/AST/IR/resolver/exporter/CLI/reference-parser/simulator/ABI fixtures plus the six-job remote matrix passed in [Compiler Core #32247154982](https://github.com/TangoSplicer/SynQ/actions/runs/32247154982). |
 | U4 — Measurement feedback | **Completed Alpha slice:** one named measurement result is immediately consumed by one direct conditional `x` correction; resolver preserves result provenance and enforces direct single use and terminal lifetime. | One measurement can drive one in-range explicit-qubit `x` correction, including the same qubit. | Strict Hybrid uses one exporter-owned scalar bit plus one measurement assignment/conditional gate; local simulation deterministically enumerates the two branches and does not expose a sampled host value. | Parser/AST/IR/resolver/exporter/CLI/reference-parser/simulator/ABI fixtures plus the six-job remote matrix passed in [Compiler Core #32250265354](https://github.com/TangoSplicer/SynQ/actions/runs/32250265354). |
 | U5 — Classical callable execution | **Completed Alpha slice:** one earlier typed function with one parameter-only expression body and one immutable invocation; `--eval-runtime` evaluates one explicit local frame under checked integer and fixed resource bounds. | No quantum argument or routine execution changes. | Strict Hybrid export, quantum simulation, and ABI v1 explicitly reject U5 nodes; local callable evaluation has no target-side meaning. | Parser/AST/IR/resolver/evaluator/CLI/exporter/simulator/C-ABI/tutorial fixtures plus the six-job remote matrix passed in [Compiler Core #32266056516](https://github.com/TangoSplicer/SynQ/actions/runs/32266056516). |
+| U6 — Binary classical callable execution | **Completed Alpha slice:** exactly one earlier two-formal, ordered, same-type Integer or Boolean function with one documented binary body and one immutable ordered two-actual invocation; `--eval-runtime` evaluates one non-capturing two-binding local frame under checked integer, deterministic Boolean, and fixed resource bounds. | No quantum argument or routine execution changes. | Strict Hybrid export, quantum simulation, and ABI v1 explicitly reject U6 nodes; local callable evaluation has no target-side meaning. | Parser/AST/IR/resolver/evaluator/CLI/exporter/simulator/C-ABI/tutorial/overflow/limit fixtures plus the six-job remote matrix passed in [Compiler Core #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206). |
 
 ## Design rules
 
@@ -98,8 +99,10 @@ security/support commitment.
    not add routine execution or a general callable model.
 3. **U4 is complete** as one bounded feedback pair; it does not add general
    measurement control or a general hybrid runtime.
-4. **U5 is complete** as one bounded local callable evaluator; it does not add a
-   general runtime, lexical scope, or callable execution model.
+4. **U5 and U6 are complete** as bounded one- and two-formal local callable
+   evaluators; they do not add a general runtime, lexical scope, arbitrary calls,
+   or general callable execution model. The next increment remains a separately
+   contracted wider callable/control design.
 
 ## References
 

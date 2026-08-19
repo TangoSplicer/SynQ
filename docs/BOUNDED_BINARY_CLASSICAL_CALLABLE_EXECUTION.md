@@ -1,12 +1,10 @@
 # Bounded Binary Classical Callable Execution (U6 Design Contract)
 
-**Feature stage:** Implemented Alpha U6 candidate; not remotely verified and
-not a capability claim until the implementation revision passes the full
-six-job Compiler Core matrix.
-**Current baseline:** U5 is remotely verified at revision `7307c00` by
-[Compiler Core #32266056516][1] (45/45 Linux recovery CTests, 31/31 Windows
-MSVC and macOS Clang platform-neutral CTests, and three clean-install
-experimental static-SDK consumer jobs).
+**Feature stage:** Remotely verified Alpha U6 contract for revision `9a1a9b3`.
+**Current baseline:** [Compiler Core #32270327206][1] passed all six jobs for
+this implementation revision: 46/46 Linux recovery CTests, 32/32 Windows MSVC
+and macOS Clang platform-neutral CTests, and clean-install experimental
+static-SDK consumer jobs on Ubuntu 22.04, Windows MSVC, and macOS Clang.
 
 ## Purpose
 
@@ -177,8 +175,10 @@ implementation revision.
    public Evidence Ledger call this exact U6 slice remotely verified.
 
 The focused U6 fixture, CLI smoke extension, C ABI boundary extension, and the
-full local **46/46** recovery suite passed for the implementation candidate.
-Remote matrix evidence remains required before any availability claim.
+full local **46/46** recovery suite passed. The unchanged implementation
+revision then passed all six remote matrix jobs, so repository status, changelog,
+readiness records, and the Evidence Ledger may call this exact U6 slice remotely
+verified while retaining every listed non-goal.
 
 ## Explicit non-goals
 
@@ -193,7 +193,7 @@ or any claim of a complete runtime.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32266056516 "SynQ Compiler Core — U5 bounded classical callable runtime"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32270327206 "SynQ Compiler Core — U6 bounded binary classical callable runtime"
 [2]: ./RUNTIME_SUBSET_CLAIM_STANDARD.md "SynQ Runtime-Subset Claim Standard"
 [3]: https://learn.microsoft.com/en-us/azure/quantum/qsharp-overview "Microsoft Q# overview"
 [4]: https://docs.quantinuum.com/nexus/trainings/notebooks/basics/qir/index.html "Quantinuum QIR overview and profile capabilities"

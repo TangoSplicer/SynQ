@@ -9,9 +9,9 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32266056516](https://github.com/TangoSplicer/SynQ/actions/runs/32266056516),
-which passed all six independently scoped jobs for revision `7307c00`: **45/45**
-Linux recovery-profile CTests, **31/31** Windows MSVC and macOS Clang
+platform-matrix run #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206),
+which passed all six independently scoped jobs for revision `9a1a9b3`: **46/46**
+Linux recovery-profile CTests, **32/32** Windows MSVC and macOS Clang
 platform-neutral CTests, and Ubuntu 22.04, Windows MSVC, and macOS Clang
 clean-install static-SDK consumer checks. The tested
 environment and exact clean-install boundaries are documented in
@@ -19,8 +19,8 @@ environment and exact clean-install boundaries are documented in
 
 | Area | Verified experimental capability | Explicit boundary |
 | --- | --- | --- |
-| Compiler and CLI | C++17 recovery build produces `libsynq_lib.a` and `synqc 0.1.0-experimental`, including explicit bounded `--eval-state` and U5 `--eval-runtime`. | No general executor, REPL, package manager, or stable CLI contract. |
-| Source profile | Typed gates, bounded declarations, Alpha Boolean/integer forms, immutable declaration evaluation, gated `var`/`set` state, qubit declarations, named measurement provenance, U3 source-only quantum routines, U4 one-pair feedback, and U5 one-formal local classical functions. | No lexical scopes beyond one U5 frame, general returns, recursion, nested calls, general control/measurement bodies, target-side state lowering, routine execution, routine ABI execution, or general runtime semantics. |
+| Compiler and CLI | C++17 recovery build produces `libsynq_lib.a` and `synqc 0.1.0-experimental`, including explicit bounded `--eval-state` and U5/U6 `--eval-runtime`. | No general executor, REPL, package manager, or stable CLI contract. |
+| Source profile | Typed gates, bounded declarations, Alpha Boolean/integer forms, immutable declaration evaluation, gated `var`/`set` state, qubit declarations, named measurement provenance, U3 source-only quantum routines, U4 one-pair feedback, U5 one-formal local functions, and U6 two-formal same-type local functions. | No lexical scopes beyond one non-capturing local frame, general returns, recursion, nested calls, mixed-type or arbitrary-arity calls, general control/measurement bodies, target-side state lowering, routine execution, routine ABI execution, or general runtime semantics. |
 | Named registers | Alpha `name[index]` operands resolve against earlier declared registers, lower through strict Hybrid OpenQASM, and participate in bounded declaration-order local simulation. | No resource lifetime, deallocation, aliasing, dynamic allocation, or hardware mapping. |
 | Control lowering | Strict Hybrid OpenQASM lowers documented literal and immutable-Boolean `if` forms, plus one U4 top-level named measurement immediately followed by `if <same-result> then quantum x register[index]`. | No nested negation, binary expression, alias, `else`, loop, measurement body, branch execution, or general classical-runtime lowering. |
 | Local simulation | Opt-in pure-state probability calculation for explicit declared default or named registers and a limited gate set; U4 models one terminal named measurement/direct-`x` pair through deterministic branch enumeration. | No sampled host value, general collapse API, noise, general control execution, providers, hardware execution, or general resource lifecycle. |
@@ -81,6 +81,8 @@ accepted/rejected control forms.
 | [`docs/BOUNDED_MEASUREMENT_FEEDBACK.md`](docs/BOUNDED_MEASUREMENT_FEEDBACK.md) | Remotely verified U4 Alpha named-measurement/direct-`x` feedback, strict source-lowering, and deterministic local branch-enumeration contract. |
 | [`docs/BOUNDED_CLASSICAL_CALLABLE_EXECUTION.md`](docs/BOUNDED_CLASSICAL_CALLABLE_EXECUTION.md) | Remotely verified U5 Alpha one-formal local callable-evaluation contract with explicit evaluator, source, simulator, and ABI boundaries. |
 | [`docs/CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md`](docs/CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md) | Beginner-first U5 local callable tutorial and safe failure explanation. |
+| [`docs/BOUNDED_BINARY_CLASSICAL_CALLABLE_EXECUTION.md`](docs/BOUNDED_BINARY_CLASSICAL_CALLABLE_EXECUTION.md) | Remotely verified U6 Alpha two-formal same-type local callable contract with strict parser, resolver, evaluator, source, simulator, and ABI boundaries. |
+| [`docs/BINARY_CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md`](docs/BINARY_CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md) | Beginner-first U6 two-input local callable tutorial and safe failure explanation. |
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |

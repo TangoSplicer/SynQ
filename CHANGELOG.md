@@ -9,6 +9,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Alpha bounded binary classical callable runtime (U6):** The jointly gated
+  `classical-callable-execution` and `multi-formal-classical-callables` subset
+  accepts one earlier `fn name(left: Integer|Boolean, right: same-type) ->`
+  documented binary body and one immutable ordered two-actual invocation.
+  Typed AST/Hybrid IR and resolution retain callable, each formal/actual, exact
+  static type, and earlier-definition provenance. `synqc --eval-runtime`
+  evaluates a non-capturing two-binding depth-1 local frame with checked `int64`
+  arithmetic, deterministic Boolean operators, and the existing
+  32-declaration/128-invocation/depth-16/128-operation limits; failure is
+  atomic. Strict Hybrid export, bounded quantum simulation, and ABI v1
+  explicitly reject U6 nodes. A focused U6 fixture, CLI smoke extension, C ABI
+  rejection check, parser/resolver/boundary/overflow/limit tests, and
+  beginner-first tutorial are included. [Compiler Core platform-matrix run
+  #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206)
+  passed all six jobs for revision `9a1a9b3`: 46 Linux CTests, 32 Windows MSVC
+  CTests, 32 macOS Clang CTests, and clean-install experimental static-SDK
+  external-consumer checks on Ubuntu 22.04, Windows MSVC, and macOS Clang. This
+  adds no arbitrary arity, mixed types, String binary body, capture, mutable
+  local state, returns, recursion, nested calls, target execution, provider,
+  network, AI, or hardware claim.
 - **Alpha bounded classical callable runtime (U5):** The feature-gated
   `classical-callable-execution` subset accepts one earlier
   `fn name(value: Integer|Boolean|String) ->` parameter-only body and one
