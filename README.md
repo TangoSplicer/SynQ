@@ -77,6 +77,7 @@ accepted/rejected control forms.
 | [`docs/BOUNDED_CALLABLE_KERNELS.md`](docs/BOUNDED_CALLABLE_KERNELS.md) | Alpha non-recursive one-gate kernel and source-only call-expansion contract. |
 | [`docs/BOUNDED_RECURSIVE_CONSTANT_EVALUATION.md`](docs/BOUNDED_RECURSIVE_CONSTANT_EVALUATION.md) | Alpha bounded immutable Boolean and Integer declaration-expression evaluation contract. |
 | [`docs/BOUNDED_MUTABLE_CLASSICAL_STATE.md`](docs/BOUNDED_MUTABLE_CLASSICAL_STATE.md) | Remotely validated Alpha U2 local mutable-cell and assignment contract, including strict non-runtime and non-target boundaries. |
+| [`docs/BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md`](docs/BOUNDED_PARAMETERIZED_QUANTUM_ROUTINES.md) | Proposed U3 explicit qubit/angle routine and static source-expansion contract; not an availability claim. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |

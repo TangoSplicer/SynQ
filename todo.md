@@ -161,4 +161,5 @@
 - [x] Specify safe mutable classical storage and assignment semantics before accepting executable state updates, loops, or general branch execution.
 - [x] Implement, locally validate, remotely verify, and document the bounded U2 mutable-cell and assignment subset before making any mutable-state availability claim.
 - [ ] Specify measurement-result storage and target-side feedback semantics before accepting hybrid measurement-controlled source lowering or simulation execution.
-- [ ] Specify a practical bounded quantum-routine contract for parameterized kernels, explicit qubit operands, resource effects, and non-recursive call composition.
+- [x] Specify a practical bounded quantum-routine contract for parameterized kernels, explicit qubit operands, resource effects, and non-recursive call composition.
+- [ ] Implement, locally validate, remotely verify, and document the bounded U3 parameterized quantum-routine subset before making any routine availability claim.
