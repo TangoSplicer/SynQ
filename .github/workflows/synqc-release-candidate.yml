@@ -1,0 +1,177 @@
+name: synqc Release Candidate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "compiler/**"
+      - "docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md"
+      - "docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md"
+      - ".github/workflows/synqc-release-candidate.yml"
+      - "LICENSE"
+      - "LICENSE_COMMERCIAL.md"
+      - "README.md"
+
+# This workflow intentionally has no contents: write permission and contains no
+# release publication command. Its retained artifacts are non-published
+# candidate evidence, not public downloads.
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  release-candidate:
+    name: synqc candidate (${{ matrix.platform }}, ${{ runner.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            runner: ubuntu-latest
+          - platform: macos
+            runner: macos-latest
+          - platform: windows
+            runner: windows-latest
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out exact candidate revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Linux recovery-profile dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ rustc cargo sbcl cl-cffi clojure libjna-java flex bison nlohmann-json3-dev libssl-dev
+          python3 -m pip install --disable-pip-version-check -r compiler/tests/requirements-openqasm3.txt
+
+      - name: Restore Mercury C-backend toolchain cache
+        if: matrix.platform == 'linux'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/synq-mercury
+          key: mercury-22.01.8-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build verified Mercury C-backend toolchain
+        if: matrix.platform == 'linux'
+        run: |
+          mercury_bin="$(compiler/tests/interop/setup_mercury_toolchain.sh | tail -n 1)"
+          echo "$mercury_bin" >> "$GITHUB_PATH"
+
+      - name: Install macOS recovery-profile dependencies
+        if: matrix.platform == 'macos'
+        run: |
+          brew update
+          brew install cmake nlohmann-json openssl@3
+
+      - name: Install Windows recovery-profile dependencies
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: vcpkg install nlohmann-json:x64-windows openssl:x64-windows
+
+      - name: Configure verified Linux recovery profile
+        if: matrix.platform == 'linux'
+        run: |
+          cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_CLI_TOOLS=OFF \
+            -DBUILD_COMPILER_EXECUTABLE=OFF \
+            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
+            -DBUILD_REPL=OFF \
+            -DBUILD_CORE_SMOKE_TESTS=ON
+
+      - name: Configure verified macOS recovery profile
+        if: matrix.platform == 'macos'
+        run: |
+          cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release \
+            "-DCMAKE_PREFIX_PATH=$(brew --prefix nlohmann-json);$(brew --prefix openssl@3)" \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_CLI_TOOLS=OFF \
+            -DBUILD_COMPILER_EXECUTABLE=OFF \
+            -DBUILD_EXPERIMENTAL_COMPONENTS=OFF \
+            -DBUILD_REPL=OFF \
+            -DBUILD_CORE_SMOKE_TESTS=ON \
+            -DBUILD_RECOVERY_NATIVE_SDK=OFF \
+            -DBUILD_RECOVERY_INTEROP_SMOKE_TESTS=OFF \
+            -DBUILD_OPENQASM_REFERENCE_CHECKS=OFF
+
+      - name: Configure verified Windows recovery profile
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: >-
+          cmake -S compiler -B compiler/build -DCMAKE_BUILD_TYPE=Release
+          "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=x64-windows
+          -DBUILD_TESTS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_CLI_TOOLS=OFF
+          -DBUILD_COMPILER_EXECUTABLE=OFF -DBUILD_EXPERIMENTAL_COMPONENTS=OFF
+          -DBUILD_REPL=OFF -DBUILD_CORE_SMOKE_TESTS=ON
+          -DBUILD_RECOVERY_NATIVE_SDK=OFF
+          -DBUILD_RECOVERY_INTEROP_SMOKE_TESTS=OFF
+          -DBUILD_OPENQASM_REFERENCE_CHECKS=OFF
+
+      - name: Build recovery profile
+        run: cmake --build compiler/build --config Release --parallel 2
+
+      - name: Run verified platform test profile
+        run: ctest --test-dir compiler/build -C Release --output-on-failure
+
+      - name: Create non-publishing CLI candidate archive
+        id: package
+        env:
+          SYNQ_PLATFORM: ${{ matrix.platform }}
+          SYNQ_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [[ "$SYNQ_PLATFORM" == "windows" ]]; then
+            synqc_binary="$GITHUB_WORKSPACE/compiler/build/Release/synqc.exe"
+            extension="zip"
+          else
+            synqc_binary="$GITHUB_WORKSPACE/compiler/build/synqc"
+            extension="tar.gz"
+          fi
+
+          cmake \
+            "-DSYNQ_RELEASE_BINARY=$synqc_binary" \
+            "-DSYNQ_RELEASE_SOURCE_DIR=$GITHUB_WORKSPACE" \
+            "-DSYNQ_RELEASE_OUTPUT_DIR=$GITHUB_WORKSPACE/release-candidate" \
+            "-DSYNQ_RELEASE_PLATFORM=$SYNQ_PLATFORM" \
+            "-DSYNQ_RELEASE_ARCH=$RUNNER_ARCH" \
+            "-DSYNQ_RELEASE_COMMIT=$GITHUB_SHA" \
+            "-DSYNQ_RELEASE_TAG=not-a-release" \
+            "-DSYNQ_RELEASE_WORKFLOW_URL=$SYNQ_RUN_URL" \
+            -P compiler/cmake/synqc_release_candidate.cmake
+
+          archive="$GITHUB_WORKSPACE/release-candidate/synqc-0.1.0-experimental-$SYNQ_PLATFORM-$RUNNER_ARCH.$extension"
+          manifest="$GITHUB_WORKSPACE/release-candidate/synqc-0.1.0-experimental-$SYNQ_PLATFORM-$RUNNER_ARCH-manifest.json"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
+
+      - name: Validate exact extracted candidate archive
+        env:
+          SYNQ_PLATFORM: ${{ matrix.platform }}
+        run: |
+          cmake \
+            "-DSYNQ_RELEASE_ARCHIVE=${{ steps.package.outputs.archive }}" \
+            "-DSYNQ_RELEASE_MANIFEST=${{ steps.package.outputs.manifest }}" \
+            "-DSYNQ_RELEASE_SOURCE_DIR=$GITHUB_WORKSPACE" \
+            "-DSYNQ_RELEASE_SCRATCH_DIR=$GITHUB_WORKSPACE/release-candidate/extract" \
+            -P compiler/tests/cmake/release_candidate_package_smoke.cmake
+
+      - name: Generate candidate archive provenance attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ steps.package.outputs.archive }}
+
+      - name: Retain non-published candidate archive and verification materials
+        uses: actions/upload-artifact@v4
+        with:
+          name: synqc-release-candidate-${{ matrix.platform }}-${{ runner.arch }}
+          path: release-candidate/
+          if-no-files-found: error

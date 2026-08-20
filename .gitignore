@@ -16,6 +16,9 @@ cmake_install.cmake
 Makefile
 *.cmake
 !compiler/tests/cmake/installed_sdk_conformance.cmake
+!compiler/cmake/synqc_release_candidate.cmake
+!compiler/tests/cmake/release_candidate_package_smoke.cmake
+!compiler/tests/cmake/release_candidate_package_smoke_wrapper.cmake
 
 # Python
 __pycache__/

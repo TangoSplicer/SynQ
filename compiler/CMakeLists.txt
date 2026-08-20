@@ -222,6 +222,16 @@ if(BUILD_CORE_SMOKE_TESTS)
     if(BUILD_RECOVERY_CLI)
         add_executable(synq_cli_smoke tests/smoke/cli_smoke.cpp)
         add_test(NAME synq_cli_smoke COMMAND synq_cli_smoke $<TARGET_FILE:synqc>)
+
+        if(NOT SYNQ_ENABLE_SANITIZERS)
+            add_test(
+                NAME synq_release_candidate_package_smoke
+                COMMAND ${CMAKE_COMMAND}
+                        -DSYNQ_BUILD_DIR=${CMAKE_BINARY_DIR}
+                        -DSYNQ_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+                        -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/cmake/release_candidate_package_smoke_wrapper.cmake
+            )
+        endif()
     endif()
 
     add_executable(synq_c_abi_smoke tests/interop/c_abi_smoke.c)
