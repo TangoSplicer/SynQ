@@ -9,14 +9,15 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013),
-which passed all seven independently scoped jobs for reliability revision
-`2965ec4`: **46/46** ordinary Ubuntu recovery-profile CTests, **32/32** Windows
-MSVC and macOS Clang platform-neutral CTests, three clean-install static-SDK
-consumer checks, and an additive **32/32** Ubuntu Clang ASan/UBSan core profile.
-The sanitizer profile is a narrow Linux/Clang testing configuration, not a
-security certification or non-Linux sanitizer claim. The tested environment and
-exact clean-install boundaries are documented in
+platform-matrix run #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046),
+which passed all seven independently scoped jobs for revision `8fc1de5`:
+**47/47** ordinary Ubuntu recovery-profile CTests, **33/33** Windows MSVC and
+macOS Clang platform-neutral CTests, three clean-install static-SDK consumer
+checks, and an additive **33/33** Ubuntu Clang ASan/UBSan core profile. The new
+deterministic replay target uses a checked-in five-source SynQ corpus and eight
+fixed single-byte mutation seeds; it is not continuous fuzzing, a security
+certification, or a non-Linux sanitizer claim. The tested environment and exact
+clean-install boundaries are documented in
 [`docs/TESTED_ENVIRONMENTS.md`](docs/TESTED_ENVIRONMENTS.md).
 
 | Area | Verified experimental capability | Explicit boundary |
@@ -88,6 +89,7 @@ accepted/rejected control forms.
 | [`docs/CONFORMANCE_FIXTURE_MANIFEST_v0.1.0.md`](docs/CONFORMANCE_FIXTURE_MANIFEST_v0.1.0.md) | Versioned index of 15 pinned entry fixtures, their CTest owners, profile boundaries, and direct raw-source downloads. |
 | [`docs/CONFORMANCE_REQUIREMENT_MATRIX_v0.1.0.md`](docs/CONFORMANCE_REQUIREMENT_MATRIX_v0.1.0.md) | Initial requirement-to-test mapping for the U1–U6 candidate subset, including named closure gaps. |
 | [`docs/ZERO_COST_SANITIZER_HARDENING.md`](docs/ZERO_COST_SANITIZER_HARDENING.md) | Remotely verified additive Linux/Clang ASan/UBSan core-profile evidence and its explicit exclusions. |
+| [`docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md`](docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md) | Remotely verified fixed-corpus parser/lowering/resolution/bounded-evaluation replay contract, exact seeds, reproduction command, and exclusions. |
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |

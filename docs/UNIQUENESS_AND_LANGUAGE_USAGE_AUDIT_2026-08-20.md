@@ -2,7 +2,7 @@
 
 **Status:** Evidence-led assessment of the experimental recovery profile.  
 **Reviewed:** 20 August 2026.  
-**Evidence baseline:** [Compiler Core #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013), reliability revision `2965ec4`.
+**Evidence baseline:** [Compiler Core #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046), revision `8fc1de5`.
 
 ## Decision
 
@@ -61,7 +61,7 @@ each remains qualified by the current experimental boundary.
 | **Bounded local classical execution** | U5/U6 evaluate particular non-capturing one- and two-formal callable shapes with static types, checked integer arithmetic, resource limits, and atomic failure. | No lexical scopes, capture, recursion, nested calls, arbitrary arity, general returns, or target/ABI execution. |
 | **Measured feedback provenance** | U4 retains a named measurement result through one adjacent direct-`x` feedback shape and locally enumerates its two branches. | No generic branch execution, `else`, loops, multiple-result lifetime, or sampled host value. |
 | **Foreign-consumer proof instead of wrapper marketing** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend consumers exercise the opaque C ABI in the Ubuntu full profile. | No released language packages, source compatibility, bidirectional translation, frozen ABI, or broad platform-delivery guarantee. |
-| **Evidence-gated release posture** | The current seven-job matrix covers ordinary Linux, Windows, macOS, three clean SDK consumers, and a narrow Linux/Clang ASan/UBSan core profile. | The sanitizer profile is not a security certification, fuzzing result, complete coverage metric, or all-platform sanitizer claim. |
+| **Evidence-gated release posture** | The current seven-job matrix covers ordinary Linux, Windows, macOS, three clean SDK consumers, a narrow Linux/Clang ASan/UBSan core profile, and a fixed deterministic replay target. | The sanitizer/replay evidence is not a security certification, continuous fuzzing result, complete coverage metric, or all-platform sanitizer claim. |
 
 ## SynQ-native usage policy
 

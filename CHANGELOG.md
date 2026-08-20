@@ -9,6 +9,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Deterministic parser/runtime replay and native-usage audit:** Added the
+  `synq_deterministic_replay_smoke` C++17 recovery target with a checked-in
+  five-source SynQ corpus, fixed eight-seed single-byte mutation schedule,
+  4 KiB input cap, in-memory parser/Hybrid-IR/resolver/bounded-evaluator
+  pipeline, twice-per-input outcome-digest comparison, and an exact
+  `--case`/`--seed` reproduction interface. The target is registered in both
+  the ordinary and isolated sanitizer profiles. [Compiler Core #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046)
+  passed all seven jobs for revision `8fc1de5`: 47/47 ordinary Linux CTests,
+  33/33 Windows MSVC and macOS Clang platform-neutral CTests, three
+  clean-install static-SDK consumer jobs, and 33/33 Linux/Clang ASan/UBSan core
+  CTests. This is fixed deterministic replay—not continuous fuzzing, libFuzzer,
+  property-test coverage, a general-runtime proof, or a security certification.
+  The same revision adds a cited differentiation and SynQ-native usage audit,
+  a versioned known-limit ledger, current testing guidance, and retirement
+  notices for unsupported Python-centric or invented language documentation.
 - **Zero-cost Clang sanitizer core profile:** The opt-in
   `SYNQ_ENABLE_SANITIZERS=ON` CMake profile uses Clang AddressSanitizer and
   UndefinedBehaviorSanitizer with frame pointers, non-recovering undefined
@@ -209,6 +224,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   contribution workflow, security-reporting policy, and bounded issue templates.
 
 ### Changed
+- **Evidence baseline and teaching materials:** Updated the README, project
+  status, runtime-gap assessment, testing guide, deterministic replay contract,
+  and known-limit ledger to the #32374149046 evidence baseline. Learner-facing
+  SynQ programs use SynQ syntax; C, Rust, Mercury, Common Lisp, Clojure, and
+  Python remain only where explicitly identified as implementation, ABI-consumer,
+  or downstream-validation tooling.
 - **Portable SDK conformance harness:** Made the isolated SDK producer/consumer
   script configuration-aware so it can select a multi-configuration build,
   executable suffix, and vcpkg toolchain for the verified Windows MSVC path.

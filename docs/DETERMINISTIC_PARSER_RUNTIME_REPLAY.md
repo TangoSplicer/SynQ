@@ -1,8 +1,7 @@
 # Deterministic Parser/Runtime Replay Contract
 
-**Status:** Design contract for the next reliability increment; implementation
-evidence is pending.  
-**Issued:** 20 August 2026.  
+**Status:** Remotely verified bounded replay contract.
+**Verified evidence:** [Compiler Core #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046), revision `8fc1de5`, 20 August 2026.
 **Scope:** The C++17 recovery parser, Hybrid IR lowering, bounded name resolver,
 and bounded local evaluator entry points.
 
@@ -100,10 +99,16 @@ a failure log can be replayed locally. The CTest owner is
 | Corpus errors | Missing manifest file, duplicate manifest entry, unknown selected case, unreadable file, oversize input, malformed seed syntax, or invalid selector combination fails the harness deterministically. |
 | Platform behavior | The target is ordinary C++17 CTest coverage. It has no platform-specific dependency and must remain suitable for the existing Linux/Windows/macOS platform-neutral profile. |
 
-## Evidence promotion rule
+## Verified evidence and continuing boundary
 
-This contract may be described as implemented only after the focused target,
-the full ordinary local recovery profile, and the required remote Compiler Core
-matrix pass for one revision. The sanitizer profile must also include the target
-or explicitly state why it is excluded. Until then, the known-limit ledger keeps
-fuzzing and replay unclaimed.
+`synq_deterministic_replay_smoke` is registered in the ordinary recovery profile
+and the isolated sanitizer profile. Compiler Core #32374149046 passed all seven
+jobs: 47/47 ordinary Linux CTests, 33/33 Windows MSVC and macOS Clang
+platform-neutral CTests, three static-SDK consumer jobs, and 33/33
+Linux/Clang ASan/UBSan CTests. The replay target is therefore verified for the
+documented five-source corpus and fixed schedule, not for arbitrary inputs or a
+general runtime.
+
+Any corpus, seed schedule, input cap, digest representation, or pipeline change
+must re-run the focused target, full ordinary local recovery profile, sanitizer
+profile, and required remote Compiler Core matrix before this record is updated.

@@ -1,7 +1,7 @@
 # SynQ Testing and Evidence Guide
 
 **Status:** Current guide for the bounded experimental recovery profile.
-**Evidence baseline:** [Compiler Core #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013).
+**Evidence baseline:** [Compiler Core #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046), revision `8fc1de5`.
 
 > Test counts are evidence snapshots, not a coverage percentage, a complete
 > language claim, a security certification, or a promise that every tracked file
@@ -18,10 +18,10 @@ foreign-language conformance fixtures.
 
 | Evidence layer | Current scope | Explicit exclusion |
 | --- | --- | --- |
-| Ordinary recovery profile | 46 Ubuntu CTests for parser, semantics, bounded evaluator, exporter, simulator, CLI, C ABI, and named interop checks. | A project-wide test inventory or coverage figure. |
-| Platform-neutral smoke | 32 CTests each on Windows MSVC and macOS Clang. | Toolchain-specific Lisp, Clojure, Mercury, reference-parser, and related Ubuntu-only checks. |
+| Ordinary recovery profile | 47 Ubuntu CTests for parser, semantics, bounded evaluator, exporter, simulator, CLI, C ABI, deterministic replay, and named interop checks. | A project-wide test inventory or coverage figure. |
+| Platform-neutral smoke | 33 CTests each on Windows MSVC and macOS Clang. | Toolchain-specific Lisp, Clojure, Mercury, reference-parser, and related Ubuntu-only checks. |
 | Native SDK consumers | Clean-install static C SDK consumers on Ubuntu 22.04, Windows MSVC, and macOS Clang. | Shared-library distribution, a frozen ABI, or released language packages. |
-| Sanitizer profile | 32 isolated Linux/Clang ASan/UBSan core CTests. | Fuzzing, replay, all-platform sanitizer coverage, external-parser coverage, or security certification. |
+| Sanitizer profile | 33 isolated Linux/Clang ASan/UBSan core CTests, including deterministic replay. | Continuous fuzzing, all-platform sanitizer coverage, external-parser coverage, or security certification. |
 
 ## Build and run the ordinary local recovery profile
 
@@ -90,10 +90,15 @@ command, operating system/toolchain version, complete diagnostic, and the
 expected bounded behavior. Do not infer a general language defect from a file
 that is outside the supported recovery subset.
 
-## Next reliability work
+## Deterministic replay evidence
 
-The next planned evidence increment is a deterministic parser/runtime
-fuzz-replay target with a checked-in seed/corpus contract and a failure
-reproduction command. Until it is locally and remotely validated, SynQ makes no
-fuzzing or deterministic-replay claim. See [`todo.md`](todo.md) and
-[`docs/KNOWN_LIMITS_v0.1.0.md`](docs/KNOWN_LIMITS_v0.1.0.md).
+`synq_deterministic_replay_smoke` exercises five checked-in SynQ corpus sources
+through parser, Hybrid IR lowering, name resolution, and all bounded evaluator
+entry points. It replays each source unmodified and with eight fixed single-byte
+mutation seeds, runs every input twice, and compares environment-independent
+outcome digests. The target passed in the ordinary and sanitizer profiles of
+Compiler Core #32374149046. It is a fixed, deterministic replay smoke target;
+it does not claim continuous fuzzing, libFuzzer integration, property-test
+coverage, or a security certification. See
+[`docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md`](docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md)
+and [`docs/KNOWN_LIMITS_v0.1.0.md`](docs/KNOWN_LIMITS_v0.1.0.md).
