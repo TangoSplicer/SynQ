@@ -195,6 +195,7 @@ jobs:
             "-DSYNQ_RELEASE_MANIFEST=${{ steps.package.outputs.manifest }}" \
             "-DSYNQ_RELEASE_SOURCE_DIR=$GITHUB_WORKSPACE" \
             "-DSYNQ_RELEASE_SCRATCH_DIR=$GITHUB_WORKSPACE/release-candidate/extract" \
+            "-DSYNQ_EXPECTED_TAG=${{ steps.candidate_identity.outputs.tag }}" \
             -P compiler/tests/cmake/release_candidate_package_smoke.cmake
 
       - name: Generate candidate archive provenance attestation
