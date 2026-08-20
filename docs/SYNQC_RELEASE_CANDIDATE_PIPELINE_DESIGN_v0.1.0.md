@@ -68,6 +68,17 @@ macOS ARM64, and Windows X64 in run #32393670587. It does not attach an asset to
 a GitHub Release or assert user-facing provenance. A future release candidate
 must still pass the documented publication gates before any asset is published.
 
+## Tag-aware candidate mode
+
+The non-publishing `workflow_dispatch` path accepts an optional `release_tag`
+input. When empty, it retains the historical `not-a-release` behavior. When
+present, the workflow checks out that existing Git tag with full tag history,
+rejects a reserved or malformed tag, resolves the tag to a commit, and rejects
+any mismatch with the checked-out source. Only then does it embed the tag and
+resolved commit in the non-published candidate manifest. This preparation does
+not create a tag, GitHub Release, asset upload, installer, registry package,
+signing, or notarization; those remain separate confirmed actions.
+
 ## Verified run result
 
 The candidate workflow completed all three platform jobs. Each job built the

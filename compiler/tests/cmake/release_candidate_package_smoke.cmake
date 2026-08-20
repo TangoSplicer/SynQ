@@ -7,7 +7,8 @@ foreach(required_var IN ITEMS
         SYNQ_RELEASE_ARCHIVE
         SYNQ_RELEASE_MANIFEST
         SYNQ_RELEASE_SOURCE_DIR
-        SYNQ_RELEASE_SCRATCH_DIR)
+        SYNQ_RELEASE_SCRATCH_DIR
+        SYNQ_EXPECTED_TAG)
     if(NOT DEFINED ${required_var} OR "${${required_var}}" STREQUAL "")
         message(FATAL_ERROR "${required_var} is required")
     endif()
@@ -25,6 +26,7 @@ foreach(required_json IN ITEMS
         "\"distribution\": \"synqc-release-candidate\""
         "\"publication_status\": \"not-published\""
         "\"cli_version\": \"0.1.0-experimental\""
+        "\"release_tag\": \"${SYNQ_EXPECTED_TAG}\""
         "\"file_name\"")
     string(FIND "${manifest_contents}" "${required_json}" json_index)
     if(json_index EQUAL -1)

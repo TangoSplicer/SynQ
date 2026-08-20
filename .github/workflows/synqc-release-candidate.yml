@@ -2,6 +2,11 @@ name: synqc Release Candidate
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing experimental Git tag to build as a non-publishing candidate; leave empty for not-a-release evidence"
+        required: false
+        type: string
   push:
     branches: [main]
     paths:
@@ -42,7 +47,35 @@ jobs:
       - name: Check out exact candidate revision
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: ${{ inputs.release_tag || github.sha }}
+          fetch-depth: 0
+
+      - name: Resolve non-publishing candidate identity
+        id: candidate_identity
+        env:
+          SYNQ_REQUESTED_TAG: ${{ inputs.release_tag }}
+        run: |
+          if [[ -z "$SYNQ_REQUESTED_TAG" ]]; then
+            echo "tag=not-a-release" >> "$GITHUB_OUTPUT"
+            echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$SYNQ_REQUESTED_TAG" == "not-a-release" ]] || \
+             ! git check-ref-format --allow-onelevel "refs/tags/$SYNQ_REQUESTED_TAG"; then
+            echo "release_tag must be an existing non-reserved Git tag" >&2
+            exit 1
+          fi
+
+          tag_commit="$(git rev-parse "refs/tags/$SYNQ_REQUESTED_TAG^{commit}" 2>/dev/null || true)"
+          checkout_commit="$(git rev-parse HEAD)"
+          if [[ -z "$tag_commit" ]] || [[ "$tag_commit" != "$checkout_commit" ]]; then
+            echo "release_tag does not resolve to the checked-out source revision" >&2
+            exit 1
+          fi
+
+          echo "tag=$SYNQ_REQUESTED_TAG" >> "$GITHUB_OUTPUT"
+          echo "commit=$checkout_commit" >> "$GITHUB_OUTPUT"
 
       - name: Install Linux recovery-profile dependencies
         if: matrix.platform == 'linux'
@@ -143,8 +176,8 @@ jobs:
             "-DSYNQ_RELEASE_OUTPUT_DIR=$GITHUB_WORKSPACE/release-candidate" \
             "-DSYNQ_RELEASE_PLATFORM=$SYNQ_PLATFORM" \
             "-DSYNQ_RELEASE_ARCH=$RUNNER_ARCH" \
-            "-DSYNQ_RELEASE_COMMIT=$GITHUB_SHA" \
-            "-DSYNQ_RELEASE_TAG=not-a-release" \
+            "-DSYNQ_RELEASE_COMMIT=${{ steps.candidate_identity.outputs.commit }}" \
+            "-DSYNQ_RELEASE_TAG=${{ steps.candidate_identity.outputs.tag }}" \
             "-DSYNQ_RELEASE_WORKFLOW_URL=$SYNQ_RUN_URL" \
             -P compiler/cmake/synqc_release_candidate.cmake
 

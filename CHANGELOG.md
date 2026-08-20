@@ -34,6 +34,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   not public releases, signed/notarized binaries, installers, or registry
   packages; publication still requires user confirmation and separate release
   metadata.
+- **Tag-aware candidate preparation:** The manual non-publishing candidate
+  workflow now accepts an optional existing `release_tag`, checks out and
+  resolves that tag, rejects reserved/malformed or tag-to-checkout mismatches,
+  and embeds the validated tag in the candidate manifest. The package smoke now
+  exercises a local tagged manifest invariant. This does not create tags, GitHub
+  Releases, release assets, installers, registry packages, signing, or
+  notarization; those remain separately confirmed public actions.
 - **Deterministic parser/runtime replay and native-usage audit:** Added the
   `synq_deterministic_replay_smoke` C++17 recovery target with a checked-in
   five-source SynQ corpus, fixed eight-seed single-byte mutation schedule,
