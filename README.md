@@ -101,6 +101,8 @@ accepted/rejected control forms.
 | [`docs/MULTI_REGISTER_SIMULATION.md`](docs/MULTI_REGISTER_SIMULATION.md) | Bounded named-register allocation and local-probability simulation contract. |
 | [`docs/EXPERIMENTAL_RUST_WRAPPER.md`](docs/EXPERIMENTAL_RUST_WRAPPER.md) | Source-only Alpha Rust wrapper and C ABI ownership contract. |
 | [`docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md`](docs/LANGUAGE_WIDE_IMPROVEMENT_ASSESSMENT_2026-08-17.md) | Prioritized language-core improvement assessment, grounded in current code and evidence. |
+| [`docs/UNIQUENESS_AND_LANGUAGE_USAGE_AUDIT_2026-08-20.md`](docs/UNIQUENESS_AND_LANGUAGE_USAGE_AUDIT_2026-08-20.md) | Evidence-backed comparison with selected quantum ecosystems, the bounded SynQ differentiation position, and a SynQ-native learning-material policy. |
+| [`docs/KNOWN_LIMITS_v0.1.0.md`](docs/KNOWN_LIMITS_v0.1.0.md) | Versioned ledger of unsupported language, runtime, target, ABI, platform, hardware, and evidence claims. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Safe contribution workflow. |
 | [`SECURITY.md`](SECURITY.md) | Responsible vulnerability-reporting route. |
 

@@ -1,0 +1,4 @@
+#[experimental(feature = "classical-callable-execution")]
+#[experimental(feature = "multi-formal-classical-callables")]
+fn add(left: Integer, right: Integer) -> left + right
+let answer = add(20, 22)

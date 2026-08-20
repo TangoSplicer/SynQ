@@ -106,6 +106,14 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_parser_runtime_smoke PRIVATE synq_lib)
     add_test(NAME synq_parser_runtime_smoke COMMAND synq_parser_runtime_smoke)
 
+    add_executable(synq_deterministic_replay_smoke tests/fuzz/deterministic_replay_smoke.cpp)
+    target_include_directories(synq_deterministic_replay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_deterministic_replay_smoke PRIVATE synq_lib)
+    add_test(
+        NAME synq_deterministic_replay_smoke
+        COMMAND synq_deterministic_replay_smoke ${CMAKE_CURRENT_SOURCE_DIR}/tests/fuzz/corpus
+    )
+
     add_executable(synq_feature_gate_smoke tests/smoke/feature_gate_smoke.cpp)
     target_include_directories(synq_feature_gate_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_feature_gate_smoke PRIVATE synq_lib)

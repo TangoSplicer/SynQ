@@ -1,0 +1,7 @@
+#[experimental(feature = "qubit-declarations")]
+#[experimental(feature = "classical-control-flow")]
+#[experimental(feature = "measurement-feedback")]
+qubit q[2]
+quantum h q[0]
+measure q[0] as observed
+if observed then quantum x q[1]

@@ -1,0 +1,6 @@
+# Deterministic replay corpus v0.1.0. Entries are ordered and NUL-free SynQ sources.
+u6_binary_add.synq
+mutable_state.synq
+measurement_feedback.synq
+missing_runtime_gate.synq
+malformed_binary_call.synq

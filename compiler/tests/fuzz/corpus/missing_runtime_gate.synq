@@ -1,0 +1,2 @@
+fn increment(value: Integer) -> value + 1
+let answer = increment(41)

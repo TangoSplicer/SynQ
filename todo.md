@@ -179,4 +179,8 @@
 - [x] Publish the first versioned requirement-to-test conformance matrix for the verified bounded U1–U6 local-runtime candidates, including requirement IDs, fixture owners, profile scope, and known closure gaps.
 - [ ] Add zero-budget reliability evidence: sanitizer-enabled builds where available, deterministic seed/replay controls, parser/runtime fuzzing or property tests, and a security/known-limit review.
 - [x] Add and remotely verify the first additive zero-cost Linux/Clang ASan/UBSan core profile (Compiler Core #32369872013: 32/32 sanitizer CTests alongside the unchanged six-job evidence matrix).
+- [ ] Publish, implement, locally validate, and remotely verify a deterministic bounded parser/runtime fuzz-replay target with a checked-in seed/corpus contract and explicit failure-reproduction command.
+- [ ] Audit all language-learning examples and tutorials so that SynQ syntax is used for SynQ programs; retain C, C++, Rust, Mercury, Common Lisp, and Clojure only where they are explicit foreign-consumer interoperability fixtures or build tooling.
+- [ ] Publish an evidence-backed differentiation audit against comparable quantum languages and SDKs, separating distinctive combined properties from claims of worldwide exclusivity.
+- [ ] Publish a versioned known-limit ledger that states unsupported syntax, runtime, target, ABI-execution, platform-package, hardware, and interoperability boundaries.
 - [ ] Publish a stable-runtime candidate only after the documented subset has a reproducible installation path, compatibility/deprecation policy, executable examples, diagnostics guide, release checklist, and repeated six-job remote evidence.

@@ -1,0 +1,8 @@
+#[experimental(feature = "mutable-classical-state")]
+#[experimental(feature = "integer-arithmetic-expressions")]
+#[experimental(feature = "classical-control-flow")]
+let seed = 5
+var total = seed
+set total = total + 4
+var ready = true
+set ready = not ready

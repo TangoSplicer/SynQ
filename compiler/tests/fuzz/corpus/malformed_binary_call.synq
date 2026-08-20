@@ -1,0 +1,3 @@
+#[experimental(feature = "classical-callable-execution")]
+#[experimental(feature = "multi-formal-classical-callables")]
+let answer = add(1, 2, 3)
