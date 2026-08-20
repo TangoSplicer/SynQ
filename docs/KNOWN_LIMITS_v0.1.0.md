@@ -2,7 +2,7 @@
 
 **Status:** Versioned boundary ledger for the experimental recovery profile.  
 **Issued:** 20 August 2026.  
-**Evidence baseline:** [Compiler Core #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046), revision `8fc1de5`.
+**Evidence baseline:** [Compiler Core #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652), revision `fdbbbec`.
 
 > This ledger records what SynQ **does not** currently claim. A future capability
 > may be added only when it has a written contract, focused local tests, the full
@@ -14,12 +14,14 @@
 SynQ is an experimental hybrid quantum–classical language kernel, not a
 feature-complete language, provider client, hardware service, or stable SDK.
 The verified profile is a deliberately bounded C++17 compiler and CLI. The
-baseline has 47/47 ordinary Ubuntu recovery CTests, 33/33 Windows MSVC and
+baseline has 48/48 ordinary Ubuntu recovery CTests, 34/34 Windows MSVC and
 macOS Clang platform-neutral CTests, three static-SDK consumer jobs, and a
 narrow 33/33 Linux/Clang ASan/UBSan core profile. It also has a five-source,
-eight-seed deterministic replay smoke target. These are additive reliability
-evidence, **not** a security certification, continuous fuzzing service, or a
-full fuzzing result.
+eight-seed deterministic replay smoke target, plus a separately verified
+non-publishing candidate archive/manifest/checksum/extraction/attestation
+workflow. These are additive reliability evidence, **not** a security
+certification, continuous fuzzing service, public-package release, or a full
+fuzzing result.
 
 ## Language and semantic limits
 
@@ -55,7 +57,7 @@ full fuzzing result.
 | --- | --- | --- |
 | Test evidence | Named smoke fixtures, a conformance fixture manifest, a U1–U6 requirement matrix, ordinary platform tests, SDK consumers, a fixed replay corpus/schedule, and a narrow sanitizer profile. | Complete coverage, absence of defects, continuous fuzzing coverage, property testing, formal verification, security certification, or a complete conformance suite. |
 | Sanitizers | Opt-in Linux/Clang ASan/UBSan applies to an isolated 33-test core profile with stated halt/leak settings, including deterministic replay. | Sanitizer results for Windows, macOS, SDK consumers, all interop fixtures, external parsers, production deployments, or every source path. |
-| Reproducibility | Exact build/test commands, corpus source names, replay seeds, and remote run links are documented for current evidence. | Hermetic build reproduction on every machine, supply-chain attestation, signed release artifacts, or arbitrary-input fuzz replay. |
+| Reproducibility | Exact build/test commands, corpus source names, replay seeds, a three-platform candidate archive workflow, checksums/manifests, and remote run links are documented for current evidence. | Hermetic build reproduction on every machine, public release assets, signed release artifacts, notarization, package-manager delivery, or arbitrary-input fuzz replay. |
 
 ## Documentation and historical-material limits
 

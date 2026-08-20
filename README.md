@@ -9,15 +9,20 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046),
-which passed all seven independently scoped jobs for revision `8fc1de5`:
-**47/47** ordinary Ubuntu recovery-profile CTests, **33/33** Windows MSVC and
+platform-matrix run #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652),
+which passed all seven independently scoped jobs for revision `fdbbbec`:
+**48/48** ordinary Ubuntu recovery-profile CTests, **34/34** Windows MSVC and
 macOS Clang platform-neutral CTests, three clean-install static-SDK consumer
-checks, and an additive **33/33** Ubuntu Clang ASan/UBSan core profile. The new
-deterministic replay target uses a checked-in five-source SynQ corpus and eight
-fixed single-byte mutation seeds; it is not continuous fuzzing, a security
-certification, or a non-Linux sanitizer claim. The tested environment and exact
-clean-install boundaries are documented in
+checks, and an additive **33/33** Ubuntu Clang ASan/UBSan core profile. The added
+ordinary-platform check creates, content-checks, hash-checks, extracts, and
+executes a non-published CLI candidate archive. Separately,
+[synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587)
+passed Linux, macOS ARM64, and Windows X64 candidate archive, attestation, and
+retention jobs. Those artifacts are CI evidence, not GitHub Release assets or
+public packages. The deterministic replay target remains a checked-in five-source
+SynQ corpus with eight fixed single-byte mutation seeds; it is not continuous
+fuzzing, a security certification, or a non-Linux sanitizer claim. The tested
+environment and exact clean-install boundaries are documented in
 [`docs/TESTED_ENVIRONMENTS.md`](docs/TESTED_ENVIRONMENTS.md).
 
 | Area | Verified experimental capability | Explicit boundary |
@@ -96,6 +101,7 @@ accepted/rejected control forms.
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |
 | [`docs/PACKAGING.md`](docs/PACKAGING.md) | Current source-build, CPack, CI-artifact, and public-release boundary. |
 | [`docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md`](docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md) | Proposed zero-cost Linux, macOS, and Windows CLI-archive, verification, provenance, and release-acceptance contract. |
+| [`docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md`](docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md) | Remotely verified non-publishing candidate-archive, extraction, and provenance workflow with the release-publication boundary. |
 | [`docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md) | Fixed Ubuntu 22.04 static-SDK conformance evidence and limits. |
 | [`docs/BEGINNER_TUTORIAL.md`](docs/BEGINNER_TUTORIAL.md) | First build, validation, export, and local-probability walkthrough. |
 | [`docs/BEGINNER_EXPERIENCE.md`](docs/BEGINNER_EXPERIENCE.md) | Guided-playground and visual-lesson non-execution contract. |

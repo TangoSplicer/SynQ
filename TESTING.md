@@ -1,7 +1,7 @@
 # SynQ Testing and Evidence Guide
 
 **Status:** Current guide for the bounded experimental recovery profile.
-**Evidence baseline:** [Compiler Core #32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046), revision `8fc1de5`.
+**Evidence baseline:** [Compiler Core #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652), revision `fdbbbec`.
 
 > Test counts are evidence snapshots, not a coverage percentage, a complete
 > language claim, a security certification, or a promise that every tracked file
@@ -18,8 +18,8 @@ foreign-language conformance fixtures.
 
 | Evidence layer | Current scope | Explicit exclusion |
 | --- | --- | --- |
-| Ordinary recovery profile | 47 Ubuntu CTests for parser, semantics, bounded evaluator, exporter, simulator, CLI, C ABI, deterministic replay, and named interop checks. | A project-wide test inventory or coverage figure. |
-| Platform-neutral smoke | 33 CTests each on Windows MSVC and macOS Clang. | Toolchain-specific Lisp, Clojure, Mercury, reference-parser, and related Ubuntu-only checks. |
+| Ordinary recovery profile | 48 Ubuntu CTests for parser, semantics, bounded evaluator, exporter, simulator, CLI, C ABI, deterministic replay, candidate-package extraction, and named interop checks. | A project-wide test inventory or coverage figure. |
+| Platform-neutral smoke | 34 CTests each on Windows MSVC and macOS Clang, including candidate-package extraction. | Toolchain-specific Lisp, Clojure, Mercury, reference-parser, and related Ubuntu-only checks. |
 | Native SDK consumers | Clean-install static C SDK consumers on Ubuntu 22.04, Windows MSVC, and macOS Clang. | Shared-library distribution, a frozen ABI, or released language packages. |
 | Sanitizer profile | 33 isolated Linux/Clang ASan/UBSan core CTests, including deterministic replay. | Continuous fuzzing, all-platform sanitizer coverage, external-parser coverage, or security certification. |
 
@@ -102,3 +102,17 @@ it does not claim continuous fuzzing, libFuzzer integration, property-test
 coverage, or a security certification. See
 [`docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md`](docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md)
 and [`docs/KNOWN_LIMITS_v0.1.0.md`](docs/KNOWN_LIMITS_v0.1.0.md).
+
+## Non-publishing candidate-package evidence
+
+`synq_release_candidate_package_smoke` uses the exact built `synqc` binary to
+make a CLI-only platform archive, write a JSON manifest and SHA-256 manifest,
+enforce the archive allowlist, extract into a fresh directory, and run
+`--version`, `--help`, and a verified SynQ `--validate` fixture. It is part of
+the 48-test Linux and 34-test Windows/macOS ordinary profiles in Compiler Core
+#32394772652. The separate
+[synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587)
+passed three candidate jobs, each creating, extracting, attesting, and retaining
+a candidate archive. Those retained artifacts are **not** public GitHub Release
+assets, installers, signed binaries, or package-manager packages. See
+[`docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md`](docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md).

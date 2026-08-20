@@ -1,18 +1,25 @@
 # synqc Packaging Status and Specification Index
 
-**Status:** Current delivery boundary plus a link to the proposed major-platform
-distribution specification. This is not a public binary-release announcement.
+**Status:** Remotely verified non-publishing candidate-archive path plus the
+public-release acceptance boundary. This is not a public binary-release
+announcement.
 
 ## Current delivery position
 
 The recovery CMake profile builds `synqc 0.1.0-experimental`, installs it with
-`cmake --install`, and configures a local ZIP-oriented CPack path. Compiler Core
-currently uploads platform build artifacts but does not publish GitHub Release
-assets, checksums, provenance attestations, signed binaries, installers, or
-package-manager entries. The current remote source-build evidence is Compiler
-Core [#32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046):
-47/47 ordinary Linux CTests, 33/33 Windows MSVC and macOS Clang CTests, three
-experimental static-SDK consumer jobs, and 33/33 Linux/Clang sanitizer CTests.
+`cmake --install`, and configures a local ZIP-oriented CPack path. The new
+non-publishing candidate workflow creates CLI-only Linux, macOS ARM64, and
+Windows X64 archives; writes JSON and SHA-256 manifests; enforces a contents
+allowlist; extracts each exact archive; runs CLI smoke checks; generates GitHub
+provenance attestations; and retains the results as CI artifacts. The workflow
+passed as [synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587).
+
+The exact source-build baseline is Compiler Core
+[#32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652),
+revision `fdbbbec`: 48/48 ordinary Linux CTests, 34/34 Windows MSVC and macOS
+Clang CTests, three experimental static-SDK consumer jobs, and 33/33 Linux/Clang
+sanitizer CTests. None of this publishes GitHub Release assets, user-downloadable
+checksums, signed binaries, installers, or package-manager entries.
 
 The CMake delivery surface can include an experimental static SDK when
 `BUILD_RECOVERY_NATIVE_SDK=ON`; that is a source/CMake integration path, not a
@@ -28,9 +35,10 @@ ZIPs, SHA-256 manifests, clean-extraction tests, immutable GitHub Release assets
 optional GitHub provenance attestations, explicit unsigned macOS/Windows limits,
 and separate acceptance gates before publication.
 
-> Until those gates are implemented and pass for the exact release commit, SynQ
-> has a source-build/install path and CI artifacts—not verified public CLI
-> packages.
+> The candidate archive gates are implemented and passed for revision `fdbbbec`.
+> SynQ still has source-build/install paths and retained CI artifacts—not
+> published public CLI packages. A separate confirmed publication step remains
+> required.
 
 ## Current local commands
 

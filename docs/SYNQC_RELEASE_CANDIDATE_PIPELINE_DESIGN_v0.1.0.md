@@ -1,8 +1,11 @@
 # synqc Non-Publishing Release-Candidate Pipeline Design v0.1.0
 
-**Status:** Implementation design. This document authorizes candidate archive
-creation and retention for test evidence only; it does not authorize creating,
-editing, or publishing a GitHub Release.
+**Status:** Remotely verified non-publishing candidate workflow.
+**Evidence:** [synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587), revision `fdbbbec`, 20 August 2026.
+
+This document authorizes candidate archive creation and retention for test
+evidence only; it does not authorize creating, editing, or publishing a GitHub
+Release.
 
 ## Purpose
 
@@ -60,9 +63,22 @@ interface with the candidate archive as `subject-path`. GitHub describes an
 attestation as a provenance claim and warns that it is not, by itself, a security
 guarantee.[1]
 
-The first implementation retains attestations with candidate artifacts. It does
-not attach an asset to a GitHub Release or assert user-facing provenance until a
-future release candidate passes the documented publication gates.
+The implemented workflow retained candidate archive attestations for Linux,
+macOS ARM64, and Windows X64 in run #32393670587. It does not attach an asset to
+a GitHub Release or assert user-facing provenance. A future release candidate
+must still pass the documented publication gates before any asset is published.
+
+## Verified run result
+
+The candidate workflow completed all three platform jobs. Each job built the
+configured platform source profile, created its candidate archive, validated the
+exact extracted archive, generated a GitHub provenance attestation, and retained
+the candidate materials. Compiler Core
+[#32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652)
+also passed all seven jobs for the exact revision: 48/48 ordinary Linux CTests,
+34/34 Windows and macOS CTests, three SDK-consumer jobs, and 33/33 sanitizer
+CTests. This evidence is limited to the named CI platform/architecture candidates
+and does not make them public packages or general platform-support commitments.
 
 ## Publication separation
 

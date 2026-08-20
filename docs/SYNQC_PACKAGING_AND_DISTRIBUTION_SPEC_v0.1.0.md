@@ -187,11 +187,14 @@ must be retrieved from the same immutable release and verified against the
 release manifest; a checksum displayed on a mutable page is not enough on its
 own.
 
-### 5.2 Proposed provenance gate
+### 5.2 Implemented candidate provenance gate
 
-The release workflow should generate GitHub artifact attestations for the exact
-public archives and document `gh attestation verify` with the repository and
-release asset. GitHub describes attestations as cryptographically signed
+The non-publishing candidate workflow generates GitHub artifact attestations for
+the exact Linux, macOS ARM64, and Windows X64 candidate archives in
+[run #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587).
+The future public-release workflow must retain that gate and document
+`gh attestation verify` against the published repository and release asset.
+GitHub describes attestations as cryptographically signed
 provenance claims containing workflow, repository, commit, and trigger context,
 but explicitly states that an attestation is not a guarantee that an artifact is
 secure. [8] Attestation therefore improves traceability; it does not replace

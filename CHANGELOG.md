@@ -9,6 +9,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Non-publishing synqc candidate archives:** Added a portable CMake
+  candidate packager and extraction smoke target that stages only `synqc`,
+  licenses, current bounded-profile documentation, a notice, and version JSON;
+  writes a SHA-256 manifest; rejects all non-allowlisted archive entries; and
+  validates the extracted CLI through `--version`, `--help`, and a verified
+  SynQ validation fixture. The `synqc Release Candidate` workflow has no
+  release-publication permission and passed Linux, macOS ARM64, and Windows X64
+  archive, extraction, GitHub provenance-attestation, and CI-artifact-retention
+  jobs in [run #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587).
+  The exact revision `fdbbbec` passed all seven Compiler Core jobs in
+  [run #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652):
+  48/48 ordinary Linux, 34/34 Windows MSVC/macOS Clang, three static-SDK consumer,
+  and 33/33 Linux/Clang sanitizer CTests. The retained candidate artifacts are
+  not public releases, signed/notarized binaries, installers, or registry
+  packages; publication still requires user confirmation and separate release
+  metadata.
 - **Deterministic parser/runtime replay and native-usage audit:** Added the
   `synq_deterministic_replay_smoke` C++17 recovery target with a checked-in
   five-source SynQ corpus, fixed eight-seed single-byte mutation schedule,
