@@ -183,4 +183,5 @@
 - [x] Audit all language-learning examples and tutorials so that SynQ syntax is used for SynQ programs; retain C, C++, Rust, Mercury, Common Lisp, and Clojure only where they are explicit foreign-consumer interoperability fixtures or build tooling.
 - [x] Publish an evidence-backed differentiation audit against comparable quantum languages and SDKs, separating distinctive combined properties from claims of worldwide exclusivity.
 - [x] Publish a versioned known-limit ledger that states unsupported syntax, runtime, target, ABI-execution, platform-package, hardware, and interoperability boundaries.
+- [x] Draft and publish an evidence-bounded, zero-cost synqc packaging and distribution specification for Linux, macOS, and Windows, separating current build evidence from proposed archives, checksums, signatures, installers, and support policy.
 - [ ] Publish a stable-runtime candidate only after the documented subset has a reproducible installation path, compatibility/deprecation policy, executable examples, diagnostics guide, release checklist, and repeated six-job remote evidence.

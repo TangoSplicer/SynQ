@@ -9,18 +9,18 @@ it is not a cross-platform support promise.
 The recovery compiler profile is continuously exercised by the
 [`Compiler Core` workflow](../.github/workflows/compiler-core.yml). The latest
 remote evidence is [Compiler Core platform-matrix run
-#32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013)
-for reliability revision `2965ec4`. Its ordinary Linux job passed the full
-**46/46** recovery-profile CTest suite; distinct Windows MSVC and macOS Clang
-jobs each passed a **32-test** platform-neutral compiler/CLI/C-ABI smoke profile.
-An additive Ubuntu Clang ASan/UBSan job separately passed **32/32** tests under
-the documented sanitizer runtime settings.
+#32374149046](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046)
+for revision `8fc1de5`. Its ordinary Linux job passed the full **47/47**
+recovery-profile CTest suite; distinct Windows MSVC and macOS Clang jobs each
+passed a **33-test** platform-neutral compiler/CLI/C-ABI smoke profile. An
+additive Ubuntu Clang ASan/UBSan job separately passed **33/33** tests under the
+documented sanitizer runtime settings.
 
 The same workflow includes distinct Ubuntu 22.04, Windows MSVC, and macOS Clang
 clean-install jobs. Each builds a minimal static SDK producer, installs it into a
 fresh temporary prefix, configures an external public-header C consumer through
 `CMAKE_PREFIX_PATH`, and executes that consumer. All three jobs passed in
-[the same platform-matrix run](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013).
+[the same platform-matrix run](https://github.com/TangoSplicer/SynQ/actions/runs/32374149046).
 
 The local confirmation made on 16 August 2026 used the following Ubuntu 24.04
 environment. It rebuilt the same recovery profile and independently passed the
@@ -32,16 +32,16 @@ evidence, not minimum-version guarantees.
 | Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` full recovery profile, `windows-latest` MSVC platform-neutral smoke and clean-install SDK jobs, `macos-latest` Clang platform-neutral smoke and clean-install SDK jobs, and fixed `ubuntu-22.04` static-SDK conformance job |
 | CMake | 3.28.3 | `apt` `cmake`; project requires CMake 3.18 or later |
 | C++ compiler | GCC 13.3.0 | `apt` `g++` on Ubuntu; MSVC via `windows-latest`; Apple Clang via `macos-latest`; project requires C++17 support |
-| Sanitizer compiler | Clang, isolated local profile | `apt` `clang` on `ubuntu-latest`; only the additive 32-test `SYNQ_ENABLE_SANITIZERS=ON` profile uses ASan/UBSan |
+| Sanitizer compiler | Clang, isolated local profile | `apt` `clang` on `ubuntu-latest`; only the additive 33-test `SYNQ_ENABLE_SANITIZERS=ON` profile uses ASan/UBSan |
 | OpenSSL | 3.0.13 | `apt` `libssl-dev` |
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
 
-> **Support boundary:** `windows-latest` has remote MSVC evidence for a 32-test
+> **Support boundary:** `windows-latest` has remote MSVC evidence for a 33-test
 > platform-neutral compiler/CLI/C-ABI smoke profile **and** an experimental
 > static-SDK clean-install external-consumer check. `macos-latest` has a separate
-> 32-test Clang platform-neutral smoke profile **and** an experimental static-SDK
-> clean-install external-consumer check. The full 46-test suite, the
+> 33-test Clang platform-neutral smoke profile **and** an experimental static-SDK
+> clean-install external-consumer check. The full 47-test suite, the
 > direct Rust, source-only Alpha Rust-wrapper, Common Lisp/Clojure/Mercury fixtures,
 > and OpenQASM Python reference checks
 > remain Ubuntu-only evidence. These CI results do not establish a stable ABI,
@@ -49,8 +49,8 @@ evidence, not minimum-version guarantees.
 > linking, general cross-platform distribution, other Linux distribution, ARM, or future ABI
 > compatibility claim.
 
-> **Sanitizer boundary:** Compiler Core #32369872013 adds Linux/Clang ASan/UBSan
-> evidence for a 32-test isolated core profile only. It does not instrument the
+> **Sanitizer boundary:** Compiler Core #32374149046 adds Linux/Clang ASan/UBSan
+> evidence for a 33-test isolated core profile only. It does not instrument the
 > Ubuntu full-recovery, Windows, macOS, SDK, language-interop, reference-parser,
 > or release artifact paths, and it is not a security certification.
 
@@ -90,7 +90,7 @@ assuming a distribution package provides an equivalent compiler.
 
 The Windows smoke job is deliberately separate from the Ubuntu full profile. It
 installs `nlohmann-json` and OpenSSL with vcpkg, builds the recovery compiler
-with MSVC, and runs the platform-neutral 32-test profile. A distinct Windows
+with MSVC, and runs the platform-neutral 33-test profile. A distinct Windows
 job now proves the experimental static SDK clean-install consumer path. Neither
 Windows job attempts the Ubuntu-only interoperability or Python-reference checks.
 
@@ -114,7 +114,7 @@ ctest --test-dir compiler/build -C Release --output-on-failure
 ## Reproduce the macOS Clang smoke profile
 
 The macOS job has an independent Homebrew and Clang setup. It proves the same
-32-test platform-neutral compiler/CLI/C-ABI smoke profile as Windows. A separate
+33-test platform-neutral compiler/CLI/C-ABI smoke profile as Windows. A separate
 macOS job proves the experimental static-SDK clean-install external-consumer
 path; neither job validates language-interoperability fixtures or package
 distribution.

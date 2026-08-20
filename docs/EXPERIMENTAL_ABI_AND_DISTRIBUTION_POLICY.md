@@ -31,7 +31,7 @@ the checked-in header, not this explanatory document.[1]
 | C ABI major | `SYNQ_ABI_VERSION` = `1` | The integer returned by `synq_abi_version()`. | It identifies the current experimental header shape; it is not a frozen ABI guarantee.[1] |
 | C ABI string | `synq-c-abi/1` | Static identifier returned by `synq_version()`. | It is library-owned, NUL-terminated, and must not be freed or modified by callers.[1] |
 | CLI version | `0.1.0-experimental` | Version string printed by `synqc --version`. | It labels a bounded experimental command, not the C ABI’s stability level or a general language release.[2] |
-| Evidence baseline | Compiler Core #45, 26/26 checks | The recovery compiler profile, including CLI and interop smoke checks, passed on GitHub Actions for implementation revision `202ebaf`.[3] | It does not test binary artifacts distributed to arbitrary systems. |
+| Evidence baseline | Compiler Core #32374149046, seven jobs | Revision `8fc1de5` passed 47/47 ordinary Linux CTests, 33/33 Windows MSVC and macOS Clang CTests, three static-SDK consumer jobs, and 33/33 Linux/Clang sanitizer CTests.[3] | It does not test binary archives distributed to arbitrary systems. |
 
 The CLI version and ABI major are **independent version domains**. A CLI version
 change does not by itself change the ABI major; an ABI-major change does not by
@@ -120,8 +120,9 @@ and ownership tests. The minimum evidence sequence is deliberately compatible
 with zero-cost local tooling and GitHub Actions:
 
 1. Build the recovery profile using the documented CMake command.
-2. Run `ctest --test-dir <build> --output-on-failure`; the current evidence
-   baseline is 26 focused checks.[3]
+2. Run `ctest --test-dir <build> --output-on-failure`; the current ordinary
+   Linux evidence baseline is 47 CTests, with separately scoped 33-test Windows,
+   macOS, and Linux/Clang sanitizer profiles.[3]
 3. Exercise `synqc --version` and the documented bounded CLI smoke path.
 4. For an intended CLI archive, run the documented local install and CPack
    commands, then inspect that the archive reflects only the configured CLI and
@@ -162,7 +163,7 @@ distribution or security claims.
 
 [2]: ../compiler/CMakeLists.txt "SynQ recovery CMake configuration"
 
-[3]: https://github.com/TangoSplicer/SynQ/actions/runs/31887461976 "SynQ Compiler Core #45 — successful 26-check recovery profile"
+[3]: https://github.com/TangoSplicer/SynQ/actions/runs/32374149046 "SynQ Compiler Core #32374149046 — seven-job deterministic replay baseline"
 
 [4]: ./C_ABI.md "SynQ C ABI Foundation"
 

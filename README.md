@@ -94,6 +94,8 @@ accepted/rejected control forms.
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |
+| [`docs/PACKAGING.md`](docs/PACKAGING.md) | Current source-build, CPack, CI-artifact, and public-release boundary. |
+| [`docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md`](docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md) | Proposed zero-cost Linux, macOS, and Windows CLI-archive, verification, provenance, and release-acceptance contract. |
 | [`docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md) | Fixed Ubuntu 22.04 static-SDK conformance evidence and limits. |
 | [`docs/BEGINNER_TUTORIAL.md`](docs/BEGINNER_TUTORIAL.md) | First build, validation, export, and local-probability walkthrough. |
 | [`docs/BEGINNER_EXPERIENCE.md`](docs/BEGINNER_EXPERIENCE.md) | Guided-playground and visual-lesson non-execution contract. |
