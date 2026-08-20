@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   release-candidate:
-    name: synqc candidate (${{ matrix.platform }}, ${{ runner.arch }})
+    name: synqc candidate (${{ matrix.platform }})
     strategy:
       fail-fast: false
       matrix:
