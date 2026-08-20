@@ -53,7 +53,7 @@ source downloads, exact CTest names, and platform labels.[3]
 | Cross-feature execution closure | U1/U2/U5/U6 have focused local meanings, but the matrix does not define or test all state/callable/feedback compositions. | Explicit composition contract and positive/negative cross-feature fixtures. |
 | Hybrid closure | U4 covers one terminal pair only; repeated results, branch bodies, `else`, and callable/result composition are unrepresented. | Independently specified bounded hybrid-control slice with local and source-representation tests. |
 | Differential evidence | No current fixture compares SynQ behavior against a second independently implemented semantic oracle for the same accepted profile. | A carefully scoped reference model or differential oracle, where technically meaningful. |
-| Fuzzing, sanitizers, and replay | The matrix has no checked-in sanitizer job, parser/runtime fuzz/property target, or replay protocol. | Zero-cost CI/local hardening design, fixtures, and evidence. |
+| Fuzzing, sanitizers, and replay | Compiler Core #32369872013 adds a 32-test Linux/Clang ASan/UBSan core profile; there is still no parser/runtime fuzz/property target or replay protocol. | Versioned fuzz/property targets, deterministic replay controls, corpus handling, and evidence. |
 | Release closure | No compatibility/deprecation policy, reproducible-build proof, known-limit ledger, release checklist, or two consecutive unchanged matrices exists. | Versioned release-candidate process and repeated six-job results. |
 
 ## Matrix maintenance rule

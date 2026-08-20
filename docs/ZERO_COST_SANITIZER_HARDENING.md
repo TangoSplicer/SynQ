@@ -1,8 +1,8 @@
 # SynQ Zero-Cost Sanitizer Hardening Contract
 
-**Status:** Locally validated implementation; remote verification pending. This
-document does not claim that a sanitizer build is remotely verified, or that a
-fuzz campaign, security audit, or runtime reliability closure has been completed.
+**Status:** Remotely verified additive reliability profile for revision
+`2965ec4`. This document does not claim that a fuzz campaign, security audit, or
+runtime reliability closure has been completed.
 
 ## Objective
 
@@ -65,8 +65,18 @@ CTests under `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1` and
 `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1`. The ordinary recovery profile
 was then rebuilt and passed **46/46** CTests without sanitizer instrumentation.
 Finally, configuring the sanitizer option with GNU C/C++ compilers failed with
-the documented `SYNQ_ENABLE_SANITIZERS requires Clang` message. These are local
-checks only; the additive workflow has not yet supplied remote evidence.
+the documented `SYNQ_ENABLE_SANITIZERS requires Clang` message.
+
+### Remote evidence — Compiler Core #32369872013
+
+[Compiler Core #32369872013][4] passed all **seven** jobs for `2965ec4`:
+the additive Ubuntu Clang ASan/UBSan profile passed **32/32** CTests with the
+documented options, the unchanged ordinary Ubuntu recovery profile passed
+**46/46**, Windows MSVC and macOS Clang platform-neutral profiles each passed
+**32/32**, and the three experimental static-SDK clean-install consumer jobs
+passed. This establishes sanitizer evidence only for the isolated Linux/Clang
+profile and its 32 listed tests; it does not imply that the ordinary or non-Linux
+profiles are sanitizer-instrumented.
 
 ## Explicit non-claims
 
@@ -82,3 +92,4 @@ handling, and reproduction contract.[3]
 [1]: https://clang.llvm.org/docs/AddressSanitizer.html "Clang AddressSanitizer documentation"
 [2]: https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html "Clang UndefinedBehaviorSanitizer documentation"
 [3]: https://llvm.org/docs/LibFuzzer.html "LLVM libFuzzer documentation"
+[4]: https://github.com/TangoSplicer/SynQ/actions/runs/32369872013 "SynQ Compiler Core — additive Linux Clang ASan/UBSan profile"

@@ -1,6 +1,6 @@
 # SynQ Project Status
 
-**Review date:** 19 August 2026
+**Review date:** 20 August 2026
 **Status:** Experimental recovery-profile evidence ledger. This document does
 not declare SynQ feature-complete, production-ready, or fully operational.
 
@@ -10,17 +10,17 @@ not declare SynQ feature-complete, production-ready, or fully operational.
 
 ## Current verified baseline
 
- [Compiler Core platform-matrix run #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206)
-passed all six independent jobs for revision `9a1a9b3`: the Linux recovery
-profile passed **46/46** CTest checks; Windows MSVC and macOS Clang each passed
-**32/32** platform-neutral CTest checks; and Ubuntu 22.04, Windows MSVC, and macOS
-Clang each built, installed, discovered, compiled, and ran the experimental static
-SDK consumer from a clean prefix. The exact tested-environment boundary is recorded in
-[`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
+[Compiler Core platform-matrix run #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013)
+passed all seven independent jobs for reliability revision `2965ec4`: the ordinary
+Linux recovery profile passed **46/46** CTest checks; Windows MSVC and macOS Clang
+each passed **32/32** platform-neutral CTest checks; Ubuntu 22.04, Windows MSVC,
+and macOS Clang each passed the experimental static-SDK consumer; and an additive
+Linux/Clang ASan/UBSan profile passed **32/32** isolated core tests. The exact
+tested-environment boundary is recorded in [`TESTED_ENVIRONMENTS.md`](./TESTED_ENVIRONMENTS.md).
 
 | Area | Verified status | Evidence and boundary |
 | --- | --- | --- |
-| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 46 CTests. Separate Windows MSVC and macOS Clang profiles each pass 32 platform-neutral compiler/CLI/C-ABI CTests. Optional historical targets remain outside these claims. |
+| Compiler core | **Remotely validated, independently scoped profiles.** | The Ubuntu Linux profile builds `libsynq_lib.a`, `synqc`, test-only `libsynq_ffi.so`, and passes 46 CTests. Separate Windows MSVC and macOS Clang profiles each pass 32 platform-neutral compiler/CLI/C-ABI CTests. An additive Linux/Clang 32-test ASan/UBSan profile covers only its isolated core configuration. Optional historical targets remain outside these claims. |
 | `synqc` CLI | **Remotely validated experimental workflow.** | Supports validation, bounded AST/strict-Hybrid OpenQASM source output, immutable/state evaluation, U5/U6 `--eval-runtime`, and bounded local probabilities. It is not a general executor, provider client, REPL, package manager, or stable CLI. |
 | Typed source model | **Remotely validated bounded subset.** | Supports immutable declarations, Alpha top-level mutable cells, typed gates, named measurement provenance, Alpha expressions, zero-parameter/U3 parameterized kernels, one U4 feedback pair, U5 one-formal local functions, and U6 two-formal same-type local functions. No general returns, lexical scopes, recursion, nested routine calls, general branch execution, target-side state lowering, or general runtime semantics exist. |
 | Bounded Boolean declaration evaluation | **Remotely validated Alpha compile-time subset.** | `synqc --eval-constants` deterministically evaluates immutable top-level Boolean literal/reference/`not`/`and`/`or` trees after static resolution, with default expression-depth `16`, request-wide operation budget `128`, and no short-circuit runtime meaning. Depth and operation exhaustion yield structured diagnostics. No assignment, state mutation, loop/branch execution, target-side expression execution, measurement-result value, or simulation execution is claimed. |
@@ -35,6 +35,7 @@ SDK consumer from a clean prefix. The exact tested-environment boundary is recor
 | Bounded measurement feedback | **Remotely validated U4 Alpha hybrid subset in [Compiler Core #32250265354](https://github.com/TangoSplicer/SynQ/actions/runs/32250265354).** | The `measurement-feedback` feature accepts one top-level named measurement immediately followed by one direct `if <same-result> then quantum x register[index]`. Resolver retains typed result provenance and rejects non-direct, reused, non-adjacent, invalid, and post-feedback forms. Strict Hybrid export emits one exporter-owned scalar bit, one measurement assignment, and one conditional `x`; local simulation enumerates the two measurement branches and returns weighted final probabilities without sampling. The C ABI explicitly rejects U4 nodes. No `else`, loop, generic control, general collapse API, target-side user state, routine feedback, provider, or hardware behavior is claimed. |
 | Bounded classical callable runtime | **Remotely validated U5 Alpha local subset in [Compiler Core #32266056516](https://github.com/TangoSplicer/SynQ/actions/runs/32266056516).** | The `classical-callable-execution` feature accepts one earlier `fn name(value: Integer|Boolean|String) ->` parameter-only body and one immutable `let result = name(actual)`. `--eval-runtime` uses one explicit local frame, checked `int64` arithmetic, exact static types, defaults of 32 declarations/128 invocations/depth 1/depth 16/128 operations, and atomic failure. Strict Hybrid export, bounded quantum simulation, and ABI v1 explicitly reject U5 nodes. No capture, mutable local state, multi-argument calls, returns, recursion, nested calls, target execution, provider, or hardware behavior is claimed. |
 | Bounded binary classical callable runtime | **Remotely validated U6 Alpha local subset in [Compiler Core #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206).** | The jointly gated `classical-callable-execution` and `multi-formal-classical-callables` features accept one earlier `fn name(left: Integer|Boolean, right: same-type) ->` documented binary body and one immutable ordered two-actual invocation. `--eval-runtime` uses a two-binding non-capturing frame, exact static types, checked `int64` arithmetic, deterministic Boolean operators, U5’s declaration/invocation/depth/expression/operation defaults, and atomic failure. Strict Hybrid export, bounded quantum simulation, and ABI v1 explicitly reject U6 nodes. No arbitrary arity, mixed types, String binary body, capture, mutable local state, returns, recursion, nested calls, target execution, provider, or hardware behavior is claimed. |
+| Zero-cost sanitizer core profile | **Remotely validated additive Linux/Clang test profile in [Compiler Core #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013).** | An opt-in `SYNQ_ENABLE_SANITIZERS=ON` build applies ASan/UBSan and passed 32/32 isolated core CTests with leak detection and halt-on-error settings. It does not establish sanitizer coverage for ordinary Linux recovery, Windows, macOS, SDK, interop, reference-parser, artifact, fuzzing, replay, audit, or production-security paths. |
 | Interoperability proofs | **Remotely exercised on the Ubuntu full profile.** | C, Rust, test-only Common Lisp/CFFI, test-only Clojure/JNA, and test-only Mercury C-backend fixtures use the opaque C ABI. The Windows profile intentionally excludes those toolchain-specific fixtures. They are not released wrappers or language packages. |
 | Alpha Rust wrapper | **Remotely exercised source-only adapter on the Ubuntu full profile.** | The dependency-free `synq-alpha` Cargo package owns the opaque program handle through RAII and exposes parse, OpenQASM 3 export, and ABI-identifier helpers. Three Cargo conformance tests pass through CMake against the test/build C ABI shared library. It is not published to a registry, bundled as a shared-library distribution, or a stable Rust API. |
 | Governance and maintenance | **Factual baseline published.** | `CHANGELOG.md`, contribution guidance, a security-reporting route, issue templates, support-environment guide, and ABI/distribution policy exist. They do not promise review times, support SLA, signing, or package availability. |

@@ -9,6 +9,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Zero-cost Clang sanitizer core profile:** The opt-in
+  `SYNQ_ENABLE_SANITIZERS=ON` CMake profile uses Clang AddressSanitizer and
+  UndefinedBehaviorSanitizer with frame pointers, non-recovering undefined
+  behavior diagnostics, leak detection, and halt-on-error settings. An additive
+  Linux Compiler Core job configures, builds, and runs the isolated core profile
+  without changing the established ordinary Linux, Windows, macOS, or static-SDK
+  jobs. [Compiler Core #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013)
+  passed all seven jobs for revision `2965ec4`: 32/32 sanitizer CTests, 46/46
+  ordinary Linux recovery CTests, 32/32 Windows MSVC and macOS Clang
+  platform-neutral CTests, and three clean-install static-SDK consumer jobs. The
+  sanitizer evidence is limited to that Linux/Clang 32-test profile; it does not
+  add fuzzing, property testing, deterministic replay, a security audit, a
+  production-hardening mode, a stable runtime, or hardware capability claim.
 - **Alpha bounded binary classical callable runtime (U6):** The jointly gated
   `classical-callable-execution` and `multi-formal-classical-callables` subset
   accepts one earlier `fn name(left: Integer|Boolean, right: same-type) ->`

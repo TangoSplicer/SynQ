@@ -6,8 +6,8 @@ announcement.
 workflow, the experimental opaque C ABI and static SDK path, the source-only Alpha
 Rust wrapper, and the factual public-facing project position.
 **Evidence cut-off:** Compiler Core platform-matrix run
-[#32270327206][1] for implementation revision `9a1a9b3`, with repository
-evidence records aligned through the bounded Alpha U6 binary-classical-callable update.
+[#32369872013][1] for reliability revision `2965ec4`, with repository evidence
+records aligned through the additive Linux/Clang sanitizer profile.
 
 ## Executive assessment
 
@@ -19,7 +19,8 @@ quantum subset. The current recovery profile passed **46/46** CTest checks
 locally and in the Ubuntu CI profile; independent Windows MSVC and macOS Clang
 profiles each passed **32/32** platform-neutral CTest checks. The same remote
 matrix passed Ubuntu 22.04, Windows MSVC, and macOS Clang experimental static-
-SDK external-consumer jobs.[1] [2] [3]
+SDK external-consumer jobs, and a separate Linux/Clang ASan/UBSan profile passed
+**32/32** isolated core CTests.[1] [2] [3]
 
 Seven deliberately constrained evidence increments are now implemented and tested:
 read-only inspection of resolved top-level classical bindings, declaration-order
@@ -64,11 +65,11 @@ remote evidence distinct.
 
 | Evidence level | Meaning in this assessment | Current examples |
 | --- | --- | --- |
-| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 46 Linux CTests; 32 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded `if` export; U3 parameterized routine source expansion; U4 feedback; U5 one-formal and U6 binary local callable evaluation; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
+| **Remotely validated** | The checked-in recovery profile passed in GitHub Actions. | 46 Linux CTests; 32 Windows and macOS platform-neutral CTests; three static-SDK consumer jobs; a separate 32-test Linux/Clang ASan/UBSan core profile; semantic inspection; local-only bounded mutable state; multi-register simulation; bounded `if` export; U3 parameterized routine source expansion; U4 feedback; U5 one-formal and U6 binary local callable evaluation; and the Ubuntu-only language fixture set, including the Alpha Rust wrapper.[1] |
 | **Locally validated** | The documented operation was executed in the review environment but is not itself a separate CI assertion. | Local build/test troubleshooting or exploratory work not represented by a dedicated checked-in remote fixture. |
 | **Designed or planned** | The repository describes an intended subsystem but lacks the active contract and evidence required for a capability claim. | General runtime, target-side user state/control execution, multiple-result feedback, registry packages, provider access, and AI services.[2] [7] |
 
-The distinction is material. The current six-job matrix establishes only the
+The distinction is material. The current seven-job matrix establishes only the
 scoped profile results named above. It does not establish cross-platform binary
 compatibility, performance thresholds, package availability, a stable ABI, or a
 general language implementation.[1] [3]
@@ -121,7 +122,7 @@ editor integration, or user-tested ergonomic study.
 | G4 — Quantum developer loop | Complete for local validate/export/simulate exploration, including bounded named-register allocation. | Remotely validated. | Add provider or hardware paths only with separate credentials, safety, and integration evidence. |
 | G5 — Tooling and diagnostics | Complete as a bounded compiler baseline. | Remotely validated. | Add stable textual/structured output policy, broader examples, and editor-facing diagnostics. |
 | G6 — Interoperability contract | Complete only as an experimental opaque-C-ABI foundation, three-environment static-SDK proof, and source-only Alpha Rust-wrapper proof. | Remotely validated, narrowly scoped. | Add artifact lifecycle evidence and any package delivery one ecosystem at a time. |
-| G7 — Performance and reliability | Build/test configuration is validated; no CI performance contract exists. | Remote build/test only. | Add reproducible benchmark matrix, regression thresholds, sanitizers, fuzzing, and security review. |
+| G7 — Performance and reliability | Ordinary build/test configuration and one isolated Linux/Clang ASan/UBSan core profile are validated; no CI performance contract exists. | Partially remotely validated. | Add reproducible benchmark matrix, regression thresholds, parser/runtime fuzz or property tests, deterministic replay, and security review. |
 | G8 — Distribution and maintenance | Versioned artifact configuration, environment guidance, contribution process, security route, and issue templates exist. | Mixed: remote compiler baseline; local package/archive checks. | Add signing/provenance, maintained known-issues practice, and only then any support or distribution claim. |
 
 ## Material gaps
@@ -248,7 +249,7 @@ revenue exploration, and future acquisition discussions.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32270327206 "SynQ Compiler Core platform matrix — bounded Alpha binary classical callable runtime"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32369872013 "SynQ Compiler Core platform matrix — additive Linux Clang ASan/UBSan profile"
 
 [2]: ./PROJECT_STATUS.md "Current SynQ Project Status"
 

@@ -9,12 +9,14 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206),
-which passed all six independently scoped jobs for revision `9a1a9b3`: **46/46**
-Linux recovery-profile CTests, **32/32** Windows MSVC and macOS Clang
-platform-neutral CTests, and Ubuntu 22.04, Windows MSVC, and macOS Clang
-clean-install static-SDK consumer checks. The tested
-environment and exact clean-install boundaries are documented in
+platform-matrix run #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013),
+which passed all seven independently scoped jobs for reliability revision
+`2965ec4`: **46/46** ordinary Ubuntu recovery-profile CTests, **32/32** Windows
+MSVC and macOS Clang platform-neutral CTests, three clean-install static-SDK
+consumer checks, and an additive **32/32** Ubuntu Clang ASan/UBSan core profile.
+The sanitizer profile is a narrow Linux/Clang testing configuration, not a
+security certification or non-Linux sanitizer claim. The tested environment and
+exact clean-install boundaries are documented in
 [`docs/TESTED_ENVIRONMENTS.md`](docs/TESTED_ENVIRONMENTS.md).
 
 | Area | Verified experimental capability | Explicit boundary |
@@ -85,6 +87,7 @@ accepted/rejected control forms.
 | [`docs/BINARY_CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md`](docs/BINARY_CLASSICAL_CALLABLE_RUNTIME_TUTORIAL.md) | Beginner-first U6 two-input local callable tutorial and safe failure explanation. |
 | [`docs/CONFORMANCE_FIXTURE_MANIFEST_v0.1.0.md`](docs/CONFORMANCE_FIXTURE_MANIFEST_v0.1.0.md) | Versioned index of 15 pinned entry fixtures, their CTest owners, profile boundaries, and direct raw-source downloads. |
 | [`docs/CONFORMANCE_REQUIREMENT_MATRIX_v0.1.0.md`](docs/CONFORMANCE_REQUIREMENT_MATRIX_v0.1.0.md) | Initial requirement-to-test mapping for the U1–U6 candidate subset, including named closure gaps. |
+| [`docs/ZERO_COST_SANITIZER_HARDENING.md`](docs/ZERO_COST_SANITIZER_HARDENING.md) | Remotely verified additive Linux/Clang ASan/UBSan core-profile evidence and its explicit exclusions. |
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |

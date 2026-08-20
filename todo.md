@@ -178,4 +178,5 @@
 - [ ] Build a versioned language conformance suite that runs positive, negative, differential, and regression fixtures in the free Compiler Core matrix, with coverage targets recorded as engineering evidence rather than a completeness percentage.
 - [x] Publish the first versioned requirement-to-test conformance matrix for the verified bounded U1–U6 local-runtime candidates, including requirement IDs, fixture owners, profile scope, and known closure gaps.
 - [ ] Add zero-budget reliability evidence: sanitizer-enabled builds where available, deterministic seed/replay controls, parser/runtime fuzzing or property tests, and a security/known-limit review.
+- [x] Add and remotely verify the first additive zero-cost Linux/Clang ASan/UBSan core profile (Compiler Core #32369872013: 32/32 sanitizer CTests alongside the unchanged six-job evidence matrix).
 - [ ] Publish a stable-runtime candidate only after the documented subset has a reproducible installation path, compatibility/deprecation policy, executable examples, diagnostics guide, release checklist, and repeated six-job remote evidence.

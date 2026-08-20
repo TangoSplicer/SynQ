@@ -9,16 +9,18 @@ it is not a cross-platform support promise.
 The recovery compiler profile is continuously exercised by the
 [`Compiler Core` workflow](../.github/workflows/compiler-core.yml). The latest
 remote evidence is [Compiler Core platform-matrix run
-#32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206)
-for revision `9a1a9b3`. Its Linux job passed the full **46/46** recovery-profile
-CTest suite; distinct Windows MSVC and macOS Clang jobs each passed a **32-test**
-platform-neutral compiler/CLI/C-ABI smoke profile.
+#32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013)
+for reliability revision `2965ec4`. Its ordinary Linux job passed the full
+**46/46** recovery-profile CTest suite; distinct Windows MSVC and macOS Clang
+jobs each passed a **32-test** platform-neutral compiler/CLI/C-ABI smoke profile.
+An additive Ubuntu Clang ASan/UBSan job separately passed **32/32** tests under
+the documented sanitizer runtime settings.
 
 The same workflow includes distinct Ubuntu 22.04, Windows MSVC, and macOS Clang
 clean-install jobs. Each builds a minimal static SDK producer, installs it into a
 fresh temporary prefix, configures an external public-header C consumer through
 `CMAKE_PREFIX_PATH`, and executes that consumer. All three jobs passed in
-[the same platform-matrix run](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206).
+[the same platform-matrix run](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013).
 
 The local confirmation made on 16 August 2026 used the following Ubuntu 24.04
 environment. It rebuilt the same recovery profile and independently passed the
@@ -30,6 +32,7 @@ evidence, not minimum-version guarantees.
 | Operating system | Ubuntu 24.04 | GitHub `ubuntu-latest` full recovery profile, `windows-latest` MSVC platform-neutral smoke and clean-install SDK jobs, `macos-latest` Clang platform-neutral smoke and clean-install SDK jobs, and fixed `ubuntu-22.04` static-SDK conformance job |
 | CMake | 3.28.3 | `apt` `cmake`; project requires CMake 3.18 or later |
 | C++ compiler | GCC 13.3.0 | `apt` `g++` on Ubuntu; MSVC via `windows-latest`; Apple Clang via `macos-latest`; project requires C++17 support |
+| Sanitizer compiler | Clang, isolated local profile | `apt` `clang` on `ubuntu-latest`; only the additive 32-test `SYNQ_ENABLE_SANITIZERS=ON` profile uses ASan/UBSan |
 | OpenSSL | 3.0.13 | `apt` `libssl-dev` |
 | JSON | `nlohmann-json3-dev` 3.11.3 | `apt` `nlohmann-json3-dev` |
 | Interop fixtures | Rust, SBCL/CFFI, Clojure/JNA, Mercury 22.01.8 | Installed or bootstrapped by Compiler Core |
@@ -45,6 +48,11 @@ evidence, not minimum-version guarantees.
 > shared-library delivery, registry package, broad package support, dynamic
 > linking, general cross-platform distribution, other Linux distribution, ARM, or future ABI
 > compatibility claim.
+
+> **Sanitizer boundary:** Compiler Core #32369872013 adds Linux/Clang ASan/UBSan
+> evidence for a 32-test isolated core profile only. It does not instrument the
+> Ubuntu full-recovery, Windows, macOS, SDK, language-interop, reference-parser,
+> or release artifact paths, and it is not a security certification.
 
 ## Reproduce the supported recovery profile
 

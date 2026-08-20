@@ -4,10 +4,12 @@
 SynQ already has a complete runtime, a stable release, a general-purpose
 language implementation, or a hardware service.
 
-**Current implementation baseline:** The remotely verified U6 binary-callable
-revision `9a1a9b3` passed [Compiler Core #32270327206][1]: 46/46 Linux recovery
-CTests, 32/32 Windows MSVC and macOS Clang platform-neutral CTests, and three
-clean-install experimental static-SDK consumer jobs.
+**Current language baseline:** The remotely verified U6 binary-callable revision
+`9a1a9b3` passed Compiler Core #32270327206. The later reliability revision
+`2965ec4` passed [Compiler Core #32369872013][1]: 46/46 ordinary Linux recovery
+CTests, 32/32 Windows MSVC and macOS Clang platform-neutral CTests, three
+clean-install experimental static-SDK consumer jobs, and a separate 32/32
+Linux/Clang ASan/UBSan core profile.
 
 ## Purpose
 
@@ -119,17 +121,20 @@ runs may therefore provide no-cost additional evidence.[3]
    model; source lowering remains separately described.
 4. **Conformance and hardening:** requirement-to-test matrix, regression corpus,
    fuzz/property targets, applicable sanitizers, deterministic replay, and
-   updated interoperability boundaries.
+   updated interoperability boundaries. The initial matrix and one isolated
+   sanitizer profile exist; that stage remains incomplete until the other named
+   evidence is delivered.
 5. **Release candidate:** reproducible rebuild/install path, compatibility
    policy, tutorials, known-limit ledger, and at least two consecutive clean
-   six-job Compiler Core matrices for an unchanged runtime profile.
+   unchanged Compiler Core matrices for an unchanged runtime profile, including
+   every then-required reliability job.
 
 Only after all five stages may the named runtime-subset claim be published.
 Hardware service remains outside this standard.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32270327206 "SynQ Compiler Core — Alpha bounded binary classical callable runtime"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32369872013 "SynQ Compiler Core — additive Linux Clang ASan/UBSan profile"
 [2]: https://www.nist.gov/itl/voting/conformance-testing-101 "NIST Conformance Testing 101"
 [3]: https://llvm.org/docs/LibFuzzer.html "LLVM libFuzzer documentation"
 [4]: https://reproducible-builds.org/ "Reproducible Builds"

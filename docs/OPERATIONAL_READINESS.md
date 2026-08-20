@@ -2,7 +2,7 @@
 
 **Status:** Planning and acceptance record. This document does not declare SynQ
 operationally ready.
-**Last reviewed:** 19 August 2026
+**Last reviewed:** 20 August 2026
 
 ## Purpose
 
@@ -21,7 +21,7 @@ evidence, and a maintenance model.
 
 | Area | Current evidence | Operational gap |
 | --- | --- | --- |
-| Compiler foundation | [Compiler Core #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206) passed 46/46 Linux recovery-profile checks and 32/32 Windows/macOS platform-neutral checks for revision `9a1a9b3`, plus Ubuntu 22.04, Windows MSVC, and macOS Clang static-SDK consumer jobs. | The grammar and semantics remain intentionally narrow. |
+| Compiler foundation | [Compiler Core #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013) passed seven jobs for reliability revision `2965ec4`: 46/46 ordinary Linux recovery checks, 32/32 Windows/macOS platform-neutral checks, three static-SDK consumer jobs, and an additive 32/32 Linux/Clang ASan/UBSan core profile. | The grammar and semantics remain intentionally narrow; sanitizer evidence is limited to its isolated Linux/Clang core profile. |
 | Source model | Typed gates, bounded classical metadata/evaluation, qubit declarations with Alpha named operands, documented `if` source-lowering forms, bounded simulation, U3 routines, U4 feedback, U5 one-formal local callable evaluation, and U6 two-formal same-type local callable evaluation exist behind exact gates/opt-ins. | No nested negation over results, binary-expression/alias/`else`/loop result control, general scopes/returns/recursion/nested calls, arbitrary arity or mixed-type calls, routine execution, or general executable classical semantics exists. |
 | Quantum path | AST/strict Hybrid OpenQASM export and a bounded local probability simulator are tested for exact supported subsets, including U4 source feedback and two-branch local feedback enumeration. | Source lowering and local simulation are not provider integration or hardware execution. |
 | Native interoperability | C, direct Rust, source-only Alpha Rust wrapper, test-only Common Lisp, test-only Clojure/JNA, and test-only Mercury consumers exercise an opaque C ABI. | There are no registry packages, stable safe wrappers, or a frozen ABI policy. |
@@ -38,7 +38,7 @@ evidence, and a maintenance model.
 | G3 — Quantum developer loop | **Remotely validated.** A developer can create one verified example, validate it, inspect/export it, and calculate bounded local probabilities without hardware claims in [Compiler Core #43](https://github.com/TangoSplicer/SynQ/actions/runs/31886881473). |
 | G4 — Tooling and diagnostics | **Remotely validated compiler baseline.** Versioned CLI smoke coverage, structured failures, source-aware diagnostics, reference documentation, and the documented CMake/CTest build path were compiled and tested in [Compiler Core #45](https://github.com/TangoSplicer/SynQ/actions/runs/31887461976). Stable output compatibility and wider examples remain gaps. |
 | G5 — Interoperability contract | **Remotely validated experimental foundation with published policy and SDK conformance.** The versioned opaque C ABI and each advertised test consumer are independently exercised by the recovery profile, including [Compiler Core #46](https://github.com/TangoSplicer/SynQ/actions/runs/31898767207). [`EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md`](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md) defines the v1 change, ownership, and delivery boundary; [`EXPERIMENTAL_NATIVE_SDK.md`](./EXPERIMENTAL_NATIVE_SDK.md) records remote clean-prefix static-SDK conformance. Supported-platform evidence, packages, and safe wrappers remain gaps. |
-| G6 — Performance and reliability | **Remotely validated build/test configuration; local-only performance observation.** The warnings/hardening-enabled recovery compiler profile and its 46 tests passed in [Compiler Core #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206); the fixed benchmark timing is not a CI gate. Regression thresholds, sanitizers, and broader security review remain gaps. |
+| G6 — Performance and reliability | **Partially remotely validated.** The ordinary 46-test recovery profile and additive Linux/Clang 32-test ASan/UBSan core profile passed in [Compiler Core #32369872013](https://github.com/TangoSplicer/SynQ/actions/runs/32369872013); the fixed benchmark timing is not a CI gate. Regression thresholds, parser/runtime fuzz or property testing, deterministic replay, and broader security review remain gaps. |
 | G7 — Distribution and maintenance | **Remotely validated compiler baseline; locally validated delivery operations.** The versioned CLI and package configuration compile with the 46-check recovery profile in [Compiler Core #32270327206](https://github.com/TangoSplicer/SynQ/actions/runs/32270327206), while installation and CPack archive generation were run locally. Tags, signing, support policy, security disclosure route, and a maintained known-issues ledger remain gaps. |
 
 ## Performance and ecosystem principles
