@@ -38,7 +38,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   workflow now accepts an optional existing `release_tag`, checks out and
   resolves that tag, rejects reserved/malformed or tag-to-checkout mismatches,
   and embeds the validated tag in the candidate manifest. The package smoke now
-  exercises a local tagged manifest invariant. This does not create tags, GitHub
+  exercises a local tagged manifest invariant. [synqc Release Candidate
+  #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347)
+  passed all three non-publishing candidate jobs and [Compiler Core
+  #32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066)
+  passed the exact-revision seven-job matrix. This does not create tags, GitHub
   Releases, release assets, installers, registry packages, signing, or
   notarization; those remain separately confirmed public actions.
 - **Deterministic parser/runtime replay and native-usage audit:** Added the

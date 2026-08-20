@@ -4,9 +4,9 @@
 asset, or Git tag has been created by this document.  
 **Proposed tag:** `v0.1.0-experimental` (**available on the remote at the time
 of this record**).  
-**Candidate source revision:** `fdbbbec43b75ec7cbc2efef1c62ec951f5800230`.  
-**Candidate workflow:** [synqc Release Candidate #32393670587][1].  
-**Required source evidence:** [Compiler Core #32394772652][2].
+**Candidate source revision:** `812528711dc9189ba7d1af27657821b9d54a39ab`.
+**Candidate workflow:** [synqc Release Candidate #32401780347][1].
+**Required source evidence:** [Compiler Core #32403435066][2].
 
 ## Decision record
 
@@ -14,7 +14,7 @@ The proposed tag deliberately matches the existing `synqc 0.1.0-experimental`
 CLI version. It is a **pre-release identifier**, not a stable-language, stable
 ABI, hardware-provider, package-manager, installer, signing, or notarization
 claim. The candidate source revision is the exact commit built by the completed
-three-platform candidate workflow; the required Compiler Core run independently
+three-platform tag-aware candidate workflow; the required Compiler Core run independently
 validated that same revision with 48/48 ordinary Linux CTests, 34/34 Windows
 MSVC and macOS Clang CTests, three SDK-consumer jobs, and 33/33 isolated
 Linux/Clang sanitizer CTests.[2]
@@ -24,21 +24,21 @@ Linux/Clang sanitizer CTests.[2]
 | Tag | `v0.1.0-experimental` | **Not created** |
 | Release title | `SynQ CLI v0.1.0-experimental (pre-release)` | Template only |
 | GitHub Release | One pre-release, not latest | **Not created** |
-| Target commit | `fdbbbec43b75ec7cbc2efef1c62ec951f5800230` | Remotely verified |
+| Target commit | `812528711dc9189ba7d1af27657821b9d54a39ab` | Remotely verified |
 | Archive provenance | GitHub Actions artifact attestations | Candidate evidence only |
 
 ## Retained candidate evidence
 
 The following files were generated, extracted, validated, attested, and retained
-by run #32393670587. They are **CI artifacts**, not GitHub Release assets. Their
+by run #32401780347. They are **CI artifacts**, not GitHub Release assets. Their
 hashes are recorded here only to make the final tagged candidate reproducible and
 auditable; they are not a user-download announcement.
 
 | Candidate platform / architecture | Retained candidate archive | SHA-256 | Candidate manifest |
 | --- | --- | --- | --- |
-| Linux / X64 | `synqc-0.1.0-experimental-linux-X64.tar.gz` | `e1ab54fbeab761039b4597ab39d22c8b1fb35ce5ec03917f65f2ba082e80ad92` | `synqc-0.1.0-experimental-linux-X64-manifest.json` |
-| macOS / ARM64 | `synqc-0.1.0-experimental-macos-ARM64.tar.gz` | `ad35809d9936a5d09b6c205e1d2cc3329e055b466e971521108f16029be2bbf3` | `synqc-0.1.0-experimental-macos-ARM64-manifest.json` |
-| Windows / X64 | `synqc-0.1.0-experimental-windows-X64.zip` | `104bc02451de637aef08c89582d647fdffad5fae6d196d113748d7ed077631a3` | `synqc-0.1.0-experimental-windows-X64-manifest.json` |
+| Linux / X64 | `synqc-0.1.0-experimental-linux-X64.tar.gz` | `7bf149ab839eb54f3208f3e4d28bb712433dafdb690e5fadca005e06ae144a91` | `synqc-0.1.0-experimental-linux-X64-manifest.json` |
+| macOS / ARM64 | `synqc-0.1.0-experimental-macos-ARM64.tar.gz` | `5e06a40b1e675244b0eeca2eb93093f456a6ac5433b6b24c69738dd2cfaab2ed` | `synqc-0.1.0-experimental-macos-ARM64-manifest.json` |
+| Windows / X64 | `synqc-0.1.0-experimental-windows-X64.zip` | `e22e1d19a3f3401b003161bfe3fd3bdf320809c580d6a30aa840ee74a1e38155` | `synqc-0.1.0-experimental-windows-X64-manifest.json` |
 
 > **Important:** Each retained candidate manifest has `release_tag:
 > "not-a-release"`. The files above must not be relabeled or uploaded as
@@ -66,5 +66,5 @@ text immediately before that action.
 
 ## References
 
-[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32393670587 "synqc Release Candidate #32393670587"
-[2]: https://github.com/TangoSplicer/SynQ/actions/runs/32394772652 "Compiler Core #32394772652"
+[1]: https://github.com/TangoSplicer/SynQ/actions/runs/32401780347 "synqc Release Candidate #32401780347"
+[2]: https://github.com/TangoSplicer/SynQ/actions/runs/32403435066 "Compiler Core #32403435066"

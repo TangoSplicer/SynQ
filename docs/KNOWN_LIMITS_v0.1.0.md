@@ -2,7 +2,7 @@
 
 **Status:** Versioned boundary ledger for the experimental recovery profile.  
 **Issued:** 20 August 2026.  
-**Evidence baseline:** [Compiler Core #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652), revision `fdbbbec`.
+**Evidence baseline:** [Compiler Core #32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066), revision `8125287`.
 
 > This ledger records what SynQ **does not** currently claim. A future capability
 > may be added only when it has a written contract, focused local tests, the full
@@ -19,7 +19,7 @@ macOS Clang platform-neutral CTests, three static-SDK consumer jobs, and a
 narrow 33/33 Linux/Clang ASan/UBSan core profile. It also has a five-source,
 eight-seed deterministic replay smoke target, plus a separately verified
 non-publishing candidate archive/manifest/checksum/extraction/attestation
-workflow. These are additive reliability evidence, **not** a security
+workflow with a validated optional existing-tag input. These are additive reliability evidence, **not** a security
 certification, continuous fuzzing service, public-package release, or a full
 fuzzing result.
 

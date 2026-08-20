@@ -1,7 +1,7 @@
 # synqc Non-Publishing Release-Candidate Pipeline Design v0.1.0
 
-**Status:** Remotely verified non-publishing candidate workflow.
-**Evidence:** [synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587), revision `fdbbbec`, 20 August 2026.
+**Status:** Remotely verified tag-aware non-publishing candidate workflow.
+**Evidence:** [synqc Release Candidate #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347), revision `8125287`, 20 August 2026.
 
 This document authorizes candidate archive creation and retention for test
 evidence only; it does not authorize creating, editing, or publishing a GitHub
@@ -18,7 +18,10 @@ a release exists.
 ## Trigger and source identity
 
 The candidate workflow runs on a narrow `main`-branch path set and by manual
-dispatch. It checks out the triggering commit and embeds its full SHA in each
+dispatch. Untagged runs check out the triggering commit and retain
+`release_tag: "not-a-release"`. A manual run may instead name an existing,
+non-reserved tag: the workflow checks out the tag, resolves its commit, and
+rejects a tag-to-checkout mismatch before embedding that tag and commit in each
 manifest. The workflow neither creates a tag nor calls a release-publishing API.
 Candidate artifact retention is a CI convenience, not a public download channel.
 
@@ -64,7 +67,7 @@ attestation as a provenance claim and warns that it is not, by itself, a securit
 guarantee.[1]
 
 The implemented workflow retained candidate archive attestations for Linux,
-macOS ARM64, and Windows X64 in run #32393670587. It does not attach an asset to
+macOS ARM64, and Windows X64 in run #32401780347. It does not attach an asset to
 a GitHub Release or assert user-facing provenance. A future release candidate
 must still pass the documented publication gates before any asset is published.
 
@@ -81,11 +84,11 @@ signing, or notarization; those remain separate confirmed actions.
 
 ## Verified run result
 
-The candidate workflow completed all three platform jobs. Each job built the
+The tag-aware candidate workflow completed all three platform jobs. Each job built the
 configured platform source profile, created its candidate archive, validated the
 exact extracted archive, generated a GitHub provenance attestation, and retained
 the candidate materials. Compiler Core
-[#32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652)
+[#32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066)
 also passed all seven jobs for the exact revision: 48/48 ordinary Linux CTests,
 34/34 Windows and macOS CTests, three SDK-consumer jobs, and 33/33 sanitizer
 CTests. This evidence is limited to the named CI platform/architecture candidates

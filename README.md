@@ -9,17 +9,17 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652),
-which passed all seven independently scoped jobs for revision `fdbbbec`:
+platform-matrix run #32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066),
+which passed all seven independently scoped jobs for revision `8125287`:
 **48/48** ordinary Ubuntu recovery-profile CTests, **34/34** Windows MSVC and
 macOS Clang platform-neutral CTests, three clean-install static-SDK consumer
 checks, and an additive **33/33** Ubuntu Clang ASan/UBSan core profile. The added
 ordinary-platform check creates, content-checks, hash-checks, extracts, and
 executes a non-published CLI candidate archive. Separately,
-[synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587)
+[synqc Release Candidate #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347)
 passed Linux, macOS ARM64, and Windows X64 candidate archive, attestation, and
-retention jobs. Those artifacts are CI evidence, not GitHub Release assets or
-public packages. The deterministic replay target remains a checked-in five-source
+retention jobs with the optional validated-tag workflow input. Those artifacts
+are CI evidence, not GitHub Release assets or public packages. The deterministic replay target remains a checked-in five-source
 SynQ corpus with eight fixed single-byte mutation seeds; it is not continuous
 fuzzing, a security certification, or a non-Linux sanitizer claim. The tested
 environment and exact clean-install boundaries are documented in

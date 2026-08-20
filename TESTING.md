@@ -1,7 +1,7 @@
 # SynQ Testing and Evidence Guide
 
 **Status:** Current guide for the bounded experimental recovery profile.
-**Evidence baseline:** [Compiler Core #32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652), revision `fdbbbec`.
+**Evidence baseline:** [Compiler Core #32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066), revision `8125287`.
 
 > Test counts are evidence snapshots, not a coverage percentage, a complete
 > language claim, a security certification, or a promise that every tracked file

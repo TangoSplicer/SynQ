@@ -12,11 +12,11 @@ non-publishing candidate workflow creates CLI-only Linux, macOS ARM64, and
 Windows X64 archives; writes JSON and SHA-256 manifests; enforces a contents
 allowlist; extracts each exact archive; runs CLI smoke checks; generates GitHub
 provenance attestations; and retains the results as CI artifacts. The workflow
-passed as [synqc Release Candidate #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587).
+passed as [synqc Release Candidate #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347). Its optional manual tag input checks out and resolves an existing tag before embedding it in a non-published manifest; this run used the untagged `not-a-release` path.
 
 The exact source-build baseline is Compiler Core
-[#32394772652](https://github.com/TangoSplicer/SynQ/actions/runs/32394772652),
-revision `fdbbbec`: 48/48 ordinary Linux CTests, 34/34 Windows MSVC and macOS
+[#32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066),
+revision `8125287`: 48/48 ordinary Linux CTests, 34/34 Windows MSVC and macOS
 Clang CTests, three experimental static-SDK consumer jobs, and 33/33 Linux/Clang
 sanitizer CTests. None of this publishes GitHub Release assets, user-downloadable
 checksums, signed binaries, installers, or package-manager entries.
@@ -35,7 +35,8 @@ ZIPs, SHA-256 manifests, clean-extraction tests, immutable GitHub Release assets
 optional GitHub provenance attestations, explicit unsigned macOS/Windows limits,
 and separate acceptance gates before publication.
 
-> The candidate archive gates are implemented and passed for revision `fdbbbec`.
+> The candidate archive gates, including the optional validated-tag input, are
+> implemented and passed for revision `8125287`.
 > SynQ still has source-build/install paths and retained CI artifacts—not
 > published public CLI packages. A separate confirmed publication step remains
 > required.

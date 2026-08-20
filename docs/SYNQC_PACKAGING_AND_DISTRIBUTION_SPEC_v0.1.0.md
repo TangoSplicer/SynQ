@@ -191,7 +191,10 @@ own.
 
 The non-publishing candidate workflow generates GitHub artifact attestations for
 the exact Linux, macOS ARM64, and Windows X64 candidate archives in
-[run #32393670587](https://github.com/TangoSplicer/SynQ/actions/runs/32393670587).
+[run #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347).
+The same run verified the optional existing-tag input and its tag-to-checkout
+guard, while retaining `release_tag: "not-a-release"` because no public tag was
+created for that run.
 The future public-release workflow must retain that gate and document
 `gh attestation verify` against the published repository and release asset.
 GitHub describes attestations as cryptographically signed
