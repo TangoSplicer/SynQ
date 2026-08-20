@@ -40,6 +40,21 @@ and separate acceptance gates before publication.
 > published public CLI packages. A separate confirmed publication step remains
 > required.
 
+## Prepared release-readiness records
+
+The proposed tag, exact candidate-asset evidence, and tag-to-asset publication
+boundary are recorded in
+[`EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md`](./EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md).
+That proposed tag has not been created and the retained candidate archives have
+not been relabeled as public assets.
+
+For future users, [`EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md`](./EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md)
+explains checksum, optional release-integrity, GitHub-attestation, and
+non-executing identification checks. The reusable
+[`EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md`](./EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md)
+requires exact tag, commit, archive, hash, extraction, provenance, and
+experimental-boundary values before public publication.
+
 ## Current local commands
 
 ```bash

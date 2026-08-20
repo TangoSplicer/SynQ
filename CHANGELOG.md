@@ -9,6 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- **Prepared experimental release-readiness records:** Added a proposed-tag
+  record for `v0.1.0-experimental`, tied to the exact remotely verified
+  candidate revision and retained CI archive hashes without creating the tag or
+  a GitHub Release. Added a user-facing archive-verification guide and a
+  reusable pre-release notes template with explicit SHA-256, optional
+  release-integrity, GitHub-attestation, extraction, experimental-boundary, and
+  final-confirmation checks. These records prepare a future release only; no
+  public asset, signing/notarization, installer, package-manager package, or
+  support commitment has been created.
 - **Non-publishing synqc candidate archives:** Added a portable CMake
   candidate packager and extraction smoke target that stages only `synqc`,
   licenses, current bounded-profile documentation, a notice, and version JSON;

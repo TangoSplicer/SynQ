@@ -102,6 +102,9 @@ accepted/rejected control forms.
 | [`docs/PACKAGING.md`](docs/PACKAGING.md) | Current source-build, CPack, CI-artifact, and public-release boundary. |
 | [`docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md`](docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md) | Proposed zero-cost Linux, macOS, and Windows CLI-archive, verification, provenance, and release-acceptance contract. |
 | [`docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md`](docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md) | Remotely verified non-publishing candidate-archive, extraction, and provenance workflow with the release-publication boundary. |
+| [`docs/EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md`](docs/EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md) | Proposed `v0.1.0-experimental` tag, exact candidate commit, retained CI-asset hashes, and confirmation-gated publication record. |
+| [`docs/EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md`](docs/EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md) | User-facing SHA-256, release-integrity, provenance, and non-executing CLI-identification instructions for a future public pre-release. |
+| [`docs/EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md`](docs/EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md) | Reusable pre-release notes and publication checklist with exact tag, commit, asset, evidence, and boundary fields. |
 | [`docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md) | Fixed Ubuntu 22.04 static-SDK conformance evidence and limits. |
 | [`docs/BEGINNER_TUTORIAL.md`](docs/BEGINNER_TUTORIAL.md) | First build, validation, export, and local-probability walkthrough. |
 | [`docs/BEGINNER_EXPERIENCE.md`](docs/BEGINNER_EXPERIENCE.md) | Guided-playground and visual-lesson non-execution contract. |
