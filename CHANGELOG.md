@@ -28,6 +28,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   49/49 ordinary Linux, 35/35 Windows MSVC/macOS Clang, three static-SDK
   consumers, and 34/34 sanitizer CTests. This verifies only the narrow
   composition/rejection contract, not runtime or conformance completion.
+- **Local evaluator value-composition fixture:** Added
+  `synq_local_classical_evaluation_value_composition_smoke` and its
+  `LCEP-COMP-002` contract. It confirms existing Integer, Boolean, and String
+  immutable behavior, typed mutable cells, U5 Integer/Boolean/String results,
+  U6 Boolean results, and atomic rejection boundaries across the separate local
+  modes. It adds no evaluator composition or language semantics. The local
+  ordinary recovery suite (50/50) and isolated sanitizer profile (35/35) passed,
+  followed by all seven jobs in [Compiler Core
+  #32496656921](https://github.com/TangoSplicer/SynQ/actions/runs/32496656921):
+  50/50 ordinary Linux, 36/36 Windows MSVC/macOS Clang, three static-SDK
+  consumers, and 35/35 sanitizer CTests. This verifies only narrow
+  value-diversity and separation evidence, not runtime or conformance completion.
 
 ## [v0.1.0-experimental] - 2026-08-21
 

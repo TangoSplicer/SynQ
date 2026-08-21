@@ -9,11 +9,11 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32485055898](https://github.com/TangoSplicer/SynQ/actions/runs/32485055898),
-which passed all seven independently scoped jobs for revision `8d939d1`:
-**49/49** ordinary Ubuntu recovery-profile CTests, **35/35** Windows MSVC and
+platform-matrix run #32496656921](https://github.com/TangoSplicer/SynQ/actions/runs/32496656921),
+which passed all seven independently scoped jobs for revision `366cbd9`:
+**50/50** ordinary Ubuntu recovery-profile CTests, **36/36** Windows MSVC and
 macOS Clang platform-neutral CTests, three clean-install static-SDK consumer
-checks, and an additive **34/34** Ubuntu Clang ASan/UBSan core profile. The added
+checks, and an additive **35/35** Ubuntu Clang ASan/UBSan core profile. The added
 ordinary-platform check creates, content-checks, hash-checks, extracts, and
 executes a candidate CLI archive. The final tag-aware workflow,
 [synqc Release Candidate #32482750179](https://github.com/TangoSplicer/SynQ/actions/runs/32482750179),
@@ -101,6 +101,7 @@ accepted/rejected control forms.
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
 | [`docs/LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md) | Draft named profile for the existing local constants, state, and U5/U6 callable evaluator modes; it records mode separation and acceptance gaps without claiming runtime completion. |
 | [`docs/LOCAL_CLASSICAL_EVALUATION_COMPOSITION_CONTRACT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_COMPOSITION_CONTRACT_v0.1.0.md) | Remotely verified narrow LCEP-COMP mode-composition and rejection contract; it proves existing evaluator separation, not runtime completion or new semantics. |
+| [`docs/LOCAL_CLASSICAL_EVALUATION_VALUE_COMPOSITION_CONTRACT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_VALUE_COMPOSITION_CONTRACT_v0.1.0.md) | Remotely verified LCEP-COMP-002 value-diversity extension for existing immutable, state, U5, and U6 behavior; it does not compose evaluator modes or establish a complete runtime. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |

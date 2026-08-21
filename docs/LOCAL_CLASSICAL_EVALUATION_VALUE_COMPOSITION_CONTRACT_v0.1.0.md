@@ -1,7 +1,6 @@
 # SynQ Local Classical Evaluation Value-Composition Contract v0.1.0
 
-**Status:** Implemented fixture contract; local verification passed and remote
-verification is pending. It extends the profile-level evaluator-separation evidence only. It
+**Status:** Remotely verified narrow fixture contract. It extends the profile-level evaluator-separation evidence only. It
 does **not** add a type, expression, evaluator composition, callable behavior,
 or complete-runtime claim.
 
@@ -41,11 +40,13 @@ smoke profile. It is intended to run in ordinary Linux, Windows, macOS, and the
 isolated Linux/Clang sanitizer configuration.
 
 The complete local recovery suite passed 50/50 and the isolated local
-Linux/Clang sanitizer profile passed 35/35 for this implementation. No
-value-composition evidence may be called verified until the required seven-job
-Compiler Core matrix also passes for its exact implementation revision. Even
-after that gate, the fixture will remain evidence for existing evaluator
-separation—not a unified runtime or profile closure.
+Linux/Clang sanitizer profile passed 35/35 for this implementation. The exact
+revision then passed all seven jobs in [Compiler Core
+#32496656921](https://github.com/TangoSplicer/SynQ/actions/runs/32496656921):
+50/50 ordinary Linux CTests, 36/36 Windows and macOS CTests, three SDK-consumer
+jobs, and 35/35 sanitizer CTests. This is verified narrow value-diversity
+evidence only; it remains evidence for existing evaluator separation—not a
+unified runtime or profile closure.
 
 ## References
 
