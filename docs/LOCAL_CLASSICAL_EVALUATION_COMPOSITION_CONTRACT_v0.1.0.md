@@ -36,7 +36,10 @@ remain authoritative.
 `compiler/tests/smoke/local_classical_evaluation_composition_smoke.cpp` owns the
 fixture and is registered as `synq_local_classical_evaluation_composition_smoke`.
 It uses the ordinary core-smoke registration, so it enters the ordinary Linux,
-Windows, macOS, and additive sanitizer configurations when those profiles are
-run. A local pass is only local evidence. The requirement is not recorded as
-remotely verified until the full local recovery suite and the seven-job Compiler
-Core matrix both pass for the implementation revision.
+Windows, macOS, and additive sanitizer configurations. The full local recovery
+suite passed 49/49 and the isolated local sanitizer profile passed 34/34. The
+same implementation revision passed all seven jobs in [Compiler Core
+#32485055898](https://github.com/TangoSplicer/SynQ/actions/runs/32485055898):
+49/49 ordinary Linux CTests, 35/35 Windows and macOS CTests, three SDK-consumer
+jobs, and 34/34 sanitizer CTests. This is verified narrow mode-separation
+evidence, not profile completion.

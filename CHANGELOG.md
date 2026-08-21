@@ -22,9 +22,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   `LCEP-COMP-001` contract. It checks the agreement of the three existing modes
   on immutable declarations and their atomic rejection of state/callable,
   callable-only, mixed state/callable, and quantum shapes. It adds no evaluator
-  composition or language semantics. The local ordinary recovery suite and
-  isolated sanitizer profile passed; remote matrix verification remains required
-  before this evidence is described as verified.
+  composition or language semantics. The local ordinary recovery suite (49/49)
+  and isolated sanitizer profile (34/34) passed, followed by all seven jobs in
+  [Compiler Core #32485055898](https://github.com/TangoSplicer/SynQ/actions/runs/32485055898):
+  49/49 ordinary Linux, 35/35 Windows MSVC/macOS Clang, three static-SDK
+  consumers, and 34/34 sanitizer CTests. This verifies only the narrow
+  composition/rejection contract, not runtime or conformance completion.
 
 ## [v0.1.0-experimental] - 2026-08-21
 

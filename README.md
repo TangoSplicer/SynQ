@@ -9,11 +9,11 @@
 ## Verified baseline
 
 The latest independently validated compiler baseline is [Compiler Core
-platform-matrix run #32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066),
-which passed all seven independently scoped jobs for revision `8125287`:
-**48/48** ordinary Ubuntu recovery-profile CTests, **34/34** Windows MSVC and
+platform-matrix run #32485055898](https://github.com/TangoSplicer/SynQ/actions/runs/32485055898),
+which passed all seven independently scoped jobs for revision `8d939d1`:
+**49/49** ordinary Ubuntu recovery-profile CTests, **35/35** Windows MSVC and
 macOS Clang platform-neutral CTests, three clean-install static-SDK consumer
-checks, and an additive **33/33** Ubuntu Clang ASan/UBSan core profile. The added
+checks, and an additive **34/34** Ubuntu Clang ASan/UBSan core profile. The added
 ordinary-platform check creates, content-checks, hash-checks, extracts, and
 executes a candidate CLI archive. The final tag-aware workflow,
 [synqc Release Candidate #32482750179](https://github.com/TangoSplicer/SynQ/actions/runs/32482750179),
@@ -100,7 +100,7 @@ accepted/rejected control forms.
 | [`docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md`](docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md) | Remotely verified fixed-corpus parser/lowering/resolution/bounded-evaluation replay contract, exact seeds, reproduction command, and exclusions. |
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
 | [`docs/LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md) | Draft named profile for the existing local constants, state, and U5/U6 callable evaluator modes; it records mode separation and acceptance gaps without claiming runtime completion. |
-| [`docs/LOCAL_CLASSICAL_EVALUATION_COMPOSITION_CONTRACT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_COMPOSITION_CONTRACT_v0.1.0.md) | Narrow LCEP-COMP mode-composition and rejection contract; local fixture evidence is pending the required remote matrix before it may be called verified. |
+| [`docs/LOCAL_CLASSICAL_EVALUATION_COMPOSITION_CONTRACT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_COMPOSITION_CONTRACT_v0.1.0.md) | Remotely verified narrow LCEP-COMP mode-composition and rejection contract; it proves existing evaluator separation, not runtime completion or new semantics. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |
