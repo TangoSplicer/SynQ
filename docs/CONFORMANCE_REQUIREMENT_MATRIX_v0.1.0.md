@@ -49,7 +49,7 @@ source downloads, exact CTest names, and platform labels.[3]
 
 | Closure requirement from the runtime standard | Current matrix finding | Required next evidence |
 | --- | --- | --- |
-| Versioned semantic-profile specification | Feature contracts exist, but there is no single closed profile defining all values, scopes, effects, evaluation order, errors, and exclusions together. | Normative named profile plus requirement IDs for every supported and rejected construct. |
+| Versioned semantic-profile specification | A draft named profile now records the three mutually exclusive local evaluator modes, values, scope, budgets, and exclusions, but it is not yet an accepted closed grammar/effect specification. | Convert the draft into a normative profile with requirement IDs and executable evidence for every supported and rejected construct. |
 | Cross-feature execution closure | U1/U2/U5/U6 have focused local meanings, but the matrix does not define or test all state/callable/feedback compositions. | Explicit composition contract and positive/negative cross-feature fixtures. |
 | Hybrid closure | U4 covers one terminal pair only; repeated results, branch bodies, `else`, and callable/result composition are unrepresented. | Independently specified bounded hybrid-control slice with local and source-representation tests. |
 | Differential evidence | No current fixture compares SynQ behavior against a second independently implemented semantic oracle for the same accepted profile. | A carefully scoped reference model or differential oracle, where technically meaningful. |

@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+- **Draft local classical evaluation profile:** Added
+  `LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md`, a source-grounded
+  vocabulary for the existing mutually exclusive constants, state, and U5/U6
+  local callable evaluator modes. It records values, source-order scope,
+  non-capturing frames, current budgets, diagnostic families, rejected
+  cross-mode/hybrid shapes, learnability obligations, and the profile-level
+  conformance work still required. It is a draft contract, not a complete
+  runtime, conformance, stable-API, or new execution-capability claim.
+
 ## [v0.1.0-experimental] - 2026-08-21
 
 ### Released

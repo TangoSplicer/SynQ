@@ -99,6 +99,7 @@ accepted/rejected control forms.
 | [`docs/ZERO_COST_SANITIZER_HARDENING.md`](docs/ZERO_COST_SANITIZER_HARDENING.md) | Remotely verified additive Linux/Clang ASan/UBSan core-profile evidence and its explicit exclusions. |
 | [`docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md`](docs/DETERMINISTIC_PARSER_RUNTIME_REPLAY.md) | Remotely verified fixed-corpus parser/lowering/resolution/bounded-evaluation replay contract, exact seeds, reproduction command, and exclusions. |
 | [`docs/RUNTIME_SUBSET_CLAIM_STANDARD.md`](docs/RUNTIME_SUBSET_CLAIM_STANDARD.md) | Zero-cost, learnability, differentiation, security, and evidence gates for any future named runtime-subset claim. |
+| [`docs/LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md`](docs/LOCAL_CLASSICAL_EVALUATION_PROFILE_DRAFT_v0.1.0.md) | Draft named profile for the existing local constants, state, and U5/U6 callable evaluator modes; it records mode separation and acceptance gaps without claiming runtime completion. |
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |
