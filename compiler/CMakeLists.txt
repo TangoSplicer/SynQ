@@ -219,6 +219,11 @@ if(BUILD_CORE_SMOKE_TESTS)
     target_link_libraries(synq_local_classical_evaluation_composition_smoke PRIVATE synq_lib)
     add_test(NAME synq_local_classical_evaluation_composition_smoke COMMAND synq_local_classical_evaluation_composition_smoke)
 
+    add_executable(synq_local_classical_evaluation_value_composition_smoke tests/smoke/local_classical_evaluation_value_composition_smoke.cpp)
+    target_include_directories(synq_local_classical_evaluation_value_composition_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(synq_local_classical_evaluation_value_composition_smoke PRIVATE synq_lib)
+    add_test(NAME synq_local_classical_evaluation_value_composition_smoke COMMAND synq_local_classical_evaluation_value_composition_smoke)
+
     add_executable(synq_bounded_simulator_smoke tests/smoke/bounded_simulator_smoke.cpp)
     target_include_directories(synq_bounded_simulator_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(synq_bounded_simulator_smoke PRIVATE synq_lib)
