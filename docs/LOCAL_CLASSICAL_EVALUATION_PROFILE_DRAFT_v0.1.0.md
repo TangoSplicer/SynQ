@@ -168,7 +168,7 @@ remotely verified against one frozen profile revision.
 | Draft requirement | Missing closure | Minimum evidence to accept |
 | --- | --- | --- |
 | `LCEP-SPEC-001` | The three modes are documented separately but not yet versioned as a closed grammar/type/effect specification. | Normative accepted/rejected grammar inventory, exact mode-selection rules, and versioned change policy. |
-| `LCEP-COMP-001` | Cross-mode composition is intentionally rejected but not comprehensively represented in one test matrix. | Positive and negative fixtures for every cell in the mode-separation table, including callable/state and quantum/classical crossings. |
+| `LCEP-COMP-001` | A narrow local composition/rejection fixture now covers shared immutable declarations plus state/callable, callable-only, mixed state/callable, and quantum crossings; it is not remotely verified or comprehensive. | Pass the required remote matrix, then extend the matrix deliberately to every remaining cell in the mode-separation table. |
 | `LCEP-DIAG-001` | Current diagnostics are structured but not a frozen category-and-remediation contract. | Stable category mapping, source-span assertions, and beginner-facing invalid examples for every profile family. |
 | `LCEP-LIMIT-001` | Individual U1/U2/U5/U6 limits exist; profile-wide resource and source-size boundaries are incomplete. | Exact boundary fixtures for every listed budget and an explicit decision on source-size, memory, and step limits. |
 | `LCEP-REL-001` | Fixed deterministic replay and one sanitizer profile exist; continuous fuzz/property evidence does not. | Bounded parser/runtime property or fuzz target with deterministic reproducers, corpus policy, and applicable sanitizer coverage. |

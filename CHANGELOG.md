@@ -17,6 +17,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   cross-mode/hybrid shapes, learnability obligations, and the profile-level
   conformance work still required. It is a draft contract, not a complete
   runtime, conformance, stable-API, or new execution-capability claim.
+- **Local evaluator composition fixture:** Added the narrow
+  `synq_local_classical_evaluation_composition_smoke` CTest and its
+  `LCEP-COMP-001` contract. It checks the agreement of the three existing modes
+  on immutable declarations and their atomic rejection of state/callable,
+  callable-only, mixed state/callable, and quantum shapes. It adds no evaluator
+  composition or language semantics. The local ordinary recovery suite and
+  isolated sanitizer profile passed; remote matrix verification remains required
+  before this evidence is described as verified.
 
 ## [v0.1.0-experimental] - 2026-08-21
 
