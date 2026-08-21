@@ -1,7 +1,6 @@
 # SynQ Local Classical Evaluation Full Matrix Contract v0.1.0
 
-**Status:** Implemented fixture contract; local verification passed and remote
-verification is pending. This is a completeness claim only for the **current parser-resolvable
+**Status:** Remotely verified fixture contract. This is a completeness claim only for the **current parser-resolvable
 top-level evaluator-dispatch categories** listed below. It does not claim all
 program permutations, diagnostic completeness, language completeness, or a
 complete runtime.
@@ -55,11 +54,13 @@ core-smoke profile and is intended for ordinary Linux, Windows, macOS, and the
 isolated Linux/Clang sanitizer profile.
 
 The full local recovery suite passed 51/51 and the isolated local Linux/Clang
-sanitizer profile passed 36/36 for this implementation. This contract may be
-called verified only after the exact implementation revision’s seven-job
-Compiler Core matrix also passes. Even then, it will establish a complete
-**current dispatch-category matrix**, not a unified evaluator, runtime, stable
-API, hardware service, or security claim.
+sanitizer profile passed 36/36 for this implementation. The exact revision then
+passed all seven jobs in [Compiler Core
+#32533581417](https://github.com/TangoSplicer/SynQ/actions/runs/32533581417):
+51/51 ordinary Linux CTests, 37/37 Windows and macOS CTests, three SDK-consumer
+jobs, and 36/36 sanitizer CTests. This establishes a complete **current
+dispatch-category matrix**, not a unified evaluator, runtime, stable API,
+hardware service, or security claim.
 
 ## References
 

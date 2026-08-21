@@ -40,6 +40,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   50/50 ordinary Linux, 36/36 Windows MSVC/macOS Clang, three static-SDK
   consumers, and 35/35 sanitizer CTests. This verifies only narrow
   value-diversity and separation evidence, not runtime or conformance completion.
+- **Local evaluator full dispatch-matrix fixture:** Added
+  `synq_local_classical_evaluation_full_matrix_smoke` and its
+  `LCEP-COMP-003` contract. It covers the remaining parser-resolvable top-level
+  evaluator-dispatch categories: qubits, direct gates, standalone measurement,
+  controls with gate or measurement bodies, and parameterized quantum routine
+  declaration/call sources. Each mode rejects atomically after a preceding
+  immutable declaration. The local ordinary recovery suite (51/51) and isolated
+  sanitizer profile (36/36) passed, followed by all seven jobs in [Compiler Core
+  #32533581417](https://github.com/TangoSplicer/SynQ/actions/runs/32533581417):
+  51/51 ordinary Linux, 37/37 Windows MSVC/macOS Clang, three static-SDK
+  consumers, and 36/36 sanitizer CTests. This completes only the current
+  parser-resolvable evaluator-dispatch matrix; it does not establish grammar,
+  diagnostic, limit, regression, runtime, ABI, hardware, or security completion.
 
 ## [v0.1.0-experimental] - 2026-08-21
 

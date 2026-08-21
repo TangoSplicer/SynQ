@@ -1,7 +1,7 @@
 # SynQ Testing and Evidence Guide
 
 **Status:** Current guide for the bounded experimental recovery profile.
-**Evidence baseline:** [Compiler Core #32496656921](https://github.com/TangoSplicer/SynQ/actions/runs/32496656921), revision `366cbd9`.
+**Evidence baseline:** [Compiler Core #32533581417](https://github.com/TangoSplicer/SynQ/actions/runs/32533581417), revision `cbdab9c`.
 
 > Test counts are evidence snapshots, not a coverage percentage, a complete
 > language claim, a security certification, or a promise that every tracked file
@@ -18,10 +18,10 @@ foreign-language conformance fixtures.
 
 | Evidence layer | Current scope | Explicit exclusion |
 | --- | --- | --- |
-| Ordinary recovery profile | 50 Ubuntu CTests for parser, semantics, bounded evaluator, evaluator-mode composition and value diversity, exporter, simulator, CLI, C ABI, deterministic replay, candidate-package extraction, and named interop checks. | A project-wide test inventory or coverage figure. |
-| Platform-neutral smoke | 36 CTests each on Windows MSVC and macOS Clang, including evaluator-mode composition, value diversity, and candidate-package extraction. | Toolchain-specific Lisp, Clojure, Mercury, reference-parser, and related Ubuntu-only checks. |
+| Ordinary recovery profile | 51 Ubuntu CTests for parser, semantics, bounded evaluator, evaluator-mode composition, value diversity, and current dispatch-matrix coverage; exporter, simulator, CLI, C ABI, deterministic replay, candidate-package extraction, and named interop checks. | A project-wide test inventory or coverage figure. |
+| Platform-neutral smoke | 37 CTests each on Windows MSVC and macOS Clang, including evaluator-mode composition, value diversity, current dispatch-matrix coverage, and candidate-package extraction. | Toolchain-specific Lisp, Clojure, Mercury, reference-parser, and related Ubuntu-only checks. |
 | Native SDK consumers | Clean-install static C SDK consumers on Ubuntu 22.04, Windows MSVC, and macOS Clang. | Shared-library distribution, a frozen ABI, or released language packages. |
-| Sanitizer profile | 35 isolated Linux/Clang ASan/UBSan core CTests, including deterministic replay, evaluator-mode composition, and value diversity. | Continuous fuzzing, all-platform sanitizer coverage, external-parser coverage, or security certification. |
+| Sanitizer profile | 36 isolated Linux/Clang ASan/UBSan core CTests, including deterministic replay, evaluator-mode composition, value diversity, and current dispatch-matrix coverage. | Continuous fuzzing, all-platform sanitizer coverage, external-parser coverage, or security certification. |
 
 ## Build and run the ordinary local recovery profile
 
