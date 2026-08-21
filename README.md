@@ -15,11 +15,14 @@ which passed all seven independently scoped jobs for revision `8125287`:
 macOS Clang platform-neutral CTests, three clean-install static-SDK consumer
 checks, and an additive **33/33** Ubuntu Clang ASan/UBSan core profile. The added
 ordinary-platform check creates, content-checks, hash-checks, extracts, and
-executes a non-published CLI candidate archive. Separately,
-[synqc Release Candidate #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347)
-passed Linux, macOS ARM64, and Windows X64 candidate archive, attestation, and
-retention jobs with the optional validated-tag workflow input. Those artifacts
-are CI evidence, not GitHub Release assets or public packages. The deterministic replay target remains a checked-in five-source
+executes a candidate CLI archive. The final tag-aware workflow,
+[synqc Release Candidate #32482750179](https://github.com/TangoSplicer/SynQ/actions/runs/32482750179),
+passed Linux X64, macOS ARM64, and Windows X64 candidate archive, extraction,
+attestation, and retention jobs for the published
+[`v0.1.0-experimental` pre-release](https://github.com/TangoSplicer/SynQ/releases/tag/v0.1.0-experimental).
+The nine uploaded files are three CLI-only archives, three JSON manifests, and
+three platform checksum files; the archives remain unsigned, the macOS archive
+is not notarized, and no installer or package-manager claim is made. The deterministic replay target remains a checked-in five-source
 SynQ corpus with eight fixed single-byte mutation seeds; it is not continuous
 fuzzing, a security certification, or a non-Linux sanitizer claim. The tested
 environment and exact clean-install boundaries are documented in
@@ -99,11 +102,11 @@ accepted/rejected control forms.
 | [`docs/C_ABI.md`](docs/C_ABI.md) | Authoritative opaque C ABI contract. |
 | [`docs/INTEROPERABILITY_CONTRACT.md`](docs/INTEROPERABILITY_CONTRACT.md) | Consumer-proof and package-distribution boundaries. |
 | [`docs/EXPERIMENTAL_NATIVE_SDK.md`](docs/EXPERIMENTAL_NATIVE_SDK.md) | Installed static SDK/CMake-package path. |
-| [`docs/PACKAGING.md`](docs/PACKAGING.md) | Current source-build, CPack, CI-artifact, and public-release boundary. |
+| [`docs/PACKAGING.md`](docs/PACKAGING.md) | Current source-build, CPack, published experimental CLI-archive, and delivery boundaries. |
 | [`docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md`](docs/SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md) | Proposed zero-cost Linux, macOS, and Windows CLI-archive, verification, provenance, and release-acceptance contract. |
 | [`docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md`](docs/SYNQC_RELEASE_CANDIDATE_PIPELINE_DESIGN_v0.1.0.md) | Remotely verified non-publishing candidate-archive, extraction, and provenance workflow with the release-publication boundary. |
-| [`docs/EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md`](docs/EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md) | Proposed `v0.1.0-experimental` tag, exact candidate commit, retained CI-asset hashes, and confirmation-gated publication record. |
-| [`docs/EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md`](docs/EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md) | User-facing SHA-256, release-integrity, provenance, and non-executing CLI-identification instructions for a future public pre-release. |
+| [`docs/EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md`](docs/EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md) | Published `v0.1.0-experimental` tag, exact candidate commit, final archive hashes, and release-gate record. |
+| [`docs/EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md`](docs/EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md) | User-facing SHA-256, release-integrity, provenance, and non-executing CLI-identification instructions for the public experimental pre-release. |
 | [`docs/EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md`](docs/EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md) | Reusable pre-release notes and publication checklist with exact tag, commit, asset, evidence, and boundary fields. |
 | [`docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md`](docs/SECOND_CLEAN_INSTALL_ENVIRONMENT.md) | Fixed Ubuntu 22.04 static-SDK conformance evidence and limits. |
 | [`docs/BEGINNER_TUTORIAL.md`](docs/BEGINNER_TUTORIAL.md) | First build, validation, export, and local-probability walkthrough. |

@@ -1,9 +1,9 @@
 # Verify an Experimental `synqc` CLI Archive
 
-**Status:** User-facing instructions prepared before the first public CLI
-release. There are currently **no public SynQ CLI release assets** to download.  
-**Scope:** Linux X64, macOS ARM64, and Windows X64 CLI-only archives after a
-future confirmed pre-release is published.
+**Status:** User-facing instructions for the published
+[`v0.1.0-experimental` pre-release](https://github.com/TangoSplicer/SynQ/releases/tag/v0.1.0-experimental).
+**Scope:** Linux X64, macOS ARM64, and Windows X64 CLI-only archives from that
+experimental pre-release.
 
 ## Purpose and trust boundary
 
@@ -25,7 +25,7 @@ Open the repository’s **Releases** page and find the exact pre-release tag
 listed in its release notes. Download only these three release assets plus their
 corresponding JSON manifests and `SHA256SUMS.txt` files:
 
-| Platform | Future archive filename pattern | Local trust boundary |
+| Platform | Published archive filename | Local trust boundary |
 | --- | --- | --- |
 | Linux X64 | `synqc-0.1.0-experimental-linux-X64.tar.gz` | Unsigned experimental archive; no package-manager claim. |
 | macOS ARM64 | `synqc-0.1.0-experimental-macos-ARM64.tar.gz` | Unsigned and not notarized unless release notes explicitly say otherwise. |

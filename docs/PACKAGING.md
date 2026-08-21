@@ -1,25 +1,28 @@
 # synqc Packaging Status and Specification Index
 
-**Status:** Remotely verified non-publishing candidate-archive path plus the
-public-release acceptance boundary. This is not a public binary-release
-announcement.
+**Status:** Published `v0.1.0-experimental` GitHub pre-release with verified
+CLI-only archives. It remains an unsigned, experimental delivery path—not a
+stable runtime or ABI release, installer, package-manager package, signing, or
+notarization announcement.
 
 ## Current delivery position
 
 The recovery CMake profile builds `synqc 0.1.0-experimental`, installs it with
 `cmake --install`, and configures a local ZIP-oriented CPack path. The new
-non-publishing candidate workflow creates CLI-only Linux, macOS ARM64, and
+tag-aware candidate workflow creates CLI-only Linux, macOS ARM64, and
 Windows X64 archives; writes JSON and SHA-256 manifests; enforces a contents
 allowlist; extracts each exact archive; runs CLI smoke checks; generates GitHub
 provenance attestations; and retains the results as CI artifacts. The workflow
-passed as [synqc Release Candidate #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347). Its optional manual tag input checks out and resolves an existing tag before embedding it in a non-published manifest; this run used the untagged `not-a-release` path.
+passed as [synqc Release Candidate #32482750179](https://github.com/TangoSplicer/SynQ/actions/runs/32482750179). Its optional manual tag input checks out and resolves an existing tag before embedding it in the manifest; the final run embedded `v0.1.0-experimental`.
 
 The exact source-build baseline is Compiler Core
 [#32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066),
 revision `8125287`: 48/48 ordinary Linux CTests, 34/34 Windows MSVC and macOS
 Clang CTests, three experimental static-SDK consumer jobs, and 33/33 Linux/Clang
-sanitizer CTests. None of this publishes GitHub Release assets, user-downloadable
-checksums, signed binaries, installers, or package-manager entries.
+sanitizer CTests. The approved final candidate files are published in the
+[`v0.1.0-experimental` pre-release](https://github.com/TangoSplicer/SynQ/releases/tag/v0.1.0-experimental): three archives, three manifests, and three
+platform checksum files. They are not signed binaries, installers, or
+package-manager entries.
 
 The CMake delivery surface can include an experimental static SDK when
 `BUILD_RECOVERY_NATIVE_SDK=ON`; that is a source/CMake integration path, not a
@@ -27,29 +30,29 @@ distributed CLI bundle or stable ABI. The test-only shared ABI and consumer
 fixtures are never a release-library product. See
 [`EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md`](./EXPERIMENTAL_ABI_AND_DISTRIBUTION_POLICY.md).
 
-## Proposed path
+## Implemented experimental path
 
 [`SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md`](./SYNQC_PACKAGING_AND_DISTRIBUTION_SPEC_v0.1.0.md)
-defines the proposed zero-cost path: CLI-only Linux/macOS archives and Windows
+defines the zero-cost path: CLI-only Linux/macOS archives and Windows
 ZIPs, SHA-256 manifests, clean-extraction tests, immutable GitHub Release assets,
 optional GitHub provenance attestations, explicit unsigned macOS/Windows limits,
-and separate acceptance gates before publication.
+and acceptance gates before publication.
 
 > The candidate archive gates, including the optional validated-tag input, are
-> implemented and passed for revision `8125287`.
-> SynQ still has source-build/install paths and retained CI artifacts—not
-> published public CLI packages. A separate confirmed publication step remains
-> required.
+> implemented and passed for the `v0.1.0-experimental` tag target. The three
+> corresponding CLI archives are now published as an experimental pre-release;
+> source-build/install paths, static SDK boundaries, and all non-runtime limits
+> remain unchanged.
 
-## Prepared release-readiness records
+## Published release record and verification
 
-The proposed tag, exact candidate-asset evidence, and tag-to-asset publication
-boundary are recorded in
+The published tag, exact candidate-asset evidence, and tag-to-asset publication
+record are recorded in
 [`EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md`](./EXPERIMENTAL_RELEASE_CANDIDATE_RECORD_v0.1.0.md).
-That proposed tag has not been created and the retained candidate archives have
-not been relabeled as public assets.
+The public [GitHub pre-release](https://github.com/TangoSplicer/SynQ/releases/tag/v0.1.0-experimental) uploads only the three CLI archives, their JSON manifests,
+and their platform checksum files.
 
-For future users, [`EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md`](./EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md)
+For users of the published pre-release, [`EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md`](./EXPERIMENTAL_CLI_ARCHIVE_VERIFICATION.md)
 explains checksum, optional release-integrity, GitHub-attestation, and
 non-executing identification checks. The reusable
 [`EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md`](./EXPERIMENTAL_RELEASE_NOTES_TEMPLATE.md)

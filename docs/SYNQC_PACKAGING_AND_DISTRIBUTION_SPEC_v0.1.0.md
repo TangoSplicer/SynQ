@@ -1,9 +1,9 @@
 # synqc Packaging and Distribution Specification v0.1.0
 
-**Status:** Proposed experimental release specification. It is a design and
-acceptance contract, **not** evidence that SynQ currently publishes platform
-archives, checksums, provenance attestations, signed binaries, installers, or
-operating-system packages.
+**Status:** Experimental release specification with one published evidence-bound
+pre-release. The design and acceptance contract does not establish signed
+binaries, installers, operating-system packages, a stable runtime, or a stable
+ABI.
 
 **Applies to:** The recovery-profile `synqc` command-line executable on Linux,
 macOS, and Windows. It does not package a stable C ABI, shared library,
@@ -21,11 +21,16 @@ The current recovery CMake profile builds `synqc 0.1.0-experimental` and
 configures a local CPack ZIP path. The Compiler Core workflow uploads build
 artifacts separately on Linux, Windows, and macOS; it does not create GitHub
 Release assets, checksum manifests, signatures, attestations, installers, or
-package-manager entries. [1] [2] The most recent compiler evidence, run
-[#32374149046][3] for revision `8fc1de5`, covers source builds and tests: 47/47
-ordinary Linux CTests, 33/33 Windows MSVC CTests, 33/33 macOS Clang CTests, three
-static-SDK consumer jobs, and 33/33 Linux/Clang sanitizer CTests. It does not
-validate a released archive on a consumer machine.
+package-manager entries. [1] [2] The final tag-aware candidate workflow then
+validated and produced Linux X64, macOS ARM64, and Windows X64 CLI-only archives
+with manifests, checksums, extraction smoke checks, and provenance attestations;
+the nine verification files were published in the
+[`v0.1.0-experimental` pre-release](https://github.com/TangoSplicer/SynQ/releases/tag/v0.1.0-experimental).
+The exact source evidence, [Compiler Core #32403435066][3], covers the tag
+target with 48/48 ordinary Linux CTests, 34/34 Windows MSVC CTests, 34/34 macOS
+Clang CTests, three static-SDK consumer jobs, and 33/33 Linux/Clang sanitizer
+CTests. The release does not validate a consumer-machine installation beyond the
+same-platform clean-extraction smoke checks.
 
 > **A build artifact is not a release.** A release claim begins only after the
 > exact downloadable archive, its verification material, and its clean
@@ -35,9 +40,9 @@ validate a released archive on a consumer machine.
 | Delivery surface | Current status | This specification proposes | Explicit non-claim until gates pass |
 | --- | --- | --- | --- |
 | Source build | Documented and remotely exercised on the three CI operating-system families. | Keep as the canonical fallback and debugging route. | A source build does not create a supported binary package. |
-| CPack archive | Configured and locally described as ZIP-only; prior local archive inspection is older evidence. | Replace as the public mechanism with per-platform, CLI-only release archives. | No archive is currently published or remotely acceptance-tested. |
+| CPack archive | Configured and locally described as ZIP-only; prior local archive inspection is older evidence. | Replace as the public mechanism with per-platform, CLI-only release archives. | CPack output itself is not the published archive mechanism. |
 | GitHub Actions artifact | Current CI uploads build outputs. | Use only as a workflow intermediate; promote verified files into immutable GitHub Release assets. | CI artifact retention is not public release retention or provenance. |
-| GitHub Release asset | Not published. | First public channel once every release gate passes. | No release tag, asset, hash, or immutable-release verification exists today. |
+| GitHub Release asset | Published experimentally for Linux X64, macOS ARM64, and Windows X64 at `v0.1.0-experimental`. | Retain the same tag/manifest/checksum/extraction gates for later releases. | No stable ABI/runtime, signing, notarization, installer, or package-manager support claim. |
 | Native installer/package registry | Not published. | Deferred. | No `.msi`, `.pkg`, `.deb`, `.rpm`, Homebrew, Chocolatey, winget, apt, or equivalent claim. |
 
 ## 2. Release-channel decision
@@ -189,13 +194,14 @@ own.
 
 ### 5.2 Implemented candidate provenance gate
 
-The non-publishing candidate workflow generates GitHub artifact attestations for
+The final tag-aware candidate workflow generated GitHub artifact attestations for
 the exact Linux, macOS ARM64, and Windows X64 candidate archives in
-[run #32401780347](https://github.com/TangoSplicer/SynQ/actions/runs/32401780347).
-The same run verified the optional existing-tag input and its tag-to-checkout
-guard, while retaining `release_tag: "not-a-release"` because no public tag was
-created for that run.
-The future public-release workflow must retain that gate and document
+[run #32482750179](https://github.com/TangoSplicer/SynQ/actions/runs/32482750179).
+It verified the optional existing-tag input and its tag-to-checkout guard, then
+embedded `v0.1.0-experimental` in each manifest. The matching three archives,
+manifests, and SHA-256 files were published in the
+[`v0.1.0-experimental` pre-release](https://github.com/TangoSplicer/SynQ/releases/tag/v0.1.0-experimental).
+Any later public-release workflow must retain that gate and document
 `gh attestation verify` against the published repository and release asset.
 GitHub describes attestations as cryptographically signed
 provenance claims containing workflow, repository, commit, and trigger context,
@@ -215,7 +221,7 @@ path until it has its own clean-install evidence.
 
 ## 6. Build and release workflow contract
 
-The future workflow name should be `synqc-release.yml`. It must trigger only
+Any later dedicated publishing workflow should be `synqc-release.yml`. It must trigger only
 from a maintainer-approved version tag or explicit manual dispatch that supplies
 an exact tag and commit. It must never publish from an unreviewed pull request or
 from the moving `main` branch.

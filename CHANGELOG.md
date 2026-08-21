@@ -8,6 +8,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [v0.1.0-experimental] - 2026-08-21
+
+### Released
+- **Published experimental CLI pre-release:** Created the annotated
+  `v0.1.0-experimental` tag at commit
+  `812528711dc9189ba7d1af27657821b9d54a39ab` and published one GitHub
+  pre-release, explicitly not latest. The release uploads three CLI-only
+  archives, three matching JSON manifests, and three platform-specific
+  `SHA256SUMS.txt` files. Final tag-aware candidate workflow
+  [#32482750179](https://github.com/TangoSplicer/SynQ/actions/runs/32482750179)
+  passed Linux X64, macOS ARM64, and Windows X64 archive creation, extraction,
+  CLI smoke, and provenance-attestation-generation jobs. The exact tag target
+  had already passed all seven Compiler Core jobs in
+  [#32403435066](https://github.com/TangoSplicer/SynQ/actions/runs/32403435066).
+  The archives are unsigned; the macOS archive is not notarized. This is not a
+  stable runtime or ABI release, installer, package-manager package, hardware
+  service, provider integration, or general platform-support commitment.
+
 ### Added
 - **Prepared experimental release-readiness records:** Added a proposed-tag
   record for `v0.1.0-experimental`, tied to the exact remotely verified
